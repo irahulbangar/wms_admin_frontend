@@ -2,10 +2,12 @@ import ProtectedRoute from './Components/ProtectedRoute';
 import Login from './Components/Login';
 import HomePage from './Components/HomePage';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
   return (
+    <ThemeProvider>
       <AuthProvider>
         <Router>
           <div className="App">
@@ -24,6 +26,7 @@ function App() {
           </div>
         </Router>
       </AuthProvider>
+    </ThemeProvider>
   );
 }
 

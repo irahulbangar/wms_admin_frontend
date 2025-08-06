@@ -1,5 +1,260 @@
 @import "tailwindcss";
 
+/* Light Theme CSS Variables */
+:root {
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-gradient-start: #f8fafc;
+  --bg-gradient-middle: #e0f2fe;
+  --bg-gradient-end: #e0e7ff;
+  
+  /* Text Colors */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+  
+  /* Border Colors */
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --border-accent: #3b82f6;
+  --border-focus: #3b82f6;
+  
+  /* Accent Colors */
+  --accent-primary: #3b82f6;
+  --accent-secondary: #1d4ed8;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --accent-info: #06b6d4;
+  
+  /* Input Colors */
+  --input-bg: #eef1f4;
+  --input-border: #d1d5db;
+  --input-text: #111827;
+  --input-placeholder: #9ca3af;
+  --input-focus-border: #3b82f6;
+  --input-focus-ring: rgba(59, 130, 246, 0.5);
+  
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  /* Dashboard Specific Colors */
+  --dashboard-bg: #f8fafc;
+  --dashboard-card-bg: #ffffff;
+  --dashboard-card-border: #e2e8f0;
+  --dashboard-header-bg: rgba(255, 255, 255, 0.8);
+  --dashboard-sidebar-bg: #ffffff;
+  --dashboard-sidebar-border: #e2e8f0;
+  
+  /* Status Colors */
+  --status-online: #10b981;
+  --status-offline: #6b7280;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
+  
+  /* Hover States */
+  --hover-bg-primary: #f1f5f9;
+  --hover-bg-secondary: #e2e8f0;
+  --hover-text-primary: #1e293b;
+  --hover-border-primary: #cbd5e1;
+}
+
+/* Dark Theme CSS Variables - Matching Screenshot */
+.dark {
+  /* Background Colors - Lighter dark like screenshot */
+  --bg-primary: #374151;
+  --bg-secondary: #4b5563;
+  --bg-tertiary: #6b7280;
+  --bg-card: #4b5563;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-gradient-start: #374151;
+  --bg-gradient-middle: #4b5563;
+  --bg-gradient-end: #6b7280;
+  
+  /* Text Colors */
+  --text-primary: #f1f5f9;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-inverse: #111827;
+  
+  /* Border Colors */
+  --border-primary: #4b5563;
+  --border-secondary: #6b7280;
+  --border-accent: #3b82f6;
+  --border-focus: #60a5fa;
+  
+  /* Accent Colors */
+  --accent-primary: #3b82f6;
+  --accent-secondary: #60a5fa;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --accent-info: #06b6d4;
+  
+  /* Input Colors */
+  --input-bg: #4b5563;
+  --input-border: #6b7280;
+  --input-text: #f9fafb;
+  --input-placeholder: #9ca3af;
+  --input-focus-border: #60a5fa;
+  --input-focus-ring: rgba(96, 165, 250, 0.3);
+  
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  
+  /* Dashboard Specific Colors - Matching Screenshot */
+  --dashboard-bg: #374151;
+  --dashboard-card-bg: #4b5563;
+  --dashboard-card-border: #6b7280;
+  --dashboard-header-bg: rgba(55, 65, 81, 0.8);
+  --dashboard-sidebar-bg: #4b5563;
+  --dashboard-sidebar-border: #6b7280;
+  
+  /* Status Colors */
+  --status-online: #10b981;
+  --status-offline: #6b7280;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
+  
+  /* Hover States */
+  --hover-bg-primary: #4b5563;
+  --hover-bg-secondary: #6b7280;
+  --hover-text-primary: #f3f4f6;
+  --hover-border-primary: #9ca3af;
+}
+
+/* Theme Utility Classes */
+.bg-theme-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-theme-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-theme-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.bg-theme-card {
+  background-color: var(--bg-card);
+}
+
+.text-theme-primary {
+  color: var(--text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+
+.text-theme-tertiary {
+  color: var(--text-tertiary);
+}
+
+.text-theme-muted {
+  color: var(--text-muted);
+}
+
+.border-theme-primary {
+  border-color: var(--border-primary);
+}
+
+.border-theme-secondary {
+  border-color: var(--border-secondary);
+}
+
+.border-theme-accent {
+  border-color: var(--border-accent);
+}
+
+.input-theme {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
+}
+
+.input-theme::placeholder {
+  color: var(--input-placeholder);
+}
+
+.input-theme:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.shadow-theme-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-theme-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-theme-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-theme-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+/* Dashboard Theme */
+.dashboard-bg {
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-middle) 50%, var(--bg-gradient-end) 100%);
+}
+
+.dashboard-card {
+  background-color: var(--dashboard-card-bg);
+  border: 1px solid var(--dashboard-card-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard-header {
+  background-color: var(--dashboard-header-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.dashboard-sidebar {
+  background-color: var(--dashboard-sidebar-bg);
+  border-right: 1px solid var(--dashboard-sidebar-border);
+}
+
+.hover-theme-primary:hover {
+  background-color: var(--hover-bg-primary);
+}
+
+.hover-theme-secondary:hover {
+  background-color: var(--hover-bg-secondary);
+}
+
+/* Global Theme Transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+html {
+  transition: background-color 0.3s ease;
+}
+
+body {
+  transition: background-color 0.3s ease;
+}
+
 @keyframes panBackground {
     0% {
         background-position: 0% center;

@@ -145,10 +145,10 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                     return (
                       <button
                         key={submenu.id}
-                        className={`w-full flex items-center text-left p-2 text-sm text-theme-secondary hover:text-theme-primary hover-theme-primary rounded-lg transition-all ${
+                        className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all ${
                           currentPage === submenu.id || submenu.active
                             ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
-                            : "text-theme-secondary hover:text-theme-primary"
+                            : "text-theme-primary hover:text-theme-primary"
                         }`}
                         onClick={() => {
                           onPageChange(submenu.id);
