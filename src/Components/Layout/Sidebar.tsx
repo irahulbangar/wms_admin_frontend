@@ -9,6 +9,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+interface SubmenuItem {
+  id: string;
+  label: string;
+  active: boolean;
+  icon: React.ReactNode;
+  href: string;
+}
+
 const menuItems = [
   {
     id: "dashboard",
@@ -27,18 +35,18 @@ const menuItems = [
         label: "Devices",
         active: false,
         icon: <Monitor className="w-5 h-5" />,
-        href: "/devices",
+        href: "/organization/devices",
       },
       {
         id: "users",
-        label: "Organization Users",
+        label: "Users",
         active: false,
         icon: <User className="w-5 h-5" />,
         href: "/organization/users",
       },
       {
         id: "organization-setting",
-        label: "Organization Setting",
+        label: "Setting",
         active: false,
         icon: <Settings className="w-5 h-5" />,
         href: "/organization/setting",
@@ -95,6 +103,19 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
     setExpanded(newExpanded);
   };
 
+  const handleSubmenuClick = (submenu: SubmenuItem) => {
+    // For devices submenu, navigate to the devices page
+    if (submenu.id === 'devices') {
+      onPageChange('devices');
+    } else if (submenu.id === 'users') {
+      onPageChange('users');
+    } else if (submenu.id === 'organization-setting') {
+      onPageChange('organization-setting');
+    } else {
+      onPageChange(submenu.id);
+    }
+  };
+
   return (
     <div
       className={`transition-all duration-300 ease-in-out bg-theme-primary backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10 ${
@@ -141,7 +162,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
               {/* Submenu */}
               {!collapsed && item.submenu && expanded.has(item.id) && (
                 <div className="ml-8 mt-2 space-y-1">
-                  {item.submenu?.map((submenu) => {
+                  {item.submenu?.map((submenu: SubmenuItem) => {
                     return (
                       <button
                         key={submenu.id}
@@ -151,7 +172,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                             : "text-theme-primary hover:text-theme-primary"
                         }`}
                         onClick={() => {
-                          onPageChange(submenu.id);
+                          handleSubmenuClick(submenu);
                         }}
                       >
                         {submenu.icon}
