@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@keyframes panBackground {
+    0% {
+        background-position: 0% center;
+    }
+    100% {
+        background-position: 100% center;
+    }
+}
+
+.animate-pan-background {
+    animation: panBackground 20s ease-in-out infinite;
+}
