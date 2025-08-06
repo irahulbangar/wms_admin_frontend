@@ -8,16 +8,54 @@ import {
   Moon,
   User,
   Settings,
+  LogOut,
+  User as UserIcon,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
+  onPageChange?: (page: string) => void;
 }
 
-const Header = ({ onToggleSidebar }: HeaderProps) => {
+const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setIsDropdownOpen(false);
+  };
+
+  const handleProfile = () => {
+    if (onPageChange) {
+      onPageChange('profile');
+    }
+    setIsDropdownOpen(false);
+  };
+
   return (
     <div className="bg-theme-primary backdrop-blur-xl border-b border-theme-primary px-6 py-4 shadow-theme-sm">
       <div className="flex items-center justify-between">
@@ -34,7 +72,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
               Dashboard
             </h1>
             <p className="text-theme-secondary">
-              Welcome back, Jhon!
+              Welcome back, {user?.email || 'User'}!
             </p>
           </div>
         </div>
@@ -75,20 +113,51 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
             <Settings className="w-5 h-5" />
           </button>
 
-          {/* Profile */}
-          <div
-            className="flex items-center space-x-3 pl-3 border-l border-theme-primary"
-          >
-            <User className="w-5 h-5 text-theme-primary" />
-            <div className="hidden md:block">
-              <p className="text-sm font-medium text-theme-primary">
-                Jhon Doe
-              </p>
-              <p className="text-xs text-theme-muted">
-                Administrator
-              </p>
-            </div>
-            <ChevronDown className="w-4 h-4 text-theme-muted" />
+          {/* Profile Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              className="flex items-center space-x-3 pl-3 border-l border-theme-primary p-2 rounded-lg hover-theme-primary transition-colors"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <User className="w-5 h-5 text-theme-primary" />
+              <div className="hidden md:block">
+                <p className="text-sm font-medium text-theme-primary">
+                  {user?.email || 'User'}
+                </p>
+                <p className="text-xs text-theme-muted">
+                  Administrator
+                </p>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-theme-muted transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-theme-card border border-theme-primary rounded-xl shadow-theme-lg z-50">
+                <div className="py-2">
+                  {/* Profile Option */}
+                  <button
+                    onClick={handleProfile}
+                    className="w-full flex items-center px-4 py-3 text-theme-primary hover-theme-primary transition-colors"
+                  >
+                    <UserIcon className="w-4 h-4 mr-3" />
+                    <span className="text-sm font-medium">Profile</span>
+                  </button>
+                  
+                  {/* Divider */}
+                  <div className="border-t border-theme-primary my-1"></div>
+                  
+                  {/* Logout Option */}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 mr-3" />
+                    <span className="text-sm font-medium">Logout</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
