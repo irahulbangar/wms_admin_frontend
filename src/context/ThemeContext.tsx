@@ -23,34 +23,31 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>('light');
-
-  // Initialize theme from localStorage or system preference
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('wms-theme') as Theme;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-      setThemeState(savedTheme);
-    } else if (systemPrefersDark) {
-      setThemeState('dark');
+  const getInitialTheme = (): Theme => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('wms-theme') as Theme;
+      if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+        return savedTheme;
+      }
+      
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return systemPrefersDark ? 'dark' : 'light';
     }
-  }, []);
+    
+    return 'light';
+  };
 
-  // Apply theme to document
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+
   useEffect(() => {
     const root = document.documentElement;
-    
-    // Remove existing theme classes
+
     root.classList.remove('light', 'dark');
     
-    // Add current theme class
     root.classList.add(theme);
     
-    // Set data-theme attribute for CSS custom properties
     root.setAttribute('data-theme', theme);
     
-    // Save to localStorage
     localStorage.setItem('wms-theme', theme);
   }, [theme]);
 
