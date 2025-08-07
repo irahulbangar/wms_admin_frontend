@@ -15,7 +15,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Info } from "../../utils/toast";
+import { Success } from "../../utils/toast";
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
@@ -47,7 +47,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
     logout();
     navigate('/');
     setIsDropdownOpen(false);
-    Info('You have been logged out successfully.');
+    Success('You have been logged out successfully.');
   };
 
   const handleProfile = () => {
