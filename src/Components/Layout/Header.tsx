@@ -19,10 +19,9 @@ import { useNavigate } from "react-router-dom";
 interface HeaderProps {
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
-  onPageChange?: (page: string) => void;
 }
 
-const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
+const Header = ({ onToggleSidebar }: HeaderProps) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -50,9 +49,7 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
   };
 
   const handleProfile = () => {
-    if (onPageChange) {
-      onPageChange('profile');
-    }
+    navigate('/profile');
     setIsDropdownOpen(false);
   };
 

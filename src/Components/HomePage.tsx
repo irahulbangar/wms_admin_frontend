@@ -24,6 +24,8 @@ const HomePage = () => {
             setCurrentPage('organization-setting');
         } else if (location.pathname === '/home') {
             setCurrentPage('home');
+        } else if (location.pathname === '/profile') {
+            setCurrentPage('profile');
         }
     }, [location.pathname]);
 
@@ -85,7 +87,6 @@ const HomePage = () => {
                     <Header 
                         sidebarCollapsed={sidebarCollapsed} 
                         onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} 
-                        onPageChange={handlePageChange} 
                     />
 
                     {/* Main Content */}
