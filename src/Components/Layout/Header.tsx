@@ -7,7 +7,6 @@ import {
   Sun,
   Moon,
   User,
-  Settings,
   LogOut,
   User as UserIcon,
 } from "lucide-react";
@@ -105,11 +104,6 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               3
             </span>
-          </button>
-
-          {/* Settings */}
-          <button className="p-2.5 rounded-xl text-theme-secondary hover-theme-primary transition-colors cursor-pointer">
-            <Settings className="w-5 h-5" />
           </button>
 
           {/* Profile Dropdown */}

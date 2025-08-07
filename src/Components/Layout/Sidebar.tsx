@@ -65,7 +65,7 @@ const menuItems = [
       },
       {
         id: "admin-setting",
-        label: "Settings",
+        label: "Setting",
         icon: <Settings className="w-5 h-5" />,
         href: "/admin-setting",
       },
@@ -198,7 +198,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
       
       {/* User Profile */}
       {!collapsed && (
-        <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50">
+        <div className="p-4 border-t border-theme-primary">
           <div className="flex items-center space-x-3 p-3 rounded-xl bg-theme-secondary">
             {/* <img src="" alt="user" className="w-10 h-10 rounded-full ring-2 ring-blue-500" /> */}
             <User className="w-8 h-8 text-theme-muted rounded-full ring-2 ring-blue-500" />
