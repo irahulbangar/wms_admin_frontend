@@ -46,7 +46,23 @@ function App() {
                 }
               />
               <Route
+                path="/admin-users"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin-setting"
                 element={
                   <ProtectedRoute>
                     <HomePage />

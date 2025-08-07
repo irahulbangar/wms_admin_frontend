@@ -12,7 +12,6 @@ import { useState } from "react";
 interface SubmenuItem {
   id: string;
   label: string;
-  active: boolean;
   icon: React.ReactNode;
   href: string;
 }
@@ -22,32 +21,27 @@ const menuItems = [
     id: "dashboard",
     icon: <LayoutDashboard className="w-5 h-5" />,
     label: "Dashboard",
-    active: true,
   },
   {
     id: "organization",
     icon: <Building2 className="w-5 h-5" />,
     label: "Organization",
-    active: false,
     submenu: [
       {
         id: "devices",
         label: "Devices",
-        active: false,
         icon: <Monitor className="w-5 h-5" />,
         href: "/organization/devices",
       },
       {
         id: "users",
         label: "Users",
-        active: false,
         icon: <User className="w-5 h-5" />,
         href: "/organization/users",
       },
       {
         id: "organization-setting",
         label: "Setting",
-        active: false,
         icon: <Settings className="w-5 h-5" />,
         href: "/organization/setting",
       },
@@ -57,27 +51,23 @@ const menuItems = [
     id: "admin-users",
     icon: <Users className="w-5 h-5" />,
     label: "Admin Users",
-    active: false,
   },
   {
     id: "settings",
     icon: <Settings className="w-5 h-5" />,
     label: "Settings",
-    active: false,
     submenu: [
       {
         id: "profile",
         label: "Profile",
-        active: false,
         icon: <User className="w-5 h-5" />,
         href: "/profile",
       },
       {
-        id: "setting",
+        id: "admin-setting",
         label: "Settings",
-        active: false,
         icon: <Settings className="w-5 h-5" />,
-        href: "/settings",
+        href: "/admin-setting",
       },
     ],
   },
@@ -92,6 +82,20 @@ interface SidebarProps {
 
 const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
   const [expanded, setExpanded] = useState(new Set(["dashboard"]));
+
+  // Helper function to check if a menu item should be active
+  const isMenuItemActive = (item: typeof menuItems[0]) => {
+    if (currentPage === item.id) {
+      return true;
+    }
+    
+    // Check if any submenu item is active
+    if (item.submenu) {
+      return item.submenu.some((submenu: SubmenuItem) => currentPage === submenu.id);
+    }
+    
+    return false;
+  };
 
   const toggleExpanded = (itemId: string) => {
     const newExpanded = new Set(expanded);
@@ -136,7 +140,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
             <div key={item.id}>
               <button
                 className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer ${
-                  currentPage === item.id || item.active
+                  isMenuItemActive(item)
                     ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
                     : "text-theme-primary hover-theme-primary"
                 }`}
@@ -167,7 +171,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                       <button
                         key={submenu.id}
                         className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all cursor-pointer ${
-                          currentPage === submenu.id || submenu.active
+                          currentPage === submenu.id
                             ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
                             : "text-theme-primary hover:text-theme-primary"
                         }`}
