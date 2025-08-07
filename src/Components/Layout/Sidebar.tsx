@@ -83,13 +83,11 @@ interface SidebarProps {
 const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
   const [expanded, setExpanded] = useState(new Set(["dashboard"]));
 
-  // Helper function to check if a menu item should be active
   const isMenuItemActive = (item: typeof menuItems[0]) => {
     if (currentPage === item.id) {
       return true;
     }
     
-    // Check if any submenu item is active
     if (item.submenu) {
       return item.submenu.some((submenu: SubmenuItem) => currentPage === submenu.id);
     }
@@ -108,7 +106,6 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
   };
 
   const handleSubmenuClick = (submenu: SubmenuItem) => {
-    // For devices submenu, navigate to the devices page
     if (submenu.id === 'devices') {
       onPageChange('devices');
     } else if (submenu.id === 'users') {
@@ -126,14 +123,12 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
         collapsed ? "w-20" : "w-72"
       }`}
     >
-      {/* Logo */}
       <div className="p-5 border-b border-theme-primary shadow-xs">
         <div className="flex items-center gap-x-3">
           <img src="/logo.png" alt="logo" className="h-12 w-32" />
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           return (
@@ -163,7 +158,6 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                 )}
               </button>
 
-              {/* Submenu */}
               {!collapsed && item.submenu && expanded.has(item.id) && (
                 <div className="ml-8 mt-2 space-y-1">
                   {item.submenu?.map((submenu: SubmenuItem) => {
@@ -192,6 +186,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
           );
         })}
       </nav>
+      
       {/* User Profile */}
       {!collapsed && (
         <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50">

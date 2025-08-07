@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   User, 
@@ -56,14 +56,12 @@ const Profile = () => {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-theme-primary">Profile Settings</h1>
         <p className="text-theme-secondary mt-2">Manage your account information and preferences</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
         <div className="lg:col-span-1">
           <div className="bg-theme-card border border-theme-primary rounded-xl p-6 shadow-theme-sm">
             <div className="text-center mb-6">
@@ -95,9 +93,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Settings */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Personal Information */}
           <div className="bg-theme-card border border-theme-primary rounded-xl p-6 shadow-theme-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-theme-primary">Personal Information</h3>
@@ -206,7 +202,6 @@ const Profile = () => {
             )}
           </div>
 
-          {/* Preferences */}
           <div className="bg-theme-card border border-theme-primary rounded-xl p-6 shadow-theme-sm">
             <h3 className="text-lg font-semibold text-theme-primary mb-6">Preferences</h3>
             

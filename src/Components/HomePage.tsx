@@ -17,7 +17,6 @@ const HomePage = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Update current page based on URL
     useEffect(() => {
         if (location.pathname === '/organization/devices') {
             setCurrentPage('devices');
@@ -39,7 +38,6 @@ const HomePage = () => {
     const handlePageChange = (page: string) => {
         setCurrentPage(page);
         
-        // Navigate to appropriate route
         switch (page) {
             case 'devices':
                 navigate('/organization/devices');

@@ -3,13 +3,11 @@ import { Search, Filter, Monitor, PlusCircle } from "lucide-react";
 const Devices = () => {
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center w-full">
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-theme-primary">Devices</h1>
           <p className="text-theme-muted">Manage your organization's devices</p>
         </div>
-        {/* Search and Filter */}
         <div className="flex items-center gap-4 p-4 bg-theme-primary rounded-lg flex-1">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-theme-muted" />
@@ -30,8 +28,6 @@ const Devices = () => {
         </button>
       </div>
 
-      {/* Empty State (uncomment if needed) */}
-      
       <div className="text-center py-12">
         <Monitor className="w-16 h-16 text-theme-muted mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-theme-primary mb-2">No devices found</h3>
@@ -40,7 +36,6 @@ const Devices = () => {
           Add Device
         </button>
       </div>
-     
     </div>
   );
 };
