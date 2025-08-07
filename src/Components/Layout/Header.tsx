@@ -61,7 +61,7 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            className="p-2 rounded-lg text-theme-secondary hover-theme-primary transition-colors"
+            className="p-2 rounded-lg text-theme-secondary hover-theme-primary transition-colors cursor-pointer"
             onClick={onToggleSidebar}
           >
             <Menu className="w-5 h-5" />
@@ -85,7 +85,7 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
               placeholder="Search Anything"
               className="w-full pl-10 pr-4 py-2.5 input-theme rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-theme-muted hover:text-theme-secondary">
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-theme-muted hover:text-theme-secondary cursor-pointer">
               <Filter />
             </button>
           </div>
@@ -93,7 +93,7 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
         {/* Right */}
         <div className="flex items-center space-x-3">
           <button 
-            className="p-2.5 rounded-xl text-theme-secondary hover-theme-primary transition-colors"
+            className="p-2.5 rounded-xl text-theme-secondary hover-theme-primary transition-colors cursor-pointer"
             onClick={toggleTheme}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
@@ -101,7 +101,7 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
           </button>
 
           {/* Notification */}
-          <button className="relative p-2.5 rounded-xl text-theme-secondary hover-theme-primary transition-colors">
+          <button className="relative p-2.5 rounded-xl text-theme-secondary hover-theme-primary transition-colors cursor-pointer">
             <Bell className="w-5 h-5" />
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               3
@@ -109,14 +109,14 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
           </button>
 
           {/* Settings */}
-          <button className="p-2.5 rounded-xl text-theme-secondary hover-theme-primary transition-colors">
+          <button className="p-2.5 rounded-xl text-theme-secondary hover-theme-primary transition-colors cursor-pointer">
             <Settings className="w-5 h-5" />
           </button>
 
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
-              className="flex items-center space-x-3 pl-3 border-l border-theme-primary p-2 rounded-lg hover-theme-primary transition-colors"
+              className="flex items-center space-x-3 pl-3 border-l border-theme-primary p-2 rounded-lg hover-theme-primary transition-colors cursor-pointer"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <User className="w-5 h-5 text-theme-primary" />
@@ -138,7 +138,7 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
                   {/* Profile Option */}
                   <button
                     onClick={handleProfile}
-                    className="w-full flex items-center px-4 py-3 text-theme-primary hover-theme-primary transition-colors"
+                    className="w-full flex items-center px-4 py-3 text-theme-primary hover-theme-primary transition-colors cursor-pointer"
                   >
                     <UserIcon className="w-4 h-4 mr-3" />
                     <span className="text-sm font-medium">Profile</span>
@@ -150,7 +150,7 @@ const Header = ({ onToggleSidebar, onPageChange }: HeaderProps) => {
                   {/* Logout Option */}
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
                   >
                     <LogOut className="w-4 h-4 mr-3" />
                     <span className="text-sm font-medium">Logout</span>

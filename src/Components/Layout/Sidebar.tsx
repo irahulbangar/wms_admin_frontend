@@ -118,12 +118,12 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out bg-theme-primary backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10 ${
+      className={`transition-all duration-300 ease-in-out bg-theme-primary backdrop-blur-xl border-r border-theme-primary flex flex-col relative z-10 ${
         collapsed ? "w-20" : "w-72"
       }`}
     >
       {/* Logo */}
-      <div className="p-5 border-b border-slate-200/50 dark:border-slate-700/50 shadow-xs">
+      <div className="p-5 border-b border-theme-primary shadow-xs">
         <div className="flex items-center gap-x-3">
           <img src="/logo.png" alt="logo" className="h-12 w-32" />
         </div>
@@ -135,7 +135,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
           return (
             <div key={item.id}>
               <button
-                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer ${
                   currentPage === item.id || item.active
                     ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
                     : "text-theme-primary hover-theme-primary"
@@ -166,7 +166,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                     return (
                       <button
                         key={submenu.id}
-                        className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all ${
+                        className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all cursor-pointer ${
                           currentPage === submenu.id || submenu.active
                             ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
                             : "text-theme-primary hover:text-theme-primary"
