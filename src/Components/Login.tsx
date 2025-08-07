@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import backgroundImage from '/background.jpg';
+import { Error, Success } from '../utils/toast';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('test@test.com');
     const [password, setPassword] = useState('test');
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
 
     const { login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
@@ -21,18 +21,18 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError('');
 
         try {
             const success = await login(username, password);
             if (success) {
                 navigate('/home');
+                Success('You have been logged in successfully.');
             } else {
-                setError('Invalid email or password');
+                Error('Invalid email or password.');
             }
         } catch (err) {
             console.error(err);
-            setError('An error occurred during login');
+            Error('An error occurred during login.');
         } finally {
             setIsLoading(false);
         }
@@ -67,12 +67,6 @@ const Login: React.FC = () => {
                     </div>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                                {error}
-                            </div>
-                        )}
-
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                                 Username

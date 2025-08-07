@@ -13,6 +13,7 @@ import {
   Settings,
   Bell
 } from 'lucide-react';
+import { Success,  Info } from '../utils/toast';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -38,6 +39,7 @@ const Profile = () => {
     // Here you would typically save to backend
     console.log('Saving profile data:', formData);
     setIsEditing(false);
+    Success('Profile updated successfully!');
   };
 
   const handleCancel = () => {
@@ -52,6 +54,7 @@ const Profile = () => {
       joinDate: 'January 2024'
     });
     setIsEditing(false);
+    Info('Changes cancelled. Profile data restored.');
   };
 
   return (
