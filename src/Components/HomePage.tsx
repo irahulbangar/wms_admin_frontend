@@ -12,10 +12,19 @@ import AdminSetting from './AdminSetting';
 import Setting from './Organization/Setting';
 
 const HomePage = () => {
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    // Initialize sidebar collapsed state from localStorage
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+        const saved = localStorage.getItem('sidebar-collapsed');
+        return saved ? JSON.parse(saved) : false;
+    });
     const [currentPage, setCurrentPage] = useState('dashboard');
     const location = useLocation();
     const navigate = useNavigate();
+
+    // Save sidebar collapsed state to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('sidebar-collapsed', JSON.stringify(sidebarCollapsed));
+    }, [sidebarCollapsed]);
 
     useEffect(() => {
         if (location.pathname === '/organization/devices') {

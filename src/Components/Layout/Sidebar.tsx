@@ -7,7 +7,7 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface SubmenuItem {
   id: string;
@@ -81,7 +81,16 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
-  const [expanded, setExpanded] = useState(new Set(["dashboard"]));
+  // Initialize expanded state from localStorage
+  const [expanded, setExpanded] = useState(() => {
+    const saved = localStorage.getItem('sidebar-expanded');
+    return saved ? new Set(JSON.parse(saved)) : new Set(["dashboard"]);
+  });
+
+  // Save expanded state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('sidebar-expanded', JSON.stringify(Array.from(expanded)));
+  }, [expanded]);
 
   const isMenuItemActive = (item: typeof menuItems[0]) => {
     if (currentPage === item.id) {
