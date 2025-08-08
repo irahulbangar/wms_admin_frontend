@@ -1,4 +1,5 @@
 import {
+  Building,
   Building2,
   ChevronDown,
   LayoutDashboard,
@@ -23,10 +24,16 @@ const menuItems = [
     label: "Dashboard",
   },
   {
-    id: "organization",
+    id: "organizations",
     icon: <Building2 className="w-5 h-5" />,
-    label: "Organization",
+    label: "Organizations",
     submenu: [
+      {
+        id: "organization",
+        label: "Organization",
+        icon: <Building className="w-5 h-5" />,
+        href: "/organization",
+      },
       {
         id: "devices",
         label: "Devices",
