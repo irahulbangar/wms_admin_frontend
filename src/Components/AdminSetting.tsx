@@ -122,25 +122,25 @@ const AdminSetting = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
             Admin Settings
           </h1>
-          <p className="text-theme-secondary mt-1">
+          <p className="text-text-secondary mt-1">
             Manage your account settings and preferences
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-theme-primary">
+      <div className="flex flex-wrap gap-2 border-b border-border-primary">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-              activeTab === tab.id
-                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-                : "text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary"
+                activeTab === tab.id
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                : "text-text-secondary hover:text-text-primary hover:bg-secondary"
             }`}
           >
             {tab.icon}
@@ -150,26 +150,26 @@ const AdminSetting = () => {
       </div>
 
       {/* Content */}
-      <div className="bg-theme-primary border border-theme-primary rounded-xl p-4 sm:p-6 shadow-theme-sm">
+      <div className="bg-primary border border-border-primary rounded-xl p-4 sm:p-6 shadow-theme-sm">
         {activeTab === "theme" && (
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <Settings className="w-6 h-6 text-theme-primary" />
-              <h2 className="text-xl font-semibold text-theme-primary">Theme Settings</h2>
+              <Settings className="w-6 h-6 text-text-primary" />
+              <h2 className="text-xl font-semibold text-text-primary">Theme Settings</h2>
             </div>
 
             {/* Current Theme Display */}
             <div className="rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-theme-primary">Current Theme</h3>
-                  <p className="text-sm text-theme-secondary">
+                  <h3 className="font-medium text-text-primary">Current Theme</h3>
+                  <p className="text-sm text-text-secondary">
                     {theme === "light" ? "Light Mode" : "Dark Mode"}
                   </p>
                 </div>
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-2 px-4 py-2 input-theme  border-theme-primary rounded-lg hover:bg-theme-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex items-center gap-2 px-4 py-2 bg-input-bg border-input-border text-text-primary rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {theme === "light" ? (
                     <>
@@ -191,14 +191,14 @@ const AdminSetting = () => {
         {activeTab === "password" && (
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <Shield className="w-6 h-6 text-theme-primary" />
-              <h2 className="text-xl font-semibold text-theme-primary">Change Password</h2>
+              <Shield className="w-6 h-6 text-text-primary" />
+              <h2 className="text-xl font-semibold text-text-primary">Change Password</h2>
             </div>
 
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-6">
               {/* Current Password */}
               <div>
-                <label className="block text-sm font-medium text-theme-primary mb-2">
+                <label className="block text-sm font-medium text-text-primary mb-2">
                   Current Password
                 </label>
                 <div className="relative">
@@ -206,13 +206,13 @@ const AdminSetting = () => {
                     type={showCurrentPassword ? "text" : "password"}
                     value={passwordForm.currentPassword}
                     onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
-                    className="w-full pl-4 pr-12 py-3 bg-theme-primary text-theme-secondary border-theme-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Enter your current password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-theme-muted hover:text-theme-primary"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
                     {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -221,7 +221,7 @@ const AdminSetting = () => {
 
               {/* New Password */}
               <div>
-                <label className="block text-sm font-medium text-theme-primary mb-2">
+                <label className="block text-sm font-medium text-text-primary mb-2">
                   New Password
                 </label>
                 <div className="relative">
@@ -229,13 +229,13 @@ const AdminSetting = () => {
                     type={showNewPassword ? "text" : "password"}
                     value={passwordForm.newPassword}
                     onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
-                    className="w-full pl-4 pr-12 py-3 bg-theme-primary text-theme-secondary border-theme-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Enter your new password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-theme-muted hover:text-theme-primary"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
                     {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -244,7 +244,7 @@ const AdminSetting = () => {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-sm font-medium text-theme-primary mb-2">
+                <label className="block text-sm font-medium text-text-primary mb-2">
                   Confirm New Password
                 </label>
                 <div className="relative">
@@ -252,26 +252,26 @@ const AdminSetting = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     value={passwordForm.confirmPassword}
                     onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
-                    className="w-full pl-4 pr-12 py-3 bg-theme-primary text-theme-secondary border-theme-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Confirm your new password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-theme-muted hover:text-theme-primary"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 {passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-500">Passwords do not match</p>
+                  <p className="mt-1 text-sm text-status-danger">Passwords do not match</p>
                 )}
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={!isPasswordFormValid() || isLoading}
+                disabled={isLoading}
                 className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
@@ -293,16 +293,16 @@ const AdminSetting = () => {
         {activeTab === "profile" && (
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <User className="w-6 h-6 text-theme-primary" />
-              <h2 className="text-xl font-semibold text-theme-primary">Profile Settings</h2>
+              <User className="w-6 h-6 text-text-primary" />
+              <h2 className="text-xl font-semibold text-text-primary">Profile Settings</h2>
             </div>
 
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-theme-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-theme-muted" />
+              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-text-muted" />
               </div>
-              <h3 className="text-lg font-medium text-theme-primary mb-2">Profile Settings</h3>
-              <p className="text-theme-secondary">Profile settings functionality coming soon...</p>
+              <h3 className="text-lg font-medium text-text-primary mb-2">Profile Settings</h3>
+              <p className="text-text-secondary">Profile settings functionality coming soon...</p>
             </div>
           </div>
         )}

@@ -114,7 +114,7 @@ const HomePage = () => {
                     />
 
                     {/* Main Content */}
-                    <main className="flex-1 overflow-y-auto bg-theme-primary pb-16">
+                    <main className="flex-1 overflow-y-auto bg-primary pb-16">
                         <div className="p-6 space-y-6">
                             {renderContent()}
                         </div>

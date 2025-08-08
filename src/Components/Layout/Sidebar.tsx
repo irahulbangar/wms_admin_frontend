@@ -128,14 +128,12 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out bg-theme-primary backdrop-blur-xl border-r border-theme-primary flex flex-col relative z-10 ${
+      className={`transition-all duration-300 ease-in-out bg-primary backdrop-blur-xl border-r border-border-primary flex flex-col relative z-10 ${
         collapsed ? "w-20" : "w-72"
       }`}
     >
-      <div className="p-5 border-b border-theme-primary shadow-xs">
-        <div className="flex items-center gap-x-3">
-          <img src="/logo.png" alt="logo" className="h-12 w-32" />
-        </div>
+      <div className="px-5 py-3 border-b border-border-primary shadow-xs flex items-center justify-center">
+          <img src="/logo.png" alt="logo" className="h-16 w-32" />
       </div>
 
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -146,7 +144,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                 className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer ${
                   isMenuItemActive(item)
                     ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
-                    : "text-theme-primary hover-theme-primary"
+                    : "text-text-primary hover-theme-primary"
                 }`}
                 onClick={() => {
                   if (item.submenu) {
@@ -176,7 +174,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                         className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all cursor-pointer ${
                           currentPage === submenu.id
                             ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
-                            : "text-theme-primary hover:text-theme-primary"
+                            : "text-text-primary hover:text-text-primary"
                         }`}
                         onClick={() => {
                           handleSubmenuClick(submenu);
@@ -198,16 +196,16 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
       
       {/* User Profile */}
       {!collapsed && (
-        <div className="p-4 border-t border-theme-primary">
-          <div className="flex items-center space-x-3 p-3 rounded-xl bg-theme-secondary">
+        <div className="p-4 border-t border-border-primary">
+          <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary">
             {/* <img src="" alt="user" className="w-10 h-10 rounded-full ring-2 ring-blue-500" /> */}
-            <User className="w-8 h-8 text-theme-muted rounded-full ring-2 ring-blue-500" />
+            <User className="w-8 h-8 text-text-muted rounded-full ring-2 ring-blue-500" />
             <div className="flex-1 min-w-0">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-theme-primary truncate">
+                <p className="text-sm font-medium text-text-primary truncate">
                   Jhon Doe
                 </p>
-                <p className="text-xs text-theme-muted truncate">
+                <p className="text-xs text-text-muted truncate">
                   Administrator
                 </p>
               </div>

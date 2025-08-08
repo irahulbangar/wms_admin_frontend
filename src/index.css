@@ -1,5 +1,52 @@
 @import "tailwindcss";
 
+@theme {
+  /* Background Colors */
+  --color-primary: var(--bg-primary);
+  --color-secondary: var(--bg-secondary);
+  --color-tertiary: var(--bg-tertiary);
+  --color-card: var(--bg-card);
+  --color-overlay: var(--bg-overlay);
+  --color-gradient-start: var(--bg-gradient-start);
+  --color-gradient-middle: var(--bg-gradient-middle);
+  --color-gradient-end: var(--bg-gradient-end);
+
+  /* Text Colors */
+  --color-text-primary: var(--text-primary);  
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-muted: var(--text-muted);  
+  --color-text-inverse: var(--text-inverse);
+
+  /* Border Colors */
+  --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
+  --color-border-accent: var(--border-accent);
+  --color-border-focus: var(--border-focus);
+  
+  /* Accent Colors */
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-success: var(--accent-success);
+  --color-accent-warning: var(--accent-warning);
+  --color-accent-error: var(--accent-error);
+  --color-accent-info: var(--accent-info);
+
+  /* Input Colors */
+  --color-input-bg: var(--input-bg);
+  --color-input-border: var(--input-border);
+  --color-input-text: var(--input-text);
+  --color-input-placeholder: var(--input-placeholder);
+  --color-input-focus-border: var(--input-focus-border);
+  --color-input-focus-ring: var(--input-focus-ring);
+
+  /* Status Colors */
+  --color-status-success: var(--status-success);
+  --color-status-danger: var(--status-danger);
+  --color-status-warning: var(--status-warning);
+  --color-status-info: var(--status-info);
+}
+
 /* Light Theme CSS Variables */
 :root {
   /* Background Colors */
@@ -56,10 +103,10 @@
   --dashboard-sidebar-border: #e2e8f0;
   
   /* Status Colors */
-  --status-online: #10b981;
-  --status-offline: #6b7280;
+  --status-success: #10b981;
+  --status-danger: #ff0000;
   --status-warning: #f59e0b;
-  --status-error: #ef4444;
+  --status-info: #06b6d4;
   
   /* Hover States */
   --hover-bg-primary: #f1f5f9;
@@ -74,7 +121,7 @@
   --bg-primary: #374151;
   --bg-secondary: #4b5563;
   --bg-tertiary: #6b7280;
-  --bg-card: #4b5563;
+  --bg-card: #374151;
   --bg-overlay: rgba(0, 0, 0, 0.7);
   --bg-gradient-start: #374151;
   --bg-gradient-middle: #4b5563;
@@ -124,10 +171,10 @@
   --dashboard-sidebar-border: #6b7280;
   
   /* Status Colors */
-  --status-online: #10b981;
-  --status-offline: #6b7280;
+  --status-success: #10b981;
+  --status-danger: #ff0000;
   --status-warning: #f59e0b;
-  --status-error: #ef4444;
+  --status-info: #06b6d4;
   
   /* Hover States */
   --hover-bg-primary: #4b5563;
@@ -137,50 +184,9 @@
 }
 
 /* Theme Utility Classes */
-.bg-theme-primary {
-  background-color: var(--bg-primary);
-}
-
-.bg-theme-secondary {
-  background-color: var(--bg-secondary);
-}
-
 .bg-theme-tertiary {
   background-color: var(--bg-tertiary);
 }
-
-.bg-theme-card {
-  background-color: var(--bg-card);
-}
-
-.text-theme-primary {
-  color: var(--text-primary);
-}
-
-.text-theme-secondary {
-  color: var(--text-secondary);
-}
-
-.text-theme-tertiary {
-  color: var(--text-tertiary);
-}
-
-.text-theme-muted {
-  color: var(--text-muted);
-}
-
-.border-theme-primary {
-  border-color: var(--border-primary);
-}
-
-.border-theme-secondary {
-  border-color: var(--border-secondary);
-}
-
-.border-theme-accent {
-  border-color: var(--border-accent);
-}
-
 .input-theme {
   background-color: var(--input-bg);
   border-color: var(--input-border);
