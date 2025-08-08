@@ -96,7 +96,7 @@ const HomePage = () => {
     };
 
     return (
-        <div className="min-h-screen dashboard-bg transition-all duration-500">
+        <div className="min-h-screen transition-all duration-500">
             <div className="flex h-screen overflow-hidden">
                 <Sidebar 
                     collapsed={sidebarCollapsed} 

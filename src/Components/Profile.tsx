@@ -66,7 +66,7 @@ const Profile = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <div className="bg-card border border-border-primary rounded-xl p-6 shadow-theme-sm">
+          <div className="bg-card border border-border-primary rounded-xl p-6 shadow-sm">
             <div className="text-center mb-6">
               <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-12 h-12 text-white" />
@@ -97,7 +97,7 @@ const Profile = () => {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-card border border-border-primary rounded-xl p-6 shadow-theme-sm">
+          <div className="bg-card border border-border-primary rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-text-primary">Personal Information</h3>
               <button
@@ -205,7 +205,7 @@ const Profile = () => {
             )}
           </div>
 
-          <div className="bg-card border border-border-primary rounded-xl p-6 shadow-theme-sm">
+          <div className="bg-card border border-border-primary rounded-xl p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-text-primary mb-6">Preferences</h3>
             
             <div className="space-y-4">
@@ -217,7 +217,7 @@ const Profile = () => {
                     <p className="text-text-secondary text-sm">Add an extra layer of security</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 bg-secondary text-text-primary rounded-lg hover-theme-primary transition-colors">
+                <button className="px-4 py-2 bg-secondary text-text-primary rounded-lg hover:bg-hover-bg-primary transition-colors">
                   Enable
                 </button>
               </div>
@@ -243,7 +243,7 @@ const Profile = () => {
                     <p className="text-text-secondary text-sm">Manage your privacy preferences</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 bg-secondary text-text-primary rounded-lg hover-theme-primary transition-colors">
+                <button className="px-4 py-2 bg-secondary text-text-primary rounded-lg hover:bg-hover-bg-primary transition-colors">
                   Configure
                 </button>
               </div>

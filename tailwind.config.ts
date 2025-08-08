@@ -46,6 +46,18 @@ const config: Config = {
                 warning: "var(--status-warning)",
                 info: "var(--status-info)",
             },
+            shadowColor: {
+                sm: "var(--shadow-sm)",
+                md: "var(--shadow-md)",
+                lg: "var(--shadow-lg)",
+                xl: "var(--shadow-xl)",
+            },
+            hoverColor: {
+                bgPrimary: "var(--hover-bg-primary)",
+                bgSecondary: "var(--hover-bg-secondary)",
+                textPrimary: "var(--hover-text-primary)",
+                borderPrimary: "var(--hover-border-primary)",
+            },
         },
     },
     plugins: [],

@@ -150,7 +150,7 @@ const AdminSetting = () => {
       </div>
 
       {/* Content */}
-      <div className="bg-primary border border-border-primary rounded-xl p-4 sm:p-6 shadow-theme-sm">
+      <div className="bg-primary border border-border-primary rounded-xl p-4 sm:p-6 shadow-sm">
         {activeTab === "theme" && (
           <div className="space-y-6">
             <div className="flex items-center gap-3">

@@ -55,11 +55,11 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
   };
 
   return (
-    <div className="bg-primary backdrop-blur-xl border-b border-border-primary px-6 py-4 shadow-theme-sm">
+    <div className="bg-primary backdrop-blur-xl border-b border-border-primary px-6 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            className="p-2 rounded-lg text-text-secondary hover-theme-primary transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer"
             onClick={onToggleSidebar}
           >
             <Menu className="w-5 h-5" />
@@ -91,7 +91,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
         {/* Right */}
         <div className="flex items-center space-x-3">
           <button 
-            className="p-2.5 rounded-xl text-text-secondary hover-theme-primary transition-colors cursor-pointer"
+            className="p-2.5 rounded-xl text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer"
             onClick={toggleTheme}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
@@ -99,7 +99,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
           </button>
 
           {/* Notification */}
-          <button className="relative p-2.5 rounded-xl text-text-secondary hover-theme-primary transition-colors cursor-pointer">
+          <button className="relative p-2.5 rounded-xl text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer">
             <Bell className="w-5 h-5" />
             <span className="absolute -top-1 -right-1 bg-status-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               3
@@ -109,7 +109,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
-              className="flex items-center space-x-3 pl-3 border-l border-border-primary p-2 rounded-lg hover-theme-primary transition-colors cursor-pointer"
+              className="flex items-center space-x-3 pl-3 border-l border-border-primary p-2 rounded-lg hover:bg-hover-bg-primary transition-colors cursor-pointer"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <User className="w-5 h-5 text-text-primary" />
@@ -126,12 +126,12 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-card border border-border-primary rounded-xl shadow-theme-lg z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-card border border-border-primary rounded-xl shadow-lg z-50">
                 <div className="py-2">
                   {/* Profile Option */}
                   <button
                     onClick={handleProfile}
-                      className="w-full flex items-center px-4 py-3 text-text-primary hover-theme-primary transition-colors cursor-pointer"
+                      className="w-full flex items-center px-4 py-3 text-text-primary hover:bg-hover-bg-primary transition-colors cursor-pointer"
                   >
                     <UserIcon className="w-4 h-4 mr-3" />
                     <span className="text-sm font-medium">Profile</span>

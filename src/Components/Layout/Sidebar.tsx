@@ -144,7 +144,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                 className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer ${
                   isMenuItemActive(item)
                     ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
-                    : "text-text-primary hover-theme-primary"
+                    : "text-text-primary hover:bg-hover-bg-primary"
                 }`}
                 onClick={() => {
                   if (item.submenu) {
@@ -174,7 +174,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                         className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all cursor-pointer ${
                           currentPage === submenu.id
                             ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
-                            : "text-text-primary hover:text-text-primary"
+                            : "text-text-primary hover:text-text-primary hover:bg-hover-bg-primary"
                         }`}
                         onClick={() => {
                           handleSubmenuClick(submenu);

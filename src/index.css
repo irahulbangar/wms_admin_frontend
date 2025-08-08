@@ -45,6 +45,18 @@
   --color-status-danger: var(--status-danger);
   --color-status-warning: var(--status-warning);
   --color-status-info: var(--status-info);
+
+  /* Shadow Colors */
+  --color-shadow-sm: var(--shadow-sm);
+  --color-shadow-md: var(--shadow-md);
+  --color-shadow-lg: var(--shadow-lg);
+  --color-shadow-xl: var(--shadow-xl);
+
+  /* Hover States */
+  --color-hover-bg-primary: var(--hover-bg-primary);
+  --color-hover-bg-secondary: var(--hover-bg-secondary);
+  --color-hover-text-primary: var(--hover-text-primary);
+  --color-hover-border-primary: var(--hover-border-primary);
 }
 
 /* Light Theme CSS Variables */
@@ -93,14 +105,6 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  
-  /* Dashboard Specific Colors */
-  --dashboard-bg: #f8fafc;
-  --dashboard-card-bg: #ffffff;
-  --dashboard-card-border: #e2e8f0;
-  --dashboard-header-bg: rgba(255, 255, 255, 0.8);
-  --dashboard-sidebar-bg: #ffffff;
-  --dashboard-sidebar-border: #e2e8f0;
   
   /* Status Colors */
   --status-success: #10b981;
@@ -162,14 +166,6 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
   
-  /* Dashboard Specific Colors - Matching Screenshot */
-  --dashboard-bg: #374151;
-  --dashboard-card-bg: #4b5563;
-  --dashboard-card-border: #6b7280;
-  --dashboard-header-bg: rgba(55, 65, 81, 0.8);
-  --dashboard-sidebar-bg: #4b5563;
-  --dashboard-sidebar-border: #6b7280;
-  
   /* Status Colors */
   --status-success: #10b981;
   --status-danger: #ff0000;
@@ -186,66 +182,6 @@
 /* Theme Utility Classes */
 .bg-theme-tertiary {
   background-color: var(--bg-tertiary);
-}
-.input-theme {
-  background-color: var(--input-bg);
-  border-color: var(--input-border);
-  color: var(--input-text);
-}
-
-.input-theme::placeholder {
-  color: var(--input-placeholder);
-}
-
-.input-theme:focus {
-  border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 3px var(--input-focus-ring);
-}
-
-.shadow-theme-sm {
-  box-shadow: var(--shadow-sm);
-}
-
-.shadow-theme-md {
-  box-shadow: var(--shadow-md);
-}
-
-.shadow-theme-lg {
-  box-shadow: var(--shadow-lg);
-}
-
-.shadow-theme-xl {
-  box-shadow: var(--shadow-xl);
-}
-
-/* Dashboard Theme */
-.dashboard-bg {
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-middle) 50%, var(--bg-gradient-end) 100%);
-}
-
-.dashboard-card {
-  background-color: var(--dashboard-card-bg);
-  border: 1px solid var(--dashboard-card-border);
-  box-shadow: var(--shadow-sm);
-}
-
-.dashboard-header {
-  background-color: var(--dashboard-header-bg);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-primary);
-}
-
-.dashboard-sidebar {
-  background-color: var(--dashboard-sidebar-bg);
-  border-right: 1px solid var(--dashboard-sidebar-border);
-}
-
-.hover-theme-primary:hover {
-  background-color: var(--hover-bg-primary);
-}
-
-.hover-theme-secondary:hover {
-  background-color: var(--hover-bg-secondary);
 }
 
 /* Global Theme Transitions */
