@@ -16,69 +16,58 @@ const mockOrganizations = [
   {
     id: 1,
     name: "TechCorp Solutions",
-    description: "Leading technology solutions provider",
     address: "123 Innovation Drive, Tech City, TC 12345",
-    phone: "+1 (555) 123-4567",
+    contactPerson: "John Doe",
+    contactNumber: "+1 (555) 123-4567",
     email: "contact@techcorp.com",
-    employeeCount: 150,
-    status: "active",
-    createdAt: "2024-01-15",
+    notes: "Leading technology solutions provider",
   },
   {
     id: 2,
     name: "Global Manufacturing Inc",
-    description: "International manufacturing and logistics",
     address: "456 Industrial Blvd, Manufacturing District, MD 67890",
-    phone: "+1 (555) 987-6543",
+    contactPerson: "Jane Smith",
+    contactNumber: "+1 (555) 987-6543",
     email: "info@globalmanufacturing.com",
-    employeeCount: 320,
-    status: "active",
-    createdAt: "2024-02-20",
+    notes: "International manufacturing and logistics",
   },
   {
     id: 3,
     name: "Green Energy Co",
-    description: "Sustainable energy solutions and consulting",
     address: "789 Renewable Way, Eco Park, EP 11111",
-    phone: "+1 (555) 456-7890",
+    contactPerson: "Mike Johnson",
+    contactNumber: "+1 (555) 456-7890",
     email: "hello@greenenergy.com",
-    employeeCount: 85,
-    status: "active",
-    createdAt: "2024-03-10",
+    notes: "Sustainable energy solutions and consulting",
   },
   {
     id: 4,
     name: "Digital Innovations Ltd",
-    description: "Cutting-edge digital transformation services",
     address: "321 Digital Street, Innovation Hub, IH 22222",
-    phone: "+1 (555) 789-0123",
+    contactPerson: "Sarah Brown",
+    contactNumber: "+1 (555) 789-0123",
     email: "contact@digitalinnovations.com",
-    employeeCount: 200,
-    status: "active",
-    createdAt: "2024-01-30",
+    notes: "Cutting-edge digital transformation services",
   },
 ];
 
 interface Organization {
   id: number;
   name: string;
-  description: string;
   address: string;
-  phone: string;
+  contactPerson: string;
+  contactNumber: string;
   email: string;
-  employeeCount: number;
-  status: string;
-  createdAt: string;
+  notes: string;
 }
 
 interface AddOrganizationForm {
   name: string;
-  description: string;
   address: string;
-  phone: string;
+  contactPerson: string;
+  contactNumber: string;
   email: string;
-  expiryDate: string;
-  userName: string;
+  notes: string;
 }
 
 const Organization = () => {
@@ -89,19 +78,17 @@ const Organization = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<AddOrganizationForm>({
     name: "",
-    description: "",
     address: "",
-    phone: "",
+    contactPerson: "",
+    contactNumber: "",
     email: "",
-    expiryDate: "",
-    userName: "",
+    notes: "",
   });
 
   const filteredOrganizations = useMemo(() => {
     return organizations.filter(
       (org) =>
         org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        org.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         org.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
         org.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -127,21 +114,17 @@ const Organization = () => {
       const newOrganization: Organization = {
         id: Date.now(),
         ...formData,
-        employeeCount: 0,
-        status: "active",
-        createdAt: new Date().toISOString().split("T")[0],
       };
 
       setOrganizations((prev) => [newOrganization, ...prev]);
       setShowAddModal(false);
       setFormData({
         name: "",
-        description: "",
         address: "",
-        phone: "",
+        contactPerson: "",
+        contactNumber: "",
         email: "",
-        expiryDate: "",
-        userName: "",
+        notes: "",
       });
       toast.success("Organization added successfully!");
     } catch {
@@ -157,7 +140,7 @@ const Organization = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center w-full">
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-text-primary">
@@ -194,7 +177,7 @@ const Organization = () => {
 
       {filteredOrganizations.length > 0 ? (
         <div className="bg-secondary rounded-lg shadow-sm overflow-hidden">
-          <table className="w-full text-sm text-left text-text-secondary">
+          <table className="w-full text-sm text-left text-text-secondary overflow-auto resposive">
             <thead className="text-xs text-text-secondary uppercase bg-secondary border-b border-border-secondary">
               <tr>
                 <th scope="col" className="px-4 py-3 text-center">
@@ -204,16 +187,19 @@ const Organization = () => {
                   Organization Name
                 </th>
                 <th scope="col" className="px-4 py-3 text-center">
-                  Country
+                  Address
                 </th>
                 <th scope="col" className="px-4 py-3 text-center">
-                  Employees
+                  Contact Person
                 </th>
                 <th scope="col" className="px-4 py-3 text-center">
-                  Status
+                  Contact Number
                 </th>
                 <th scope="col" className="px-4 py-3 text-center">
-                  Created
+                  Email
+                </th>
+                <th scope="col" className="px-4 py-3 text-center">
+                  Notes
                 </th>
                 <th scope="col" className="px-4 py-3 text-center">
                   Actions
@@ -236,16 +222,19 @@ const Organization = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-text-primary text-center">
-                    India
+                    {org.address}
                   </td>
                   <td className="px-4 py-3 text-text-primary text-center">
-                    {org.employeeCount}
+                    {org.contactPerson}
                   </td>
                   <td className="px-4 py-3 text-text-primary text-center">
-                    {org.status}
+                    {org.contactNumber}
                   </td>
                   <td className="px-4 py-3 text-text-primary text-center">
-                    {org.createdAt}
+                    {org.email}
+                  </td>
+                  <td className="px-4 py-3 text-text-primary text-center">
+                    {org.notes}
                   </td>
                   <td className="px-4 py-3 text-text-primary text-center">
                     <div className="flex items-center justify-center space-x-2">
@@ -400,56 +389,13 @@ const Organization = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-text-secondary mb-1">
-                    Description
+                    Address
                   </label>
                   <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows={3}
-                    className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter organization description"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
-                    Expiry Date
-                  </label>
-                  <input
-                    type="date"
-                    name="expiryDate"
-                    value={formData.expiryDate}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter expiry date"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
-                    User Name
-                  </label>
-                  <input
-                    type="text"
-                    name="userName"
-                    value={formData.userName}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter user name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1">
-                    Address *
-                  </label>
-                  <input
-                    type="text"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    required
+                    rows={3}
                     className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter organization address"
                   />
@@ -457,29 +403,57 @@ const Organization = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-text-secondary mb-1">
-                    Phone Number
+                    Contact Person
                   </label>
                   <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
+                    type="text"
+                    name="contactPerson"
+                    value={formData.contactPerson}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter phone number"
+                    placeholder="Enter contact person"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-text-secondary mb-1">
-                    Email Address
+                    Contact Number
+                  </label>
+                  <input
+                    type="text"
+                    name="contactNumber"
+                    value={formData.contactNumber}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter contact number"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                    Email
                   </label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    required
                     className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter email address"
+                    placeholder="Enter email"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                    Notes
+                  </label>
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter notes"
                   />
                 </div>
 
