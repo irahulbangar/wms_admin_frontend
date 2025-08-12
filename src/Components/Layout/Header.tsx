@@ -20,7 +20,7 @@ interface HeaderProps {
   onToggleSidebar: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   };
 
   return (
-    <div className="bg-primary backdrop-blur-xl border-b border-border-primary px-6 py-4 shadow-sm fixed top-0 left-72 right-0 z-10">
+    <div className={`bg-primary backdrop-blur-xl border-b border-border-primary px-6 py-4 shadow-sm fixed top-0 ${sidebarCollapsed ? 'left-20' : 'left-72'} right-0 z-10`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
