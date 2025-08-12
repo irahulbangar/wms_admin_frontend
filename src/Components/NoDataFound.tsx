@@ -14,7 +14,7 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({ icon, title, description, but
         {icon}
         <h3 className="text-lg font-semibold text-text-primary mb-2">{title}</h3>
         <p className="text-text-muted mb-4">{description}</p>
-        <button className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200" onClick={buttonOnClick}>
+        <button className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={buttonOnClick}>
           {buttonText}
         </button>
       </div>

@@ -27,13 +27,13 @@ const Users = () => {
             Filter
           </button> */}
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200">
+        <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer">
           <PlusCircle className="w-4 h-4" />
           Add User
         </button>
       </div>
 
-      <NoDataFound icon={<User className="w-16 h-16 text-text-muted mx-auto mb-4" />} title="No users found" description="Add your first user to get started" buttonText="Add User" buttonOnClick={() => {}} />
+      <NoDataFound icon={<User className="w-16 h-16 text-text-muted mx-auto mb-4" />} title="No users found" description="Add your first user to get started" buttonText="Add User" buttonOnClick={() => { }} />
     </div>
   );
 };

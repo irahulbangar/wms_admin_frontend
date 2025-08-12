@@ -44,17 +44,18 @@ const AdminSetting = () => {
   });
 
   // Password validation state
-  const [passwordValidation, setPasswordValidation] = useState<PasswordValidation>({
-    length: false,
-    uppercase: false,
-    lowercase: false,
-    number: false,
-    special: false,
-  });
+  const [passwordValidation, setPasswordValidation] =
+    useState<PasswordValidation>({
+      length: false,
+      uppercase: false,
+      lowercase: false,
+      number: false,
+      special: false,
+    });
 
   // Handle password input change
   const handlePasswordChange = (field: keyof PasswordForm, value: string) => {
-    setPasswordForm(prev => ({ ...prev, [field]: value }));
+    setPasswordForm((prev) => ({ ...prev, [field]: value }));
 
     // Validate new password
     if (field === "newPassword") {
@@ -72,26 +73,31 @@ const AdminSetting = () => {
   const isPasswordFormValid = () => {
     const { currentPassword, newPassword, confirmPassword } = passwordForm;
     const isNewPasswordValid = Object.values(passwordValidation).every(Boolean);
-    
-    return currentPassword && newPassword && confirmPassword && 
-           newPassword === confirmPassword && isNewPasswordValid;
+
+    return (
+      currentPassword &&
+      newPassword &&
+      confirmPassword &&
+      newPassword === confirmPassword &&
+      isNewPasswordValid
+    );
   };
 
   // Handle password change submission
   const handlePasswordChangeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isPasswordFormValid()) {
       Error("Please fill all fields correctly and ensure passwords match.");
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       Success("Password changed successfully!");
       setPasswordForm({
         currentPassword: "",
@@ -113,8 +119,16 @@ const AdminSetting = () => {
   };
 
   const tabs = [
-    { id: "theme", label: "Theme Settings", icon: <Palette className="w-4 h-4" /> },
-    { id: "password", label: "Change Password", icon: <Lock className="w-4 h-4" /> },
+    {
+      id: "theme",
+      label: "Theme Settings",
+      icon: <Palette className="w-4 h-4" />,
+    },
+    {
+      id: "password",
+      label: "Change Password",
+      icon: <Lock className="w-4 h-4" />,
+    },
   ];
 
   return (
@@ -138,8 +152,8 @@ const AdminSetting = () => {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                activeTab === tab.id
-                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+              activeTab === tab.id
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
                 : "text-text-secondary hover:text-text-primary hover:bg-secondary"
             }`}
           >
@@ -155,14 +169,18 @@ const AdminSetting = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Settings className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary">Theme Settings</h2>
+              <h2 className="text-xl font-semibold text-text-primary">
+                Theme Settings
+              </h2>
             </div>
 
             {/* Current Theme Display */}
             <div className="rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-text-primary">Current Theme</h3>
+                  <h3 className="font-medium text-text-primary">
+                    Current Theme
+                  </h3>
                   <p className="text-sm text-text-secondary">
                     {theme === "light" ? "Light Mode" : "Dark Mode"}
                   </p>
@@ -192,7 +210,9 @@ const AdminSetting = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Shield className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary">Change Password</h2>
+              <h2 className="text-xl font-semibold text-text-primary">
+                Change Password
+              </h2>
             </div>
 
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-6">
@@ -205,7 +225,9 @@ const AdminSetting = () => {
                   <input
                     type={showCurrentPassword ? "text" : "password"}
                     value={passwordForm.currentPassword}
-                    onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
+                    onChange={(e) =>
+                      handlePasswordChange("currentPassword", e.target.value)
+                    }
                     className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Enter your current password"
                   />
@@ -214,7 +236,11 @@ const AdminSetting = () => {
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
-                    {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showCurrentPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -228,7 +254,9 @@ const AdminSetting = () => {
                   <input
                     type={showNewPassword ? "text" : "password"}
                     value={passwordForm.newPassword}
-                    onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
+                    onChange={(e) =>
+                      handlePasswordChange("newPassword", e.target.value)
+                    }
                     className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Enter your new password"
                   />
@@ -237,7 +265,11 @@ const AdminSetting = () => {
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
-                    {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showNewPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -251,7 +283,9 @@ const AdminSetting = () => {
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     value={passwordForm.confirmPassword}
-                    onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
+                    onChange={(e) =>
+                      handlePasswordChange("confirmPassword", e.target.value)
+                    }
                     className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Confirm your new password"
                   />
@@ -260,12 +294,19 @@ const AdminSetting = () => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
                   >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
-                {passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword && (
-                  <p className="mt-1 text-sm text-status-danger">Passwords do not match</p>
-                )}
+                {passwordForm.confirmPassword &&
+                  passwordForm.newPassword !== passwordForm.confirmPassword && (
+                    <p className="mt-1 text-sm text-status-danger">
+                      Passwords do not match
+                    </p>
+                  )}
               </div>
 
               {/* Submit Button */}
@@ -294,15 +335,21 @@ const AdminSetting = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <User className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary">Profile Settings</h2>
+              <h2 className="text-xl font-semibold text-text-primary">
+                Profile Settings
+              </h2>
             </div>
 
             <div className="text-center py-8">
               <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-8 h-8 text-text-muted" />
               </div>
-              <h3 className="text-lg font-medium text-text-primary mb-2">Profile Settings</h3>
-              <p className="text-text-secondary">Profile settings functionality coming soon...</p>
+              <h3 className="text-lg font-medium text-text-primary mb-2">
+                Profile Settings
+              </h3>
+              <p className="text-text-secondary">
+                Profile settings functionality coming soon...
+              </p>
             </div>
           </div>
         )}

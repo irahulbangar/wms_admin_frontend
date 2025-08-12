@@ -135,7 +135,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out bg-primary backdrop-blur-xl border-r border-border-primary flex flex-col relative z-10 ${
+      className={`transition-all duration-300 ease-in-out bg-primary backdrop-blur-xl border-r border-border-primary flex flex-col z-10 h-full fixed top-0 left-0 ${
         collapsed ? "w-20" : "w-72"
       }`}
     >
@@ -143,7 +143,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
           <img src="/logo.png" alt="logo" className="h-16 w-32" />
       </div>
 
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto h-full">
         {menuItems.map((item) => {
           return (
             <div key={item.id}>

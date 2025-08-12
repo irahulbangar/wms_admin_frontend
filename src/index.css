@@ -209,3 +209,12 @@ body {
 .animate-pan-background {
     animation: panBackground 20s ease-in-out infinite;
 }
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
