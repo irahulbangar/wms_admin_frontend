@@ -22,6 +22,7 @@ const Login: React.FC = () => {
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    if (isLoading) return;
     e.preventDefault();
     setIsLoading(true);
 
