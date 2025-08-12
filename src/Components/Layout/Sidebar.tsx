@@ -206,7 +206,6 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
       {!collapsed && (
         <div className="p-4 border-t border-border-primary">
           <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary">
-            {/* <img src="" alt="user" className="w-10 h-10 rounded-full ring-2 ring-blue-500" /> */}
             <User className="w-8 h-8 text-text-muted rounded-full ring-2 ring-blue-500" />
             <div className="flex-1 min-w-0">
               <div className="flex-1 min-w-0">
