@@ -113,16 +113,17 @@ const HomePage = () => {
           onPageChange={handlePageChange}
         />
 
-        {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
           <Header
             sidebarCollapsed={sidebarCollapsed}
             onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
 
-          {/* Main Content */}
-          <main className={`flex-1 h-full bg-primary p-6 space-y-6 mt-22 overflow-y-auto pb-16 ${sidebarCollapsed ? 'ml-20' : 'ml-72'}`}>
+          <main
+            className={`flex-1 h-full bg-primary p-6 space-y-6 mt-22 overflow-y-auto pb-16 ${
+              sidebarCollapsed ? "ml-20" : "ml-72"
+            }`}
+          >
             {renderContent()}
           </main>
           <Footer sidebarCollapsed={sidebarCollapsed} />

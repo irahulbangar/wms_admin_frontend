@@ -5,6 +5,8 @@ import backgroundImage from "/background.jpg";
 import { Error, Success } from "../utils/toast";
 import { Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useAppDispatch } from "../../store/store";
+import { getAdmin } from "../../store/adminSlice";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("test@test.com");
@@ -15,12 +17,19 @@ const Login: React.FC = () => {
 
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/home");
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    dispatch(getAdmin()).unwrap().then((res) => {
+      console.log(res);
+    });
+  }, [dispatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (isLoading) return;
