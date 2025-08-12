@@ -116,6 +116,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
     if (newExpanded.has(itemId)) {
       newExpanded.delete(itemId);
     } else {
+      newExpanded.clear();
       newExpanded.add(itemId);
     }
     setExpanded(newExpanded);
@@ -200,7 +201,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
           );
         })}
       </nav>
-      
+        
       {/* User Profile */}
       {!collapsed && (
         <div className="p-4 border-t border-border-primary">

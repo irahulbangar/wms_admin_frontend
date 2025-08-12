@@ -1,7 +1,6 @@
 import {
   Bell,
   ChevronDown,
-  Filter,
   Menu,
   Search,
   Sun,
@@ -77,15 +76,15 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
         {/* Center */}
         <div className="flex-1 max-w-md mx-8">
           <div className="relative">
-            <Search className="w-4 h-4 absolute top-1/2 transform -translate-y-1/2 left-2 text-text-muted" />
+            <Search className="w-5 h-5 absolute top-1/2 transform -translate-y-1/2 left-2 text-text-muted" />
             <input
               type="text"
               placeholder="Search Anything"
               className="w-full pl-10 pr-4 py-2.5 bg-input-bg border-input-border text-text-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-text-muted hover:text-text-secondary cursor-pointer">
+            {/* <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-text-muted hover:text-text-secondary cursor-pointer">
               <Filter />
-            </button>
+            </button> */}
           </div>
         </div>
         {/* Right */}
