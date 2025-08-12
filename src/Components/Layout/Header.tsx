@@ -20,7 +20,7 @@ interface HeaderProps {
   onToggleSidebar: () => void;
 }
 
-const Header = ({ onToggleSidebar }: HeaderProps) => {
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
