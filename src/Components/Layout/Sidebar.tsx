@@ -90,24 +90,29 @@ interface SidebarProps {
 const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
   // Initialize expanded state from localStorage
   const [expanded, setExpanded] = useState(() => {
-    const saved = localStorage.getItem('sidebar-expanded');
+    const saved = localStorage.getItem("sidebar-expanded");
     return saved ? new Set(JSON.parse(saved)) : new Set(["dashboard"]);
   });
 
   // Save expanded state to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('sidebar-expanded', JSON.stringify(Array.from(expanded)));
+    localStorage.setItem(
+      "sidebar-expanded",
+      JSON.stringify(Array.from(expanded))
+    );
   }, [expanded]);
 
-  const isMenuItemActive = (item: typeof menuItems[0]) => {
+  const isMenuItemActive = (item: (typeof menuItems)[0]) => {
     if (currentPage === item.id) {
       return true;
     }
-    
+
     if (item.submenu) {
-      return item.submenu.some((submenu: SubmenuItem) => currentPage === submenu.id);
+      return item.submenu.some(
+        (submenu: SubmenuItem) => currentPage === submenu.id
+      );
     }
-    
+
     return false;
   };
 
@@ -123,12 +128,12 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
   };
 
   const handleSubmenuClick = (submenu: SubmenuItem) => {
-    if (submenu.id === 'devices') {
-      onPageChange('devices');
-    } else if (submenu.id === 'users') {
-      onPageChange('users');
-    } else if (submenu.id === 'organization-setting') {
-      onPageChange('organization-setting');
+    if (submenu.id === "devices") {
+      onPageChange("devices");
+    } else if (submenu.id === "users") {
+      onPageChange("users");
+    } else if (submenu.id === "organization-setting") {
+      onPageChange("organization-setting");
     } else {
       onPageChange(submenu.id);
     }
@@ -141,7 +146,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
       }`}
     >
       <div className="px-5 py-3 border-b border-border-primary shadow-xs flex items-center justify-center">
-          <img src="/logo.png" alt="logo" className="h-16 w-32" />
+        <img src="/logo.png" alt="logo" className="h-16 w-32" />
       </div>
 
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto h-full">
@@ -165,7 +170,9 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                 <div className="flex items-center space-x-3">
                   {item.icon}
                   {!collapsed && (
-                      <span className="font-medium ml-2">{item.label}</span>
+                    <span className="font-medium ml-2 font-roboto text-lg">
+                      {item.label}
+                    </span>
                   )}
                 </div>
                 {!collapsed && item.submenu && (
@@ -189,7 +196,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                         }}
                       >
                         {submenu.icon}
-                        <span className="font-medium ml-2">
+                        <span className="font-medium ml-2 font-roboto text-base">
                           {submenu.label}
                         </span>
                       </button>
@@ -201,7 +208,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
           );
         })}
       </nav>
-        
+
       {/* User Profile */}
       {!collapsed && (
         <div className="p-4 border-t border-border-primary">
@@ -212,7 +219,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
                 <p className="text-sm font-medium text-text-primary truncate">
                   Jhon Doe
                 </p>
-                <p className="text-xs text-text-muted truncate">
+                <p className="text-xs text-text-secondary truncate">
                   Administrator
                 </p>
               </div>

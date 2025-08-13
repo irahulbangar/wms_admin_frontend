@@ -20,7 +20,10 @@ interface HeaderProps {
   onToggleSidebar: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) => {
+const Header: React.FC<HeaderProps> = ({
+  onToggleSidebar,
+  sidebarCollapsed,
+}) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -30,31 +33,38 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) =>
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
     setIsDropdownOpen(false);
-    Success('You have been logged out successfully.');
+    Success("You have been logged out successfully.");
   };
 
   const handleProfile = () => {
-    navigate('/profile');
+    navigate("/profile");
     setIsDropdownOpen(false);
   };
 
   return (
-    <div className={`bg-primary backdrop-blur-xl border-b border-border-primary px-6 py-4 shadow-sm fixed top-0 ${sidebarCollapsed ? 'left-20' : 'left-72'} right-0 z-10`}>
+    <div
+      className={`bg-primary backdrop-blur-xl border-b border-border-primary px-6 py-4 shadow-sm fixed top-0 ${
+        sidebarCollapsed ? "left-20" : "left-72"
+      } right-0 z-10`}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
@@ -65,11 +75,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) =>
           </button>
 
           <div className="hidden md:block">
-            <h1 className="text-2xl font-black text-text-primary">
+            <h1 className="text-2xl font-black text-text-primary font-roboto">
               Dashboard
             </h1>
-            <p className="text-text-secondary">
-              Welcome back, {user?.email || 'User'}!
+            <p className="text-text-secondary font-roboto">
+              Welcome back, {user?.email || "User"}!
             </p>
           </div>
         </div>
@@ -80,7 +90,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) =>
             <input
               type="text"
               placeholder="Search Anything"
-              className="w-full pl-10 pr-4 py-2.5 bg-input-bg border-input-border text-text-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-input-bg border-input-border font-roboto text-text-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
             />
             {/* <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-text-muted hover:text-text-secondary cursor-pointer">
               <Filter />
@@ -89,18 +99,22 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) =>
         </div>
         {/* Right */}
         <div className="flex items-center space-x-3">
-          <button 
+          <button
             className="p-2.5 rounded-xl text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer"
             onClick={toggleTheme}
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
           >
-            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            {theme === "light" ? (
+              <Moon className="w-5 h-5" />
+            ) : (
+              <Sun className="w-5 h-5" />
+            )}
           </button>
 
           {/* Notification */}
           <button className="relative p-2.5 rounded-xl text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer">
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-status-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-status-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-roboto">
               3
             </span>
           </button>
@@ -113,14 +127,18 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) =>
             >
               <User className="w-5 h-5 text-text-primary" />
               <div className="hidden md:block">
-                <p className="text-sm font-medium text-text-primary">
-                  {user?.email || 'User'}
+                <p className="text-base font-medium text-text-primary font-roboto">
+                  {user?.email || "User"}
                 </p>
-                <p className="text-xs text-text-muted">
+                <p className="text-sm text-text-secondary font-roboto">
                   Administrator
                 </p>
               </div>
-              <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`w-4 h-4 text-text-primary transition-transform ${
+                  isDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
             </button>
 
             {/* Dropdown Menu */}
@@ -130,22 +148,26 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarCollapsed }) =>
                   {/* Profile Option */}
                   <button
                     onClick={handleProfile}
-                      className="w-full flex items-center px-4 py-3 text-text-primary hover:bg-hover-bg-primary transition-colors cursor-pointer"
+                    className="w-full flex items-center px-4 py-3 text-text-primary hover:bg-hover-bg-primary transition-colors cursor-pointer"
                   >
                     <UserIcon className="w-4 h-4 mr-3" />
-                    <span className="text-sm font-medium">Profile</span>
+                    <span className="text-base font-medium font-roboto">
+                      Profile
+                    </span>
                   </button>
-                  
+
                   {/* Divider */}
                   <div className="border-t border-border-primary my-1"></div>
-                  
+
                   {/* Logout Option */}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center px-4 py-3 text-status-danger hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
                   >
                     <LogOut className="w-4 h-4 mr-3" />
-                    <span className="text-sm font-medium">Logout</span>
+                    <span className="text-base font-medium font-roboto">
+                      Logout
+                    </span>
                   </button>
                 </div>
               </div>

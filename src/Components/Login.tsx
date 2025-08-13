@@ -26,9 +26,11 @@ const Login: React.FC = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    dispatch(getAdmin()).unwrap().then((res) => {
-      console.log(res);
-    });
+    dispatch(getAdmin())
+      .unwrap()
+      .then((res) => {
+        console.log(res);
+      });
   }, [dispatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,9 +68,7 @@ const Login: React.FC = () => {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Overlay for better readability */}
       <div className="absolute inset-0 bg-black/50 bg-opacity-40"></div>
-
       <div className="max-w-md w-full relative z-10 bg-primary rounded-lg shadow-xl p-8">
         <div className="flex items-center justify-between">
           <div className="flex flex-col mb-6">
@@ -130,7 +130,7 @@ const Login: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary transition-colors"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (

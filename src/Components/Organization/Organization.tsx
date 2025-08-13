@@ -72,7 +72,7 @@ const Organization = () => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-primary rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-4 scrollbar-hide">
-            <div className="flex items-center justify-between mb-6 sticky top-0 bg-primary pb-4 shadow-sm border-b border-border-primary">
+            <div className="flex items-center justify-between mb-6 sticky top-0 bg-primary pb-4 border-b border-border-primary">
               <h2 className="text-xl font-semibold text-text-primary">
                 Add New Organization
               </h2>
