@@ -3,6 +3,7 @@ import Header from "./Layout/Header";
 import Footer from "./Layout/Footer";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../store/store";
 import Dashboard from "./Dashboard/Dashboard";
 import Profile from "./Profile";
 import Devices from "./Organization/Devices";
@@ -11,6 +12,7 @@ import AdminUsers from "./Users";
 import AdminSetting from "./AdminSetting";
 import Setting from "./Organization/Setting";
 import Organization from "./Organization/Organization";
+import Loader from "./Loader";
 
 const HomePage = () => {
   // Initialize sidebar collapsed state from localStorage
@@ -21,6 +23,14 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAppSelector((state) => state.admin);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   // Save sidebar collapsed state to localStorage whenever it changes
   useEffect(() => {
@@ -46,6 +56,11 @@ const HomePage = () => {
       setCurrentPage("admin-setting");
     }
   }, [location.pathname]);
+
+  // Show loading while checking authentication
+  if (isLoading || !isAuthenticated) {
+    return <Loader />;
+  }
 
   const handlePageChange = (page: string) => {
     setCurrentPage(page);

@@ -7,7 +7,16 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated } = useAppSelector((state) => state.admin);
+  const { isAuthenticated, isLoading } = useAppSelector((state) => state.admin);
+
+  // Show loading while authentication state is being determined
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-primary">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;

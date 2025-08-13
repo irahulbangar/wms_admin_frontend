@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
+import { jwtDecode } from "jwt-decode";
 
 interface Admin {
   id: string;
@@ -57,6 +58,43 @@ export const adminSlice = createSlice({
     setLoading: (state, action) => {
       state.isLoading = action.payload;
     },
+    checkAuthStatus: (state) => {
+      try {
+        const token = sessionStorage.getItem("accessToken");
+        const admin = sessionStorage.getItem("admin");
+
+        if (token && admin) {
+          const decodedToken = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
+
+          if (decodedToken.exp && decodedToken.exp < currentTime) {
+            // Token expired, logout
+            state.admin = null;
+            state.token = null;
+            state.isAuthenticated = false;
+            sessionStorage.clear();
+            localStorage.clear();
+          } else {
+            // Valid token, restore state
+            state.admin = JSON.parse(admin);
+            state.token = token;
+            state.isAuthenticated = true;
+          }
+        } else {
+          // No token, ensure logged out state
+          state.admin = null;
+          state.token = null;
+          state.isAuthenticated = false;
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+        state.admin = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        sessionStorage.clear();
+        localStorage.clear();
+      }
+    },
   },
 });
 
@@ -82,7 +120,13 @@ export const loginAdmin = createAsyncThunk(
   }
 );
 
-export const { setAdmin, setToken, logout, clearError, setLoading } =
-  adminSlice.actions;
+export const {
+  setAdmin,
+  setToken,
+  logout,
+  clearError,
+  setLoading,
+  checkAuthStatus,
+} = adminSlice.actions;
 
 export default adminSlice.reducer;

@@ -7,7 +7,6 @@ import { useTheme } from "../context/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { loginAdmin, setAdmin, setToken } from "../../store/adminSlice";
 import { jwtDecode } from "jwt-decode";
-// import { jwtDecode } from "jwt-decode";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -19,31 +18,21 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated } = useAppSelector((state) => state.admin);
 
-  // Check if user is already logged in
-  useEffect(() => {
-    const token = sessionStorage.getItem("accessToken");
-    const admin = sessionStorage.getItem("admin");
-
-    if (token && admin) {
-      try {
-        const adminData = JSON.parse(admin);
-        dispatch(setAdmin(adminData));
-        dispatch(setToken(token));
-        navigate("/home");
-      } catch (error) {
-        console.error("Error parsing stored admin data:", error);
-        sessionStorage.clear();
-        localStorage.clear();
-      }
-    }
-  }, [dispatch, navigate]);
-
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/home");
     }
   }, [isAuthenticated, navigate]);
+
+  // Show loading while checking authentication
+  if (isAuthenticated || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-primary">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

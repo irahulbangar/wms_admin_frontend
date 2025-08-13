@@ -10,8 +10,35 @@ const listenerMiddlewareInstance = createListenerMiddleware({
   onError: () => console.error,
 });
 
+// Initialize store with authentication state from sessionStorage
+const getInitialState = () => {
+  try {
+    const token = sessionStorage.getItem("accessToken");
+    const admin = sessionStorage.getItem("admin");
+
+    if (token && admin) {
+      const adminData = JSON.parse(admin);
+      return {
+        admin: {
+          admin: adminData,
+          token: token,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        },
+      };
+    }
+  } catch (error) {
+    console.error("Error restoring auth state:", error);
+    sessionStorage.clear();
+  }
+
+  return {};
+};
+
 const store = configureStore({
   reducer: rootReducer,
+  preloadedState: getInitialState(),
   devTools: true,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddlewareInstance.middleware),
@@ -19,7 +46,6 @@ const store = configureStore({
 
 export type AppDispatch = typeof store.dispatch;
 export type RootStateType = ReturnType<typeof store.getState>;
-
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector = <T>(selector: (state: RootStateType) => T) =>
   useSelector<RootStateType, T>(selector);
