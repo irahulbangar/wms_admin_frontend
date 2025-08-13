@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAppSelector } from "../../store/store";
 import {
   User,
   Mail,
@@ -15,12 +15,12 @@ import {
 } from "lucide-react";
 import { Success, Info } from "../utils/toast";
 
-const Profile = () => {
-  const { user } = useAuth();
+const Profile: React.FC = () => {
+  const { admin } = useAppSelector((state) => state.admin);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "Jhon Doe",
-    email: user?.email || "",
+    email: admin?.email || "",
     phone: "+1 (555) 123-4567",
     location: "New York, NY",
     role: "Administrator",
@@ -46,7 +46,7 @@ const Profile = () => {
     // Reset form data to original values
     setFormData({
       name: "Jhon Doe",
-      email: user?.email || "",
+      email: admin?.email || "",
       phone: "+1 (555) 123-4567",
       location: "New York, NY",
       role: "Administrator",

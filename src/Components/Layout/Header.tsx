@@ -10,7 +10,8 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
-import { useAuth } from "../../context/AuthContext";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import { logout } from "../../../store/adminSlice";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Success } from "../../utils/toast";
@@ -24,11 +25,12 @@ const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   sidebarCollapsed,
 }) => {
-  const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const { admin } = useAppSelector((state) => state.admin);
+  const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -48,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate("/");
     setIsDropdownOpen(false);
     Success("You have been logged out successfully.");
@@ -79,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({
               Dashboard
             </h1>
             <p className="text-text-secondary font-roboto">
-              Welcome back, {user?.email || "User"}!
+              Welcome back, {admin?.email || "User"}!
             </p>
           </div>
         </div>
@@ -128,7 +130,7 @@ const Header: React.FC<HeaderProps> = ({
               <User className="w-5 h-5 text-text-primary" />
               <div className="hidden md:block">
                 <p className="text-base font-medium text-text-primary font-roboto">
-                  {user?.email || "User"}
+                  {admin?.email || "User"}
                 </p>
                 <p className="text-sm text-text-secondary font-roboto">
                   Administrator

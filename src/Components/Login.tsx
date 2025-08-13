@@ -1,37 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImage from "/background.jpg";
 import { Error, Success } from "../utils/toast";
 import { Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-import { useAppDispatch } from "../../store/store";
-import { loginAdmin } from "../../store/adminSlice";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { loginAdmin, setAdmin, setToken } from "../../store/adminSlice";
+import { jwtDecode } from "jwt-decode";
 // import { jwtDecode } from "jwt-decode";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { isLoading, isAuthenticated } = useAppSelector((state) => state.admin);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken");
+    const admin = sessionStorage.getItem("admin");
+
+    if (token && admin) {
+      try {
+        const adminData = JSON.parse(admin);
+        dispatch(setAdmin(adminData));
+        dispatch(setToken(token));
+        navigate("/home");
+      } catch (error) {
+        console.error("Error parsing stored admin data:", error);
+        sessionStorage.clear();
+        localStorage.clear();
+      }
+    }
+  }, [dispatch, navigate]);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
+    // Clear previous session data
     sessionStorage.clear();
     localStorage.clear();
 
     try {
       const result = await dispatch(loginAdmin({ email, password })).unwrap();
-      console.log("result", result);
+
       if (result.success) {
         sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
-        const token = result.token;
-        sessionStorage.setItem("accessToken", token);
+        sessionStorage.setItem("accessToken", result.token);
+        const decodedToken = jwtDecode(result.token);
+        sessionStorage.setItem("admin", JSON.stringify(decodedToken));
+
+        dispatch(setAdmin(decodedToken));
+        dispatch(setToken(result.token));
+
         navigate("/home");
         Success("You have been logged in successfully.");
       } else {
@@ -42,8 +74,6 @@ const Login: React.FC = () => {
       Error(
         typeof error === "string" ? error : "An error occurred during login."
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 

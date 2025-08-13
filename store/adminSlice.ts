@@ -15,10 +15,20 @@ interface LoginResponse {
   message?: string;
 }
 
-const initialState = {
-  admin: null as Admin | null,
-  token: null as string | null,
+interface AdminState {
+  admin: Admin | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: AdminState = {
+  admin: null,
+  token: null,
   isAuthenticated: false,
+  isLoading: false,
+  error: null,
 };
 
 export const adminSlice = createSlice({
@@ -27,6 +37,7 @@ export const adminSlice = createSlice({
   reducers: {
     setAdmin: (state, action) => {
       state.admin = action.payload;
+      state.isAuthenticated = !!action.payload;
     },
     setToken: (state, action) => {
       state.token = action.payload;
@@ -36,6 +47,15 @@ export const adminSlice = createSlice({
       state.admin = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.error = null;
+      sessionStorage.clear();
+      localStorage.clear();
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
+    setLoading: (state, action) => {
+      state.isLoading = action.payload;
     },
   },
 });
@@ -49,16 +69,20 @@ export const loginAdmin = createAsyncThunk(
   "admin/loginAdmin",
   async (data: LoginPayload, thunkAPI) => {
     try {
+      thunkAPI.dispatch(setLoading(true));
       const response = await api().post<LoginResponse>("/admin/login", data);
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
       return thunkAPI.rejectWithValue(errorMessage);
+    } finally {
+      thunkAPI.dispatch(setLoading(false));
     }
   }
 );
 
-export const { setAdmin, setToken, logout } = adminSlice.actions;
+export const { setAdmin, setToken, logout, clearError, setLoading } =
+  adminSlice.actions;
 
 export default adminSlice.reducer;
