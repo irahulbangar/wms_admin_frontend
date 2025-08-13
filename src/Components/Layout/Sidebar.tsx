@@ -215,13 +215,13 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
       {!collapsed && (
         <div className="p-4 border-t border-border-primary">
           <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary">
-            <User className="w-8 h-8 text-text-muted rounded-full ring-2 ring-blue-500" />
+            <User className="w-10 h-10 text-text-primary rounded-full bg-primary p-2" />
             <div className="flex-1 min-w-0">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-primary truncate">
+                <p className="text-base font-medium text-text-primary truncate">
                   {admin?.name}
                 </p>
-                <p className="text-xs text-text-secondary truncate">
+                <p className="text-sm text-text-secondary truncate">
                   {admin?.role}
                 </p>
               </div>

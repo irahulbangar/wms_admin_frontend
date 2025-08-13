@@ -13,7 +13,6 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = () => {
       try {
-        // Use the centralized auth status check
         dispatch(checkAuthStatus());
       } catch (error) {
         console.error("Error initializing auth:", error);
@@ -24,18 +23,15 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
 
     initializeAuth();
 
-    // Set up periodic token validation (every 5 minutes)
     const tokenValidationInterval = setInterval(() => {
       dispatch(checkAuthStatus());
     }, 5 * 60 * 1000);
 
-    // Cleanup interval on unmount
     return () => {
       clearInterval(tokenValidationInterval);
     };
   }, [dispatch]);
 
-  // Show loading while initializing
   if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-primary">
