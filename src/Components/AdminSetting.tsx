@@ -146,15 +146,15 @@ const AdminSetting = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-border-primary">
+      <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
               activeTab === tab.id
                 ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-                : "text-text-secondary hover:text-text-primary hover:bg-secondary"
+                : "text-text-secondary hover:text-text-primary bg-secondary"
             }`}
           >
             {tab.icon}
@@ -187,17 +187,21 @@ const AdminSetting = () => {
                 </div>
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-2 px-4 py-2 bg-input-bg border-input-border text-text-primary rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex items-center gap-2 px-4 py-2 bg-input-bg border-input-border text-text-primary rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   {theme === "light" ? (
                     <>
                       <Moon className="w-4 h-4" />
-                      <span className="hidden sm:inline">Switch to Dark</span>
+                      <span className="hidden sm:inline font-roboto">
+                        Switch to Dark
+                      </span>
                     </>
                   ) : (
                     <>
                       <Sun className="w-4 h-4" />
-                      <span className="hidden sm:inline">Switch to Light</span>
+                      <span className="hidden sm:inline font-roboto">
+                        Switch to Light
+                      </span>
                     </>
                   )}
                 </button>
