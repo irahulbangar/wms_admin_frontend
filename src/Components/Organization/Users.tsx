@@ -13,19 +13,15 @@ const Users = () => {
             Manage your organization's users
           </p>
         </div>
-        <div className="flex items-center gap-4 p-4 bg-primary rounded-lg flex-1">
+        <div className="flex items-center gap-4 p-4 bg-secondary rounded-lg flex-1">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
               type="text"
               placeholder="Search users..."
-              className="w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary dark:border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 text-text-secondary bg-secondary border border-border-secondary dark:border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          {/* <button className="flex items-center gap-2 px-4 py-2 text-text-secondary bg-primary border border-border-secondary dark:border-slate-300 rounded-lg hover:bg-theme-sendary transition-all duration-200">
-            <Filter className="w-4 h-4" />
-            Filter
-          </button> */}
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer">
           <PlusCircle className="w-4 h-4" />
@@ -33,7 +29,13 @@ const Users = () => {
         </button>
       </div>
 
-      <NoDataFound icon={<User className="w-16 h-16 text-text-muted mx-auto mb-4" />} title="No users found" description="Add your first user to get started" buttonText="Add User" buttonOnClick={() => { }} />
+      <NoDataFound
+        icon={<User className="w-16 h-16 text-text-muted mx-auto mb-4" />}
+        title="No users found"
+        description="Add your first user to get started"
+        buttonText="Add User"
+        buttonOnClick={() => {}}
+      />
     </div>
   );
 };

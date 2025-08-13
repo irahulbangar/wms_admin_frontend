@@ -135,7 +135,7 @@ const HomePage = () => {
           />
 
           <main
-            className={`flex-1 h-full bg-primary p-6 space-y-6 mt-22 overflow-y-auto pb-16 ${
+            className={`flex-1 h-full bg-input-bg p-6 space-y-6 mt-22 overflow-y-auto pb-16 ${
               sidebarCollapsed ? "ml-20" : "ml-72"
             }`}
           >
