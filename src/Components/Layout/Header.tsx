@@ -81,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({
               Dashboard
             </h1>
             <p className="text-text-secondary font-roboto">
-              Welcome back, {admin?.email || "User"}!
+              Welcome back, {admin?.name}!
             </p>
           </div>
         </div>
@@ -94,9 +94,6 @@ const Header: React.FC<HeaderProps> = ({
               placeholder="Search Anything"
               className="w-full pl-10 pr-4 py-2.5 bg-input-bg border-input-border font-roboto text-text-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
             />
-            {/* <button className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-text-muted hover:text-text-secondary cursor-pointer">
-              <Filter />
-            </button> */}
           </div>
         </div>
         {/* Right */}
@@ -130,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({
               <User className="w-5 h-5 text-text-primary" />
               <div className="hidden md:block">
                 <p className="text-base font-medium text-text-primary font-roboto">
-                  {admin?.email || "User"}
+                  {admin?.email}
                 </p>
                 <p className="text-sm text-text-secondary font-roboto">
                   Administrator
