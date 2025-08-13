@@ -83,7 +83,7 @@ const Dashboard = () => {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-primary rounded-lg shadow-sm border border-border-secondary p-6 hover:shadow-md transition-shadow"
+            className="bg-primary rounded-lg shadow-sm border border-border-primary p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
