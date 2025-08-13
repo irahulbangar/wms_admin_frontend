@@ -147,7 +147,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
         collapsed ? "w-20" : "w-72"
       }`}
     >
-      <div className="px-5 py-3 border-b border-border-primary shadow-xs flex items-center justify-center">
+      <div className="px-5 py-3.5 border-b border-border-primary shadow-xs flex items-center justify-center">
         <img src="/logo.png" alt="logo" className="h-16 w-32" />
       </div>
 
