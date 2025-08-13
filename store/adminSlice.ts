@@ -52,9 +52,6 @@ export const adminSlice = createSlice({
       sessionStorage.clear();
       localStorage.clear();
     },
-    clearError: (state) => {
-      state.error = null;
-    },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
     },
@@ -68,20 +65,17 @@ export const adminSlice = createSlice({
           const currentTime = Date.now() / 1000;
 
           if (decodedToken.exp && decodedToken.exp < currentTime) {
-            // Token expired, logout
             state.admin = null;
             state.token = null;
             state.isAuthenticated = false;
             sessionStorage.clear();
             localStorage.clear();
           } else {
-            // Valid token, restore state
             state.admin = JSON.parse(admin);
             state.token = token;
             state.isAuthenticated = true;
           }
         } else {
-          // No token, ensure logged out state
           state.admin = null;
           state.token = null;
           state.isAuthenticated = false;
@@ -109,6 +103,16 @@ export const loginAdmin = createAsyncThunk(
     try {
       thunkAPI.dispatch(setLoading(true));
       const response = await api().post<LoginResponse>("/admin/login", data);
+      if (response.data.success) {
+        sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
+        sessionStorage.setItem("accessToken", response.data.token);
+        const decodedToken = jwtDecode<{ admin: Admin }>(
+          response.data.token
+        ).admin;
+        sessionStorage.setItem("admin", JSON.stringify(decodedToken));
+        thunkAPI.dispatch(setAdmin(decodedToken));
+        thunkAPI.dispatch(setToken(response.data.token));
+      }
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
@@ -120,13 +124,7 @@ export const loginAdmin = createAsyncThunk(
   }
 );
 
-export const {
-  setAdmin,
-  setToken,
-  logout,
-  clearError,
-  setLoading,
-  checkAuthStatus,
-} = adminSlice.actions;
+export const { setAdmin, setToken, logout, setLoading, checkAuthStatus } =
+  adminSlice.actions;
 
 export default adminSlice.reducer;

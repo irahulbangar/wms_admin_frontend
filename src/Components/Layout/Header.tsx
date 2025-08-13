@@ -127,10 +127,10 @@ const Header: React.FC<HeaderProps> = ({
               <User className="w-5 h-5 text-text-primary" />
               <div className="hidden md:block">
                 <p className="text-base font-medium text-text-primary font-roboto">
-                  {admin?.email}
+                  {admin?.name}
                 </p>
                 <p className="text-sm text-text-secondary font-roboto">
-                  Administrator
+                  {admin?.role}
                 </p>
               </div>
               <ChevronDown

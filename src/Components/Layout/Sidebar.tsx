@@ -9,6 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAppSelector } from "../../../store/store";
 
 interface SubmenuItem {
   id: string;
@@ -88,6 +89,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
+  const { admin } = useAppSelector((state) => state.admin);
   // Initialize expanded state from localStorage
   const [expanded, setExpanded] = useState(() => {
     const saved = localStorage.getItem("sidebar-expanded");
@@ -217,10 +219,10 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
             <div className="flex-1 min-w-0">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-text-primary truncate">
-                  Jhon Doe
+                  {admin?.name}
                 </p>
                 <p className="text-xs text-text-secondary truncate">
-                  Administrator
+                  {admin?.role}
                 </p>
               </div>
             </div>

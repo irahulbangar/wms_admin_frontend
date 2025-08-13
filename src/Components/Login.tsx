@@ -5,8 +5,7 @@ import { Error, Success } from "../utils/toast";
 import { Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { loginAdmin, setAdmin, setToken } from "../../store/adminSlice";
-import { jwtDecode } from "jwt-decode";
+import { loginAdmin } from "../../store/adminSlice";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -45,14 +44,6 @@ const Login: React.FC = () => {
       const result = await dispatch(loginAdmin({ email, password })).unwrap();
 
       if (result.success) {
-        sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
-        sessionStorage.setItem("accessToken", result.token);
-        const decodedToken = jwtDecode(result.token);
-        sessionStorage.setItem("admin", JSON.stringify(decodedToken));
-
-        dispatch(setAdmin(decodedToken));
-        dispatch(setToken(result.token));
-
         navigate("/home");
         Success("You have been logged in successfully.");
       } else {
