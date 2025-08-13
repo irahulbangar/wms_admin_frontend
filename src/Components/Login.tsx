@@ -1,62 +1,51 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import backgroundImage from "/background.jpg";
 import { Error, Success } from "../utils/toast";
 import { Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAppDispatch } from "../../store/store";
-import { getAdmin } from "../../store/adminSlice";
+import { loginAdmin } from "../../store/adminSlice";
+// import { jwtDecode } from "jwt-decode";
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState("test@test.com");
-  const [password, setPassword] = useState("test");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
-  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/home");
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    dispatch(getAdmin())
-      .unwrap()
-      .then((res) => {
-        console.log(res);
-      });
-  }, [dispatch]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    if (isLoading) return;
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
+    sessionStorage.clear();
+    localStorage.clear();
+
     try {
-      const success = await login(username, password);
-      if (success) {
+      const result = await dispatch(loginAdmin({ email, password })).unwrap();
+      console.log("result", result);
+      if (result.success) {
+        sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
+        const token = result.token;
+        sessionStorage.setItem("accessToken", token);
         navigate("/home");
         Success("You have been logged in successfully.");
       } else {
         Error("Invalid email or password.");
       }
-    } catch (err) {
-      console.error(err);
-      Error("An error occurred during login.");
+    } catch (error) {
+      console.error("Login error:", error);
+      Error(
+        typeof error === "string" ? error : "An error occurred during login."
+      );
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (isAuthenticated) {
-    return null;
-  }
 
   return (
     <div
@@ -90,23 +79,23 @@ const Login: React.FC = () => {
           </button>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleLogin}>
           <label
             htmlFor="email"
             className="block text-sm font-medium text-text-secondary mb-2"
           >
-            Username
+            Email
           </label>
           <input
-            id="username"
-            name="username"
-            type="text"
-            autoComplete="username"
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
             required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            placeholder="Enter your username"
+            placeholder="Enter your email"
           />
 
           <label
