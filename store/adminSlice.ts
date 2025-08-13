@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import { jwtDecode } from "jwt-decode";
+import type { AdminUsersResponse } from "../model/admin-users.interface";
 
 interface Admin {
   id: string;
@@ -120,6 +121,25 @@ export const loginAdmin = createAsyncThunk(
       return thunkAPI.rejectWithValue(errorMessage);
     } finally {
       thunkAPI.dispatch(setLoading(false));
+    }
+  }
+);
+
+// get all users
+export const getAllUsers = createAsyncThunk(
+  "admin/getAllUsers",
+  async (_, thunkAPI) => {
+    try {
+      const response = await api().get<AdminUsersResponse>("/admin/all-users", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch users";
+      return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );

@@ -1,7 +1,29 @@
 import { Search, PlusCircle, User } from "lucide-react";
 import NoDataFound from "./NoDataFound";
+import { useAppDispatch } from "../../store/store";
+import type {
+  AdminUsers,
+  AdminUsersResponse,
+} from "../../model/admin-users.interface";
+import { useEffect, useState } from "react";
+import { getAllUsers } from "../../store/adminSlice";
 
 const Users = () => {
+  const dispatch = useAppDispatch();
+  const [users, setUsers] = useState<AdminUsers[]>([]);
+
+  console.log("users", users);
+
+  useEffect(() => {
+    dispatch(getAllUsers())
+      .unwrap()
+      .then((res: AdminUsersResponse) => {
+        if (res.success) {
+          setUsers(res.data);
+        }
+      });
+  }, [dispatch]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center w-full">
