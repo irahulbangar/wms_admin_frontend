@@ -36,8 +36,16 @@ const Users = () => {
       });
   }, []);
 
+  const handleEditUser = (id: string) => {
+    console.log(id);
+  };
+
+  const handleDeleteUser = (id: string) => {
+    console.log(id);
+  };
+
   return (
-    <div className="flex flex-col gap-6 h-full pb-4 relative">
+    <div className="flex flex-col gap-6 h-full pb-5 relative">
       {loading ? (
         <Loader />
       ) : (
@@ -65,7 +73,7 @@ const Users = () => {
             </button>
           </div>
 
-          <div className="relative overflow-x-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+          <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
                 <tr>
@@ -118,7 +126,7 @@ const Users = () => {
                   users.map((user, index) => (
                     <tr
                       key={user.id}
-                      className="bg-primary border-b border-border-primary hover:bg-primary/30"
+                      className="bg-primary border-b border-border-primary hover:bg-secondary"
                     >
                       <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
                         {index + 1}
@@ -140,8 +148,14 @@ const Users = () => {
                       </td>
                       <td className="px-6 py-4 font-roboto text-sm">
                         <div className="flex items-center gap-3 justify-center">
-                          <SquarePen className="w-5 h-5 text-status-info cursor-pointer" />
-                          <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
+                          <SquarePen
+                            onClick={() => handleEditUser(user.id)}
+                            className="w-5 h-5 text-status-info cursor-pointer"
+                          />
+                          <Trash2
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="w-5 h-5 text-status-danger cursor-pointer"
+                          />
                         </div>
                       </td>
                     </tr>

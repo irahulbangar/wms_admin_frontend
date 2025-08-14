@@ -5,7 +5,7 @@ export interface AdminUsersResponse {
 }
 
 export interface AdminUsers {
-  id: number;
+  id: string;
   name: string;
   email: string;
   password: string;
