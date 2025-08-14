@@ -5,7 +5,7 @@ import type {
   AdminUsers,
   AdminUsersResponse,
 } from "../../model/admin-users.interface";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getAllUsers } from "../../store/adminSlice";
 import { Error } from "../utils/toast";
 import Loader from "./Loader";
@@ -14,8 +14,11 @@ const Users = () => {
   const dispatch = useAppDispatch();
   const [users, setUsers] = useState<AdminUsers[]>([]);
   const [loading, setLoading] = useState(false);
+  const hasCalledAPI = useRef(false);
 
   useEffect(() => {
+    if (hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
     setLoading(true);
     dispatch(getAllUsers())
       .unwrap()
@@ -70,7 +73,7 @@ const Users = () => {
                     scope="col"
                     className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm"
                   >
-                    Sr No.
+                    Sr No
                   </th>
                   <th
                     scope="col"
