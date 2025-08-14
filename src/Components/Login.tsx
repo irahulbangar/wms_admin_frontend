@@ -17,14 +17,12 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated } = useAppSelector((state) => state.admin);
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/home");
     }
   }, [isAuthenticated, navigate]);
 
-  // Show loading while checking authentication
   if (isAuthenticated || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-primary">
@@ -36,7 +34,6 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous session data
     sessionStorage.clear();
     localStorage.clear();
 

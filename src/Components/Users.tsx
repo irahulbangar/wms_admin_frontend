@@ -15,8 +15,6 @@ const Users = () => {
   const [users, setUsers] = useState<AdminUsers[]>([]);
   const [loading, setLoading] = useState(false);
 
-  console.log("users", users);
-
   useEffect(() => {
     setLoading(true);
     dispatch(getAllUsers())
