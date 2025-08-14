@@ -1,13 +1,27 @@
 import { X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useAppDispatch } from "../../../store/store";
+import {
+  addOrganization,
+  getOrganizationById,
+  updateOrganization,
+} from "../../../store/organizationSlice";
+import { Error, Success } from "../../utils/toast";
 
 interface AddUpdateOrganizationProps {
   setShowAddModal: (show: boolean) => void;
+  type: "add" | "update";
+  organizationId: string;
 }
 
 const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   setShowAddModal,
+  type,
+  organizationId,
 }) => {
+  const dispatch = useAppDispatch();
+  const hasCalledAPI = useRef(false);
+
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -26,12 +40,89 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       [name]: value,
     }));
   };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
+
+    const organizationData = {
+      org_name: formData.name,
+      address: formData.address,
+      contact_person: formData.contactPerson,
+      contact_number: formData.contactNumber,
+      email: formData.email,
+      note: formData.notes,
+    };
+
+    if (type === "add") {
+      dispatch(addOrganization(organizationData))
+        .unwrap()
+        .then((res: { success: boolean }) => {
+          if (res.success) {
+            Success("Organization added successfully");
+            setShowAddModal(false);
+          }
+        })
+        .catch((err: string) => {
+          Error(err);
+        })
+        .finally(() => {
+          setShowAddModal(false);
+        });
+    } else {
+      dispatch(updateOrganization({ id: organizationId, ...organizationData }))
+        .unwrap()
+        .then((res: { success: boolean }) => {
+          if (res.success) {
+            Success("Organization updated successfully");
+            setShowAddModal(false);
+          }
+        })
+        .catch((err: string) => {
+          Error(err);
+        })
+        .finally(() => {
+          setShowAddModal(false);
+        });
+    }
+  };
+
+  useEffect(() => {
+    if (type === "update" && organizationId) {
+      dispatch(getOrganizationById(organizationId))
+        .unwrap()
+        .then((res) => {
+          setFormData({
+            name: res.data.org_name,
+            address: res.data.address,
+            contactPerson: res.data.contact_person,
+            contactNumber: res.data.contact_number,
+            email: res.data.email,
+            notes: res.data.note,
+          });
+        })
+        .catch((err) => {
+          Error(err as string);
+        });
+    } else if (type === "add") {
+      setFormData({
+        name: "",
+        address: "",
+        contactPerson: "",
+        contactNumber: "",
+        email: "",
+        notes: "",
+      });
+    }
+  }, [type, organizationId, dispatch]);
+
   return (
     <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-4 scrollbar-hide">
         <div className="flex items-center justify-between mb-6 sticky top-0 bg-primary pb-4 border-b border-border-primary">
           <h2 className="text-xl font-semibold text-text-primary">
-            Add New Organization
+            {type === "add" ? "Add New Organization" : "Update Organization"}
           </h2>
           <button
             onClick={() => setShowAddModal(false)}
@@ -41,7 +132,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           </button>
         </div>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">
               Organization Name
@@ -137,9 +228,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              Add Organization
+              {type === "add" ? "Add Organization" : "Update Organization"}
             </button>
           </div>
         </form>

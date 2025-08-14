@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, PlusCircle, Building2, Trash2, SquarePen } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch } from "../../../store/store";
@@ -9,11 +9,16 @@ import AddUpdateOrganization from "./AddUpdateOrganization";
 const Organization = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddModalType, setShowAddModalType] = useState<"add" | "update">(
+    "add"
+  );
+  const [organizationId, setOrganizationId] = useState<string>("");
+  const hasCalledAPI = useRef(false);
 
   const dispatch = useAppDispatch();
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
 
-  useEffect(() => {
+  const refreshOrganizations = () => {
     dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
@@ -21,15 +26,29 @@ const Organization = () => {
           setOrganizations(res.data);
         }
       });
+  };
+
+  useEffect(() => {
+    if (hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
+    refreshOrganizations();
   }, []);
 
   const handleEditOrganization = (id: string) => {
-    console.log(id);
     setShowAddModal(true);
+    setShowAddModalType("update");
+    setOrganizationId(id);
   };
 
   const handleDeleteOrganization = (id: string) => {
     console.log(id);
+  };
+
+  const handleModalClose = () => {
+    setShowAddModal(false);
+    setShowAddModalType("add");
+    setOrganizationId("");
+    refreshOrganizations();
   };
 
   return (
@@ -65,7 +84,11 @@ const Organization = () => {
       </div>
 
       {showAddModal && (
-        <AddUpdateOrganization setShowAddModal={setShowAddModal} />
+        <AddUpdateOrganization
+          setShowAddModal={handleModalClose}
+          type={showAddModalType}
+          organizationId={organizationId}
+        />
       )}
 
       <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
