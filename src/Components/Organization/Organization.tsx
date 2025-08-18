@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Search, PlusCircle, Building2, Trash2, SquarePen } from "lucide-react";
+import {
+  Search,
+  PlusCircle,
+  Building2,
+  Trash2,
+  SquarePen,
+  Check,
+  X,
+} from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch } from "../../../store/store";
 import {
@@ -233,7 +241,13 @@ const Organization = () => {
                     {organization?.note}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.status}
+                    <div className="flex items-center gap-2 justify-center cursor-pointer">
+                      {organization?.status === "active" ? (
+                        <Check className="w-5 h-5 text-status-success" />
+                      ) : (
+                        <X className="w-5 h-5 text-status-danger" />
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     {fromatDateWithTime(organization?.created_at)}
