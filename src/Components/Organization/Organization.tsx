@@ -7,6 +7,7 @@ import {
   SquarePen,
   Check,
   X,
+  Loader2,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch } from "../../../store/store";
@@ -219,136 +220,144 @@ const Organization = () => {
         </button>
       </div>
 
-      <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-        <table className="w-full text-sm text-left rtl:text-right text-text-primary">
-          <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
-            <tr>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Sr No
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Organization Name
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Address
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Contact Person
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Contact Number
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Email
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Notes
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Status
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Created At
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrganizations?.length > 0 ? (
-              filteredOrganizations?.map((organization, index) => (
-                <tr
-                  key={organization?.organization_id}
-                  className="bg-primary border-b border-border-primary hover:bg-secondary"
-                >
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.org_name}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.address}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.contact_person}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.contact_number}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.email}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.note}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    <div className="flex items-center gap-2 justify-center cursor-pointer">
-                      {organization?.status === "active" ? (
-                        <Check className="w-5 h-5 text-status-success" />
-                      ) : (
-                        <X className="w-5 h-5 text-status-danger" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {fromatDateWithTime(organization?.created_at)}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    <div className="flex items-center gap-3 justify-center">
-                      <SquarePen
-                        onClick={() =>
-                          handleEditOrganization(organization?.organization_id)
+      {isLoading ? (
+        <div className="flex items-center justify-center h-full">
+          <Loader2 className="w-12 h-12 text-text-primary animate-spin" />
+        </div>
+      ) : (
+        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+          <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
+              <tr>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Sr No
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Organization Name
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Address
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Contact Person
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Contact Number
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Notes
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Created At
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOrganizations?.length > 0 ? (
+                filteredOrganizations?.map((organization, index) => (
+                  <tr
+                    key={organization?.organization_id}
+                    className="bg-primary border-b border-border-primary hover:bg-secondary"
+                  >
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.org_name}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.address}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.contact_person}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.contact_number}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.email}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.note}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <div className="flex items-center gap-2 justify-center cursor-pointer">
+                        {organization?.status === "active" ? (
+                          <Check className="w-5 h-5 text-status-success" />
+                        ) : (
+                          <X className="w-5 h-5 text-status-danger" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {fromatDateWithTime(organization?.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <div className="flex items-center gap-3 justify-center">
+                        <SquarePen
+                          onClick={() =>
+                            handleEditOrganization(
+                              organization?.organization_id
+                            )
+                          }
+                          className="w-5 h-5 text-status-info cursor-pointer"
+                        />
+                        <Trash2
+                          onClick={() => handleDeleteOrganization(organization)}
+                          className="w-5 h-5 text-status-danger cursor-pointer"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-6 py-4 text-text-primary text-center font-roboto text-sm"
+                  >
+                    <NoDataFound
+                      icon={
+                        <Building2 className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                      }
+                      title={
+                        searchTerm
+                          ? "No organizations found"
+                          : "No organizations found"
+                      }
+                      description={
+                        searchTerm
+                          ? `No organizations match "${searchTerm}". Try a different search term.`
+                          : "Add your first organization to get started"
+                      }
+                      buttonText={
+                        searchTerm ? "Clear Search" : "Add Organization"
+                      }
+                      buttonOnClick={() => {
+                        if (searchTerm) {
+                          setSearchTerm("");
+                          setFilteredOrganizations(organizations);
+                        } else {
+                          setShowAddModal(true);
                         }
-                        className="w-5 h-5 text-status-info cursor-pointer"
-                      />
-                      <Trash2
-                        onClick={() => handleDeleteOrganization(organization)}
-                        className="w-5 h-5 text-status-danger cursor-pointer"
-                      />
-                    </div>
+                      }}
+                    />
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={10}
-                  className="px-6 py-4 text-text-primary text-center font-roboto text-sm"
-                >
-                  <NoDataFound
-                    icon={
-                      <Building2 className="w-16 h-16 text-text-muted mx-auto mb-4" />
-                    }
-                    title={
-                      searchTerm
-                        ? "No organizations found"
-                        : "No organizations found"
-                    }
-                    description={
-                      searchTerm
-                        ? `No organizations match "${searchTerm}". Try a different search term.`
-                        : "Add your first organization to get started"
-                    }
-                    buttonText={
-                      searchTerm ? "Clear Search" : "Add Organization"
-                    }
-                    buttonOnClick={() => {
-                      if (searchTerm) {
-                        setSearchTerm("");
-                        setFilteredOrganizations(organizations);
-                      } else {
-                        setShowAddModal(true);
-                      }
-                    }}
-                  />
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {showDeletePopup && organizationToDelete && (
         <DeletePopup
