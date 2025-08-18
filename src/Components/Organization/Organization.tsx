@@ -195,7 +195,7 @@ const Organization = () => {
                 setSearchTerm(value);
                 filterOrganizations(value);
               }}
-              className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary dark:border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {searchTerm && (
               <button
@@ -203,9 +203,9 @@ const Organization = () => {
                   setSearchTerm("");
                   setFilteredOrganizations(organizations);
                 }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             )}
           </div>
