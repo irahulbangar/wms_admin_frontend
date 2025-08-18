@@ -93,7 +93,40 @@ const Organization = () => {
     setShowAddModal(false);
     setShowAddModalType("add");
     setOrganizationId("");
-    refreshOrganizations();
+    // Only refresh if it's a new organization, not an update
+    if (showAddModalType === "add") {
+      refreshOrganizations();
+    }
+  };
+
+  const handleOrganizationUpdate = (updatedData: {
+    success: boolean;
+    data?: Record<string, unknown>;
+  }) => {
+    if (updatedData && updatedData.success && updatedData.data) {
+      const data = updatedData.data;
+      setOrganizations((prevOrganizations) =>
+        prevOrganizations.map((org) =>
+          org.organization_id === organizationId
+            ? {
+                ...org,
+                org_name: (data.org_name as string) || org.org_name,
+                address: (data.address as string) || org.address,
+                contact_person:
+                  (data.contact_person as string) || org.contact_person,
+                contact_number:
+                  (data.contact_number as string) || org.contact_number,
+                email: (data.email as string) || org.email,
+                note: (data.note as string) || org.note,
+                updated_at: new Date().toISOString(),
+              }
+            : org
+        )
+      );
+    }
+    setShowAddModal(false);
+    setShowAddModalType("add");
+    setOrganizationId("");
   };
 
   return (
@@ -133,6 +166,9 @@ const Organization = () => {
           setShowAddModal={handleModalClose}
           type={showAddModalType}
           organizationId={organizationId}
+          onUpdateSuccess={
+            showAddModalType === "update" ? handleOrganizationUpdate : undefined
+          }
         />
       )}
 

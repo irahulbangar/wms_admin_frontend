@@ -12,12 +12,17 @@ interface AddUpdateOrganizationProps {
   setShowAddModal: (show: boolean) => void;
   type: "add" | "update";
   organizationId: string;
+  onUpdateSuccess?: (data: {
+    success: boolean;
+    data?: Record<string, unknown>;
+  }) => void;
 }
 
 const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   setShowAddModal,
   type,
   organizationId,
+  onUpdateSuccess,
 }) => {
   const dispatch = useAppDispatch();
   const hasCalledAPI = useRef(false);
@@ -73,17 +78,23 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     } else {
       dispatch(updateOrganization({ id: organizationId, ...organizationData }))
         .unwrap()
-        .then((res: { success: boolean }) => {
+        .then((res: { success: boolean; data?: Record<string, unknown> }) => {
           if (res.success) {
             Success("Organization updated successfully");
-            setShowAddModal(false);
+            if (onUpdateSuccess) {
+              onUpdateSuccess(res);
+            } else {
+              setShowAddModal(false);
+            }
           }
         })
         .catch((err: string) => {
           Error(err);
         })
         .finally(() => {
-          setShowAddModal(false);
+          if (!onUpdateSuccess) {
+            setShowAddModal(false);
+          }
         });
     }
   };
