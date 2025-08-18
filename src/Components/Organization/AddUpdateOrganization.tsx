@@ -26,6 +26,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const hasCalledAPI = useRef(false);
+  const hasFetchedOrganization = useRef(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -34,10 +35,13 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     contactNumber: "",
     email: "",
     notes: "",
+    status: "active",
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -58,6 +62,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       contact_number: formData.contactNumber,
       email: formData.email,
       note: formData.notes,
+      status: formData.status,
     };
 
     if (type === "add") {
@@ -102,7 +107,12 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   };
 
   useEffect(() => {
-    if (type === "update" && organizationId) {
+    if (
+      type === "update" &&
+      organizationId &&
+      !hasFetchedOrganization.current
+    ) {
+      hasFetchedOrganization.current = true;
       dispatch(getOrganizationById(organizationId))
         .unwrap()
         .then((res) => {
@@ -113,12 +123,14 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             contactNumber: res.data.contact_number,
             email: res.data.email,
             notes: res.data.note,
+            status: res.data.status || "active",
           });
         })
         .catch((err) => {
           Error(err as string);
         });
     } else if (type === "add") {
+      hasFetchedOrganization.current = false;
       setFormData({
         name: "",
         address: "",
@@ -126,9 +138,13 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         contactNumber: "",
         email: "",
         notes: "",
+        status: "active",
       });
     }
-  }, [type, organizationId, dispatch, setShowAddModal]);
+    return () => {
+      hasFetchedOrganization.current = false;
+    };
+  }, [type, organizationId, dispatch]);
 
   return (
     <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
@@ -216,6 +232,21 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter email"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-1">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
           </div>
 
           <div>

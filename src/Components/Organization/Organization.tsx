@@ -10,6 +10,7 @@ import type { OrganizationResult } from "../../../model/get-organizations.interf
 import AddUpdateOrganization from "./AddUpdateOrganization";
 import DeletePopup from "./DeletePopup";
 import { Success, Error } from "../../utils/toast";
+import { fromatDateWithTime } from "../../utils/utils";
 
 const Organization = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -96,10 +97,11 @@ const Organization = () => {
   };
 
   const handleModalClose = () => {
+    const isAdd = showAddModalType === "add";
     setShowAddModal(false);
     setShowAddModalType("add");
     setOrganizationId("");
-    if (showAddModalType === "add" && !isLoading) {
+    if (isAdd && !isLoading) {
       refreshOrganizations();
     }
   };
@@ -166,17 +168,6 @@ const Organization = () => {
         </button>
       </div>
 
-      {showAddModal && (
-        <AddUpdateOrganization
-          setShowAddModal={handleModalClose}
-          type={showAddModalType}
-          organizationId={organizationId}
-          onUpdateSuccess={
-            showAddModalType === "update" ? handleOrganizationUpdate : undefined
-          }
-        />
-      )}
-
       <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
         <table className="w-full text-sm text-left rtl:text-right text-text-primary">
           <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
@@ -203,6 +194,12 @@ const Organization = () => {
                 Notes
               </th>
               <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                Status
+              </th>
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                Created At
+              </th>
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                 Actions
               </th>
             </tr>
@@ -211,35 +208,41 @@ const Organization = () => {
             {organizations.length > 0 ? (
               organizations.map((organization, index) => (
                 <tr
-                  key={organization.organization_id}
+                  key={organization?.organization_id}
                   className="bg-primary border-b border-border-primary hover:bg-secondary"
                 >
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization.org_name}
+                    {organization?.org_name}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization.address}
+                    {organization?.address}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization.contact_person}
+                    {organization?.contact_person}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization.contact_number}
+                    {organization?.contact_number}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization.email}
+                    {organization?.email}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization.note}
+                    {organization?.note}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {organization?.status}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {fromatDateWithTime(organization?.created_at)}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     <div className="flex items-center gap-3 justify-center">
                       <SquarePen
                         onClick={() =>
-                          handleEditOrganization(organization.organization_id)
+                          handleEditOrganization(organization?.organization_id)
                         }
                         className="w-5 h-5 text-status-info cursor-pointer"
                       />
@@ -280,6 +283,17 @@ const Organization = () => {
           onConfirm={handleConfirmDelete}
           organization={organizationToDelete}
           isLoading={isLoading}
+        />
+      )}
+
+      {showAddModal && (
+        <AddUpdateOrganization
+          setShowAddModal={handleModalClose}
+          type={showAddModalType}
+          organizationId={organizationId}
+          onUpdateSuccess={
+            showAddModalType === "update" ? handleOrganizationUpdate : undefined
+          }
         />
       )}
     </div>

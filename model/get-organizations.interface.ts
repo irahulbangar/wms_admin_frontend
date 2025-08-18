@@ -12,6 +12,7 @@ export interface OrganizationResult {
   contact_number: string;
   email: string;
   note: string;
+  status: string;
   created_at: string;
   updated_at: string;
 }
