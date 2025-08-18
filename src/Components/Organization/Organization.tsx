@@ -35,6 +35,9 @@ const Organization = () => {
 
   const dispatch = useAppDispatch();
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
+  const [filteredOrganizations, setFilteredOrganizations] = useState<
+    OrganizationResult[]
+  >([]);
 
   const refreshOrganizations = () => {
     if (isLoading) return;
@@ -60,6 +63,31 @@ const Organization = () => {
     hasCalledAPI.current = true;
     refreshOrganizations();
   };
+
+  const filterOrganizations = (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      setFilteredOrganizations(organizations);
+      return;
+    }
+
+    const filtered = organizations.filter((organization) => {
+      const searchLower = searchTerm.toLowerCase();
+
+      return (
+        organization.org_name?.toLowerCase().includes(searchLower) ||
+        organization.contact_person?.toLowerCase().includes(searchLower) ||
+        organization.contact_number?.toLowerCase().includes(searchLower) ||
+        organization.email?.toLowerCase().includes(searchLower) ||
+        organization.note?.toLowerCase().includes(searchLower)
+      );
+    });
+
+    setFilteredOrganizations(filtered);
+  };
+
+  useEffect(() => {
+    setFilteredOrganizations(organizations);
+  }, [organizations]);
 
   useEffect(() => {
     initialLoadOrganizations();
@@ -162,9 +190,24 @@ const Organization = () => {
               type="text"
               placeholder="Search organizations..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchTerm(value);
+                filterOrganizations(value);
+              }}
               className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary dark:border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilteredOrganizations(organizations);
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
         <button
@@ -213,75 +256,96 @@ const Organization = () => {
             </tr>
           </thead>
           <tbody>
-            {organizations.length > 0 ? (
-              organizations.map((organization, index) => (
-                <tr
-                  key={organization?.organization_id}
-                  className="bg-primary border-b border-border-primary hover:bg-secondary"
-                >
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.org_name}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.address}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.contact_person}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.contact_number}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.email}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {organization?.note}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    <div className="flex items-center gap-2 justify-center cursor-pointer">
-                      {organization?.status === "active" ? (
-                        <Check className="w-5 h-5 text-status-success" />
-                      ) : (
-                        <X className="w-5 h-5 text-status-danger" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {fromatDateWithTime(organization?.created_at)}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    <div className="flex items-center gap-3 justify-center">
-                      <SquarePen
-                        onClick={() =>
-                          handleEditOrganization(organization?.organization_id)
-                        }
-                        className="w-5 h-5 text-status-info cursor-pointer"
-                      />
-                      <Trash2
-                        onClick={() => handleDeleteOrganization(organization)}
-                        className="w-5 h-5 text-status-danger cursor-pointer"
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))
+            {filteredOrganizations?.length > 0 ? (
+              filteredOrganizations
+                ?.sort((a, b) => a.created_at.localeCompare(b.created_at))
+                .map((organization, index) => (
+                  <tr
+                    key={organization?.organization_id}
+                    className="bg-primary border-b border-border-primary hover:bg-secondary"
+                  >
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.org_name}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.address}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.contact_person}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.contact_number}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.email}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {organization?.note}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <div className="flex items-center gap-2 justify-center cursor-pointer">
+                        {organization?.status === "active" ? (
+                          <Check className="w-5 h-5 text-status-success" />
+                        ) : (
+                          <X className="w-5 h-5 text-status-danger" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {fromatDateWithTime(organization?.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <div className="flex items-center gap-3 justify-center">
+                        <SquarePen
+                          onClick={() =>
+                            handleEditOrganization(
+                              organization?.organization_id
+                            )
+                          }
+                          className="w-5 h-5 text-status-info cursor-pointer"
+                        />
+                        <Trash2
+                          onClick={() => handleDeleteOrganization(organization)}
+                          className="w-5 h-5 text-status-danger cursor-pointer"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
             ) : (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={10}
                   className="px-6 py-4 text-text-primary text-center font-roboto text-sm"
                 >
                   <NoDataFound
                     icon={
                       <Building2 className="w-16 h-16 text-text-muted mx-auto mb-4" />
                     }
-                    title="No organizations found"
-                    description="Add your first organization to get started"
-                    buttonText="Add Organization"
-                    buttonOnClick={() => setShowAddModal(true)}
+                    title={
+                      searchTerm
+                        ? "No organizations found"
+                        : "No organizations found"
+                    }
+                    description={
+                      searchTerm
+                        ? `No organizations match "${searchTerm}". Try a different search term.`
+                        : "Add your first organization to get started"
+                    }
+                    buttonText={
+                      searchTerm ? "Clear Search" : "Add Organization"
+                    }
+                    buttonOnClick={() => {
+                      if (searchTerm) {
+                        setSearchTerm("");
+                        setFilteredOrganizations(organizations);
+                      } else {
+                        setShowAddModal(true);
+                      }
+                    }}
                   />
                 </td>
               </tr>
