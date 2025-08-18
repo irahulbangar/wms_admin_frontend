@@ -73,7 +73,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           Error(err);
         })
         .finally(() => {
-          setShowAddModal(false);
+          if (!onUpdateSuccess) {
+            setShowAddModal(false);
+          }
         });
     } else {
       dispatch(updateOrganization({ id: organizationId, ...organizationData }))
@@ -126,7 +128,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         notes: "",
       });
     }
-  }, [type, organizationId, dispatch]);
+  }, [type, organizationId, dispatch, setShowAddModal]);
 
   return (
     <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">

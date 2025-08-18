@@ -21,7 +21,6 @@ const Organization = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [organizationToDelete, setOrganizationToDelete] =
     useState<OrganizationResult | null>(null);
-  const hasCalledAPI = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -45,10 +44,8 @@ const Organization = () => {
   };
 
   useEffect(() => {
-    if (hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
     refreshOrganizations();
-  }, [dispatch, refreshOrganizations]);
+  }, [dispatch]);
 
   const handleEditOrganization = (id: string) => {
     setShowAddModal(true);
