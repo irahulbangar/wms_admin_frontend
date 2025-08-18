@@ -21,19 +21,26 @@ const Organization = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [organizationToDelete, setOrganizationToDelete] =
     useState<OrganizationResult | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   const hasCalledAPI = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useAppDispatch();
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
 
   const refreshOrganizations = () => {
+    setIsLoading(true);
     dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
         if (res.success) {
           setOrganizations(res.data);
         }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -56,8 +63,7 @@ const Organization = () => {
 
   const handleConfirmDelete = async () => {
     if (!organizationToDelete) return;
-
-    setIsDeleting(true);
+    setIsLoading(true);
     try {
       const result = await dispatch(
         deleteOrganization(organizationToDelete.organization_id)
@@ -71,16 +77,16 @@ const Organization = () => {
         Error(result.message || "Failed to delete organization");
       }
     } catch (error) {
+      console.log(error);
       Error("Failed to delete organization");
     } finally {
-      setIsDeleting(false);
+      setIsLoading(false);
     }
   };
 
   const handleDeletePopupClose = () => {
     setShowDeletePopup(false);
     setOrganizationToDelete(null);
-    setIsDeleting(false);
   };
 
   const handleModalClose = () => {
@@ -232,7 +238,7 @@ const Organization = () => {
           onClose={handleDeletePopupClose}
           onConfirm={handleConfirmDelete}
           organization={organizationToDelete}
-          isLoading={isDeleting}
+          isLoading={isLoading}
         />
       )}
     </div>
