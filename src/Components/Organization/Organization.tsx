@@ -257,64 +257,60 @@ const Organization = () => {
           </thead>
           <tbody>
             {filteredOrganizations?.length > 0 ? (
-              filteredOrganizations
-                ?.sort((a, b) => a.created_at.localeCompare(b.created_at))
-                .map((organization, index) => (
-                  <tr
-                    key={organization?.organization_id}
-                    className="bg-primary border-b border-border-primary hover:bg-secondary"
-                  >
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {organization?.org_name}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {organization?.address}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {organization?.contact_person}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {organization?.contact_number}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {organization?.email}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {organization?.note}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      <div className="flex items-center gap-2 justify-center cursor-pointer">
-                        {organization?.status === "active" ? (
-                          <Check className="w-5 h-5 text-status-success" />
-                        ) : (
-                          <X className="w-5 h-5 text-status-danger" />
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {fromatDateWithTime(organization?.created_at)}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      <div className="flex items-center gap-3 justify-center">
-                        <SquarePen
-                          onClick={() =>
-                            handleEditOrganization(
-                              organization?.organization_id
-                            )
-                          }
-                          className="w-5 h-5 text-status-info cursor-pointer"
-                        />
-                        <Trash2
-                          onClick={() => handleDeleteOrganization(organization)}
-                          className="w-5 h-5 text-status-danger cursor-pointer"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))
+              filteredOrganizations?.map((organization, index) => (
+                <tr
+                  key={organization?.organization_id}
+                  className="bg-primary border-b border-border-primary hover:bg-secondary"
+                >
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {organization?.org_name}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {organization?.address}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {organization?.contact_person}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {organization?.contact_number}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {organization?.email}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {organization?.note}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <div className="flex items-center gap-2 justify-center cursor-pointer">
+                      {organization?.status === "active" ? (
+                        <Check className="w-5 h-5 text-status-success" />
+                      ) : (
+                        <X className="w-5 h-5 text-status-danger" />
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {fromatDateWithTime(organization?.created_at)}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <div className="flex items-center gap-3 justify-center">
+                      <SquarePen
+                        onClick={() =>
+                          handleEditOrganization(organization?.organization_id)
+                        }
+                        className="w-5 h-5 text-status-info cursor-pointer"
+                      />
+                      <Trash2
+                        onClick={() => handleDeleteOrganization(organization)}
+                        className="w-5 h-5 text-status-danger cursor-pointer"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
                 <td
