@@ -22,11 +22,14 @@ const Organization = () => {
   const [organizationToDelete, setOrganizationToDelete] =
     useState<OrganizationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const hasCalledAPI = useRef(false);
 
   const dispatch = useAppDispatch();
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
 
   const refreshOrganizations = () => {
+    if (isLoading) return;
+
     setIsLoading(true);
     dispatch(getOrganizations())
       .unwrap()
@@ -43,9 +46,15 @@ const Organization = () => {
       });
   };
 
-  useEffect(() => {
+  const initialLoadOrganizations = () => {
+    if (hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
     refreshOrganizations();
-  }, [dispatch]);
+  };
+
+  useEffect(() => {
+    initialLoadOrganizations();
+  }, []);
 
   const handleEditOrganization = (id: string) => {
     setShowAddModal(true);
@@ -59,7 +68,7 @@ const Organization = () => {
   };
 
   const handleConfirmDelete = async () => {
-    if (!organizationToDelete) return;
+    if (!organizationToDelete || isLoading) return;
     setIsLoading(true);
     try {
       const result = await dispatch(
@@ -90,8 +99,7 @@ const Organization = () => {
     setShowAddModal(false);
     setShowAddModalType("add");
     setOrganizationId("");
-    // Only refresh if it's a new organization, not an update
-    if (showAddModalType === "add") {
+    if (showAddModalType === "add" && !isLoading) {
       refreshOrganizations();
     }
   };
