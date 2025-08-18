@@ -2,9 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Search, PlusCircle, Building2, Trash2, SquarePen } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch } from "../../../store/store";
-import { getOrganizations } from "../../../store/organizationSlice";
+import {
+  getOrganizations,
+  deleteOrganization,
+} from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/get-organizations.interface";
 import AddUpdateOrganization from "./AddUpdateOrganization";
+import DeletePopup from "./DeletePopup";
+import { Success, Error } from "../../utils/toast";
 
 const Organization = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,6 +18,10 @@ const Organization = () => {
     "add"
   );
   const [organizationId, setOrganizationId] = useState<string>("");
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [organizationToDelete, setOrganizationToDelete] =
+    useState<OrganizationResult | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const hasCalledAPI = useRef(false);
 
   const dispatch = useAppDispatch();
@@ -32,7 +41,7 @@ const Organization = () => {
     if (hasCalledAPI.current) return;
     hasCalledAPI.current = true;
     refreshOrganizations();
-  }, []);
+  }, [dispatch, refreshOrganizations]);
 
   const handleEditOrganization = (id: string) => {
     setShowAddModal(true);
@@ -40,8 +49,38 @@ const Organization = () => {
     setOrganizationId(id);
   };
 
-  const handleDeleteOrganization = (id: string) => {
-    console.log(id);
+  const handleDeleteOrganization = (organization: OrganizationResult) => {
+    setOrganizationToDelete(organization);
+    setShowDeletePopup(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!organizationToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const result = await dispatch(
+        deleteOrganization(organizationToDelete.organization_id)
+      ).unwrap();
+      if (result.success) {
+        Success("Organization deleted successfully");
+        refreshOrganizations();
+        setShowDeletePopup(false);
+        setOrganizationToDelete(null);
+      } else {
+        Error(result.message || "Failed to delete organization");
+      }
+    } catch (error) {
+      Error("Failed to delete organization");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeletePopupClose = () => {
+    setShowDeletePopup(false);
+    setOrganizationToDelete(null);
+    setIsDeleting(false);
   };
 
   const handleModalClose = () => {
@@ -158,9 +197,7 @@ const Organization = () => {
                         className="w-5 h-5 text-status-info cursor-pointer"
                       />
                       <Trash2
-                        onClick={() =>
-                          handleDeleteOrganization(organization.organization_id)
-                        }
+                        onClick={() => handleDeleteOrganization(organization)}
                         className="w-5 h-5 text-status-danger cursor-pointer"
                       />
                     </div>
@@ -188,6 +225,16 @@ const Organization = () => {
           </tbody>
         </table>
       </div>
+
+      {showDeletePopup && organizationToDelete && (
+        <DeletePopup
+          isOpen={showDeletePopup}
+          onClose={handleDeletePopupClose}
+          onConfirm={handleConfirmDelete}
+          organization={organizationToDelete}
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 };

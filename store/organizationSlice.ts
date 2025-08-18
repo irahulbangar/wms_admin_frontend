@@ -117,6 +117,29 @@ export const getOrganizationById = createAsyncThunk(
   }
 );
 
+export const deleteOrganization = createAsyncThunk(
+  "organization/deleteOrganization",
+  async (id: string, thunkAPI) => {
+    try {
+      const response = await api().delete(
+        `/organization/delete-organization/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete organization";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setOrganizations } = organizationSlice.actions;
 
 export default organizationSlice.reducer;
