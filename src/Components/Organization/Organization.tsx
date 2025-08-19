@@ -8,6 +8,7 @@ import {
   Check,
   X,
   Loader2,
+  Eye,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch } from "../../../store/store";
@@ -315,6 +316,8 @@ const Organization = () => {
                           onClick={() => handleDeleteOrganization(organization)}
                           className="w-5 h-5 text-status-danger cursor-pointer"
                         />
+
+                        <Eye className="w-5 h-5 text-status-info cursor-pointer" />
                       </div>
                     </td>
                   </tr>
