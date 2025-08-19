@@ -20,6 +20,8 @@ import {
 import type { ProjectResult } from "../../../model/project.interface";
 import { Error } from "../../utils/toast";
 import { fromatDateWithTime } from "../../utils/utils";
+import { getOrganizations } from "../../../store/organizationSlice";
+import type { OrganizationResult } from "../../../model/organizations.interface";
 
 const Projects = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
@@ -33,6 +35,7 @@ const Projects = () => {
   const dispatch = useAppDispatch();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
   const hasCalledAPI = useRef(false);
+  const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
 
   const handleBackToOrganizations = () => {
     navigate("/organization");
@@ -74,10 +77,30 @@ const Projects = () => {
     }
   };
 
+  const getAllOrganizations = async () => {
+    if (isLoading || hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
+    setIsLoading(true);
+
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setOrganizations(res.data);
+        }
+      })
+      .catch((err: unknown) => {
+        const errorMessage =
+          err instanceof Error ? err.toString() : String(err);
+        Error(errorMessage || "An error occurred");
+      });
+  };
+
   // Reset projects and loading state when organization_id changes
   useEffect(() => {
     setProjects([]);
     setIsLoading(false);
+    getAllOrganizations();
 
     if (organization_id) {
       getProjectByOrganizationId();
@@ -133,6 +156,19 @@ const Projects = () => {
               ? `Projects - Organization ${organization_id}`
               : "Projects"}
           </h1>
+        </div>
+        <div className="flex-shrink-0">
+          <select
+            value={organization_id}
+            className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
+          >
+            <option value="all">All Organization</option>
+            {organizations.map((organization, index) => (
+              <option key={index} value={organization.organization_id}>
+                {organization.org_name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex items-center gap-4 p-4 rounded-lg flex-1">
           <div className="flex-1 relative">
