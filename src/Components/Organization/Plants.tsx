@@ -1,15 +1,35 @@
-import { Search, PlusCircle, Columns3Cog } from "lucide-react";
+import { Search, PlusCircle, Columns3Cog, ChevronsLeft } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
 
 const Plants = () => {
+  const { organization_id } = useParams();
+  const navigate = useNavigate();
+
+  const handleBackToOrganizations = () => {
+    navigate("/organization");
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6 h-full">
       <div className="flex items-center w-full">
+        {organization_id && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBackToOrganizations}
+              className="flex items-center gap-2 pr-3 text-text-primary hover:text-text-secondary transition-colors duration-200 cursor-pointer"
+            >
+              <ChevronsLeft className="w-5 h-5" />
+              Back
+            </button>
+          </div>
+        )}
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-text-primary">Plants</h1>
-          <p className="text-text-secondary">
-            Manage your organization's plants
-          </p>
+          <h1 className="text-2xl font-bold text-text-primary">
+            {organization_id
+              ? `Plants - Organization ${organization_id}`
+              : "Plants"}
+          </h1>
         </div>
         <div className="flex items-center gap-4 p-4 rounded-lg flex-1">
           <div className="flex-1 relative">
@@ -27,15 +47,25 @@ const Plants = () => {
         </button>
       </div>
 
-      <NoDataFound
-        icon={
-          <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
-        }
-        title="No plants found"
-        description="Add your first plant to get started"
-        buttonText="Add Plant"
-        buttonOnClick={() => {}}
-      />
+      <div className="h-[calc(100vh-295px)]">
+        <NoDataFound
+          icon={
+            <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
+          }
+          title={
+            organization_id
+              ? `No plants found for organization ${organization_id}`
+              : "No plants found"
+          }
+          description={
+            organization_id
+              ? `Add your first plant for organization ${organization_id} to get started`
+              : "Add your first plant to get started"
+          }
+          buttonText="Add Plant"
+          buttonOnClick={() => {}}
+        />
+      </div>
     </div>
   );
 };

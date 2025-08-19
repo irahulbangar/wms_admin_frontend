@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   PlusCircle,
@@ -23,6 +24,7 @@ import { Success, Error } from "../../utils/toast";
 import { fromatDateWithTime } from "../../utils/utils";
 
 const Organization = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddModalType, setShowAddModalType] = useState<"add" | "update">(
@@ -174,6 +176,10 @@ const Organization = () => {
     setOrganizationId("");
   };
 
+  const handleViewPlants = (organizationId: string) => {
+    navigate(`/organization/plants/${organizationId}`);
+  };
+
   return (
     <div className="flex flex-col gap-6 h-full overflow-y-auto pb-5">
       <div className="flex items-center w-full sticky top-0">
@@ -317,7 +323,12 @@ const Organization = () => {
                           className="w-5 h-5 text-status-danger cursor-pointer"
                         />
 
-                        <Eye className="w-5 h-5 text-status-info cursor-pointer" />
+                        <Eye
+                          onClick={() =>
+                            handleViewPlants(organization?.organization_id)
+                          }
+                          className="w-5 h-5 text-status-info cursor-pointer"
+                        />
                       </div>
                     </td>
                   </tr>

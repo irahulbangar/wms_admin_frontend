@@ -48,6 +48,14 @@ function App() {
                   }
                 />
                 <Route
+                  path="/organization/plants/:organization_id"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/organization/devices"
                   element={
                     <ProtectedRoute>
