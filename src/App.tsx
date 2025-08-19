@@ -40,6 +40,14 @@ function App() {
                   }
                 />
                 <Route
+                  path="/organization/plants"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/organization/devices"
                   element={
                     <ProtectedRoute>

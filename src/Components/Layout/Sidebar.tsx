@@ -2,6 +2,7 @@ import {
   Building,
   Building2,
   ChevronDown,
+  Columns3Cog,
   LayoutDashboard,
   Monitor,
   Settings,
@@ -34,6 +35,12 @@ const menuItems = [
         label: "Organization",
         icon: <Building className="w-5 h-5" />,
         href: "/organization",
+      },
+      {
+        id: "plants",
+        label: "Plants",
+        icon: <Columns3Cog className="w-5 h-5" />,
+        href: "/organization/plants",
       },
       {
         id: "devices",
@@ -90,13 +97,11 @@ interface SidebarProps {
 
 const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
   const { admin } = useAppSelector((state) => state.admin);
-  // Initialize expanded state from localStorage
   const [expanded, setExpanded] = useState(() => {
     const saved = localStorage.getItem("sidebar-expanded");
     return saved ? new Set(JSON.parse(saved)) : new Set(["dashboard"]);
   });
 
-  // Save expanded state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(
       "sidebar-expanded",
@@ -211,7 +216,6 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
         })}
       </nav>
 
-      {/* User Profile */}
       {!collapsed && (
         <div className="p-4 border-t border-border-primary">
           <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary">
