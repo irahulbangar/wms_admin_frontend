@@ -16,9 +16,10 @@ import { useAppDispatch } from "../../../store/store";
 import {
   getAllProjects,
   getProjectsByOrganizationId,
+  deleteProjectById,
 } from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
-import { Error } from "../../utils/toast";
+import { Error, Success } from "../../utils/toast";
 import { fromatDateWithTime } from "../../utils/utils";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
@@ -32,6 +33,9 @@ const Projects = () => {
   );
   const [projectId, setProjectId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterBy, setFilterBy] = useState("all");
+  const [filteredProjects, setFilteredProjects] = useState<ProjectResult[]>([]);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>(
     organization_id || "all"
   );
@@ -107,6 +111,29 @@ const Projects = () => {
     }
   }, [organization_id]);
 
+  // Filter projects based on search term and status filter
+  useEffect(() => {
+    let filtered = projects;
+
+    // Apply status filter
+    if (filterBy !== "all") {
+      filtered = filtered.filter((project) => project.status === filterBy);
+    }
+
+    // Apply search term filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (project) =>
+          project.project_name.toLowerCase().includes(searchLower) ||
+          project.address.toLowerCase().includes(searchLower) ||
+          project.status.toLowerCase().includes(searchLower)
+      );
+    }
+
+    setFilteredProjects(filtered);
+  }, [projects, filterBy, searchTerm]);
+
   const handleAddProject = () => {
     setShowAddModalType("add");
     setProjectId("");
@@ -117,6 +144,25 @@ const Projects = () => {
     setShowAddModalType("update");
     setProjectId(id);
     setShowAddModal(true);
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      try {
+        const result = await dispatch(deleteProjectById(id)).unwrap();
+        if (result.success) {
+          Success("Project deleted successfully");
+          // Refresh the projects list
+          if (selectedOrganizationId === "all") {
+            getProjects();
+          } else {
+            getProjectByOrganizationId(selectedOrganizationId);
+          }
+        }
+      } catch (error) {
+        Error(`Failed to delete project: ${error}`);
+      }
+    }
   };
 
   const handleModalClose = () => {
@@ -181,11 +227,27 @@ const Projects = () => {
           </select>
         </div>
         <div className="flex items-center gap-4 p-4 rounded-lg flex-1">
+          {/* Status Filter Dropdown */}
+          <div className="flex-shrink-0">
+            <select
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value)}
+              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          {/* Search Input */}
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
               type="text"
               placeholder="Search projects..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -238,8 +300,8 @@ const Projects = () => {
               </tr>
             </thead>
             <tbody>
-              {projects.length > 0 ? (
-                projects.map((project, index) => (
+              {filteredProjects.length > 0 ? (
+                filteredProjects.map((project, index) => (
                   <tr
                     key={index}
                     className="border-b border-border-primary bg-primary hover:bg-secondary"
@@ -278,7 +340,12 @@ const Projects = () => {
                         >
                           <Edit className="w-5 h-5" />
                         </button>
-                        <button className="text-status-danger hover:text-status-danger-hover transition-colors duration-200 cursor-pointer">
+                        <button
+                          onClick={() =>
+                            handleDeleteProject(project.project_id.toString())
+                          }
+                          className="text-status-danger hover:text-status-danger-hover transition-colors duration-200 cursor-pointer"
+                        >
                           <Trash2 className="w-5 h-5" />
                         </button>
                         <button className="text-teal-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer">
@@ -299,7 +366,9 @@ const Projects = () => {
                         <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
                       }
                       title={
-                        selectedOrganizationId === "all"
+                        searchTerm || filterBy !== "all"
+                          ? "No projects match your search/filter"
+                          : selectedOrganizationId === "all"
                           ? "No projects found"
                           : `No projects found for ${
                               organizations.find(
@@ -310,7 +379,9 @@ const Projects = () => {
                             }`
                       }
                       description={
-                        selectedOrganizationId === "all"
+                        searchTerm || filterBy !== "all"
+                          ? "Try adjusting your search terms or filter criteria"
+                          : selectedOrganizationId === "all"
                           ? "Add your first project to get started"
                           : `Add your first project for ${
                               organizations.find(
@@ -320,8 +391,19 @@ const Projects = () => {
                               `Organization ${selectedOrganizationId}`
                             } to get started`
                       }
-                      buttonText="Add Project"
-                      buttonOnClick={handleAddProject}
+                      buttonText={
+                        searchTerm || filterBy !== "all"
+                          ? "Clear Search"
+                          : "Add Project"
+                      }
+                      buttonOnClick={() => {
+                        if (searchTerm || filterBy !== "all") {
+                          setSearchTerm("");
+                          setFilterBy("all");
+                        } else {
+                          handleAddProject();
+                        }
+                      }}
                     />
                   </td>
                 </tr>

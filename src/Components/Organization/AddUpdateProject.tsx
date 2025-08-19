@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { Success, Error } from "../../utils/toast";
+import { useAppDispatch } from "../../../store/store";
+import {
+  addProject,
+  updateProjectById,
+  getProjectById,
+} from "../../../store/projectSlice";
 
 interface ProjectFormData {
   project_name: string;
@@ -28,6 +34,7 @@ const AddUpdateProject = ({
   organizationId,
   onUpdateSuccess,
 }: AddUpdateProjectProps) => {
+  const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<ProjectFormData>({
     project_name: "",
@@ -41,15 +48,32 @@ const AddUpdateProject = ({
 
   useEffect(() => {
     if (type === "update" && projectId) {
-      setFormData({
-        project_name: "",
-        latitude: "",
-        longitude: "",
-        address: "",
-        status: "active",
-      });
+      loadProjectData();
     }
   }, [type, projectId]);
+
+  const loadProjectData = async () => {
+    if (!projectId) return;
+
+    setIsLoading(true);
+    try {
+      const result = await dispatch(getProjectById(projectId)).unwrap();
+      if (result.success && result.data && result.data.length > 0) {
+        const project = result.data[0];
+        setFormData({
+          project_name: project.project_name || "",
+          latitude: project.latitude || "",
+          longitude: project.longitude || "",
+          address: project.address || "",
+          status: project.status || "active",
+        });
+      }
+    } catch (error) {
+      Error(`Failed to load project data: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Partial<ProjectFormData> = {};
@@ -108,21 +132,50 @@ const AddUpdateProject = ({
 
     try {
       if (type === "add") {
-        Success("Project added successfully");
-        setShowModal(false);
-      } else {
-        Success("Project updated successfully");
-        if (onUpdateSuccess) {
-          onUpdateSuccess({
-            success: true,
-            data: formData as unknown as Record<string, unknown>,
-          });
+        const projectPayload = {
+          ...formData,
+          organization_id: organizationId,
+        };
+
+        const result = await dispatch(addProject(projectPayload)).unwrap();
+        if (result.success) {
+          Success("Project added successfully");
+          setShowModal(false);
+          if (onUpdateSuccess) {
+            onUpdateSuccess({
+              success: true,
+              data: result.data,
+            });
+          }
         }
-        setShowModal(false);
+      } else {
+        if (!projectId) return;
+
+        const projectPayload = {
+          ...formData,
+          id: projectId,
+          organization_id: organizationId,
+        };
+
+        const result = await dispatch(
+          updateProjectById(projectPayload)
+        ).unwrap();
+        if (result.success) {
+          Success("Project updated successfully");
+          if (onUpdateSuccess) {
+            onUpdateSuccess({
+              success: true,
+              data: result.data,
+            });
+          }
+          setShowModal(false);
+        }
       }
-    } catch {
+    } catch (error) {
       Error(
-        type === "add" ? "Failed to add project" : "Failed to update project"
+        type === "add"
+          ? `Failed to add project: ${error}`
+          : `Failed to update project: ${error}`
       );
     } finally {
       setIsLoading(false);
@@ -138,7 +191,6 @@ const AddUpdateProject = ({
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 sticky top-0 bg-primary pb-4 border-b border-border-primary">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
             {type === "add" ? "Add New Project" : "Update Project"}
@@ -152,7 +204,6 @@ const AddUpdateProject = ({
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-3">
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Project Name

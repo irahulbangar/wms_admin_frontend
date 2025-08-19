@@ -2,6 +2,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { GetProjectsResponse } from "../model/project.interface";
 
+interface ProjectResponse {
+  success: boolean;
+  message: string;
+  data?: Record<string, unknown>;
+}
+
 export const projectSlice = createSlice({
   name: "project",
   initialState: {
@@ -43,14 +49,11 @@ export const getProjectById = createAsyncThunk(
   "project/getProjectById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get<GetProjectsResponse>(
-        `/organization/project/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+      const response = await api().get<GetProjectsResponse>(`/project/${id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+      });
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
@@ -88,6 +91,7 @@ interface ProjectPayload {
   longitude: string;
   address: string;
   status: string;
+  organization_id?: string;
 }
 
 // Add project
@@ -95,7 +99,7 @@ export const addProject = createAsyncThunk(
   "project/addProject",
   async (project: ProjectPayload, thunkAPI) => {
     try {
-      const response = await api().post<ProjectPayload>(
+      const response = await api().post<ProjectResponse>(
         `/project/create-project`,
         project,
         {
@@ -118,7 +122,7 @@ export const updateProjectById = createAsyncThunk(
   "project/updateProjectById",
   async (project: ProjectPayload & { id: string }, thunkAPI) => {
     try {
-      const response = await api().put<ProjectPayload>(
+      const response = await api().put<ProjectResponse>(
         `/project/update-project/${project.id}`,
         project,
         {
@@ -141,7 +145,7 @@ export const deleteProjectById = createAsyncThunk(
   "project/deleteProjectById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().delete<ProjectPayload>(
+      const response = await api().delete<ProjectResponse>(
         `/project/delete-project/${id}`,
         {
           headers: {
