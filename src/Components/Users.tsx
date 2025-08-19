@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { getAllUsers } from "../../store/adminSlice";
 import { Error } from "../utils/toast";
 import Loader from "./Loader";
+import { fromatDateWithTime } from "../utils/utils";
 
 const Users = () => {
   const dispatch = useAppDispatch();
@@ -141,10 +142,10 @@ const Users = () => {
                         {user.role}
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                        {user.created_at}
+                        {fromatDateWithTime(user.created_at)}
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                        {user.updated_at}
+                        {fromatDateWithTime(user.updated_at)}
                       </td>
                       <td className="px-6 py-4 font-roboto text-sm">
                         <div className="flex items-center gap-3 justify-center">

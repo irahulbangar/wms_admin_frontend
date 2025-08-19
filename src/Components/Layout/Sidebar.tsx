@@ -148,7 +148,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
       }`}
     >
       <div className="px-5 py-3.5 border-b border-border-primary shadow-xs flex items-center justify-center">
-        <img src="/logo.png" alt="logo" className="h-16 w-32" />
+        <img src="/logo.png" alt="logo" className="h-16 w-32 object-contain" />
       </div>
 
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto h-full">
