@@ -4,8 +4,6 @@ import {
   PlusCircle,
   Columns3Cog,
   ChevronsLeft,
-  Pencil,
-  Trash,
   Eye,
   Trash2,
   Edit,
