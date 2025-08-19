@@ -81,3 +81,79 @@ export const getProjectsByOrganizationId = createAsyncThunk(
     }
   }
 );
+
+interface ProjectPayload {
+  project_name: string;
+  latitude: string;
+  longitude: string;
+  address: string;
+  status: string;
+}
+
+// Add project
+export const addProject = createAsyncThunk(
+  "project/addProject",
+  async (project: ProjectPayload, thunkAPI) => {
+    try {
+      const response = await api().post<ProjectPayload>(
+        `/project/create-project`,
+        project,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add project";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Update project by id
+export const updateProjectById = createAsyncThunk(
+  "project/updateProjectById",
+  async (project: ProjectPayload & { id: string }, thunkAPI) => {
+    try {
+      const response = await api().put<ProjectPayload>(
+        `/project/update-project/${project.id}`,
+        project,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update project";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Delete project by id
+export const deleteProjectById = createAsyncThunk(
+  "project/deleteProjectById",
+  async (id: string, thunkAPI) => {
+    try {
+      const response = await api().delete<ProjectPayload>(
+        `/project/delete-project/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete project";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
