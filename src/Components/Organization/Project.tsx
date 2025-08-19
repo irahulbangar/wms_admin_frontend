@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Search,
   PlusCircle,
@@ -7,6 +7,7 @@ import {
   Eye,
   Trash2,
   Edit,
+  Loader2,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
@@ -31,13 +32,15 @@ const Projects = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
+  const hasCalledAPI = useRef(false);
 
   const handleBackToOrganizations = () => {
     navigate("/organization");
   };
 
   const getProjects = async () => {
-    if (isLoading) return;
+    if (isLoading || hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
     setIsLoading(true);
     try {
       const res = await dispatch(getAllProjects()).unwrap();
@@ -53,7 +56,8 @@ const Projects = () => {
   };
 
   const getProjectByOrganizationId = async () => {
-    if (isLoading) return;
+    if (isLoading || hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
     setIsLoading(true);
     try {
       const res = await dispatch(
@@ -150,11 +154,8 @@ const Projects = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            <p className="text-text-secondary">Loading projects...</p>
-          </div>
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+          <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
       ) : (
         <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">

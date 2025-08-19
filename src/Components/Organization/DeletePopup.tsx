@@ -29,7 +29,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
       {/* Modal */}
       <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-secondary">
+        <div className="flex items-center justify-between p-6 border-b border-border-primary">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-status-danger" />
@@ -40,7 +40,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-text-primary hover:text-text-secondary transition-colors cursor-pointer"
+            className="text-text-primary hover:text-text-primary/80 transition-colors cursor-pointer"
             disabled={isLoading}
           >
             <X className="w-5 h-5" />
@@ -55,7 +55,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-secondary">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-border-primary">
           <button
             onClick={onClose}
             disabled={isLoading}
