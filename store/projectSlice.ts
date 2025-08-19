@@ -60,4 +60,24 @@ export const getProjectById = createAsyncThunk(
   }
 );
 
-// Add project
+// Get all projects by organization id
+export const getProjectsByOrganizationId = createAsyncThunk(
+  "project/getProjectsByOrganizationId",
+  async (organization_id: string, thunkAPI) => {
+    try {
+      const response = await api().get<GetProjectsResponse>(
+        `/project/organization-projects/${organization_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch projects";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);

@@ -1,15 +1,29 @@
 import { useEffect, useRef, useState } from "react";
-import { Search, PlusCircle, Columns3Cog, ChevronsLeft } from "lucide-react";
+import {
+  Search,
+  PlusCircle,
+  Columns3Cog,
+  ChevronsLeft,
+  Pencil,
+  Trash,
+  Eye,
+  Trash2,
+  Edit,
+} from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
 import AddUpdateProject from "./AddUpdateProject";
 import { useAppDispatch } from "../../../store/store";
-import { getAllProjects } from "../../../store/projectSlice";
+import {
+  getAllProjects,
+  getProjectsByOrganizationId,
+} from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
 import { Error } from "../../utils/toast";
+import { fromatDateWithTime } from "../../utils/utils";
 
 const Projects = () => {
-  const { organization_id } = useParams();
+  const { organization_id } = useParams<{ organization_id: string }>();
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddModalType, setShowAddModalType] = useState<"add" | "update">(
@@ -43,10 +57,32 @@ const Projects = () => {
       });
   };
 
+  const getProjectByOrganizationId = () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    dispatch(getProjectsByOrganizationId(organization_id!))
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setProjects(res.data);
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     if (hasCalledAPI.current) return;
     hasCalledAPI.current = true;
-    getProjects();
+    if (organization_id) {
+      getProjectByOrganizationId();
+    } else {
+      getProjects();
+    }
   }, []);
 
   const handleAddProject = () => {
@@ -77,7 +113,7 @@ const Projects = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 h-full">
+    <div className="flex flex-col gap-6 h-full pb-4">
       <div className="flex items-center w-full">
         {organization_id && (
           <div className="flex items-center gap-2">
@@ -116,24 +152,107 @@ const Projects = () => {
         </button>
       </div>
 
-      <div className="h-[calc(100vh-295px)]">
-        <NoDataFound
-          icon={
-            <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
-          }
-          title={
-            organization_id
-              ? `No projects found for organization ${organization_id}`
-              : "No projects found"
-          }
-          description={
-            organization_id
-              ? `Add your first project for organization ${organization_id} to get started`
-              : "Add your first project to get started"
-          }
-          buttonText="Add Project"
-          buttonOnClick={handleAddProject}
-        />
+      <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+        <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+          <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
+            <tr>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                No
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Project Name
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Latitude
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Longitude
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Address
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Status
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Created At
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Updated At
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-text-primary">
+            {projects.map((project, index) => (
+              <tr key={index} className="border-b border-border-primary">
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {index + 1}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {project.project_name}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {project.latitude}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {project.longitude}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {project.address}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {project.status}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {fromatDateWithTime(project.created_at)}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  {fromatDateWithTime(project.updated_at)}
+                </td>
+                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() =>
+                        handleEditProject(project.project_id.toString())
+                      }
+                      className="text-status-info hover:text-status-info-hover transition-colors duration-200 cursor-pointer"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                    <button className="text-status-danger hover:text-status-danger-hover transition-colors duration-200 cursor-pointer">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                    <button className="text-teal-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer">
+                      <Eye className="w-5 h-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {projects.length === 0 && (
+          <NoDataFound
+            icon={
+              <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
+            }
+            title={
+              organization_id
+                ? `No projects found for organization ${organization_id}`
+                : "No projects found"
+            }
+            description={
+              organization_id
+                ? `Add your first project for organization ${organization_id} to get started`
+                : "Add your first project to get started"
+            }
+            buttonText="Add Project"
+            buttonOnClick={handleAddProject}
+          />
+        )}
       </div>
 
       {/* Add/Update Project Modal */}

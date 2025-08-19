@@ -5,9 +5,9 @@ export interface GetProjectsResponse {
 }
 
 export interface ProjectResult {
-  plant_id: number;
+  project_id: number;
   organization_id: number;
-  plant_name: string;
+  project_name: string;
   latitude: string;
   longitude: string;
   address: string;
