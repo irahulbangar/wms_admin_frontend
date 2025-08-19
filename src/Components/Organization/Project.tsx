@@ -2,7 +2,7 @@ import { Search, PlusCircle, Columns3Cog, ChevronsLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
 
-const Plants = () => {
+const Projects = () => {
   const { organization_id } = useParams();
   const navigate = useNavigate();
 
@@ -70,4 +70,4 @@ const Plants = () => {
   );
 };
 
-export default Plants;
+export default Projects;

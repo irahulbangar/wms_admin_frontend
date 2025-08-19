@@ -13,7 +13,7 @@ import AdminSetting from "./AdminSetting";
 import Setting from "./Organization/Setting";
 import Organization from "./Organization/Organization";
 import Loader from "./Loader";
-import Plants from "./Organization/Plants";
+import Projects from "./Organization/Project";
 
 const HomePage = () => {
   // Initialize sidebar collapsed state from localStorage
@@ -41,10 +41,10 @@ const HomePage = () => {
   useEffect(() => {
     if (location.pathname === "/organization") {
       setCurrentPage("organization");
-    } else if (location.pathname === "/organization/plants") {
-      setCurrentPage("plants");
-    } else if (location.pathname.startsWith("/organization/plants/")) {
-      setCurrentPage("plants");
+    } else if (location.pathname === "/organization/projects") {
+      setCurrentPage("projects");
+    } else if (location.pathname.startsWith("/organization/projects/")) {
+      setCurrentPage("projects");
     } else if (location.pathname === "/organization/devices") {
       setCurrentPage("devices");
     } else if (location.pathname === "/organization/users") {
@@ -74,8 +74,8 @@ const HomePage = () => {
       case "organization":
         navigate("/organization");
         break;
-      case "plants":
-        navigate("/organization/plants");
+      case "projects":
+        navigate("/organization/projects");
         break;
       case "devices":
         navigate("/organization/devices");
@@ -109,8 +109,8 @@ const HomePage = () => {
         return <Dashboard />;
       case "organization":
         return <Organization />;
-      case "plants":
-        return <Plants />;
+      case "projects":
+        return <Projects />;
       case "devices":
         return <Devices />;
       case "users":

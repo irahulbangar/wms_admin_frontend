@@ -2,7 +2,7 @@ import {
   Building,
   Building2,
   ChevronDown,
-  Columns3Cog,
+  FileText,
   LayoutDashboard,
   Monitor,
   Settings,
@@ -37,10 +37,10 @@ const menuItems = [
         href: "/organization",
       },
       {
-        id: "plants",
-        label: "Plants",
-        icon: <Columns3Cog className="w-5 h-5" />,
-        href: "/organization/plants",
+        id: "projects",
+        label: "Projects",
+        icon: <FileText className="w-5 h-5" />,
+        href: "/organization/projects",
       },
       {
         id: "devices",
