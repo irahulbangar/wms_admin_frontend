@@ -17,7 +17,7 @@ import {
   getOrganizations,
   deleteOrganization,
 } from "../../../store/organizationSlice";
-import type { OrganizationResult } from "../../../model/get-organizations.interface";
+import type { OrganizationResult } from "../../../model/organizations.interface";
 import AddUpdateOrganization from "./AddUpdateOrganization";
 import DeletePopup from "./DeletePopup";
 import { Success, Error } from "../../utils/toast";

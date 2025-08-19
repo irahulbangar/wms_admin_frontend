@@ -1,6 +1,6 @@
 import React from "react";
 import { X, AlertTriangle, Trash2 } from "lucide-react";
-import type { OrganizationResult } from "../../../model/get-organizations.interface";
+import type { OrganizationResult } from "../../../model/organizations.interface";
 
 interface DeletePopupProps {
   isOpen: boolean;

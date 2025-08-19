@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { GetOrganizationsResponse } from "../model/get-organizations.interface";
+import type { GetOrganizationsResponse } from "../model/organizations.interface";
 
 export const organizationSlice = createSlice({
   name: "organization",

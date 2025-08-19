@@ -1,13 +1,79 @@
+import { useEffect, useRef, useState } from "react";
 import { Search, PlusCircle, Columns3Cog, ChevronsLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
+import AddUpdateProject from "./AddUpdateProject";
+import { useAppDispatch } from "../../../store/store";
+import { getAllProjects } from "../../../store/projectSlice";
+import type { ProjectResult } from "../../../model/project.interface";
+import { Error } from "../../utils/toast";
 
 const Projects = () => {
   const { organization_id } = useParams();
   const navigate = useNavigate();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddModalType, setShowAddModalType] = useState<"add" | "update">(
+    "add"
+  );
+  const [projectId, setProjectId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const [projects, setProjects] = useState<ProjectResult[]>([]);
+  const hasCalledAPI = useRef(false);
 
   const handleBackToOrganizations = () => {
     navigate("/organization");
+  };
+
+  const getProjects = () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    dispatch(getAllProjects())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setProjects(res.data);
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (hasCalledAPI.current) return;
+    hasCalledAPI.current = true;
+    getProjects();
+  }, []);
+
+  const handleAddProject = () => {
+    setShowAddModalType("add");
+    setProjectId("");
+    setShowAddModal(true);
+  };
+
+  const handleEditProject = (id: string) => {
+    setShowAddModalType("update");
+    setProjectId(id);
+    setShowAddModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowAddModal(false);
+    setShowAddModalType("add");
+    setProjectId("");
+  };
+
+  const handleProjectUpdate = (updatedData: {
+    success: boolean;
+    data?: Record<string, unknown>;
+  }) => {
+    if (updatedData.success) {
+      handleModalClose();
+    }
   };
 
   return (
@@ -41,7 +107,10 @@ const Projects = () => {
             />
           </div>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer">
+        <button
+          onClick={handleAddProject}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer"
+        >
           <PlusCircle className="w-4 h-4" />
           Add Project
         </button>
@@ -63,9 +132,20 @@ const Projects = () => {
               : "Add your first project to get started"
           }
           buttonText="Add Project"
-          buttonOnClick={() => {}}
+          buttonOnClick={handleAddProject}
         />
       </div>
+
+      {/* Add/Update Project Modal */}
+      {showAddModal && (
+        <AddUpdateProject
+          setShowModal={handleModalClose}
+          type={showAddModalType}
+          projectId={projectId}
+          organizationId={organization_id}
+          onUpdateSuccess={handleProjectUpdate}
+        />
+      )}
     </div>
   );
 };
