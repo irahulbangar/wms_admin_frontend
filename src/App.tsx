@@ -40,7 +40,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/plants"
+                  path="/organization/projects"
                   element={
                     <ProtectedRoute>
                       <HomePage />
