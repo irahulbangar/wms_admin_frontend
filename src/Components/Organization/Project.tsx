@@ -169,6 +169,7 @@ const Projects = () => {
     setShowAddModal(false);
     setShowAddModalType("add");
     setProjectId("");
+    getProjects();
   };
 
   const handleProjectUpdate = (updatedData: {
@@ -227,20 +228,6 @@ const Projects = () => {
           </select>
         </div>
         <div className="flex items-center gap-4 p-4 rounded-lg flex-1">
-          {/* Status Filter Dropdown */}
-          <div className="flex-shrink-0">
-            <select
-              value={filterBy}
-              onChange={(e) => setFilterBy(e.target.value)}
-              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-
-          {/* Search Input */}
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
@@ -321,7 +308,7 @@ const Projects = () => {
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {project.address}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm capitalize">
                       {project.status}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
