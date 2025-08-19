@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   PlusCircle,
@@ -31,57 +31,56 @@ const Projects = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
-  const hasCalledAPI = useRef(false);
 
   const handleBackToOrganizations = () => {
     navigate("/organization");
   };
 
-  const getProjects = () => {
+  const getProjects = async () => {
     if (isLoading) return;
     setIsLoading(true);
-    dispatch(getAllProjects())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          setProjects(res.data);
-        }
-      })
-      .catch((err) => {
-        Error(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    try {
+      const res = await dispatch(getAllProjects()).unwrap();
+      if (res.success) {
+        setProjects(res.data);
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.toString() : String(err);
+      Error(errorMessage || "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const getProjectByOrganizationId = () => {
+  const getProjectByOrganizationId = async () => {
     if (isLoading) return;
     setIsLoading(true);
-    dispatch(getProjectsByOrganizationId(organization_id!))
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          setProjects(res.data);
-        }
-      })
-      .catch((err) => {
-        Error(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    try {
+      const res = await dispatch(
+        getProjectsByOrganizationId(organization_id!)
+      ).unwrap();
+      if (res.success) {
+        setProjects(res.data);
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.toString() : String(err);
+      Error(errorMessage || "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Reset projects and loading state when organization_id changes
   useEffect(() => {
-    if (hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
+    setProjects([]);
+    setIsLoading(false);
+
     if (organization_id) {
       getProjectByOrganizationId();
     } else {
       getProjects();
     }
-  }, []);
+  }, [organization_id]);
 
   const handleAddProject = () => {
     setShowAddModalType("add");
@@ -150,111 +149,128 @@ const Projects = () => {
         </button>
       </div>
 
-      <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-        <table className="w-full text-sm text-left rtl:text-right text-text-primary">
-          <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
-            <tr>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                No
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Project Name
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Latitude
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Longitude
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Address
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Status
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Created At
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Updated At
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project, index) => (
-              <tr
-                key={index}
-                className="border-b border-border-primary bg-primary hover:bg-secondary"
-              >
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {index + 1}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {project.project_name}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {project.latitude}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {project.longitude}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {project.address}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {project.status}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {fromatDateWithTime(project.created_at)}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  {fromatDateWithTime(project.updated_at)}
-                </td>
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={() =>
-                        handleEditProject(project.project_id.toString())
-                      }
-                      className="text-status-info hover:text-status-info-hover transition-colors duration-200 cursor-pointer"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                    <button className="text-status-danger hover:text-status-danger-hover transition-colors duration-200 cursor-pointer">
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                    <button className="text-teal-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer">
-                      <Eye className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <p className="text-text-secondary">Loading projects...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+          <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
+              <tr>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  No
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Project Name
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Latitude
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Longitude
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Address
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Status
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Created At
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Updated At
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Action
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {projects.length === 0 && (
-          <NoDataFound
-            icon={
-              <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
-            }
-            title={
-              organization_id
-                ? `No projects found for organization ${organization_id}`
-                : "No projects found"
-            }
-            description={
-              organization_id
-                ? `Add your first project for organization ${organization_id} to get started`
-                : "Add your first project to get started"
-            }
-            buttonText="Add Project"
-            buttonOnClick={handleAddProject}
-          />
-        )}
-      </div>
+            </thead>
+            <tbody>
+              {projects.length > 0 ? (
+                projects.map((project, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-border-primary bg-primary hover:bg-secondary"
+                  >
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {project.project_name}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {project.latitude}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {project.longitude}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {project.address}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {project.status}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {fromatDateWithTime(project.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {fromatDateWithTime(project.updated_at)}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() =>
+                            handleEditProject(project.project_id.toString())
+                          }
+                          className="text-status-info hover:text-status-info-hover transition-colors duration-200 cursor-pointer"
+                        >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button className="text-status-danger hover:text-status-danger-hover transition-colors duration-200 cursor-pointer">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                        <button className="text-teal-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer">
+                          <Eye className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-6 py-4 text-text-primary text-center font-roboto text-sm"
+                  >
+                    <NoDataFound
+                      icon={
+                        <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                      }
+                      title={
+                        organization_id
+                          ? `No projects found for organization ${organization_id}`
+                          : "No projects found"
+                      }
+                      description={
+                        organization_id
+                          ? `Add your first project for organization ${organization_id} to get started`
+                          : "Add your first project to get started"
+                      }
+                      buttonText="Add Project"
+                      buttonOnClick={handleAddProject}
+                    />
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Add/Update Project Modal */}
       {showAddModal && (
