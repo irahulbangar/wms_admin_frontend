@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   PlusCircle,
@@ -32,9 +32,11 @@ const Projects = () => {
   );
   const [projectId, setProjectId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>(
+    organization_id || "all"
+  );
   const dispatch = useAppDispatch();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
-  const hasCalledAPI = useRef(false);
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
 
   const handleBackToOrganizations = () => {
@@ -42,8 +44,7 @@ const Projects = () => {
   };
 
   const getProjects = async () => {
-    if (isLoading || hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
+    if (isLoading) return;
     setIsLoading(true);
     try {
       const res = await dispatch(getAllProjects()).unwrap();
@@ -58,13 +59,15 @@ const Projects = () => {
     }
   };
 
-  const getProjectByOrganizationId = async () => {
-    if (isLoading || hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
+  const getProjectByOrganizationId = async (orgId?: string) => {
+    if (isLoading) return;
     setIsLoading(true);
     try {
+      const targetOrgId = orgId || organization_id;
+      if (!targetOrgId) return;
+
       const res = await dispatch(
-        getProjectsByOrganizationId(organization_id!)
+        getProjectsByOrganizationId(targetOrgId)
       ).unwrap();
       if (res.success) {
         setProjects(res.data);
@@ -78,22 +81,15 @@ const Projects = () => {
   };
 
   const getAllOrganizations = async () => {
-    if (isLoading || hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
-    setIsLoading(true);
-
-    await dispatch(getOrganizations())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          setOrganizations(res.data);
-        }
-      })
-      .catch((err: unknown) => {
-        const errorMessage =
-          err instanceof Error ? err.toString() : String(err);
-        Error(errorMessage || "An error occurred");
-      });
+    try {
+      const res = await dispatch(getOrganizations()).unwrap();
+      if (res.success) {
+        setOrganizations(res.data);
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.toString() : String(err);
+      Error(errorMessage || "An error occurred");
+    }
   };
 
   // Reset projects and loading state when organization_id changes
@@ -103,8 +99,10 @@ const Projects = () => {
     getAllOrganizations();
 
     if (organization_id) {
-      getProjectByOrganizationId();
+      setSelectedOrganizationId(organization_id);
+      getProjectByOrganizationId(organization_id);
     } else {
+      setSelectedOrganizationId("all");
       getProjects();
     }
   }, [organization_id]);
@@ -137,7 +135,7 @@ const Projects = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 h-full pb-4">
+    <div className="flex flex-col gap-6 h-full pb-5">
       <div className="flex items-center w-full">
         {organization_id && (
           <div className="flex items-center gap-2">
@@ -145,21 +143,33 @@ const Projects = () => {
               onClick={handleBackToOrganizations}
               className="flex items-center gap-2 pr-3 text-text-primary hover:text-text-secondary transition-colors duration-200 cursor-pointer"
             >
-              <ChevronsLeft className="w-5 h-5" />
-              Back
+              <ChevronsLeft className="w-7 h-7" />
             </button>
           </div>
         )}
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-text-primary">
-            {organization_id
-              ? `Projects - Organization ${organization_id}`
-              : "Projects"}
+            {selectedOrganizationId === "all"
+              ? "All Projects"
+              : `Project - ${
+                  organizations.find(
+                    (org) => org.organization_id === selectedOrganizationId
+                  )?.org_name || selectedOrganizationId
+                }`}
           </h1>
         </div>
         <div className="flex-shrink-0">
           <select
-            value={organization_id}
+            value={selectedOrganizationId}
+            onChange={(e) => {
+              const newOrgId = e.target.value;
+              setSelectedOrganizationId(newOrgId);
+              if (newOrgId === "all") {
+                getProjects();
+              } else {
+                getProjectByOrganizationId(newOrgId);
+              }
+            }}
             className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
           >
             <option value="all">All Organization</option>
@@ -289,14 +299,26 @@ const Projects = () => {
                         <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
                       }
                       title={
-                        organization_id
-                          ? `No projects found for organization ${organization_id}`
-                          : "No projects found"
+                        selectedOrganizationId === "all"
+                          ? "No projects found"
+                          : `No projects found for ${
+                              organizations.find(
+                                (org) =>
+                                  org.organization_id === selectedOrganizationId
+                              )?.org_name ||
+                              `Organization ${selectedOrganizationId}`
+                            }`
                       }
                       description={
-                        organization_id
-                          ? `Add your first project for organization ${organization_id} to get started`
-                          : "Add your first project to get started"
+                        selectedOrganizationId === "all"
+                          ? "Add your first project to get started"
+                          : `Add your first project for ${
+                              organizations.find(
+                                (org) =>
+                                  org.organization_id === selectedOrganizationId
+                              )?.org_name ||
+                              `Organization ${selectedOrganizationId}`
+                            } to get started`
                       }
                       buttonText="Add Project"
                       buttonOnClick={handleAddProject}
@@ -315,7 +337,11 @@ const Projects = () => {
           setShowModal={handleModalClose}
           type={showAddModalType}
           projectId={projectId}
-          organizationId={organization_id}
+          organizationId={
+            selectedOrganizationId === "all"
+              ? undefined
+              : selectedOrganizationId
+          }
           onUpdateSuccess={handleProjectUpdate}
         />
       )}
