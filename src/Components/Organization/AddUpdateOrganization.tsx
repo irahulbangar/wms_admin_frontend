@@ -35,8 +35,59 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     contactNumber: "",
     email: "",
     notes: "",
-    status: "active",
+    status: "",
   });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Organization Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = "Organization name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Organization name must be at least 2 characters";
+    }
+
+    // Address validation
+    if (!formData.address.trim()) {
+      newErrors.address = "Address is required";
+    } else if (formData.address.trim().length < 3) {
+      newErrors.address = "Address must be at least 3 characters";
+    }
+
+    // Contact Person validation
+    if (!formData.contactPerson.trim()) {
+      newErrors.contactPerson = "Contact person is required";
+    } else if (formData.contactPerson.trim().length < 2) {
+      newErrors.contactPerson = "Contact person must be at least 2 characters";
+    }
+
+    // Contact Number validation
+    if (!formData.contactNumber.trim()) {
+      newErrors.contactNumber = "Contact number is required";
+    } else if (
+      !/^[+]?[0-9\s\-()]{10,15}$/.test(formData.contactNumber.trim())
+    ) {
+      newErrors.contactNumber = "Please enter a valid contact number";
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Status validation
+    if (!formData.status) {
+      newErrors.status = "Status is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -48,10 +99,24 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       ...prev,
       [name]: value,
     }));
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+
     if (hasCalledAPI.current) return;
     hasCalledAPI.current = true;
 
@@ -148,8 +213,8 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-primary rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-4 scrollbar-hide">
-        <div className="flex items-center justify-between mb-6 sticky top-0 bg-primary pb-4 border-b border-border-primary">
+      <div className="bg-primary rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <div className="flex items-center justify-between sticky top-0 bg-primary px-6 py-4 border-b border-border-primary">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
             {type === "add" ? "Add New Organization" : "Update Organization"}
           </h2>
@@ -161,7 +226,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           </button>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4 p-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1">
               Organization Name
@@ -172,9 +237,14 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.name ? "border-status-danger" : "border-border-secondary"
+              }`}
               placeholder="Enter organization name"
             />
+            {errors.name && (
+              <p className="text-status-danger text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -186,9 +256,18 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               value={formData.address}
               onChange={handleInputChange}
               rows={3}
-              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.address
+                  ? "border-status-danger"
+                  : "border-border-secondary"
+              }`}
               placeholder="Enter organization address"
             />
+            {errors.address && (
+              <p className="text-status-danger text-sm mt-1">
+                {errors.address}
+              </p>
+            )}
           </div>
 
           <div>
@@ -200,9 +279,18 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               name="contactPerson"
               value={formData.contactPerson}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.contactPerson
+                  ? "border-status-danger"
+                  : "border-border-secondary"
+              }`}
               placeholder="Enter contact person"
             />
+            {errors.contactPerson && (
+              <p className="text-status-danger text-sm mt-1">
+                {errors.contactPerson}
+              </p>
+            )}
           </div>
 
           <div>
@@ -214,9 +302,18 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               name="contactNumber"
               value={formData.contactNumber}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.contactNumber
+                  ? "border-status-danger"
+                  : "border-border-secondary"
+              }`}
               placeholder="Enter contact number"
             />
+            {errors.contactNumber && (
+              <p className="text-status-danger text-sm mt-1">
+                {errors.contactNumber}
+              </p>
+            )}
           </div>
 
           <div>
@@ -229,9 +326,16 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.email
+                  ? "border-status-danger"
+                  : "border-border-secondary"
+              }`}
               placeholder="Enter email"
             />
+            {errors.email && (
+              <p className="text-status-danger text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -242,11 +346,18 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               name="status"
               value={formData.status}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.status
+                  ? "border-status-danger"
+                  : "border-border-secondary"
+              }`}
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
+            {errors.status && (
+              <p className="text-status-danger text-sm mt-1">{errors.status}</p>
+            )}
           </div>
 
           <div>

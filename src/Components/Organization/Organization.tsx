@@ -327,7 +327,7 @@ const Organization = () => {
                           onClick={() =>
                             handleViewPlants(organization?.organization_id)
                           }
-                          className="w-5 h-5 text-status-info cursor-pointer"
+                          className="w-5 h-5 text-teal-500 cursor-pointer"
                         />
                       </div>
                     </td>
