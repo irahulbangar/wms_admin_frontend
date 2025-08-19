@@ -1,5 +1,5 @@
 import React from "react";
-import { X, AlertTriangle, Trash2 } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
 
 interface DeletePopupProps {
@@ -27,14 +27,11 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+      <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full transform transition-all">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border-primary">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-status-danger" />
-            </div>
-            <h3 className="text-lg font-semibold text-text-primary font-roboto">
+            <h3 className="text-xl font-semibold text-text-primary font-roboto">
               Delete Organization
             </h3>
           </div>
