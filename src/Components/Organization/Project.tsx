@@ -183,34 +183,37 @@ const Projects = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="text-text-primary">
+          <tbody>
             {projects.map((project, index) => (
-              <tr key={index} className="border-b border-border-primary">
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+              <tr
+                key={index}
+                className="border-b border-border-primary bg-primary hover:bg-secondary"
+              >
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {index + 1}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {project.project_name}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {project.latitude}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {project.longitude}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {project.address}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {project.status}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {fromatDateWithTime(project.created_at)}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   {fromatDateWithTime(project.updated_at)}
                 </td>
-                <td className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                   <div className="flex items-center justify-center gap-2">
                     <button
                       onClick={() =>
