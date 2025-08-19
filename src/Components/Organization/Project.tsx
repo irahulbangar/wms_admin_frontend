@@ -8,6 +8,8 @@ import {
   Trash2,
   Edit,
   Loader2,
+  X,
+  Check,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
@@ -42,6 +44,28 @@ const Projects = () => {
   const dispatch = useAppDispatch();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [deleteProject, setDeleteProject] = useState<ProjectResult | null>(
+    null
+  );
+
+  const handleDeleteClick = (project: ProjectResult) => {
+    setDeleteProject(project);
+    setShowDeletePopup(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteProject) {
+      await handleDeleteProject(deleteProject.project_id.toString());
+      setShowDeletePopup(false);
+      setDeleteProject(null);
+    }
+  };
+
+  const handleCloseDeletePopup = () => {
+    setShowDeletePopup(false);
+    setDeleteProject(null);
+  };
 
   const handleBackToOrganizations = () => {
     navigate("/organization");
@@ -147,21 +171,18 @@ const Projects = () => {
   };
 
   const handleDeleteProject = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this project?")) {
-      try {
-        const result = await dispatch(deleteProjectById(id)).unwrap();
-        if (result.success) {
-          Success("Project deleted successfully");
-          // Refresh the projects list
-          if (selectedOrganizationId === "all") {
-            getProjects();
-          } else {
-            getProjectByOrganizationId(selectedOrganizationId);
-          }
+    try {
+      const result = await dispatch(deleteProjectById(id)).unwrap();
+      if (result.success) {
+        Success("Project deleted successfully");
+        if (selectedOrganizationId === "all") {
+          getProjects();
+        } else {
+          getProjectByOrganizationId(selectedOrganizationId);
         }
-      } catch (error) {
-        Error(`Failed to delete project: ${error}`);
       }
+    } catch (error) {
+      Error(`Failed to delete project: ${error}`);
     }
   };
 
@@ -309,7 +330,13 @@ const Projects = () => {
                       {project.address}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm capitalize">
-                      {project.status}
+                      <div className="flex items-center gap-2 justify-center cursor-pointer">
+                        {project?.status === "active" ? (
+                          <Check className="w-5 h-5 text-status-success" />
+                        ) : (
+                          <X className="w-5 h-5 text-status-danger" />
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {fromatDateWithTime(project.created_at)}
@@ -328,9 +355,7 @@ const Projects = () => {
                           <Edit className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() =>
-                            handleDeleteProject(project.project_id.toString())
-                          }
+                          onClick={() => handleDeleteClick(project)}
                           className="text-status-danger hover:text-status-danger-hover transition-colors duration-200 cursor-pointer"
                         >
                           <Trash2 className="w-5 h-5" />
@@ -400,7 +425,6 @@ const Projects = () => {
         </div>
       )}
 
-      {/* Add/Update Project Modal */}
       {showAddModal && (
         <AddUpdateProject
           setShowModal={handleModalClose}
@@ -413,6 +437,50 @@ const Projects = () => {
           }
           onUpdateSuccess={handleProjectUpdate}
         />
+      )}
+
+      {showDeletePopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50 bg-opacity-50 transition-opacity"
+            onClick={handleCloseDeletePopup}
+          />
+          <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full transform transition-all">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
+              <h3 className="text-xl font-semibold text-text-primary font-roboto">
+                Delete Project
+              </h3>
+              <button
+                onClick={handleCloseDeletePopup}
+                className="text-text-primary hover:text-text-primary/80 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-text-secondary mb-4 font-roboto">
+                Are you sure you want to delete{" "}
+                <span className="font-bold">{deleteProject?.project_name}</span>
+                ?
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-border-primary">
+              <button
+                onClick={handleCloseDeletePopup}
+                className="px-4 py-2 text-text-primary bg-secondary border border-secondary rounded-lg hover:bg-secondary/80 transition-colors cursor-pointer font-roboto"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-lg transition-colors flex items-center gap-2 font-roboto"
+              >
+                <Trash2 className="w-4 h-5" />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

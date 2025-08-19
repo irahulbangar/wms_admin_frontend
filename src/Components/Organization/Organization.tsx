@@ -380,6 +380,7 @@ const Organization = () => {
           onConfirm={handleConfirmDelete}
           organization={organizationToDelete}
           isLoading={isLoading}
+          title="Organization"
         />
       )}
 

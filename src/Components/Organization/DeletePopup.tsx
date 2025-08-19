@@ -8,6 +8,7 @@ interface DeletePopupProps {
   onConfirm: () => void;
   organization: OrganizationResult | null;
   isLoading?: boolean;
+  title: string;
 }
 
 const DeletePopup: React.FC<DeletePopupProps> = ({
@@ -16,6 +17,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
   onConfirm,
   organization,
   isLoading = false,
+  title,
 }) => {
   if (!isOpen || !organization) return null;
 
@@ -32,7 +34,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
           <div className="flex items-center gap-3">
             <h3 className="text-xl font-semibold text-text-primary font-roboto">
-              Delete Organization
+              Delete {title}
             </h3>
           </div>
           <button
@@ -47,7 +49,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
         {/* Content */}
         <div className="p-6">
           <p className="text-text-secondary mb-4 font-roboto">
-            Are you sure you want to delete this organization?
+            Are you sure you want to delete this {title}?
           </p>
         </div>
 
