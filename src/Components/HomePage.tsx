@@ -16,7 +16,6 @@ import Loader from "./Loader";
 import Projects from "./Organization/Project";
 
 const HomePage = () => {
-  // Initialize sidebar collapsed state from localStorage
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem("sidebar-collapsed");
     return saved ? JSON.parse(saved) : false;
@@ -26,14 +25,12 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.admin);
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       navigate("/");
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  // Save sidebar collapsed state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("sidebar-collapsed", JSON.stringify(sidebarCollapsed));
   }, [sidebarCollapsed]);
@@ -62,7 +59,6 @@ const HomePage = () => {
     }
   }, [location.pathname]);
 
-  // Show loading while checking authentication
   if (isLoading || !isAuthenticated) {
     return <Loader />;
   }

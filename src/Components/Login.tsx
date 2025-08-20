@@ -6,6 +6,7 @@ import { Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { loginAdmin } from "../../store/adminSlice";
+import Loader from "./Loader";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -24,11 +25,7 @@ const Login: React.FC = () => {
   }, [isAuthenticated, navigate]);
 
   if (isAuthenticated || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-primary">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <Loader />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -68,10 +65,12 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full relative z-10 bg-primary rounded-lg shadow-xl p-8">
         <div className="flex items-center justify-between">
           <div className="flex flex-col mb-6">
-            <h2 className="text-3xl font-bold text-text-primary mb-1">
+            <h2 className="text-3xl font-bold text-text-primary mb-1 font-roboto">
               Welcome Back
             </h2>
-            <p className="text-text-secondary">Sign in to your WMS Dashboard</p>
+            <p className="text-text-secondary font-roboto">
+              Sign in to your WMS Dashboard
+            </p>
           </div>
           <button
             className="p-2.5 rounded-xl text-text-primary bg-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer absolute top-4 right-4"
@@ -86,10 +85,10 @@ const Login: React.FC = () => {
           </button>
         </div>
 
-        <form className="space-y-6" onSubmit={handleLogin}>
+        <form className="space-y-4" onSubmit={handleLogin}>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-text-secondary mb-2"
+            className="block text-sm font-medium text-text-secondary mb-2 font-roboto"
           >
             Email
           </label>
@@ -101,13 +100,13 @@ const Login: React.FC = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-success focus:border-status-success/50 transition-colors font-roboto"
             placeholder="Enter your email"
           />
 
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-text-secondary mb-2"
+            className="block text-sm font-medium text-text-secondary mb-2 font-roboto"
           >
             Password
           </label>
@@ -120,7 +119,7 @@ const Login: React.FC = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 pr-10 border border-border-secondary text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-3 py-2 pr-10 border border-border-secondary text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-success focus:border-status-success/50 transition-colors font-roboto"
               placeholder="Enter your password"
             />
             <button
@@ -143,11 +142,11 @@ const Login: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-border-primary rounded"
+                className="h-4 w-4 text-status-info focus:ring-status-info border-border-primary rounded"
               />
               <label
                 htmlFor="remember-me"
-                className="ml-2 block text-sm text-text-secondary"
+                className="ml-2 block text-sm text-text-secondary font-roboto"
               >
                 Remember me
               </label>
@@ -156,7 +155,7 @@ const Login: React.FC = () => {
             <div className="text-sm">
               <a
                 href="#"
-                className="font-medium text-blue-500 hover:text-blue-400"
+                className="font-medium text-status-info hover:text-status-info/80"
               >
                 Forgot your password?
               </a>
@@ -166,10 +165,10 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transition-all duration-200 cursor-pointer"
+            className="relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
           >
             {isLoading ? (
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2 font-roboto">
                 <Loader2 className="w-5 h-5 animate-spin" />
                 Signing in...
               </div>

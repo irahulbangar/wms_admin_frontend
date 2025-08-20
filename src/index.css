@@ -179,12 +179,10 @@
   --hover-border-primary: #9ca3af;
 }
 
-/* Theme Utility Classes */
 .bg-theme-tertiary {
   background-color: var(--bg-tertiary);
 }
 
-/* Global Theme Transitions */
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease,
     color 0.3s ease, box-shadow 0.3s ease;
@@ -198,7 +196,6 @@ body {
   transition: background-color 0.3s ease;
 }
 
-/* From Uiverse.io by gagan-gv */
 .loader {
   border: 0 solid transparent;
   border-radius: 50%;
