@@ -85,6 +85,7 @@ const Header: React.FC<HeaderProps> = ({
             </p>
           </div>
         </div>
+
         {/* Center */}
         <div className="flex-1 max-w-md mx-8">
           <div className="relative">
@@ -92,10 +93,11 @@ const Header: React.FC<HeaderProps> = ({
             <input
               type="text"
               placeholder="Search Anything"
-              className="w-full pl-10 pr-4 py-2.5 bg-input-bg border-input-border font-roboto text-text-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-input-bg border-input-border font-roboto text-text-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success focus:border-transparent transition-all"
             />
           </div>
         </div>
+
         {/* Right */}
         <div className="flex items-center space-x-3">
           <button

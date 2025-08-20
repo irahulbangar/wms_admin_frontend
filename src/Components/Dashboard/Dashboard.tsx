@@ -21,7 +21,6 @@ const Dashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Mock data - replace with actual API calls
   const stats = [
     {
       title: "Total Users",
@@ -59,19 +58,21 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
-          <p className="text-text-secondary">
+          <h1 className="text-2xl font-bold text-text-primary font-roboto">
+            Dashboard
+          </h1>
+          <p className="text-text-secondary font-roboto">
             Welcome back! Here's what's happening with your WMS today.
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2 text-sm text-text-primary">
-            <Calendar className="w-4 h-4" />
+          <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
+            <Calendar className="w-5 h-5 text-text-secondary" />
             <span>{currentTime.toLocaleDateString()}</span>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-text-primary">
-            <Clock className="w-4 h-4" />
-            <span className="font-mono">
+          <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
+            <Clock className="w-5 h-5 text-text-secondary" />
+            <span className="font-roboto font-semibold text-base">
               {currentTime.toLocaleTimeString()}
             </span>
           </div>
@@ -87,10 +88,10 @@ const Dashboard = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-base font-medium text-text-secondary">
+                <p className="text-base font-medium text-text-secondary font-roboto">
                   {stat.title}
                 </p>
-                <p className="text-2xl font-bold text-text-primary mt-1">
+                <p className="text-2xl font-bold text-text-primary mt-1 font-roboto">
                   {stat.value}
                 </p>
               </div>
@@ -104,10 +105,12 @@ const Dashboard = () => {
               ) : (
                 <ArrowDownRight className="w-4 h-4 text-status-danger mr-1" />
               )}
-              <span className={`text-sm font-medium ${stat.textColor}`}>
+              <span
+                className={`text-sm font-medium ${stat.textColor} font-roboto`}
+              >
                 {stat.change}
               </span>
-              <span className="text-sm text-text-secondary ml-1">
+              <span className="text-sm text-text-secondary ml-1 font-roboto">
                 from last month
               </span>
             </div>

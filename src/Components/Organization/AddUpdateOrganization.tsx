@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../store/store";
 import {
   addOrganization,
@@ -25,8 +25,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   onUpdateSuccess,
 }) => {
   const dispatch = useAppDispatch();
-  const hasCalledAPI = useRef(false);
-  const hasFetchedOrganization = useRef(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -43,44 +41,39 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    // Organization Name validation
     if (!formData.name.trim()) {
       newErrors.name = "Organization name is required";
     } else if (formData.name.trim().length < 2) {
       newErrors.name = "Organization name must be at least 2 characters";
     }
 
-    // Address validation
     if (!formData.address.trim()) {
       newErrors.address = "Address is required";
     } else if (formData.address.trim().length < 3) {
       newErrors.address = "Address must be at least 3 characters";
     }
 
-    // Contact Person validation
     if (!formData.contactPerson.trim()) {
       newErrors.contactPerson = "Contact person is required";
-    } else if (formData.contactPerson.trim().length < 2) {
-      newErrors.contactPerson = "Contact person must be at least 2 characters";
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.contactPerson.toString())) {
+      newErrors.contactPerson = "Contact person must be a valid name";
     }
 
-    // Contact Number validation
     if (!formData.contactNumber.trim()) {
       newErrors.contactNumber = "Contact number is required";
     } else if (
-      !/^[+]?[0-9\s\-()]{10,15}$/.test(formData.contactNumber.trim())
+      !/^[+]?[0-9\s\-()]{10,15}$/.test(formData.contactNumber.toString()) ||
+      formData.contactNumber.toString().trim().length < 10
     ) {
       newErrors.contactNumber = "Please enter a valid contact number";
     }
 
-    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       newErrors.email = "Please enter a valid email address";
     }
 
-    // Status validation
     if (!formData.status) {
       newErrors.status = "Status is required";
     }
@@ -100,7 +93,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       [name]: value,
     }));
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -112,13 +104,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validate form before submission
     if (!validateForm()) {
       return;
     }
-
-    if (hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
 
     const organizationData = {
       org_name: formData.name,
@@ -172,12 +160,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   };
 
   useEffect(() => {
-    if (
-      type === "update" &&
-      organizationId &&
-      !hasFetchedOrganization.current
-    ) {
-      hasFetchedOrganization.current = true;
+    if (type === "update" && organizationId) {
       dispatch(getOrganizationById(organizationId))
         .unwrap()
         .then((res) => {
@@ -188,14 +171,13 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             contactNumber: res.data.contact_number,
             email: res.data.email,
             notes: res.data.note,
-            status: res.data.status || "active",
+            status: res.data.status,
           });
         })
         .catch((err) => {
           Error(err as string);
         });
     } else if (type === "add") {
-      hasFetchedOrganization.current = false;
       setFormData({
         name: "",
         address: "",
@@ -203,12 +185,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         contactNumber: "",
         email: "",
         notes: "",
-        status: "active",
+        status: "",
       });
     }
-    return () => {
-      hasFetchedOrganization.current = false;
-    };
   }, [type, organizationId, dispatch]);
 
   return (
@@ -227,151 +206,129 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         </div>
 
         <form className="space-y-4 p-6" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">
-              Organization Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.name ? "border-status-danger" : "border-border-secondary"
-              }`}
-              placeholder="Enter organization name"
-            />
-            {errors.name && (
-              <p className="text-status-danger text-sm mt-1">{errors.name}</p>
-            )}
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+            Organization Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+              errors.name ? "border-status-danger" : "border-border-primary"
+            }`}
+            placeholder="Enter organization name"
+          />
+          {errors.name && (
+            <p className="text-status-danger text-sm mt-1">{errors.name}</p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">
-              Address
-            </label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              rows={3}
-              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.address
-                  ? "border-status-danger"
-                  : "border-border-secondary"
-              }`}
-              placeholder="Enter organization address"
-            />
-            {errors.address && (
-              <p className="text-status-danger text-sm mt-1">
-                {errors.address}
-              </p>
-            )}
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+            Address
+          </label>
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={handleInputChange}
+            rows={3}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+              errors.address ? "border-status-danger" : "border-border-primary"
+            }`}
+            placeholder="Enter organization address"
+          />
+          {errors.address && (
+            <p className="text-status-danger text-sm mt-1">{errors.address}</p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">
-              Contact Person
-            </label>
-            <input
-              type="text"
-              name="contactPerson"
-              value={formData.contactPerson}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.contactPerson
-                  ? "border-status-danger"
-                  : "border-border-secondary"
-              }`}
-              placeholder="Enter contact person"
-            />
-            {errors.contactPerson && (
-              <p className="text-status-danger text-sm mt-1">
-                {errors.contactPerson}
-              </p>
-            )}
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+            Contact Person
+          </label>
+          <input
+            type="text"
+            name="contactPerson"
+            value={formData.contactPerson}
+            onChange={handleInputChange}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+              errors.contactPerson
+                ? "border-status-danger"
+                : "border-border-primary"
+            }`}
+            placeholder="Enter contact person"
+          />
+          {errors.contactPerson && (
+            <p className="text-status-danger text-sm mt-1">
+              {errors.contactPerson}
+            </p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">
-              Contact Number
-            </label>
-            <input
-              type="text"
-              name="contactNumber"
-              value={formData.contactNumber}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.contactNumber
-                  ? "border-status-danger"
-                  : "border-border-secondary"
-              }`}
-              placeholder="Enter contact number"
-            />
-            {errors.contactNumber && (
-              <p className="text-status-danger text-sm mt-1">
-                {errors.contactNumber}
-              </p>
-            )}
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+            Contact Number
+          </label>
+          <input
+            type="text"
+            name="contactNumber"
+            value={formData.contactNumber}
+            onChange={handleInputChange}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+              errors.contactNumber
+                ? "border-status-danger"
+                : "border-border-primary"
+            }`}
+            placeholder="Enter contact number"
+          />
+          {errors.contactNumber && (
+            <p className="text-status-danger text-sm mt-1">
+              {errors.contactNumber}
+            </p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.email
-                  ? "border-status-danger"
-                  : "border-border-secondary"
-              }`}
-              placeholder="Enter email"
-            />
-            {errors.email && (
-              <p className="text-status-danger text-sm mt-1">{errors.email}</p>
-            )}
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+            Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+              errors.email ? "border-status-danger" : "border-border-primary"
+            }`}
+            placeholder="Enter email"
+          />
+          {errors.email && (
+            <p className="text-status-danger text-sm mt-1">{errors.email}</p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 text-text-secondary bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.status
-                  ? "border-status-danger"
-                  : "border-border-secondary"
-              }`}
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-            {errors.status && (
-              <p className="text-status-danger text-sm mt-1">{errors.status}</p>
-            )}
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+            Status
+          </label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleInputChange}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+              errors.status ? "border-status-danger" : "border-border-primary"
+            }`}
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          {errors.status && (
+            <p className="text-status-danger text-sm mt-1">{errors.status}</p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1">
-              Notes
-            </label>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter notes"
-            />
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+            Notes
+          </label>
+          <textarea
+            name="notes"
+            value={formData.notes}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success"
+            placeholder="Enter notes"
+          />
 
           <div className="flex gap-3 pt-4">
             <button

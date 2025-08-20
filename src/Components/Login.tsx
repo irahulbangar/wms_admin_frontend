@@ -142,7 +142,7 @@ const Login: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-status-info focus:ring-status-info border-border-primary rounded"
+                className="h-4 w-4 text-status-info focus:ring-status-info border-border-primary rounded cursor-pointer"
               />
               <label
                 htmlFor="remember-me"
