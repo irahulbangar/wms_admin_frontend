@@ -4,7 +4,7 @@ import {
   Search,
   PlusCircle,
   Building2,
-  Trash2,
+  // Trash2,
   SquarePen,
   Check,
   X,
@@ -103,10 +103,10 @@ const Organization = () => {
     setOrganizationId(id);
   };
 
-  const handleDeleteOrganization = (organization: OrganizationResult) => {
-    setOrganizationToDelete(organization);
-    setShowDeletePopup(true);
-  };
+  // const handleDeleteOrganization = (organization: OrganizationResult) => {
+  //   setOrganizationToDelete(organization);
+  //   setShowDeletePopup(true);
+  // };
 
   const handleConfirmDelete = async () => {
     if (!organizationToDelete || isLoading) return;
@@ -298,7 +298,7 @@ const Organization = () => {
                       {organization?.note}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      <div className="flex items-center gap-2 justify-center cursor-pointer">
+                      <div className="flex items-center gap-2 justify-center">
                         {organization?.status === "active" ? (
                           <Check className="w-5 h-5 text-status-success" />
                         ) : (
@@ -319,10 +319,10 @@ const Organization = () => {
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"
                         />
-                        <Trash2
+                        {/* <Trash2
                           onClick={() => handleDeleteOrganization(organization)}
                           className="w-5 h-5 text-status-danger cursor-pointer"
-                        />
+                        /> */}
 
                         <Eye
                           onClick={() =>

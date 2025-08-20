@@ -49,10 +49,10 @@ const Projects = () => {
     null
   );
 
-  const handleDeleteClick = (project: ProjectResult) => {
-    setDeleteProject(project);
-    setShowDeletePopup(true);
-  };
+  // const handleDeleteClick = (project: ProjectResult) => {
+  //   setDeleteProject(project);
+  //   setShowDeletePopup(true);
+  // };
 
   const handleConfirmDelete = async () => {
     if (deleteProject) {
@@ -120,7 +120,6 @@ const Projects = () => {
     }
   };
 
-  // Reset projects and loading state when organization_id changes
   useEffect(() => {
     setProjects([]);
     setIsLoading(false);
@@ -135,16 +134,13 @@ const Projects = () => {
     }
   }, [organization_id]);
 
-  // Filter projects based on search term and status filter
   useEffect(() => {
     let filtered = projects;
 
-    // Apply status filter
     if (filterBy !== "all") {
       filtered = filtered.filter((project) => project.status === filterBy);
     }
 
-    // Apply search term filter
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -342,7 +338,7 @@ const Projects = () => {
                       {project.address}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm capitalize">
-                      <div className="flex items-center gap-2 justify-center cursor-pointer">
+                      <div className="flex items-center gap-2 justify-center">
                         {project?.status === "active" ? (
                           <Check className="w-5 h-5 text-status-success" />
                         ) : (
@@ -358,31 +354,28 @@ const Projects = () => {
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       <div className="flex items-center justify-center gap-2">
-                        <button
+                        <Edit
                           onClick={() =>
                             handleEditProject(project.project_id.toString())
                           }
-                          className="text-status-info hover:text-status-info-hover transition-colors duration-200 cursor-pointer"
-                        >
-                          <Edit className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(project)}
-                          className="text-status-danger hover:text-status-danger-hover transition-colors duration-200 cursor-pointer"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                        <button
+                          className="w-5 h-5 text-status-info cursor-pointer"
+                        />
+                        {/* <Trash2
+                          onClick={() =>
+                            handleDeleteProject(project.project_id.toString())
+                          }
+                          className="w-5 h-5 text-status-danger cursor-pointer"
+                        /> */}
+
+                        <Eye
                           onClick={() =>
                             handleViewDevices(
                               project.organization_id.toString(),
                               project.project_id.toString()
                             )
                           }
-                          className="text-teal-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </button>
+                          className="w-5 h-5 text-teal-500 cursor-pointer"
+                        />
                       </div>
                     </td>
                   </tr>
