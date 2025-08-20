@@ -202,8 +202,10 @@ const Projects = () => {
     }
   };
 
-  const handleViewDevices = (projectId: string) => {
-    navigate(`/organization/devices/${projectId}`);
+  const handleViewDevices = (organizationId: string, projectId: string) => {
+    navigate(
+      `/organization/devices?organization_id=${organizationId}&project_id=${projectId}`
+    );
   };
 
   return (
@@ -289,6 +291,9 @@ const Projects = () => {
                   Project Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Organization Id
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                   Latitude
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
@@ -323,6 +328,9 @@ const Projects = () => {
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {project.project_name}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {project.organization_id}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {project.latitude}
@@ -366,7 +374,10 @@ const Projects = () => {
                         </button>
                         <button
                           onClick={() =>
-                            handleViewDevices(project.project_id.toString())
+                            handleViewDevices(
+                              project.organization_id.toString(),
+                              project.project_id.toString()
+                            )
                           }
                           className="text-teal-500 hover:text-teal-600 transition-colors duration-200 cursor-pointer"
                         >
