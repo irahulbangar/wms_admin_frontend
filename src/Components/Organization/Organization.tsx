@@ -165,6 +165,7 @@ const Organization = () => {
                   (data.contact_number as string) || org.contact_number,
                 email: (data.email as string) || org.email,
                 note: (data.note as string) || org.note,
+                status: (data.status as string) || org.status,
                 updated_at: new Date().toISOString(),
               }
             : org
@@ -203,7 +204,7 @@ const Organization = () => {
                 setSearchTerm(value);
                 filterOrganizations(value);
               }}
-              className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success"
             />
             {searchTerm && (
               <button
