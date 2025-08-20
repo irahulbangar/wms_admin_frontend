@@ -142,7 +142,7 @@ const Login: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-status-info focus:ring-status-info border-border-primary rounded cursor-pointer"
+                className="h-4 w-4 text-status-info focus:ring-status-info border-border-primary rounded cursor-pointer font-roboto"
               />
               <label
                 htmlFor="remember-me"
@@ -155,7 +155,7 @@ const Login: React.FC = () => {
             <div className="text-sm">
               <a
                 href="#"
-                className="font-medium text-status-info hover:text-status-info/80"
+                className="font-medium text-status-info hover:text-status-info/80 font-roboto"
               >
                 Forgot your password?
               </a>

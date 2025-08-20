@@ -136,10 +136,10 @@ const AdminSetting = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary font-roboto">
             Admin Settings
           </h1>
-          <p className="text-text-secondary mt-1">
+          <p className="text-text-secondary mt-1 font-roboto">
             Manage your account settings and preferences
           </p>
         </div>
@@ -151,7 +151,7 @@ const AdminSetting = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
               activeTab === tab.id
                 ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
                 : "text-text-secondary hover:text-text-primary bg-secondary"
@@ -169,7 +169,7 @@ const AdminSetting = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Settings className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary">
+              <h2 className="text-xl font-semibold text-text-primary font-roboto">
                 Theme Settings
               </h2>
             </div>
@@ -178,10 +178,10 @@ const AdminSetting = () => {
             <div className="rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-text-primary">
+                  <h3 className="font-medium text-text-primary font-roboto">
                     Current Theme
                   </h3>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-text-secondary font-roboto">
                     {theme === "light" ? "Light Mode" : "Dark Mode"}
                   </p>
                 </div>
@@ -214,15 +214,15 @@ const AdminSetting = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Shield className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary">
+              <h2 className="text-xl font-semibold text-text-primary font-roboto">
                 Change Password
               </h2>
             </div>
 
-            <form onSubmit={handlePasswordChangeSubmit} className="space-y-6">
+            <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
               {/* Current Password */}
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
                   Current Password
                 </label>
                 <div className="relative">
@@ -232,7 +232,7 @@ const AdminSetting = () => {
                     onChange={(e) =>
                       handlePasswordChange("currentPassword", e.target.value)
                     }
-                    className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Enter your current password"
                   />
                   <button
@@ -251,7 +251,7 @@ const AdminSetting = () => {
 
               {/* New Password */}
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
                   New Password
                 </label>
                 <div className="relative">
@@ -261,7 +261,7 @@ const AdminSetting = () => {
                     onChange={(e) =>
                       handlePasswordChange("newPassword", e.target.value)
                     }
-                    className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Enter your new password"
                   />
                   <button
@@ -290,7 +290,7 @@ const AdminSetting = () => {
                     onChange={(e) =>
                       handlePasswordChange("confirmPassword", e.target.value)
                     }
-                    className="w-full pl-4 pr-12 py-3 bg-input-bg text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     placeholder="Confirm your new password"
                   />
                   <button
@@ -307,7 +307,7 @@ const AdminSetting = () => {
                 </div>
                 {passwordForm.confirmPassword &&
                   passwordForm.newPassword !== passwordForm.confirmPassword && (
-                    <p className="mt-1 text-sm text-status-danger">
+                    <p className="mt-1 text-sm text-status-danger font-roboto">
                       Passwords do not match
                     </p>
                   )}
@@ -317,17 +317,17 @@ const AdminSetting = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full font-roboto sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Changing Password...</span>
+                    <span className="font-roboto">Changing Password...</span>
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    <span>Change Password</span>
+                    <span className="font-roboto">Change Password</span>
                   </>
                 )}
               </button>
@@ -339,7 +339,7 @@ const AdminSetting = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <User className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary">
+              <h2 className="text-xl font-semibold text-text-primary font-roboto">
                 Profile Settings
               </h2>
             </div>
@@ -348,10 +348,10 @@ const AdminSetting = () => {
               <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-8 h-8 text-text-muted" />
               </div>
-              <h3 className="text-lg font-medium text-text-primary mb-2">
+              <h3 className="text-lg font-medium text-text-primary mb-2 font-roboto">
                 Profile Settings
               </h3>
-              <p className="text-text-secondary">
+              <p className="text-text-secondary font-roboto">
                 Profile settings functionality coming soon...
               </p>
             </div>
