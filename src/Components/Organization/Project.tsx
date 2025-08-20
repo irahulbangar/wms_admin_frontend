@@ -21,7 +21,7 @@ import {
   deleteProjectById,
 } from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
-import { Error, Success } from "../../utils/toast";
+import { Error, Success, Warning } from "../../utils/toast";
 import { fromatDateWithTime } from "../../utils/utils";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
@@ -155,6 +155,10 @@ const Projects = () => {
   }, [projects, filterBy, searchTerm]);
 
   const handleAddProject = () => {
+    if (selectedOrganizationId === "all") {
+      Warning("Please select an organization first before adding a project");
+      return;
+    }
     setShowAddModalType("add");
     setProjectId("");
     setShowAddModal(true);
