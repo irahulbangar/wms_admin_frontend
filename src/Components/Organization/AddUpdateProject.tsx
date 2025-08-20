@@ -206,11 +206,11 @@ const AddUpdateProject = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-3">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {type === "update" && isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-text-primary" />
-              <span className="ml-2 text-text-primary">
+              <span className="ml-2 text-text-primary font-roboto">
                 Loading project data...
               </span>
             </div>

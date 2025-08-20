@@ -44,6 +44,8 @@ const HomePage = () => {
       setCurrentPage("projects");
     } else if (location.pathname === "/organization/devices") {
       setCurrentPage("devices");
+    } else if (location.pathname.startsWith("/organization/devices/")) {
+      setCurrentPage("devices");
     } else if (location.pathname === "/organization/users") {
       setCurrentPage("users");
     } else if (location.pathname === "/organization/setting") {

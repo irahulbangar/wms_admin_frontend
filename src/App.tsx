@@ -64,6 +64,14 @@ function App() {
                   }
                 />
                 <Route
+                  path="/organization/devices/:project_id"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/organization/users"
                   element={
                     <ProtectedRoute>

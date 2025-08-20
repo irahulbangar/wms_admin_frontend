@@ -206,7 +206,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         </div>
 
         <form className="space-y-4 p-6" onSubmit={handleSubmit}>
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Organization Name
           </label>
           <input
@@ -224,7 +224,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.name}</p>
           )}
 
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Address
           </label>
           <textarea
@@ -241,7 +241,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.address}</p>
           )}
 
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Contact Person
           </label>
           <input
@@ -262,7 +262,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             </p>
           )}
 
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Contact Number
           </label>
           <input
@@ -283,7 +283,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             </p>
           )}
 
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Email
           </label>
           <input
@@ -301,7 +301,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.email}</p>
           )}
 
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Status
           </label>
           <select
@@ -319,7 +319,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.status}</p>
           )}
 
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Notes
           </label>
           <textarea
