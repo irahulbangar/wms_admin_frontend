@@ -130,6 +130,18 @@ const Devices = () => {
       });
   };
 
+  const deviceStatus = (status: string) => {
+    if (status === "Online" || status === "online") {
+      return "bg-green-100 text-status-success";
+    } else if (status === "Offline" || status === "offline") {
+      return "bg-red-100 text-status-danger";
+    } else if (status === "Maintenance" || status === "maintenance") {
+      return "bg-yellow-100 text-status-warning";
+    } else {
+      return "bg-blue-100 text-status-info";
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 h-full overflow-y-auto pb-5">
       <div className="flex items-center w-full">
@@ -217,10 +229,13 @@ const Devices = () => {
                 Device Name
               </th>
               <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Device Type
+                Project ID
               </th>
               <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Device Family
+                Device Family ID
+              </th>
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                Device Type ID
               </th>
               <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                 Device Status
@@ -281,22 +296,19 @@ const Devices = () => {
                     {device.device_name}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.devicetypeid}
+                    {device?.project_id}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.devicefid}
+                    {device?.devicefid}
+                  </td>
+                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    {device?.devicetypeid}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        device.device_status === "Online"
-                          ? "bg-green-100 text-status-success"
-                          : device.device_status === "Offline"
-                          ? "bg-red-100 text-status-danger"
-                          : device.device_status === "Maintenance"
-                          ? "bg-yellow-100 text-status-warning"
-                          : "bg-blue-100 text-status-info"
-                      }`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
+                        device?.device_status
+                      )}`}
                     >
                       {device.device_status}
                     </span>
@@ -312,22 +324,17 @@ const Devices = () => {
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     <div className="flex items-center justify-center gap-2">
-                      <button
+                      <Edit
                         onClick={() =>
                           handleEditDevice(device.device_id, device.project_id)
                         }
-                        className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
-                        title="Edit Device"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
+                        className="w-5 h-5 text-status-info cursor-pointer"
+                      />
+
+                      <Trash2
                         onClick={() => {}}
-                        className="p-1 text-red-600 hover:text-red-800 transition-colors"
-                        title="Delete Device"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        className="w-5 h-5 text-status-danger cursor-pointer"
+                      />
                     </div>
                   </td>
                 </tr>
