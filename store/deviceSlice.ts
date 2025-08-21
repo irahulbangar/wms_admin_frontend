@@ -189,3 +189,36 @@ export const getDevicesByDeviceType = createAsyncThunk(
     }
   }
 );
+
+interface getProjectByOrganizationId {
+  projectId: number;
+  organizationId: number;
+}
+
+// Get device by organizationId and projectId
+export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
+  "device/getDeviceByOrganizationIdAndProjectId",
+  async (
+    { projectId, organizationId }: getProjectByOrganizationId,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().get<DeviceResponse>(
+        `/devices/projectId-and-organizationId/${projectId}/${organizationId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to get device by organizationId and projectId";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);

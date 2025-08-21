@@ -202,8 +202,8 @@ const Projects = () => {
     }
   };
 
-  const handleViewDevices = (organizationId: string, projectId: string) => {
-    navigate(`/organization/devices/${organizationId}/${projectId}`);
+  const handleViewDevices = (projectId: number, organizationId: number) => {
+    navigate(`/organization/devices/${projectId}/${organizationId}`);
   };
 
   return (
@@ -372,8 +372,8 @@ const Projects = () => {
                         <Eye
                           onClick={() =>
                             handleViewDevices(
-                              project.organization_id.toString(),
-                              project.project_id.toString()
+                              project.project_id,
+                              project.organization_id
                             )
                           }
                           className="w-5 h-5 text-teal-500 cursor-pointer"

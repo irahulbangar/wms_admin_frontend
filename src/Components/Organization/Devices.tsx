@@ -1,8 +1,18 @@
 import { useState, useEffect } from "react";
-import { Search, PlusCircle, Edit, Trash2, X } from "lucide-react";
-import { useParams } from "react-router-dom";
+import {
+  Search,
+  PlusCircle,
+  Edit,
+  Trash2,
+  X,
+  ChevronsLeft,
+} from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
-import { getDevices } from "../../../store/deviceSlice";
+import {
+  getDevices,
+  getDeviceByOrganizationIdAndProjectId,
+} from "../../../store/deviceSlice";
 import { useAppDispatch } from "../../../store/store";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
@@ -10,8 +20,10 @@ import type { ProjectResult } from "../../../model/project.interface";
 import { getAllProjects } from "../../../store/projectSlice";
 import { fromatDateWithTime } from "../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
+import { Error } from "../../utils/toast";
 
 const Devices = () => {
+  const navigate = useNavigate();
   const { organization_id, project_id } = useParams<{
     organization_id: string;
     project_id: string;
@@ -43,6 +55,7 @@ const Devices = () => {
       })
       .catch((err) => {
         console.log(err);
+        Error("Failed to get organizations");
       });
   };
 
@@ -56,30 +69,53 @@ const Devices = () => {
       })
       .catch((err) => {
         console.log(err);
+        Error("Failed to get projects");
       });
   };
 
   useEffect(() => {
     getOrganization();
     getProject();
-    dispatch(getDevices())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          setDevices(res.data);
-          setFilteredDevices(res.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
 
-  // Filter devices based on search term, organization, and project
+    if (organization_id && project_id) {
+      dispatch(
+        getDeviceByOrganizationIdAndProjectId({
+          projectId: parseInt(project_id),
+          organizationId: parseInt(organization_id),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            setDevices(res.data);
+            setFilteredDevices(res.data);
+            setSelectedOrganization(organization_id);
+            setSelectedProject(project_id);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to get devices");
+        });
+    } else {
+      dispatch(getDevices())
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            setDevices(res.data);
+            setFilteredDevices(res.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to get devices");
+        });
+    }
+  }, [organization_id, project_id, dispatch]);
+
   useEffect(() => {
     let filtered = devices;
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
         (device) =>
@@ -94,7 +130,16 @@ const Devices = () => {
       );
     }
 
-    // Filter by project (if not "all")
+    if (selectedOrganization !== "all") {
+      const orgProjectIds = project
+        .filter((p) => p.organization_id === parseInt(selectedOrganization))
+        .map((p) => p.project_id);
+
+      filtered = filtered.filter((device) =>
+        orgProjectIds.includes(device.project_id)
+      );
+    }
+
     if (selectedProject !== "all") {
       filtered = filtered.filter(
         (device) => device.project_id === parseInt(selectedProject)
@@ -102,7 +147,7 @@ const Devices = () => {
     }
 
     setFilteredDevices(filtered);
-  }, [devices, searchTerm, selectedProject]);
+  }, [devices, searchTerm, selectedOrganization, selectedProject, project]);
 
   const handleAddDevice = () => {
     setIsAddDeviceOpen(true);
@@ -116,7 +161,6 @@ const Devices = () => {
   };
 
   const handleDeviceUpdate = () => {
-    // Refresh devices after update
     dispatch(getDevices())
       .unwrap()
       .then((res) => {
@@ -142,9 +186,23 @@ const Devices = () => {
     }
   };
 
+  const handleBackToProjects = () => {
+    navigate("/organization/projects");
+  };
+
   return (
     <div className="flex flex-col gap-6 h-full overflow-y-auto pb-5">
       <div className="flex items-center w-full">
+        {organization_id && project_id && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBackToProjects}
+              className="flex items-center gap-2 pr-3 text-text-primary hover:text-text-secondary transition-colors duration-200 cursor-pointer"
+            >
+              <ChevronsLeft className="w-7 h-7" />
+            </button>
+          </div>
+        )}
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-text-primary font-roboto">
             Devices
