@@ -232,11 +232,6 @@ const Devices = () => {
           <h1 className="text-2xl font-bold text-text-primary font-roboto">
             Devices
           </h1>
-          {searchTerm && (
-            <p className="text-sm text-text-secondary mt-1">
-              {filteredDevices.length} of {devices.length} devices found
-            </p>
-          )}
         </div>
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
