@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { Search, PlusCircle, Edit, Trash2, X } from "lucide-react";
 import { useParams } from "react-router-dom";
-import AddUpdateDevice from "./AddUpdateDevice";
+import type { DeviceResult } from "../../../model/devices.interface";
+import { getDevices } from "../../../store/deviceSlice";
+import { useAppDispatch } from "../../../store/store";
+import { getOrganizations } from "../../../store/organizationSlice";
+import type { OrganizationResult } from "../../../model/organizations.interface";
+import type { ProjectResult } from "../../../model/project.interface";
+import { getAllProjects } from "../../../store/projectSlice";
+import { fromatDateWithTime } from "../../utils/utils";
 
 const Devices = () => {
   const { organization_id, project_id } = useParams<{
@@ -9,76 +16,59 @@ const Devices = () => {
     project_id: string;
   }>();
 
-  const [devices, setDevices] = useState<any[]>([]);
-  const [filteredDevices, setFilteredDevices] = useState<any[]>([]);
-  const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
-  const [isEditDeviceOpen, setIsEditDeviceOpen] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
+  const [devices, setDevices] = useState<DeviceResult[]>([]);
+  const [filteredDevices, setFilteredDevices] = useState<DeviceResult[]>([]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrganization, setSelectedOrganization] = useState(
     organization_id || "all"
   );
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
+  const [organization, setOrganization] = useState<OrganizationResult[]>([]);
+  const [project, setProject] = useState<ProjectResult[]>([]);
+
+  const dispatch = useAppDispatch();
+
+  const getOrganization = async () => {
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setOrganization(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getProject = async () => {
+    await dispatch(getAllProjects())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setProject(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
-    const mockDevices: any[] = [
-      {
-        id: 1,
-        project_id: parseInt(project_id || "1"),
-        deviceFId: 1,
-        imeiNo: "123456789012",
-        deviceTypeId: 1,
-        device_name: "GPS Tracker 001",
-        device_status: "Active",
-        created_at: "2024-01-15T10:00:00Z",
-        updated_at: "2024-01-15T10:00:00Z",
-      },
-      {
-        id: 2,
-        project_id: parseInt(project_id || "1"),
-        deviceFId: 2,
-        imeiNo: "987654321098",
-        deviceTypeId: 2,
-        device_name: "Temperature Sensor 001",
-        device_status: "Active",
-        created_at: "2024-01-14T09:00:00Z",
-        updated_at: "2024-01-14T09:00:00Z",
-      },
-      {
-        id: 3,
-        project_id: parseInt(project_id || "1"),
-        deviceFId: 3,
-        imeiNo: "555666777888",
-        deviceTypeId: 3,
-        device_name: "Security Camera 001",
-        device_status: "Maintenance",
-        created_at: "2024-01-13T08:00:00Z",
-        updated_at: "2024-01-13T08:00:00Z",
-      },
-      {
-        id: 4,
-        project_id: parseInt(project_id || "1"),
-        deviceFId: 1,
-        imeiNo: "111222333444",
-        deviceTypeId: 4,
-        device_name: "RFID Scanner 001",
-        device_status: "Inactive",
-        created_at: "2024-01-12T07:00:00Z",
-        updated_at: "2024-01-12T07:00:00Z",
-      },
-      {
-        id: 5,
-        project_id: parseInt(project_id || "1"),
-        deviceFId: 2,
-        imeiNo: "999888777666",
-        deviceTypeId: 1,
-        device_name: "GPS Tracker 002",
-        device_status: "Offline",
-        created_at: "2024-01-11T06:00:00Z",
-        updated_at: "2024-01-11T06:00:00Z",
-      },
-    ];
-    setDevices(mockDevices);
-    setFilteredDevices(mockDevices);
+    getOrganization();
+    getProject();
+    dispatch(getDevices())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDevices(res.data);
+          setFilteredDevices(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   return (
@@ -102,9 +92,11 @@ const Devices = () => {
               className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
             >
               <option value="all">All Organization</option>
-              <option value="1">Organization 1</option>
-              <option value="2">Organization 2</option>
-              <option value="3">Organization 3</option>
+              {organization.map((org) => (
+                <option key={org.organization_id} value={org.organization_id}>
+                  {org.org_name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex-shrink-0">
@@ -114,9 +106,11 @@ const Devices = () => {
               className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
             >
               <option value="all">All Project</option>
-              <option value="1">Project 1</option>
-              <option value="2">Project 2</option>
-              <option value="3">Project 3</option>
+              {project.map((proj) => (
+                <option key={proj.project_id} value={proj.project_id}>
+                  {proj.project_name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -144,10 +138,7 @@ const Devices = () => {
             )}
           </div>
         </div>
-        <button
-          onClick={() => setIsAddDeviceOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
-        >
+        <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
           <PlusCircle className="w-4 h-4" />
           Add Device
         </button>
@@ -218,7 +209,7 @@ const Devices = () => {
             ) : (
               filteredDevices.map((device, index) => (
                 <tr
-                  key={device.id}
+                  key={index}
                   className="border-b border-border-primary bg-primary hover:bg-secondary"
                 >
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
@@ -228,17 +219,17 @@ const Devices = () => {
                     {device.device_name}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.deviceTypeId}
+                    {device.devicetypeid}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.deviceFId}
+                    {device.devicefid}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        device.device_status === "Active"
+                        device.device_status === "Online"
                           ? "bg-green-100 text-green-800"
-                          : device.device_status === "Inactive"
+                          : device.device_status === "Offline"
                           ? "bg-red-100 text-red-800"
                           : device.device_status === "Maintenance"
                           ? "bg-yellow-100 text-yellow-800"
@@ -249,18 +240,18 @@ const Devices = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.imeiNo || "N/A"}
+                    {device.imeino || "N/A"}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.created_at}
+                    {fromatDateWithTime(device.created_at)}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.updated_at}
+                    {fromatDateWithTime(device.updated_at)}
                   </td>
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     <div className="flex items-center justify-center gap-2">
                       <button
-                        onClick={() => setIsEditDeviceOpen(true)}
+                        onClick={() => {}}
                         className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
                         title="Edit Device"
                       >
@@ -281,27 +272,6 @@ const Devices = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Add Device Popup */}
-      <AddUpdateDevice
-        isOpen={isAddDeviceOpen}
-        onClose={() => setIsAddDeviceOpen(false)}
-        onSubmit={() => {}}
-        project_id={parseInt(project_id || "1")}
-      />
-
-      {/* Edit Device Popup */}
-      <AddUpdateDevice
-        isOpen={isEditDeviceOpen}
-        onClose={() => {
-          setIsEditDeviceOpen(false);
-          setSelectedDevice(null);
-        }}
-        device={selectedDevice || undefined}
-        isEdit={true}
-        onSubmit={() => {}}
-        project_id={parseInt(project_id || "1")}
-      />
     </div>
   );
 };

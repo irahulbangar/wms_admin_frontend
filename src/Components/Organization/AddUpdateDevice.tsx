@@ -42,6 +42,8 @@ const AddUpdateDevice = ({
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
 
+  console.log("project_id", project_id);
+
   const getDataFromDeviceFamily = async () => {
     await dispatch(getDeviceByFamilyWise())
       .unwrap()
