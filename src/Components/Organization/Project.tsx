@@ -203,9 +203,7 @@ const Projects = () => {
   };
 
   const handleViewDevices = (organizationId: string, projectId: string) => {
-    navigate(
-      `/organization/devices?organization_id=${organizationId}&project_id=${projectId}`
-    );
+    navigate(`/organization/devices/${organizationId}/${projectId}`);
   };
 
   return (
