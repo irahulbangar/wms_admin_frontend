@@ -28,7 +28,7 @@ export interface CreateDevicePayload {
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {
-  id: number;
+  device_id: number;
 }
 
 // Create device
@@ -94,14 +94,18 @@ export const getDeviceById = createAsyncThunk(
 // update device
 export const updateDevice = createAsyncThunk(
   "device/updateDevice",
-  async (device: UpdateDevicePayload, thunkAPI) => {
+  async ({ device_id, ...device }: UpdateDevicePayload, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().put(`/devices/${device.id}`, device, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await api().put(
+        `/devices/update-device/${device_id}`,
+        device,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const errorMessage =

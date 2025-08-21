@@ -6,44 +6,164 @@ import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import {
   createDevice,
   getDeviceByFamilyWise,
+  getDeviceById,
   getDevicesByDeviceType,
+  updateDevice,
+  type CreateDevicePayload,
 } from "../../../store/deviceSlice";
-import type { CreateDevicePayload } from "../../../store/deviceSlice";
+
 import { Error, Success } from "../../utils/toast";
-import type { DeviceResult } from "../../../model/devices.interface";
 
 interface AddUpdateDeviceProps {
-  isOpen: boolean;
-  onClose: () => void;
-  isEdit?: boolean;
-  project_id: number;
-  device?: DeviceResult | null;
+  setShowAddModal: (show: boolean) => void;
+  type: "add" | "update";
+  deviceId: number;
+  onUpdateSuccess?: (data: {
+    success: boolean;
+    data?: Record<string, unknown>;
+  }) => void;
+  project_id: number | null;
 }
 
-const AddUpdateDevice = ({
-  isOpen,
-  onClose,
-  isEdit = false,
+const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
+  setShowAddModal,
+  type,
+  deviceId,
+  onUpdateSuccess,
   project_id,
-  device,
-}: AddUpdateDeviceProps) => {
-  const [formData, setFormData] = useState<CreateDevicePayload>({
-    project_id: project_id,
-    deviceFId: 0,
-    imeiNo: "",
-    deviceTypeId: 0,
-    device_name: "",
-    device_status: "Online",
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
+}) => {
   const dispatch = useAppDispatch();
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<CreateDevicePayload>({
+    project_id: project_id || 0,
+    deviceFId: 0,
+    deviceTypeId: 0,
+    device_name: "",
+    device_status: "Online",
+    imeiNo: "",
+  });
 
-  console.log("project_id", project_id);
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === "deviceFId" || name === "deviceTypeId") {
+      setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.deviceFId) {
+      newErrors.deviceFId = "Device Family is required";
+    }
+    if (!formData.deviceTypeId) {
+      newErrors.deviceTypeId = "Device Type is required";
+    }
+    if (!formData.device_name.trim()) {
+      newErrors.device_name = "Device Name is required";
+    }
+    if (!formData.device_status) {
+      newErrors.device_status = "Device Status is required";
+    }
+    if (formData.imeiNo && formData.imeiNo.length !== 12) {
+      newErrors.imeiNo = "IMEI number must be exactly 12 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const deviceData = {
+        project_id: project_id || 0,
+        deviceFId: formData.deviceFId,
+        deviceTypeId: formData.deviceTypeId,
+        device_name: formData.device_name,
+        device_status: formData.device_status,
+        imeiNo: formData.imeiNo,
+      };
+
+      if (type === "add") {
+        const result = await dispatch(createDevice(deviceData)).unwrap();
+        if (result.success) {
+          Success("Device added successfully");
+          setShowAddModal(false);
+          onUpdateSuccess?.(result);
+        }
+      } else {
+        const result = await dispatch(
+          updateDevice({ device_id: deviceId, ...deviceData })
+        ).unwrap();
+        if (result.success) {
+          Success("Device updated successfully");
+          setShowAddModal(false);
+          onUpdateSuccess?.(result);
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting device:", error);
+      Error("Failed to submit device");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (type === "update" && deviceId) {
+      dispatch(getDeviceById(deviceId))
+        .unwrap()
+        .then((res) => {
+          if (res.success && res.data && res.data.length > 0) {
+            const deviceData = res.data[0]; // Get the first device from the array
+            setFormData({
+              project_id: project_id || 0,
+              deviceFId: deviceData.devicefid,
+              deviceTypeId: deviceData.devicetypeid,
+              device_name: deviceData.device_name,
+              device_status: deviceData.device_status,
+              imeiNo: deviceData.imeino,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else if (type === "add") {
+      setFormData({
+        project_id: project_id || 0,
+        deviceFId: 0,
+        deviceTypeId: 0,
+        device_name: "",
+        device_status: "Online",
+        imeiNo: "",
+      });
+    }
+  }, [type, deviceId, dispatch, project_id]);
 
   const getDataFromDeviceFamily = async () => {
     await dispatch(getDeviceByFamilyWise())
@@ -76,116 +196,15 @@ const AddUpdateDevice = ({
     getDataFromDeviceType();
   }, []);
 
-  useEffect(() => {
-    if (device && isEdit) {
-      setFormData({
-        project_id: project_id,
-        deviceFId: device?.devicefid || 0,
-        imeiNo: device?.imeino || "",
-        deviceTypeId: device?.devicetypeid || 0,
-        device_name: device?.device_name || "",
-        device_status: device?.device_status || "",
-      });
-    } else {
-      setFormData({
-        project_id: project_id,
-        deviceFId: device?.devicefid || 0,
-        imeiNo: device?.imeino || "",
-        deviceTypeId: device?.devicetypeid || 0,
-        device_name: device?.device_name || "",
-        device_status: device?.device_status || "",
-      });
-    }
-    setErrors({});
-  }, [device, isEdit, project_id]);
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-
-    if (name === "deviceFId" || name === "deviceTypeId") {
-      setFormData((prev: CreateDevicePayload) => ({
-        ...prev,
-        [name]: parseInt(value) || 0,
-      }));
-    } else {
-      setFormData((prev: CreateDevicePayload) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-
-    if (errors[name]) {
-      setErrors((prev: Record<string, string>) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.deviceFId) {
-      newErrors.deviceFId = "Device Family is required";
-    }
-    if (!formData.deviceTypeId) {
-      newErrors.deviceTypeId = "Device Type is required";
-    }
-    if (!formData.device_name.trim()) {
-      newErrors.device_name = "Device Name is required";
-    }
-    if (!formData.device_status) {
-      newErrors.device_status = "Device Status is required";
-    }
-    if (formData.imeiNo && formData.imeiNo.length !== 12) {
-      newErrors.imeiNo = "IMEI number must be exactly 12 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await dispatch(createDevice(formData))
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            Success("Device created successfully");
-            onClose();
-          } else {
-            Error(res.message);
-          }
-        });
-    } catch (error) {
-      console.error("Error submitting device:", error);
-      Error("Failed to create device");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-border-primary">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
-            {isEdit ? "Update Device" : "Add New Device"}
+            {type === "update" ? "Update Device" : "Add New Device"}
           </h2>
           <button
-            onClick={onClose}
+            onClick={() => setShowAddModal(false)}
             className="text-text-muted hover:text-text-primary transition-colors"
           >
             <X className="w-5 h-5" />
@@ -257,7 +276,8 @@ const AddUpdateDevice = ({
               <input
                 type="text"
                 name="device_name"
-                value=""
+                value={formData.device_name}
+                onChange={handleInputChange}
                 placeholder="Enter device name"
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                   errors.device_name
@@ -296,7 +316,8 @@ const AddUpdateDevice = ({
               <input
                 type="text"
                 name="imeiNo"
-                value=""
+                value={formData.imeiNo}
+                onChange={handleInputChange}
                 placeholder="Enter 12-digit IMEI number (optional)"
                 maxLength={12}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
@@ -320,7 +341,7 @@ const AddUpdateDevice = ({
           <div className="flex items-center justify-end gap-4 pt-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => setShowAddModal(false)}
               className="px-4 py-2 text-text-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors font-roboto cursor-pointer"
             >
               Cancel
@@ -331,8 +352,7 @@ const AddUpdateDevice = ({
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-roboto cursor-pointer"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-
-              {isEdit ? "Update Device" : "Add Device"}
+              {type === "update" ? "Update Device" : "Add Device"}
             </button>
           </div>
         </form>

@@ -20,6 +20,8 @@ const Devices = () => {
   const [devices, setDevices] = useState<DeviceResult[]>([]);
   const [filteredDevices, setFilteredDevices] = useState<DeviceResult[]>([]);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
+  const [isEditDeviceOpen, setIsEditDeviceOpen] = useState(false);
+  const [editingDeviceId, setEditingDeviceId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrganization, setSelectedOrganization] = useState(
     organization_id || "all"
@@ -27,6 +29,7 @@ const Devices = () => {
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
   const [organization, setOrganization] = useState<OrganizationResult[]>([]);
   const [project, setProject] = useState<ProjectResult[]>([]);
+  const [projectId, setProjectId] = useState<number | null>(null);
 
   const dispatch = useAppDispatch();
 
@@ -72,8 +75,59 @@ const Devices = () => {
       });
   }, []);
 
+  // Filter devices based on search term, organization, and project
+  useEffect(() => {
+    let filtered = devices;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (device) =>
+          device.device_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (device.imeino &&
+            device.imeino.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          device.device_status
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          device.devicetypeid.toString().includes(searchTerm) ||
+          device.devicefid.toString().includes(searchTerm)
+      );
+    }
+
+    // Filter by project (if not "all")
+    if (selectedProject !== "all") {
+      filtered = filtered.filter(
+        (device) => device.project_id === parseInt(selectedProject)
+      );
+    }
+
+    setFilteredDevices(filtered);
+  }, [devices, searchTerm, selectedProject]);
+
   const handleAddDevice = () => {
     setIsAddDeviceOpen(true);
+    setProjectId(parseInt(project_id || "0"));
+  };
+
+  const handleEditDevice = (deviceId: number, projectId: number) => {
+    setEditingDeviceId(deviceId);
+    setIsEditDeviceOpen(true);
+    setProjectId(projectId);
+  };
+
+  const handleDeviceUpdate = () => {
+    // Refresh devices after update
+    dispatch(getDevices())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDevices(res.data);
+          setFilteredDevices(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -259,7 +313,9 @@ const Devices = () => {
                   <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                     <div className="flex items-center justify-center gap-2">
                       <button
-                        onClick={() => {}}
+                        onClick={() =>
+                          handleEditDevice(device.device_id, device.project_id)
+                        }
                         className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
                         title="Edit Device"
                       >
@@ -282,10 +338,21 @@ const Devices = () => {
       </div>
       {isAddDeviceOpen && (
         <AddUpdateDevice
-          isOpen={isAddDeviceOpen}
-          onClose={() => setIsAddDeviceOpen(false)}
-          project_id={parseInt(project_id || "0")}
-          device={null}
+          setShowAddModal={setIsAddDeviceOpen}
+          type="add"
+          deviceId={0}
+          project_id={projectId}
+          onUpdateSuccess={handleDeviceUpdate}
+        />
+      )}
+
+      {isEditDeviceOpen && editingDeviceId && (
+        <AddUpdateDevice
+          setShowAddModal={setIsEditDeviceOpen}
+          type="update"
+          deviceId={editingDeviceId}
+          project_id={projectId}
+          onUpdateSuccess={handleDeviceUpdate}
         />
       )}
     </div>
