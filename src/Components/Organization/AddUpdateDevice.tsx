@@ -53,7 +53,6 @@ const AddUpdateDevice = ({
   ) => {
     const { name, value } = e.target;
 
-    // Handle numeric fields
     if (name === "deviceFId" || name === "deviceTypeId") {
       setFormData((prev: any) => ({
         ...prev,
@@ -66,7 +65,6 @@ const AddUpdateDevice = ({
       }));
     }
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev: any) => {
         const newErrors = { ...prev };
@@ -188,7 +186,6 @@ const AddUpdateDevice = ({
               )}
             </div>
 
-            {/* Device Name */}
             <div>
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                 Device Name
@@ -211,7 +208,6 @@ const AddUpdateDevice = ({
               )}
             </div>
 
-            {/* Device Status */}
             <div>
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                 Device Status
