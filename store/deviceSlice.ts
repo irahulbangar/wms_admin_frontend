@@ -77,7 +77,7 @@ export const getDeviceById = createAsyncThunk(
   async (id: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get<DeviceResponse>(`/devices/${id}`, {
+      const response = await api().get(`/devices/${id}`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },

@@ -138,8 +138,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       dispatch(getDeviceById(deviceId))
         .unwrap()
         .then((res) => {
-          if (res.success && res.data && res.data.length > 0) {
-            const deviceData = res.data[0]; // Get the first device from the array
+          if (res.success) {
+            const deviceData = res.data;
             setFormData({
               project_id: project_id || 0,
               deviceFId: deviceData.devicefid,
