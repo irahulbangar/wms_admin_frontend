@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Save, Loader2 } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useAppDispatch } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
@@ -7,13 +7,14 @@ import {
   getDeviceByFamilyWise,
   getDevicesByDeviceType,
 } from "../../../store/deviceSlice";
+import type { CreateDevicePayload } from "../../../store/deviceSlice";
 
 interface AddUpdateDeviceProps {
   isOpen: boolean;
   onClose: () => void;
-  device: any | null;
+  device: CreateDevicePayload | null;
   isEdit?: boolean;
-  onSubmit: (device: any | null) => void;
+  onSubmit: (device: CreateDevicePayload | null) => void;
   project_id: number;
 }
 
@@ -25,7 +26,7 @@ const AddUpdateDevice = ({
   onSubmit,
   project_id,
 }: AddUpdateDeviceProps) => {
-  const [formData, setFormData] = useState<any>({
+  const [formData, setFormData] = useState<CreateDevicePayload>({
     project_id: project_id,
     deviceFId: 0,
     imeiNo: "",
@@ -79,11 +80,11 @@ const AddUpdateDevice = ({
     } else {
       setFormData({
         project_id: project_id,
-        deviceFId: 0,
-        imeiNo: "",
-        deviceTypeId: 0,
-        device_name: "",
-        device_status: "Active",
+        deviceFId: device?.deviceFId || 0,
+        imeiNo: device?.imeiNo || "",
+        deviceTypeId: device?.deviceTypeId || 0,
+        device_name: device?.device_name || "",
+        device_status: device?.device_status || "",
       });
     }
     setErrors({});
@@ -95,19 +96,19 @@ const AddUpdateDevice = ({
     const { name, value } = e.target;
 
     if (name === "deviceFId" || name === "deviceTypeId") {
-      setFormData((prev: any) => ({
+      setFormData((prev: CreateDevicePayload) => ({
         ...prev,
         [name]: parseInt(value) || 0,
       }));
     } else {
-      setFormData((prev: any) => ({
+      setFormData((prev: CreateDevicePayload) => ({
         ...prev,
         [name]: value,
       }));
     }
 
     if (errors[name]) {
-      setErrors((prev: any) => {
+      setErrors((prev: Record<string, string>) => {
         const newErrors = { ...prev };
         delete newErrors[name];
         return newErrors;

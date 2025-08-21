@@ -18,12 +18,12 @@ export const deviceSlice = createSlice({
   },
 });
 
-interface CreateDevicePayload {
+export interface CreateDevicePayload {
   device_name: string;
   device_status: string;
-  imei: string;
+  imeiNo: string;
   project_id: number;
-  device_type: string;
+  deviceTypeId: number;
   deviceFId: number;
 }
 
