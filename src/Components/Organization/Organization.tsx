@@ -229,7 +229,7 @@ const Organization = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
           <Loader2 className="w-12 h-12 text-text-primary animate-spin" />
         </div>
       ) : (
