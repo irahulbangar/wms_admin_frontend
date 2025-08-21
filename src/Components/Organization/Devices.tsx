@@ -6,6 +6,8 @@ import {
   Trash2,
   X,
   ChevronsLeft,
+  Loader2,
+  Monitor,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
@@ -21,6 +23,7 @@ import { getAllProjects } from "../../../store/projectSlice";
 import { fromatDateWithTime } from "../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
 import { Error } from "../../utils/toast";
+import NoDataFound from "../NoDataFound";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -42,10 +45,12 @@ const Devices = () => {
   const [organization, setOrganization] = useState<OrganizationResult[]>([]);
   const [project, setProject] = useState<ProjectResult[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useAppDispatch();
 
   const getOrganization = async () => {
+    setIsLoading(true);
     await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
@@ -56,10 +61,14 @@ const Devices = () => {
       .catch((err) => {
         console.log(err);
         Error("Failed to get organizations");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
   const getProject = async () => {
+    setIsLoading(true);
     await dispatch(getAllProjects())
       .unwrap()
       .then((res) => {
@@ -70,6 +79,9 @@ const Devices = () => {
       .catch((err) => {
         console.log(err);
         Error("Failed to get projects");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -78,6 +90,7 @@ const Devices = () => {
     getProject();
 
     if (organization_id && project_id) {
+      setIsLoading(true);
       dispatch(
         getDeviceByOrganizationIdAndProjectId({
           projectId: parseInt(project_id),
@@ -96,8 +109,12 @@ const Devices = () => {
         .catch((err) => {
           console.log(err);
           Error("Failed to get devices");
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     } else {
+      setIsLoading(true);
       dispatch(getDevices())
         .unwrap()
         .then((res) => {
@@ -109,6 +126,9 @@ const Devices = () => {
         .catch((err) => {
           console.log(err);
           Error("Failed to get devices");
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
   }, [organization_id, project_id, dispatch]);
@@ -161,6 +181,7 @@ const Devices = () => {
   };
 
   const handleDeviceUpdate = () => {
+    setIsLoading(true);
     dispatch(getDevices())
       .unwrap()
       .then((res) => {
@@ -171,6 +192,10 @@ const Devices = () => {
       })
       .catch((err) => {
         console.log(err);
+        Error("Failed to update device");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -276,131 +301,165 @@ const Devices = () => {
         </button>
       </div>
 
-      <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-        <table className="w-full text-base text-left rtl:text-right text-text-primary">
-          <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
-            <tr>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Sr No
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Device Name
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Project ID
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Device Family ID
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Device Type ID
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Device Status
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                IMEI Number
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Created At
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Updated At
-              </th>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDevices.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+          <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+        </div>
+      ) : (
+        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+          <table className="w-full text-base text-left rtl:text-right text-text-primary">
+            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
               <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-8 text-center text-text-muted font-roboto"
-                >
-                  {searchTerm ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <p>No devices found matching "{searchTerm}"</p>
-                      <p className="text-sm text-text-secondary">
-                        Try searching by device name, IMEI, status, type, or
-                        family
-                      </p>
-                      <button
-                        onClick={() => {
-                          setSearchTerm("");
-                          setFilteredDevices(devices);
-                        }}
-                        className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 underline"
-                      >
-                        Clear search
-                      </button>
-                    </div>
-                  ) : (
-                    "No devices found"
-                  )}
-                </td>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Sr No
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Device Name
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Project ID
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Device Family ID
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Device Type ID
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Device Status
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  IMEI Number
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Created At
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Updated At
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              filteredDevices.map((device, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-border-primary bg-primary hover:bg-secondary"
-                >
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.device_name}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device?.project_id}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device?.devicefid}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device?.devicetypeid}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
-                        device?.device_status
-                      )}`}
-                    >
-                      {device.device_status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {device.imeino || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {fromatDateWithTime(device.created_at)}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    {fromatDateWithTime(device.updated_at)}
-                  </td>
-                  <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                    <div className="flex items-center justify-center gap-2">
-                      <Edit
-                        onClick={() =>
-                          handleEditDevice(device.device_id, device.project_id)
-                        }
-                        className="w-5 h-5 text-status-info cursor-pointer"
-                      />
+            </thead>
+            <tbody>
+              {filteredDevices.length > 0 ? (
+                filteredDevices.map((device, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-border-primary bg-primary hover:bg-secondary"
+                  >
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {device.device_name}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {device?.project_id}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {device?.devicefid}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {device?.devicetypeid}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
+                          device?.device_status
+                        )}`}
+                      >
+                        {device.device_status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {device.imeino || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {fromatDateWithTime(device.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {fromatDateWithTime(device.updated_at)}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <div className="flex items-center justify-center gap-2">
+                        <Edit
+                          onClick={() =>
+                            handleEditDevice(
+                              device.device_id,
+                              device.project_id
+                            )
+                          }
+                          className="w-5 h-5 text-status-info cursor-pointer"
+                        />
 
-                      <Trash2
-                        onClick={() => {}}
-                        className="w-5 h-5 text-status-danger cursor-pointer"
-                      />
-                    </div>
+                        <Trash2
+                          onClick={() => {}}
+                          className="w-5 h-5 text-status-danger cursor-pointer"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-6 py-4 text-text-primary text-center font-roboto text-sm"
+                  >
+                    <NoDataFound
+                      icon={
+                        <Monitor className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                      }
+                      title={
+                        searchTerm || selectedOrganization !== "all"
+                          ? "No devices match your search/filter"
+                          : selectedOrganization === "all"
+                          ? "No devices found"
+                          : `No devices found for ${
+                              organization.find(
+                                (org) =>
+                                  org.organization_id === selectedOrganization
+                              )?.org_name ||
+                              `Organization ${selectedOrganization}`
+                            }`
+                      }
+                      description={
+                        searchTerm || selectedOrganization !== "all"
+                          ? "Try adjusting your search terms or filter criteria"
+                          : selectedOrganization === "all"
+                          ? "Add your first device to get started"
+                          : `Add your first project for ${
+                              organization.find(
+                                (org) =>
+                                  org.organization_id === selectedOrganization
+                              )?.org_name ||
+                              `Organization ${selectedOrganization}`
+                            } to get started`
+                      }
+                      buttonText={
+                        searchTerm || selectedOrganization !== "all"
+                          ? "Clear Search"
+                          : "Add Device"
+                      }
+                      buttonOnClick={() => {
+                        if (searchTerm || selectedOrganization !== "all") {
+                          setSearchTerm("");
+                          setSelectedOrganization("all");
+                        } else {
+                          handleAddDevice();
+                        }
+                      }}
+                    />
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {isAddDeviceOpen && (
         <AddUpdateDevice
           setShowAddModal={setIsAddDeviceOpen}

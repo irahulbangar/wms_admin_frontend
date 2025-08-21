@@ -135,6 +135,14 @@ const Projects = () => {
   }, [organization_id]);
 
   useEffect(() => {
+    getAllOrganizations();
+
+    if (!organization_id) {
+      getProjects();
+    }
+  }, []);
+
+  useEffect(() => {
     let filtered = projects;
 
     if (filterBy !== "all") {
