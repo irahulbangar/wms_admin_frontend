@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
 import { X, Save, Loader2 } from "lucide-react";
+import { useAppDispatch } from "../../../store/store";
+import type { DeviceFamilyResult } from "../../../model/device-family.interface";
+import type { DeviceTypeResult } from "../../../model/device-type.interface";
+import {
+  getDeviceByFamilyWise,
+  getDevicesByDeviceType,
+} from "../../../store/deviceSlice";
 
 interface AddUpdateDeviceProps {
   isOpen: boolean;
@@ -31,6 +38,40 @@ const AddUpdateDevice = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const statusOptions = ["Active", "Inactive", "Maintenance", "Offline"];
+  const dispatch = useAppDispatch();
+  const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
+  const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
+
+  const getDataFromDeviceFamily = async () => {
+    await dispatch(getDeviceByFamilyWise())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDeviceFamily(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getDataFromDeviceType = async () => {
+    await dispatch(getDevicesByDeviceType())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDeviceType(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    getDataFromDeviceFamily();
+    getDataFromDeviceType();
+  }, []);
 
   useEffect(() => {
     if (device && isEdit) {
@@ -140,7 +181,7 @@ const AddUpdateDevice = ({
               </label>
               <select
                 name="deviceFId"
-                value="all"
+                value={formData.deviceFId}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                   errors.deviceFId
@@ -148,10 +189,12 @@ const AddUpdateDevice = ({
                     : "border-border-primary"
                 }`}
               >
-                <option value="all">Select Device Family</option>
-                <option value="1">Device Family 1</option>
-                <option value="2">Device Family 2</option>
-                <option value="3">Device Family 3</option>
+                <option value="0">Select Device Family</option>
+                {deviceFamily.map((family) => (
+                  <option key={family.id} value={family.devicefamilyid}>
+                    {family.name}
+                  </option>
+                ))}
               </select>
               {errors.deviceFId && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
@@ -166,7 +209,7 @@ const AddUpdateDevice = ({
               </label>
               <select
                 name="deviceTypeId"
-                value="all"
+                value={formData.deviceTypeId}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                   errors.deviceTypeId
@@ -174,10 +217,12 @@ const AddUpdateDevice = ({
                     : "border-border-primary"
                 }`}
               >
-                <option value="all">Select Device Type</option>
-                <option value="1">Device Type 1</option>
-                <option value="2">Device Type 2</option>
-                <option value="3">Device Type 3</option>
+                <option value="0">Select Device Type</option>
+                {deviceType.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.topics}
+                  </option>
+                ))}
               </select>
               {errors.deviceTypeId && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
