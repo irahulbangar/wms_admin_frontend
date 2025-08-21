@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import { DeviceResponse } from "../model/devices.interface";
-import { DeviceFamilyResponse } from "../model/device-family.interface";
-import { DeviceTypeResponse } from "../model/device-type.interface";
+import type { DeviceResponse } from "../model/devices.interface";
+import type { DeviceFamilyResponse } from "../model/device-family.interface";
+import type { DeviceTypeResponse } from "../model/device-type.interface";
 
 export const deviceSlice = createSlice({
   name: "device",
