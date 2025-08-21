@@ -32,13 +32,12 @@ const AddUpdateDevice = ({
     imeiNo: "",
     deviceTypeId: 0,
     device_name: "",
-    device_status: "Active",
+    device_status: "Online",
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const statusOptions = ["Active", "Inactive", "Maintenance", "Offline"];
   const dispatch = useAppDispatch();
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
@@ -260,14 +259,13 @@ const AddUpdateDevice = ({
               </label>
               <select
                 name="device_status"
-                value="Active"
+                value={formData.device_status}
+                onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary"
               >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+                <option value="Maintenance">Maintenance</option>
               </select>
             </div>
 
