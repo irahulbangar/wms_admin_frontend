@@ -4,27 +4,28 @@ import { useAppDispatch } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import {
+  createDevice,
   getDeviceByFamilyWise,
   getDevicesByDeviceType,
 } from "../../../store/deviceSlice";
 import type { CreateDevicePayload } from "../../../store/deviceSlice";
+import { Error, Success } from "../../utils/toast";
+import type { DeviceResult } from "../../../model/devices.interface";
 
 interface AddUpdateDeviceProps {
   isOpen: boolean;
   onClose: () => void;
-  device: CreateDevicePayload | null;
   isEdit?: boolean;
-  onSubmit: (device: CreateDevicePayload | null) => void;
   project_id: number;
+  device?: DeviceResult | null;
 }
 
 const AddUpdateDevice = ({
   isOpen,
   onClose,
-  device,
   isEdit = false,
-  onSubmit,
   project_id,
+  device,
 }: AddUpdateDeviceProps) => {
   const [formData, setFormData] = useState<CreateDevicePayload>({
     project_id: project_id,
@@ -77,13 +78,20 @@ const AddUpdateDevice = ({
 
   useEffect(() => {
     if (device && isEdit) {
-      setFormData(device);
+      setFormData({
+        project_id: project_id,
+        deviceFId: device?.devicefid || 0,
+        imeiNo: device?.imeino || "",
+        deviceTypeId: device?.devicetypeid || 0,
+        device_name: device?.device_name || "",
+        device_status: device?.device_status || "",
+      });
     } else {
       setFormData({
         project_id: project_id,
-        deviceFId: device?.deviceFId || 0,
-        imeiNo: device?.imeiNo || "",
-        deviceTypeId: device?.deviceTypeId || 0,
+        deviceFId: device?.devicefid || 0,
+        imeiNo: device?.imeino || "",
+        deviceTypeId: device?.devicetypeid || 0,
         device_name: device?.device_name || "",
         device_status: device?.device_status || "",
       });
@@ -149,10 +157,19 @@ const AddUpdateDevice = ({
 
     setIsLoading(true);
     try {
-      await onSubmit(formData);
-      onClose();
+      await dispatch(createDevice(formData))
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            Success("Device created successfully");
+            onClose();
+          } else {
+            Error(res.message);
+          }
+        });
     } catch (error) {
       console.error("Error submitting device:", error);
+      Error("Failed to create device");
     } finally {
       setIsLoading(false);
     }

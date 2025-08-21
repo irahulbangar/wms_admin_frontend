@@ -9,6 +9,7 @@ import type { OrganizationResult } from "../../../model/organizations.interface"
 import type { ProjectResult } from "../../../model/project.interface";
 import { getAllProjects } from "../../../store/projectSlice";
 import { fromatDateWithTime } from "../../utils/utils";
+import AddUpdateDevice from "./AddUpdateDevice";
 
 const Devices = () => {
   const { organization_id, project_id } = useParams<{
@@ -18,7 +19,7 @@ const Devices = () => {
 
   const [devices, setDevices] = useState<DeviceResult[]>([]);
   const [filteredDevices, setFilteredDevices] = useState<DeviceResult[]>([]);
-
+  const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrganization, setSelectedOrganization] = useState(
     organization_id || "all"
@@ -70,6 +71,10 @@ const Devices = () => {
         console.log(err);
       });
   }, []);
+
+  const handleAddDevice = () => {
+    setIsAddDeviceOpen(true);
+  };
 
   return (
     <div className="flex flex-col gap-6 h-full overflow-y-auto pb-5">
@@ -138,7 +143,10 @@ const Devices = () => {
             )}
           </div>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
+        <button
+          onClick={handleAddDevice}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+        >
           <PlusCircle className="w-4 h-4" />
           Add Device
         </button>
@@ -272,6 +280,14 @@ const Devices = () => {
           </tbody>
         </table>
       </div>
+      {isAddDeviceOpen && (
+        <AddUpdateDevice
+          isOpen={isAddDeviceOpen}
+          onClose={() => setIsAddDeviceOpen(false)}
+          project_id={parseInt(project_id || "0")}
+          device={null}
+        />
+      )}
     </div>
   );
 };
