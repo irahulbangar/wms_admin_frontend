@@ -5,9 +5,10 @@ import {
   Edit,
   Trash2,
   X,
-  ChevronsLeft,
   Loader2,
   Monitor,
+  Home,
+  ChevronRight,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
@@ -269,24 +270,59 @@ const Devices = () => {
     navigate("/organization/projects");
   };
 
+  const handleBackToOrganizations = () => {
+    navigate("/organization");
+  };
+
+  const handleBackToHome = () => {
+    navigate("/");
+  };
+
   return (
-    <div className="flex flex-col gap-6 h-full overflow-y-auto pb-5">
-      <div className="flex items-center w-full">
-        {organization_id && project_id && (
-          <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto pb-5">
+      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1 rounded-lg w-fit">
+        <button
+          onClick={handleBackToHome}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <Home className="w-4 h-4" />
+          <span>Home</span>
+        </button>
+
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+
+        <button
+          onClick={handleBackToOrganizations}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Organization</span>
+        </button>
+
+        {selectedOrganization !== "all" && (
+          <>
+            <ChevronRight className="w-4 h-4 text-text-muted" />
             <button
               onClick={handleBackToProjects}
-              className="flex items-center gap-2 pr-3 text-text-primary hover:text-text-secondary transition-colors duration-200 cursor-pointer"
+              className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
             >
-              <ChevronsLeft className="w-7 h-7" />
+              <span>Projects</span>
             </button>
-          </div>
+          </>
         )}
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-text-primary font-roboto">
-            Devices
-          </h1>
-        </div>
+
+        {selectedProject !== "all" && (
+          <>
+            <ChevronRight className="w-4 h-4 text-text-muted" />
+            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded">
+              {project.find(
+                (proj) => proj.project_id === parseInt(selectedProject)
+              )?.project_name || "Project"}
+            </span>
+          </>
+        )}
+      </div>
+
+      <div className="flex items-center w-full">
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
             <select
@@ -317,7 +353,7 @@ const Devices = () => {
             </select>
           </div>
         </div>
-        <div className="flex items-center gap-4 p-4 rounded-lg flex-1">
+        <div className="flex items-center gap-4 px-4 rounded-lg flex-1">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
