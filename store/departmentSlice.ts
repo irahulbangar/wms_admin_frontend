@@ -17,8 +17,9 @@ export const departmentSlice = createSlice({
 });
 
 export interface DepartmentPayload {
-  name: string;
-  info: string;
+  department_name: string;
+  department_info: string;
+  project_id: number;
 }
 
 // Create department
