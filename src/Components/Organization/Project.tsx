@@ -3,13 +3,14 @@ import {
   Search,
   PlusCircle,
   Columns3Cog,
-  ChevronsLeft,
   Eye,
   Trash2,
   Edit,
   Loader2,
   X,
   Check,
+  Home,
+  ChevronRight,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
@@ -69,6 +70,10 @@ const Projects = () => {
 
   const handleBackToOrganizations = () => {
     navigate("/organization");
+  };
+
+  const handleBackToHome = () => {
+    navigate("/");
   };
 
   const getProjects = async () => {
@@ -208,28 +213,38 @@ const Projects = () => {
 
   return (
     <div className="flex flex-col gap-6 h-full pb-5">
-      <div className="flex items-center w-full">
-        {organization_id && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleBackToOrganizations}
-              className="flex items-center gap-2 pr-3 text-text-primary hover:text-text-secondary transition-colors duration-200 cursor-pointer"
-            >
-              <ChevronsLeft className="w-7 h-7" />
-            </button>
-          </div>
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1 rounded-lg w-fit">
+        <button
+          onClick={handleBackToHome}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <Home className="w-4 h-4" />
+          <span>Home</span>
+        </button>
+
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+
+        <button
+          onClick={handleBackToOrganizations}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Organization</span>
+        </button>
+
+        {selectedOrganizationId !== "all" && (
+          <>
+            <ChevronRight className="w-4 h-4 text-text-muted" />
+            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded">
+              {organizations.find(
+                (org) => org.organization_id === selectedOrganizationId
+              )?.org_name || selectedOrganizationId}
+            </span>
+          </>
         )}
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-text-primary">
-            {selectedOrganizationId === "all"
-              ? "All Projects"
-              : `Project - ${
-                  organizations.find(
-                    (org) => org.organization_id === selectedOrganizationId
-                  )?.org_name || selectedOrganizationId
-                }`}
-          </h1>
-        </div>
+      </div>
+
+      <div className="flex items-center w-full">
         <div className="flex-shrink-0">
           <select
             value={selectedOrganizationId}
