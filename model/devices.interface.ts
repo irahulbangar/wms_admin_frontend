@@ -14,4 +14,5 @@ export interface DeviceResult {
   devicetypeid: number;
   imeino: string;
   devicefid: number;
+  department_id: number;
 }

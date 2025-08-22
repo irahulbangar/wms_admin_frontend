@@ -105,6 +105,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       newErrors.imeiNo = "IMEI number must be exactly 15 characters";
     }
 
+    if (showAddDepartmentInput && !newDepartmentName.trim()) {
+      newErrors.department_name =
+        "Department name is required when adding new department";
+    } else if (!showAddDepartmentInput && formData.department_id === 0) {
+      newErrors.department_id = "Please select a department";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -127,6 +134,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         imeiNo: formData.imeiNo,
         department_id: formData.department_id,
       };
+
+      if (showAddDepartmentInput && newDepartmentName.trim()) {
+        deviceData.department_id = 0;
+      } else {
+        deviceData.department_id = formData.department_id;
+      }
 
       if (type === "add") {
         const result = await dispatch(createDevice(deviceData)).unwrap();
@@ -169,6 +182,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               imeiNo: deviceData.imeino,
               department_id: deviceData.departmentid,
             });
+            setShowAddDepartmentInput(false);
+            setNewDepartmentName("");
           }
         })
         .catch((err) => {
@@ -184,6 +199,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         imeiNo: "",
         department_id: 0,
       });
+      setShowAddDepartmentInput(false);
+      setNewDepartmentName("");
     }
   }, [type, deviceId, dispatch, project_id]);
 
@@ -195,7 +212,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             {type === "update" ? "Update Device" : "Add New Device"}
           </h2>
           <button
-            onClick={() => setShowAddModal(false)}
+            onClick={() => {
+              setShowAddModal(false);
+              setShowAddDepartmentInput(false);
+              setNewDepartmentName("");
+              setErrors({});
+            }}
             className="text-text-muted hover:text-text-primary transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -393,7 +415,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           <div className="flex items-center justify-end gap-4 pt-4">
             <button
               type="button"
-              onClick={() => setShowAddModal(false)}
+              onClick={() => {
+                setShowAddModal(false);
+                setShowAddDepartmentInput(false);
+                setNewDepartmentName("");
+                setErrors({});
+              }}
               className="px-4 py-2 text-text-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors font-roboto cursor-pointer"
             >
               Cancel

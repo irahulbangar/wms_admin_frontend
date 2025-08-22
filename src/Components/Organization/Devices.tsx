@@ -401,6 +401,9 @@ const Devices = () => {
                   Project Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Department ID
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                   Device Family Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
@@ -444,6 +447,9 @@ const Devices = () => {
                         ?.project_name ||
                         device?.project_id ||
                         "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      {device?.department_id || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {deviceFamily.find(
