@@ -5,9 +5,7 @@ import type { DeviceFamilyResult } from "../../../model/device-family.interface"
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import {
   createDevice,
-  getDeviceByFamilyWise,
   getDeviceById,
-  getDevicesByDeviceType,
   updateDevice,
   type CreateDevicePayload,
 } from "../../../store/deviceSlice";
@@ -23,6 +21,8 @@ interface AddUpdateDeviceProps {
     data?: Record<string, unknown>;
   }) => void;
   project_id: number | null;
+  familyData: DeviceFamilyResult[];
+  typeData: DeviceTypeResult[];
 }
 
 const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
@@ -31,10 +31,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   deviceId,
   onUpdateSuccess,
   project_id,
+  familyData,
+  typeData,
 }) => {
   const dispatch = useAppDispatch();
-  const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
-  const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<CreateDevicePayload>({
@@ -165,37 +165,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
   }, [type, deviceId, dispatch, project_id]);
 
-  const getDataFromDeviceFamily = async () => {
-    await dispatch(getDeviceByFamilyWise())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          setDeviceFamily(res.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const getDataFromDeviceType = async () => {
-    await dispatch(getDevicesByDeviceType())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          setDeviceType(res.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  useEffect(() => {
-    getDataFromDeviceFamily();
-    getDataFromDeviceType();
-  }, []);
-
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -228,7 +197,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 }`}
               >
                 <option value="0">Select Device Family</option>
-                {deviceFamily.map((family) => (
+                {familyData.map((family) => (
                   <option key={family.id} value={family.devicefamilyid}>
                     {family.name}
                   </option>
@@ -256,7 +225,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 }`}
               >
                 <option value="0">Select Device Type</option>
-                {deviceType.map((type) => (
+                {typeData.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.topics}
                   </option>

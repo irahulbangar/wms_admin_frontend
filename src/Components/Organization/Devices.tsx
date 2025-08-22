@@ -14,16 +14,20 @@ import type { DeviceResult } from "../../../model/devices.interface";
 import {
   getDevices,
   getDeviceByOrganizationIdAndProjectId,
+  getDevicesByDeviceType,
 } from "../../../store/deviceSlice";
 import { useAppDispatch } from "../../../store/store";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
 import type { ProjectResult } from "../../../model/project.interface";
 import { getAllProjects } from "../../../store/projectSlice";
+import type { DeviceFamilyResult } from "../../../model/device-family.interface";
+import { getDeviceByFamilyWise } from "../../../store/deviceSlice";
 import { fromatDateWithTime } from "../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
+import type { DeviceTypeResult } from "../../../model/device-type.interface";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -44,8 +48,10 @@ const Devices = () => {
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
   const [organization, setOrganization] = useState<OrganizationResult[]>([]);
   const [project, setProject] = useState<ProjectResult[]>([]);
+  const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
 
   const dispatch = useAppDispatch();
 
@@ -85,9 +91,46 @@ const Devices = () => {
       });
   };
 
+  const getDeviceFamily = async () => {
+    setIsLoading(true);
+    await dispatch(getDeviceByFamilyWise())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDeviceFamily(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get device families");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const getDeviceType = async () => {
+    await dispatch(getDevicesByDeviceType())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDeviceType(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get device types");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     getOrganization();
     getProject();
+    getDeviceFamily();
+    getDeviceType();
 
     if (organization_id && project_id) {
       setIsLoading(true);
@@ -146,7 +189,11 @@ const Devices = () => {
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           device.devicetypeid.toString().includes(searchTerm) ||
-          device.devicefid.toString().includes(searchTerm)
+          device.devicefid.toString().includes(searchTerm) ||
+          deviceFamily
+            .find((df) => df.devicefamilyid === device.devicefid)
+            ?.name.toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
 
@@ -275,7 +322,7 @@ const Devices = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
               type="text"
-              placeholder="Search devices by name, IMEI, status, type, or family..."
+              placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success font-roboto"
@@ -319,10 +366,10 @@ const Devices = () => {
                   Device Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Project ID
+                  Project Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Device Family ID
+                  Device Family Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                   Device Type ID
@@ -358,10 +405,17 @@ const Devices = () => {
                       {device.device_name}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {device?.project_id}
+                      {project.find((p) => p.project_id === device?.project_id)
+                        ?.project_name ||
+                        device?.project_id ||
+                        "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {device?.devicefid}
+                      {deviceFamily.find(
+                        (df) => df.devicefamilyid === device?.devicefid
+                      )?.name ||
+                        device?.devicefid ||
+                        "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {device?.devicetypeid}
@@ -469,6 +523,8 @@ const Devices = () => {
           deviceId={0}
           project_id={projectId}
           onUpdateSuccess={handleDeviceUpdate}
+          familyData={deviceFamily}
+          typeData={deviceType}
         />
       )}
 
@@ -479,6 +535,8 @@ const Devices = () => {
           deviceId={editingDeviceId}
           project_id={projectId}
           onUpdateSuccess={handleDeviceUpdate}
+          familyData={deviceFamily}
+          typeData={deviceType}
         />
       )}
     </div>
