@@ -1,7 +1,23 @@
-import { Search, PlusCircle, User } from "lucide-react";
+import { Search, PlusCircle, User, SquarePen, Trash2 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
+import { fromatDateWithTime } from "../../utils/utils";
+import { useEffect, useState } from "react";
 
 const Users = () => {
+  const [users, setUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    setUsers(users);
+  }, []);
+
+  const handleEditUser = (id: string) => {
+    console.log(id);
+  };
+
+  const handleDeleteUser = (id: string) => {
+    console.log(id);
+  };
+
   return (
     <div className="flex flex-col gap-4 w-full h-full pb-5">
       <div className="flex items-center w-full">
@@ -29,13 +45,114 @@ const Users = () => {
         </button>
       </div>
 
-      <NoDataFound
-        icon={<User className="w-16 h-16 text-text-muted mx-auto mb-4" />}
-        title="No users found"
-        description="Add your first user to get started"
-        buttonText="Add User"
-        buttonOnClick={() => {}}
-      />
+      <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+        <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+          <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+            <tr>
+              <th
+                scope="col"
+                className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm"
+              >
+                Sr No
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
+              >
+                Name
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
+              >
+                Email
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
+              >
+                Role
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
+              >
+                Created At
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
+              >
+                Updated At
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
+              >
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.length > 0 ? (
+              users.map((user, index) => (
+                <tr
+                  key={user.id}
+                  className="bg-primary border-b border-border-primary hover:bg-secondary"
+                >
+                  <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    {user.name}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    {user.email}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    {user.role}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    {fromatDateWithTime(user.created_at)}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    {fromatDateWithTime(user.updated_at)}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-sm">
+                    <div className="flex items-center gap-3 justify-center">
+                      <SquarePen
+                        onClick={() => handleEditUser(user.id)}
+                        className="w-5 h-5 text-status-info cursor-pointer"
+                      />
+                      <Trash2
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="w-5 h-5 text-status-danger cursor-pointer"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={7}
+                  className="text-center font-roboto text-text-secondary text-sm"
+                >
+                  <NoDataFound
+                    icon={
+                      <User className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                    }
+                    title="No users found"
+                    description="Add your first user to get started"
+                    buttonText="Add User"
+                    buttonOnClick={() => {}}
+                  />
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

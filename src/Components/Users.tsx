@@ -78,7 +78,7 @@ const Users = () => {
 
           <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
-              <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary">
+              <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
                   <th
                     scope="col"
