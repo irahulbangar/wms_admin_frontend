@@ -174,13 +174,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           </h2>
           <button
             onClick={() => setShowAddModal(false)}
-            className="text-text-muted hover:text-text-primary transition-colors"
+            className="text-text-muted hover:text-text-primary transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">

@@ -3,7 +3,7 @@ import NoDataFound from "../NoDataFound";
 
 const Users = () => {
   return (
-    <div className="flex flex-col gap-6 w-full h-full pb-5">
+    <div className="flex flex-col gap-4 w-full h-full pb-5">
       <div className="flex items-center w-full">
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-text-primary font-roboto">
@@ -13,7 +13,7 @@ const Users = () => {
             Manage your organization's users
           </p>
         </div>
-        <div className="flex items-center gap-4 p-4 rounded-lg flex-1">
+        <div className="flex items-center gap-4 px-4 rounded-lg flex-1">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input

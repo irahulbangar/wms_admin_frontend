@@ -3,12 +3,13 @@ import {
   Search,
   PlusCircle,
   Edit,
-  Trash2,
+  // Trash2,
   X,
   Loader2,
   Monitor,
   Home,
   ChevronRight,
+  Download,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
@@ -29,6 +30,7 @@ import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
+import AddUpdateDepartment from "./AddUpdateDepartment";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ const Devices = () => {
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
-
+  const [isAddDepartmentOpen, setIsAddDepartmentOpen] = useState(false);
   const dispatch = useAppDispatch();
 
   const getOrganization = async () => {
@@ -278,6 +280,10 @@ const Devices = () => {
     navigate("/");
   };
 
+  const handleAddDepartment = () => {
+    setIsAddDepartmentOpen(true);
+  };
+
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto pb-5">
       <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1 rounded-lg w-fit">
@@ -298,17 +304,15 @@ const Devices = () => {
           <span>Organization</span>
         </button>
 
-        {selectedOrganization !== "all" && (
-          <>
-            <ChevronRight className="w-4 h-4 text-text-muted" />
-            <button
-              onClick={handleBackToProjects}
-              className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-            >
-              <span>Projects</span>
-            </button>
-          </>
-        )}
+        <>
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToProjects}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Projects</span>
+          </button>
+        </>
 
         {selectedProject !== "all" && (
           <>
@@ -322,7 +326,7 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-center w-full">
+      <div className="flex items-center w-full gap-4 justify-end flex-wrap">
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
             <select
@@ -353,30 +357,35 @@ const Devices = () => {
             </select>
           </div>
         </div>
-        <div className="flex items-center gap-4 px-4 rounded-lg flex-1">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
-            <input
-              type="text"
-              placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success font-roboto"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilteredDevices(devices);
-                }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
-                title="Clear search"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
-          </div>
+        <div className="flex-shrink-0 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
+          <input
+            type="text"
+            placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success font-roboto"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setFilteredDevices(devices);
+              }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+              title="Clear search"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
+        <button
+          onClick={handleAddDepartment}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <PlusCircle className="w-4 h-4" />
+          Add Department
+        </button>
         <button
           onClick={handleAddDevice}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
@@ -421,6 +430,9 @@ const Devices = () => {
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                   Updated At
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Download
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                   Actions
@@ -476,6 +488,11 @@ const Devices = () => {
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       <div className="flex items-center justify-center gap-2">
+                        <Download className="w-5 h-5 text-status-success cursor-pointer" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                      <div className="flex items-center justify-center gap-2">
                         <Edit
                           onClick={() =>
                             handleEditDevice(
@@ -486,10 +503,10 @@ const Devices = () => {
                           className="w-5 h-5 text-status-info cursor-pointer"
                         />
 
-                        <Trash2
+                        {/* <Trash2
                           onClick={() => {}}
                           className="w-5 h-5 text-status-danger cursor-pointer"
-                        />
+                        /> */}
                       </div>
                     </td>
                   </tr>
@@ -573,6 +590,16 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
+        />
+      )}
+
+      {isAddDepartmentOpen && (
+        <AddUpdateDepartment
+          setShowAddModal={setIsAddDepartmentOpen}
+          type="add"
+          onUpdateSuccess={() => {
+            setIsAddDepartmentOpen(false);
+          }}
         />
       )}
     </div>
