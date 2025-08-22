@@ -22,7 +22,7 @@ import type { ProjectResult } from "../../../model/project.interface";
 import { getAllProjects } from "../../../store/projectSlice";
 import { fromatDateWithTime } from "../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
-import { Error } from "../../utils/toast";
+import { Error, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 
 const Devices = () => {
@@ -170,8 +170,15 @@ const Devices = () => {
   }, [devices, searchTerm, selectedOrganization, selectedProject, project]);
 
   const handleAddDevice = () => {
+    if (selectedOrganization === "all" || selectedProject === "all") {
+      Warning(
+        "Please select both organization and project before adding a device"
+      );
+      return;
+    }
+
     setIsAddDeviceOpen(true);
-    setProjectId(parseInt(project_id || "0"));
+    setProjectId(parseInt(selectedProject));
   };
 
   const handleEditDevice = (deviceId: number, projectId: number) => {
