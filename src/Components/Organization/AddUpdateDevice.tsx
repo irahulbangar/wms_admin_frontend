@@ -167,31 +167,31 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
 
     try {
-      await dispatch(
+      const result = await dispatch(
         createDepartment({
           department_name: newDepartmentName,
           department_info: "",
           project_id: project_id || 0,
         })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            Success("Department added successfully");
-            setShowAddDepartmentPopup(false);
-            setNewDepartmentName("");
-            dispatch(getDepartments());
-            setErrors((prev) => {
-              const newErrors = { ...prev };
-              delete newErrors.department_name;
-              return newErrors;
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error("Failed to create department");
+      ).unwrap();
+
+      if (result.success) {
+        Success("Department added successfully");
+        setShowAddDepartmentPopup(false);
+        setNewDepartmentName("");
+
+        // Refresh departments and update local state
+        const departmentsResult = await dispatch(getDepartments()).unwrap();
+        if (departmentsResult.success) {
+          setDepartmentData(departmentsResult.data);
+        }
+
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.department_name;
+          return newErrors;
         });
+      }
     } catch (error) {
       console.error("Error creating department:", error);
       Error("Failed to create department");
