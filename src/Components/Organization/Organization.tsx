@@ -311,6 +311,13 @@ const Organization = () => {
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       <div className="flex items-center gap-3 justify-center">
+                        <Eye
+                          onClick={() =>
+                            handleViewPlants(organization?.organization_id)
+                          }
+                          className="w-5 h-5 text-teal-500 cursor-pointer"
+                        />
+
                         <SquarePen
                           onClick={() =>
                             handleEditOrganization(
@@ -323,13 +330,6 @@ const Organization = () => {
                           onClick={() => handleDeleteOrganization(organization)}
                           className="w-5 h-5 text-status-danger cursor-pointer"
                         /> */}
-
-                        <Eye
-                          onClick={() =>
-                            handleViewPlants(organization?.organization_id)
-                          }
-                          className="w-5 h-5 text-teal-500 cursor-pointer"
-                        />
                       </div>
                     </td>
                   </tr>

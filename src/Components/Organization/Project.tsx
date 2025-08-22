@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Search,
   PlusCircle,
@@ -76,7 +76,7 @@ const Projects = () => {
     navigate("/");
   };
 
-  const getProjects = async () => {
+  const getProjects = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
     try {
@@ -90,30 +90,34 @@ const Projects = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dispatch]);
 
-  const getProjectByOrganizationId = async (orgId?: string) => {
-    if (isLoading) return;
-    setIsLoading(true);
-    try {
-      const targetOrgId = orgId || organization_id;
-      if (!targetOrgId) return;
+  const getProjectByOrganizationId = useCallback(
+    async (orgId?: string) => {
+      if (isLoading) return;
+      setIsLoading(true);
+      try {
+        const targetOrgId = orgId || organization_id;
+        if (!targetOrgId) return;
 
-      const res = await dispatch(
-        getProjectsByOrganizationId(targetOrgId)
-      ).unwrap();
-      if (res.success) {
-        setProjects(res.data);
+        const res = await dispatch(
+          getProjectsByOrganizationId(targetOrgId)
+        ).unwrap();
+        if (res.success) {
+          setProjects(res.data);
+        }
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.toString() : String(err);
+        Error(errorMessage || "An error occurred");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.toString() : String(err);
-      Error(errorMessage || "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [dispatch, organization_id]
+  );
 
-  const getAllOrganizations = async () => {
+  const getAllOrganizations = useCallback(async () => {
     try {
       const res = await dispatch(getOrganizations()).unwrap();
       if (res.success) {
@@ -123,7 +127,7 @@ const Projects = () => {
       const errorMessage = err instanceof Error ? err.toString() : String(err);
       Error(errorMessage || "An error occurred");
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     setProjects([]);
@@ -137,7 +141,12 @@ const Projects = () => {
       setSelectedOrganizationId("all");
       getProjects();
     }
-  }, [organization_id]);
+  }, [
+    organization_id,
+    getProjectByOrganizationId,
+    getProjects,
+    getAllOrganizations,
+  ]);
 
   useEffect(() => {
     let filtered = projects;
@@ -369,6 +378,16 @@ const Projects = () => {
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       <div className="flex items-center justify-center gap-2">
+                        <Eye
+                          onClick={() =>
+                            handleViewDevices(
+                              project.project_id,
+                              project.organization_id
+                            )
+                          }
+                          className="w-5 h-5 text-teal-500 cursor-pointer"
+                        />
+
                         <Edit
                           onClick={() =>
                             handleEditProject(project.project_id.toString())
@@ -381,16 +400,6 @@ const Projects = () => {
                           }
                           className="w-5 h-5 text-status-danger cursor-pointer"
                         /> */}
-
-                        <Eye
-                          onClick={() =>
-                            handleViewDevices(
-                              project.project_id,
-                              project.organization_id
-                            )
-                          }
-                          className="w-5 h-5 text-teal-500 cursor-pointer"
-                        />
                       </div>
                     </td>
                   </tr>

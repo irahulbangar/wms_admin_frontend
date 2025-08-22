@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Search,
   PlusCircle,
@@ -9,7 +9,6 @@ import {
   Monitor,
   Home,
   ChevronRight,
-  Download,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
@@ -56,7 +55,7 @@ const Devices = () => {
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
   const dispatch = useAppDispatch();
 
-  const getOrganization = async () => {
+  const getOrganization = useCallback(async () => {
     setIsLoading(true);
     await dispatch(getOrganizations())
       .unwrap()
@@ -72,9 +71,9 @@ const Devices = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [dispatch]);
 
-  const getProject = async () => {
+  const getProject = useCallback(async () => {
     setIsLoading(true);
     await dispatch(getAllProjects())
       .unwrap()
@@ -90,9 +89,9 @@ const Devices = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [dispatch]);
 
-  const getDeviceFamily = async () => {
+  const getDeviceFamily = useCallback(async () => {
     setIsLoading(true);
     await dispatch(getDeviceByFamilyWise())
       .unwrap()
@@ -108,9 +107,9 @@ const Devices = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [dispatch]);
 
-  const getDeviceType = async () => {
+  const getDeviceType = useCallback(async () => {
     await dispatch(getDevicesByDeviceType())
       .unwrap()
       .then((res) => {
@@ -125,7 +124,7 @@ const Devices = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     getOrganization();
@@ -175,7 +174,15 @@ const Devices = () => {
           setIsLoading(false);
         });
     }
-  }, [organization_id, project_id, dispatch]);
+  }, [
+    organization_id,
+    project_id,
+    dispatch,
+    getOrganization,
+    getProject,
+    getDeviceFamily,
+    getDeviceType,
+  ]);
 
   useEffect(() => {
     let filtered = devices;
@@ -215,7 +222,14 @@ const Devices = () => {
     }
 
     setFilteredDevices(filtered);
-  }, [devices, searchTerm, selectedOrganization, selectedProject, project]);
+  }, [
+    devices,
+    searchTerm,
+    selectedOrganization,
+    selectedProject,
+    project,
+    deviceFamily,
+  ]);
 
   const handleAddDevice = () => {
     if (selectedOrganization === "all" || selectedProject === "all") {
@@ -422,9 +436,6 @@ const Devices = () => {
                   Updated At
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Download
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                   Actions
                 </th>
               </tr>
@@ -478,11 +489,6 @@ const Devices = () => {
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {fromatDateWithTime(device.updated_at)}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      <div className="flex items-center justify-center gap-2">
-                        <Download className="w-5 h-5 text-status-success cursor-pointer" />
-                      </div>
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       <div className="flex items-center justify-center gap-2">
