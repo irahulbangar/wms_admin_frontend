@@ -46,7 +46,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_name: "",
     device_status: "Online",
     imeiNo: "",
-    departmentId: 0,
+    department_id: 0,
   });
   const [departmentData, setDepartmentData] = useState<DepartmentResult[]>([]);
   const [showAddDepartmentInput, setShowAddDepartmentInput] = useState(false);
@@ -101,8 +101,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     if (!formData.device_status) {
       newErrors.device_status = "Device Status is required";
     }
-    if (formData.imeiNo && formData.imeiNo.length !== 12) {
-      newErrors.imeiNo = "IMEI number must be exactly 12 characters";
+    if (formData.imeiNo && formData.imeiNo.length !== 15) {
+      newErrors.imeiNo = "IMEI number must be exactly 15 characters";
     }
 
     setErrors(newErrors);
@@ -125,7 +125,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_name: formData.device_name,
         device_status: formData.device_status,
         imeiNo: formData.imeiNo,
-        departmentId: formData.departmentId,
+        department_id: formData.department_id,
       };
 
       if (type === "add") {
@@ -167,7 +167,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_name: deviceData.device_name,
               device_status: deviceData.device_status,
               imeiNo: deviceData.imeino,
-              departmentId: deviceData.departmentid,
+              department_id: deviceData.departmentid,
             });
           }
         })
@@ -182,7 +182,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_name: "",
         device_status: "Online",
         imeiNo: "",
-        departmentId: 0,
+        department_id: 0,
       });
     }
   }, [type, deviceId, dispatch, project_id]);
@@ -310,7 +310,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 value={formData.imeiNo}
                 onChange={handleInputChange}
                 placeholder="Enter IMEI number"
-                maxLength={12}
+                maxLength={15}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                   errors.imeiNo
                     ? "border-status-danger"
@@ -328,9 +328,21 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 Department
               </label>
               <select
-                name="departmentId"
-                value={formData.departmentId}
-                onChange={handleInputChange}
+                name="department_id"
+                value={formData.department_id}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "add_new") {
+                    setShowAddDepartmentInput(true);
+                    setFormData((prev) => ({ ...prev, department_id: 0 }));
+                  } else {
+                    setShowAddDepartmentInput(false);
+                    setFormData((prev) => ({
+                      ...prev,
+                      department_id: parseInt(value) || 0,
+                    }));
+                  }
+                }}
                 className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary"
               >
                 <option value="0">Select Department</option>
@@ -343,11 +355,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </option>
                 ))}
                 <option
-                  onClick={() =>
-                    setShowAddDepartmentInput(!showAddDepartmentInput)
-                  }
-                  value="0"
-                  className="flex items-center gap-2 text-status-info cursor-pointer bg-overlay/20 rounded-lg p-2.5"
+                  value="add_new"
+                  className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
                 >
                   + Add New
                 </option>
@@ -355,28 +364,31 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
           </div>
 
-          <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-              Department Name
-            </label>
-            <input
-              type="text"
-              name="department_name"
-              placeholder="Enter department name"
-              value={newDepartmentName}
-              onChange={(e) => setNewDepartmentName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
-                errors.department_name
-                  ? "border-status-danger"
-                  : "border-border-primary"
-              }`}
-            />
-            {errors.department_name && (
-              <p className="text-status-danger text-sm mt-1 font-roboto">
-                {errors.department_name}
-              </p>
-            )}
-          </div>
+          {/* Department Name Input - Only show when Add New is clicked */}
+          {showAddDepartmentInput && (
+            <div>
+              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                Department Name
+              </label>
+              <input
+                type="text"
+                name="department_name"
+                placeholder="Enter department name"
+                value={newDepartmentName}
+                onChange={(e) => setNewDepartmentName(e.target.value)}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                  errors.department_name
+                    ? "border-status-danger"
+                    : "border-border-primary"
+                }`}
+              />
+              {errors.department_name && (
+                <p className="text-status-danger text-sm mt-1 font-roboto">
+                  {errors.department_name}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-4 pt-4">
             <button
