@@ -147,7 +147,7 @@ export const getDeviceByFamilyWise = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceFamilyResponse>(
-        `/devices/allDeviceFamilies`,
+        `/devices/device-families`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -172,7 +172,7 @@ export const getDevicesByDeviceType = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceTypeResponse>(
-        `/devices/allDeviceTypes`,
+        `/devices/device-types`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
