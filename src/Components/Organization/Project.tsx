@@ -127,7 +127,7 @@ const Projects = () => {
 
     if (organization_id) {
       setSelectedOrganizationId(organization_id);
-      // getProjectByOrganizationId(organization_id);
+      getProjectByOrganizationId(organization_id);
     } else {
       setSelectedOrganizationId("all");
       getProjects();
