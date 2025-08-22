@@ -25,6 +25,7 @@ export interface CreateDevicePayload {
   project_id: number;
   deviceTypeId: number;
   deviceFId: number;
+  departmentId: number;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {

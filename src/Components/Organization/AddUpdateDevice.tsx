@@ -11,6 +11,8 @@ import {
 } from "../../../store/deviceSlice";
 
 import { Error, Success } from "../../utils/toast";
+import type { DepartmentResult } from "../../../model/department.interface";
+import { getDepartments } from "../../../store/departmentSlice";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -44,7 +46,24 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_name: "",
     device_status: "Online",
     imeiNo: "",
+    departmentId: 0,
   });
+  const [departmentData, setDepartmentData] = useState<DepartmentResult[]>([]);
+  const [showAddDepartmentInput, setShowAddDepartmentInput] = useState(false);
+  const [newDepartmentName, setNewDepartmentName] = useState("");
+
+  useEffect(() => {
+    dispatch(getDepartments())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDepartmentData(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [dispatch]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -106,6 +125,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_name: formData.device_name,
         device_status: formData.device_status,
         imeiNo: formData.imeiNo,
+        departmentId: formData.departmentId,
       };
 
       if (type === "add") {
@@ -147,6 +167,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_name: deviceData.device_name,
               device_status: deviceData.device_status,
               imeiNo: deviceData.imeino,
+              departmentId: deviceData.departmentid,
             });
           }
         })
@@ -161,6 +182,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_name: "",
         device_status: "Online",
         imeiNo: "",
+        departmentId: 0,
       });
     }
   }, [type, deviceId, dispatch, project_id]);
@@ -278,7 +300,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
 
             {/* IMEI Number */}
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                 IMEI Number
               </label>
@@ -287,7 +309,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 name="imeiNo"
                 value={formData.imeiNo}
                 onChange={handleInputChange}
-                placeholder="Enter 12-digit IMEI number (optional)"
+                placeholder="Enter IMEI number"
                 maxLength={12}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                   errors.imeiNo
@@ -300,11 +322,60 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   {errors.imeiNo}
                 </p>
               )}
-              <p className="text-text-muted text-xs mt-1 font-roboto">
-                IMEI number is optional but must be exactly 12 characters if
-                provided
-              </p>
             </div>
+            <div>
+              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                Department
+              </label>
+              <select
+                name="departmentId"
+                value={formData.departmentId}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary"
+              >
+                <option value="0">Select Department</option>
+                {departmentData.map((department) => (
+                  <option
+                    key={department.department_id}
+                    value={department.department_id}
+                  >
+                    {department.department_name}
+                  </option>
+                ))}
+                <option
+                  onClick={() =>
+                    setShowAddDepartmentInput(!showAddDepartmentInput)
+                  }
+                  value="0"
+                  className="flex items-center gap-2 text-status-info cursor-pointer bg-overlay/20 rounded-lg p-2.5"
+                >
+                  + Add New
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+              Department Name
+            </label>
+            <input
+              type="text"
+              name="department_name"
+              placeholder="Enter department name"
+              value={newDepartmentName}
+              onChange={(e) => setNewDepartmentName(e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                errors.department_name
+                  ? "border-status-danger"
+                  : "border-border-primary"
+              }`}
+            />
+            {errors.department_name && (
+              <p className="text-status-danger text-sm mt-1 font-roboto">
+                {errors.department_name}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-4 pt-4">

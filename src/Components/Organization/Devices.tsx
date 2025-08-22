@@ -30,7 +30,6 @@ import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
-import AddUpdateDepartment from "./AddUpdateDepartment";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -55,7 +54,6 @@ const Devices = () => {
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
-  const [isAddDepartmentOpen, setIsAddDepartmentOpen] = useState(false);
   const dispatch = useAppDispatch();
 
   const getOrganization = async () => {
@@ -280,10 +278,6 @@ const Devices = () => {
     navigate("/");
   };
 
-  const handleAddDepartment = () => {
-    setIsAddDepartmentOpen(true);
-  };
-
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto pb-5">
       <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1 rounded-lg w-fit">
@@ -379,13 +373,6 @@ const Devices = () => {
             </button>
           )}
         </div>
-        <button
-          onClick={handleAddDepartment}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <PlusCircle className="w-4 h-4" />
-          Add Department
-        </button>
         <button
           onClick={handleAddDevice}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
@@ -590,16 +577,6 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
-        />
-      )}
-
-      {isAddDepartmentOpen && (
-        <AddUpdateDepartment
-          setShowAddModal={setIsAddDepartmentOpen}
-          type="add"
-          onUpdateSuccess={() => {
-            setIsAddDepartmentOpen(false);
-          }}
         />
       )}
     </div>
