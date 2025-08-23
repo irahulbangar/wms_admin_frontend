@@ -223,7 +223,7 @@ const Projects = () => {
   return (
     <div className="flex flex-col gap-4 h-full pb-5">
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1 rounded-lg w-fit">
+      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
         <button
           onClick={handleBackToHome}
           className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"

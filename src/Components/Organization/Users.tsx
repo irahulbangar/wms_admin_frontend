@@ -6,10 +6,14 @@ import {
   Trash2,
   X,
   Loader2,
+  ChevronRight,
+  Home,
+  Building2,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { fromatDateWithTime, userStatus } from "../../utils/utils";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type {
   ClientUsersResponse,
   ClientUsersResult,
@@ -22,6 +26,7 @@ import type { OrganizationResult } from "../../../model/organizations.interface"
 import { getOrganizations } from "../../../store/organizationSlice";
 
 const Users = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<ClientUsersResult[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +39,25 @@ const Users = () => {
     OrganizationResult[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Breadcrumb data
+  const breadcrumbs = [
+    { label: "Home", icon: <Home className="w-4 h-4" />, path: "/home" },
+    {
+      label: "Organization",
+      icon: <Building2 className="w-4 h-4" />,
+      path: "/organization",
+    },
+    {
+      label: "Users",
+      icon: <User className="w-4 h-4" />,
+      path: "/organization/users",
+    },
+  ];
+
+  const handleBreadcrumbClick = (path: string) => {
+    navigate(path);
+  };
 
   const getOrganizationData = () => {
     setIsLoading(true);
@@ -109,6 +133,45 @@ const Users = () => {
 
   return (
     <div className="flex flex-col gap-4 w-full h-full pb-5">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
+        <nav
+          className="flex items-center space-x-2 text-sm font-roboto"
+          aria-label="Breadcrumb"
+        >
+          {breadcrumbs.map((breadcrumb, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              {index > 0 && (
+                <ChevronRight
+                  className="w-4 h-4 text-text-muted"
+                  aria-hidden="true"
+                />
+              )}
+              <div
+                className={`flex items-center space-x-2 transition-colors cursor-pointer px-2 py-1 rounded ${
+                  index === breadcrumbs.length - 1
+                    ? "text-text-primary font-medium"
+                    : "text-text-secondary hover:text-text-primary hover:bg-overlay/20"
+                }`}
+                onClick={() => handleBreadcrumbClick(breadcrumb.path)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleBreadcrumbClick(breadcrumb.path);
+                  }
+                }}
+                aria-label={`Navigate to ${breadcrumb.label}`}
+              >
+                {breadcrumb.icon}
+                <span>{breadcrumb.label}</span>
+              </div>
+            </div>
+          ))}
+        </nav>
+      </div>
+
       <div className="flex items-center w-full">
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-text-primary font-roboto">
