@@ -350,7 +350,13 @@ const Projects = () => {
                       {project.project_name}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {project.organization_id}
+                      {
+                        organizations.find(
+                          (org) =>
+                            org.organization_id.toString() ===
+                            project.organization_id.toString()
+                        )?.org_name
+                      }
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       {project.latitude}

@@ -271,7 +271,13 @@ const Users = () => {
                       {user.role === "org_admin" ? "Admin" : "User"}
                     </td>
                     <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                      {user?.organization_id}
+                      {
+                        organizationData.find(
+                          (org) =>
+                            org.organization_id.toString() ===
+                            user.organization_id.toString()
+                        )?.org_name
+                      }
                     </td>
                     <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
                       <span
