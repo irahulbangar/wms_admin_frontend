@@ -65,4 +65,29 @@ export const getDepartments = createAsyncThunk(
   }
 );
 
+// Update department
+export const updateDepartment = createAsyncThunk(
+  "department/updateDepartment",
+  async (
+    department: DepartmentPayload & { department_id: number },
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().put(
+        `/departments/update-department/${department.department_id}`,
+        department,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const { setDepartments } = departmentSlice.actions;

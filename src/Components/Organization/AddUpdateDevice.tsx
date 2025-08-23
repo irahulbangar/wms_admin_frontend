@@ -12,7 +12,7 @@ import {
 
 import { Error, Success } from "../../utils/toast";
 import type { DepartmentResult } from "../../../model/department.interface";
-import { createDepartment } from "../../../store/departmentSlice";
+import AddUpdateDepartment from "./AddUpdateDepartment";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -52,7 +52,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     imeiNo: "",
     department_id: departmentId,
   });
-  const [newDepartmentName, setNewDepartmentName] = useState("");
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
 
   const handleInputChange = (
@@ -137,44 +136,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     } catch (error) {
       console.error("Error submitting device:", error);
       Error("Failed to submit device");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddDepartment = async () => {
-    setIsLoading(true);
-    if (!newDepartmentName.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        department_name: "Department name is required",
-      }));
-      return;
-    }
-
-    try {
-      const result = await dispatch(
-        createDepartment({
-          department_name: newDepartmentName,
-          department_info: "",
-          project_id: project_id || 0,
-        })
-      ).unwrap();
-
-      if (result.success) {
-        Success("Department added successfully");
-        setShowAddDepartmentPopup(false);
-        setNewDepartmentName("");
-
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors.department_name;
-          return newErrors;
-        });
-      }
-    } catch (error) {
-      console.error("Error creating department:", error);
-      Error("Failed to create department");
     } finally {
       setIsLoading(false);
     }
@@ -419,63 +380,15 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
       {/* Add Department Popup */}
       {showAddDepartmentPopup && (
-        <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
-              <h2 className="text-xl font-semibold text-text-primary font-roboto">
-                Add New Department
-              </h2>
-              <button
-                onClick={() => setShowAddDepartmentPopup(false)}
-                className="text-text-muted hover:text-text-primary transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form className="p-6 space-y-4">
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Department Name
-                </label>
-                <input
-                  type="text"
-                  name="department_name"
-                  placeholder="Enter department name"
-                  value={newDepartmentName}
-                  onChange={(e) => setNewDepartmentName(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
-                    errors.department_name
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-                {errors.department_name && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.department_name}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-end gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAddDepartmentPopup(false)}
-                  className="px-4 py-2 text-text-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors font-roboto cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAddDepartment}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-roboto cursor-pointer"
-                >
-                  Add Department
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AddUpdateDepartment
+          setShowAddDepartmentPopup={setShowAddDepartmentPopup}
+          type="add"
+          projectId={project_id || 0}
+          departmentId={departmentId}
+          onUpdateSuccess={() => {
+            setShowAddDepartmentPopup(false);
+          }}
+        />
       )}
     </div>
   );

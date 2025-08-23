@@ -33,6 +33,7 @@ import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import type { DepartmentResult } from "../../../model/department.interface";
 import { getDepartments } from "../../../store/departmentSlice";
+import AddUpdateDepartment from "./AddUpdateDepartment";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ const Devices = () => {
   const [collapsedDepartments, setCollapsedDepartments] = useState<Set<string>>(
     new Set()
   );
+  const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
 
   const getDepartment = useCallback(async () => {
     setIsLoading(true);
@@ -354,6 +356,16 @@ const Devices = () => {
     navigate("/");
   };
 
+  const handleEditDepartment = (deptId: string, projectId: number) => {
+    setIsEditDepartmentOpen(true);
+    setDepartmentId(parseInt(deptId));
+    setProjectId(projectId);
+  };
+
+  const handleDepartmentUpdate = () => {
+    getDepartment();
+  };
+
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto">
       <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
@@ -396,7 +408,7 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-center w-full gap-4 justify-end flex-wrap">
+      <div className="flex items-center w-full gap-4 justify-between flex-wrap">
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
             <select
@@ -427,36 +439,38 @@ const Devices = () => {
             </select>
           </div>
         </div>
-        <div className="flex-shrink-0 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
-          <input
-            type="text"
-            placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success font-roboto"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setFilteredDevices(devices);
-              }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
-              title="Clear search"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
-        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex-shrink-0 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
+            <input
+              type="text"
+              placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-96 pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success font-roboto"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilteredDevices(devices);
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
 
-        <button
-          onClick={handleAddDevice}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <PlusCircle className="w-4 h-4" />
-          Add Device
-        </button>
+          <button
+            onClick={handleAddDevice}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Add Device
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -498,7 +512,17 @@ const Devices = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Edit className="w-5 h-5 text-status-info cursor-pointer" />
+                      <Edit
+                        onClick={() =>
+                          handleEditDepartment(
+                            deptId,
+                            project.find(
+                              (p) => p.project_id === parseInt(deptId)
+                            )?.project_id || 0
+                          )
+                        }
+                        className="w-5 h-5 text-status-info cursor-pointer"
+                      />
                       <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
                     </div>
                   </div>
@@ -689,6 +713,16 @@ const Devices = () => {
           typeData={deviceType}
           departmentData={departmentData}
           departmentId={departmentId}
+        />
+      )}
+
+      {isEditDepartmentOpen && (
+        <AddUpdateDepartment
+          setShowAddDepartmentPopup={setIsEditDepartmentOpen}
+          type="update"
+          departmentId={departmentId}
+          projectId={projectId || undefined}
+          onUpdateSuccess={handleDepartmentUpdate}
         />
       )}
     </div>
