@@ -8,10 +8,33 @@ import type {
 } from "../../../model/client-users.interface";
 import { getAllClients } from "../../../store/clientSlice";
 import { useAppDispatch } from "../../../store/store";
+import AddUpdateUser from "./AddUpdateUser";
+import { Error } from "../../utils/toast";
 
 const Users = () => {
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
   const dispatch = useAppDispatch();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [clientId, setClientId] = useState(0);
+
+  const getClients = () => {
+    dispatch(getAllClients())
+      .unwrap()
+      .then((res: ClientUsersResponse) => {
+        if (res.success) {
+          setUsers(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error(err);
+      });
+  };
+
+  useEffect(() => {
+    getClients();
+  }, []);
+
   useEffect(() => {
     dispatch(getAllClients())
       .unwrap()
@@ -25,12 +48,19 @@ const Users = () => {
       });
   }, []);
 
-  const handleEditUser = (id: string) => {
-    console.log(id);
+  const handleEditUser = (clientId: number) => {
+    setShowAddModal(true);
+    setClientId(clientId);
   };
 
   const handleDeleteUser = (id: string) => {
     console.log(id);
+  };
+
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    setClientId(0);
+    getClients();
   };
 
   return (
@@ -54,7 +84,10 @@ const Users = () => {
             />
           </div>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+        >
           <PlusCircle className="w-4 h-4" />
           Add User
         </button>
@@ -133,9 +166,7 @@ const Users = () => {
                   <td className="px-6 py-4 font-roboto text-sm">
                     <div className="flex items-center gap-3 justify-center">
                       <SquarePen
-                        onClick={() =>
-                          handleEditUser(user.client_id.toString())
-                        }
+                        onClick={() => handleEditUser(user.client_id)}
                         className="w-5 h-5 text-status-info cursor-pointer"
                       />
                       <Trash2
@@ -151,7 +182,7 @@ const Users = () => {
             ) : (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="text-center font-roboto text-text-secondary text-sm"
                 >
                   <NoDataFound
@@ -161,7 +192,10 @@ const Users = () => {
                     title="No users found"
                     description="Add your first user to get started"
                     buttonText="Add User"
-                    buttonOnClick={() => {}}
+                    buttonOnClick={() => {
+                      setShowAddModal(true);
+                      setClientId(0);
+                    }}
                   />
                 </td>
               </tr>
@@ -169,6 +203,24 @@ const Users = () => {
           </tbody>
         </table>
       </div>
+
+      {showAddModal && (
+        <AddUpdateUser
+          clientId={clientId}
+          setShowAddModal={setShowAddModal}
+          type="add"
+          onClose={handleCloseAddModal}
+        />
+      )}
+
+      {showAddModal && (
+        <AddUpdateUser
+          clientId={clientId}
+          setShowAddModal={setShowAddModal}
+          type="update"
+          onClose={handleCloseAddModal}
+        />
+      )}
     </div>
   );
 };
