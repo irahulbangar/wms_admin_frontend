@@ -4,9 +4,7 @@ import {
   Search,
   PlusCircle,
   Building2,
-  // Trash2,
   SquarePen,
-  Check,
   X,
   Loader2,
   Eye,
@@ -21,7 +19,7 @@ import type { OrganizationResult } from "../../../model/organizations.interface"
 import AddUpdateOrganization from "./AddUpdateOrganization";
 import DeletePopup from "./DeletePopup";
 import { Success, Error } from "../../utils/toast";
-import { fromatDateWithTime } from "../../utils/utils";
+import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 
 const Organization = () => {
   const navigate = useNavigate();
@@ -102,11 +100,6 @@ const Organization = () => {
     setShowAddModalType("update");
     setOrganizationId(id);
   };
-
-  // const handleDeleteOrganization = (organization: OrganizationResult) => {
-  //   setOrganizationToDelete(organization);
-  //   setShowDeletePopup(true);
-  // };
 
   const handleConfirmDelete = async () => {
     if (!organizationToDelete || isLoading) return;
@@ -237,34 +230,34 @@ const Organization = () => {
           <table className="w-full text-sm text-left rtl:text-right text-text-primary">
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                   Sr No
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                   Organization Name
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                   Address
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary text-center text-base">
                   Contact Person
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary text-center text-base">
                   Contact Number
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary text-center text-base">
                   Email
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary text-center text-base">
                   Notes
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary text-center text-base">
                   Status
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary text-center text-base">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary text-center text-base">
                   Actions
                 </th>
               </tr>
@@ -276,40 +269,40 @@ const Organization = () => {
                     key={organization?.organization_id}
                     className="bg-primary border-b border-border-primary hover:bg-secondary"
                   >
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {index + 1}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.org_name}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.address}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.contact_person}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.contact_number}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.email}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.note}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      <div className="flex items-center gap-2 justify-center">
-                        {organization?.status === "active" ? (
-                          <Check className="w-5 h-5 text-status-success" />
-                        ) : (
-                          <X className="w-5 h-5 text-status-danger" />
-                        )}
-                      </div>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                          organization?.status
+                        )}`}
+                      >
+                        {organization?.status}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {fromatDateWithTime(organization?.created_at)}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       <div className="flex items-center gap-3 justify-center">
                         <Eye
                           onClick={() =>
@@ -326,10 +319,6 @@ const Organization = () => {
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"
                         />
-                        {/* <Trash2
-                          onClick={() => handleDeleteOrganization(organization)}
-                          className="w-5 h-5 text-status-danger cursor-pointer"
-                        /> */}
                       </div>
                     </td>
                   </tr>

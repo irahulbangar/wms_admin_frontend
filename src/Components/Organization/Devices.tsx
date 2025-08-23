@@ -504,7 +504,7 @@ const Devices = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg mb-5">
           <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
       ) : (
@@ -555,34 +555,34 @@ const Devices = () => {
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                           <tr>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Sr No
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Device Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Project Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                              Device Family Name
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                              Device Family
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                              Device Type ID
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                              Device Type
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Device Status
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               IMEI Number
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Created At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Updated At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Actions
                             </th>
                           </tr>
@@ -593,13 +593,13 @@ const Devices = () => {
                               key={`${deptId}-${device?.device_id}`}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {index + 1}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {device?.device_name}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {
                                   project?.find(
                                     (p) =>
@@ -608,7 +608,7 @@ const Devices = () => {
                                   )?.project_name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {
                                   deviceFamily?.find(
                                     (df) =>
@@ -616,32 +616,32 @@ const Devices = () => {
                                   )?.name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {
                                   deviceType?.find(
                                     (dt) => dt?.id === device?.devicetypeid
                                   )?.topics
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
+                                  className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${deviceStatus(
                                     device?.device_status
                                   )}`}
                                 >
                                   {device?.device_status}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {device?.imeino || "N/A"}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {fromatDateWithTime(device?.created_at)}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {fromatDateWithTime(device?.updated_at)}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 <div className="flex items-center justify-center gap-2">
                                   <Edit
                                     onClick={() =>

@@ -7,13 +7,13 @@ import { useAppSelector } from "../../store/store";
 import Dashboard from "./Dashboard/Dashboard";
 import Profile from "./Profile";
 import Devices from "./Organization/Devices";
-import Users from "./Organization/Users";
-import AdminUsers from "./Users";
+import OrganizationUsers from "./Organization/OrganizationUsers";
 import AdminSetting from "./AdminSetting";
 import Setting from "./Organization/Setting";
 import Organization from "./Organization/Organization";
 import Loader from "./Loader";
 import Projects from "./Organization/Project";
+import AdminUsers from "./AdminUsers";
 
 const HomePage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -112,7 +112,7 @@ const HomePage = () => {
       case "devices":
         return <Devices />;
       case "users":
-        return <Users />;
+        return <OrganizationUsers />;
       case "organization-setting":
         return <Setting />;
       case "profile":

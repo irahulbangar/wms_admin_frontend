@@ -9,7 +9,7 @@ export const fromatDateWithTime = (date: string) => {
   });
 };
 
-export const userStatus = (status: string) => {
+export const handleStatus = (status: string) => {
   if (status === "Active" || status === "active") {
     return "bg-green-100 text-status-success";
   } else if (status === "Inactive" || status === "inactive") {

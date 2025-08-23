@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { getAllUsers } from "../../store/adminSlice";
 import { Error } from "../utils/toast";
 import Loader from "./Loader";
-import { fromatDateWithTime, userStatus } from "../utils/utils";
+import { fromatDateWithTime, handleStatus } from "../utils/utils";
 
 const Users = () => {
   const dispatch = useAppDispatch();
@@ -53,9 +53,6 @@ const Users = () => {
               <h1 className="text-2xl font-bold text-text-primary font-roboto">
                 Admin Users
               </h1>
-              <p className="text-text-secondary font-roboto">
-                Manage your admin users
-              </p>
             </div>
             <div className="flex items-center gap-4 px-4 rounded-lg flex-1">
               <div className="flex-1 relative">
@@ -77,34 +74,31 @@ const Users = () => {
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Sr No
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-                  >
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Phone
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Created At
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Updated At
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Action
                   </th>
                 </tr>
@@ -114,39 +108,39 @@ const Users = () => {
                   users?.map((user, index) => (
                     <tr
                       key={user?.id}
-                      className="bg-primary border-b border-border-primary hover:bg-secondary"
+                      className="border-b border-border-primary bg-primary hover:bg-secondary"
                     >
-                      <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {index + 1}
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {user?.name}
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {user?.email}
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {user?.contact_number}
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {user?.role}
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${userStatus(
+                          className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
                             user?.status
                           )}`}
                         >
                           {user?.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {fromatDateWithTime(user?.created_at)}
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {fromatDateWithTime(user?.updated_at)}
                       </td>
-                      <td className="px-6 py-4 font-roboto text-sm">
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center gap-3 justify-center">
                           <SquarePen
                             onClick={() => handleEditUser(user?.id)}

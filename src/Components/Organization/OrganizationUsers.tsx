@@ -11,7 +11,7 @@ import {
   Building2,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
-import { fromatDateWithTime, userStatus } from "../../utils/utils";
+import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
@@ -25,7 +25,7 @@ import { Error } from "../../utils/toast";
 import type { OrganizationResult } from "../../../model/organizations.interface";
 import { getOrganizations } from "../../../store/organizationSlice";
 
-const Users = () => {
+const OrganizationUsers = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<ClientUsersResult[]>([]);
@@ -216,34 +216,34 @@ const Users = () => {
           <table className="w-full text-sm text-left rtl:text-right text-text-primary">
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Sr No
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Name
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Email
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Phone
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Role
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Organization ID
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Status
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Updated At
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Action
                 </th>
               </tr>
@@ -255,22 +255,22 @@ const Users = () => {
                     key={user.client_id}
                     className="bg-primary border-b border-border-primary hover:bg-secondary"
                   >
-                    <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
+                    <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base">
                       {index + 1}
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {user.client_name}
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {user.client_email}
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {user.client_phone}
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {user.role === "org_admin" ? "Admin" : "User"}
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {
                         organizationData.find(
                           (org) =>
@@ -279,22 +279,22 @@ const Users = () => {
                         )?.org_name
                       }
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto text-center text-text-primary text-base">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${userStatus(
+                        className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
                           user?.status
                         )}`}
                       >
                         {user.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {fromatDateWithTime(user.created_at)}
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {fromatDateWithTime(user.updated_at)}
                     </td>
-                    <td className="px-6 py-4 font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       <div className="flex items-center gap-3 justify-center">
                         <SquarePen
                           onClick={() =>
@@ -352,4 +352,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default OrganizationUsers;

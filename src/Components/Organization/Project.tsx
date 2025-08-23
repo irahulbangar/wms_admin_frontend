@@ -8,7 +8,6 @@ import {
   Edit,
   Loader2,
   X,
-  Check,
   Home,
   ChevronRight,
 } from "lucide-react";
@@ -23,7 +22,7 @@ import {
 } from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
 import { Error, Success, Warning } from "../../utils/toast";
-import { fromatDateWithTime } from "../../utils/utils";
+import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
 
@@ -304,34 +303,34 @@ const Projects = () => {
           <table className="w-full text-sm text-left rtl:text-right text-text-primary">
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  No
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  Sr No
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Project Name
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Organization Id
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  Organization
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Latitude
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Longitude
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Address
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Status
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Created At
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Updated At
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Action
                 </th>
               </tr>
@@ -343,13 +342,13 @@ const Projects = () => {
                     key={index}
                     className="border-b border-border-primary bg-primary hover:bg-secondary"
                   >
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {index + 1}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {project.project_name}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {
                         organizations.find(
                           (org) =>
@@ -358,31 +357,31 @@ const Projects = () => {
                         )?.org_name
                       }
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {project.latitude}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {project.longitude}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {project.address}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm capitalize">
-                      <div className="flex items-center gap-2 justify-center">
-                        {project?.status === "active" ? (
-                          <Check className="w-5 h-5 text-status-success" />
-                        ) : (
-                          <X className="w-5 h-5 text-status-danger" />
-                        )}
-                      </div>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <span
+                        className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                          project?.status
+                        )}`}
+                      >
+                        {project?.status}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {fromatDateWithTime(project.created_at)}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {fromatDateWithTime(project.updated_at)}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       <div className="flex items-center justify-center gap-2">
                         <Eye
                           onClick={() =>
