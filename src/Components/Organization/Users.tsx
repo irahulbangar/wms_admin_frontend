@@ -1,13 +1,28 @@
 import { Search, PlusCircle, User, SquarePen, Trash2 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
-import { fromatDateWithTime } from "../../utils/utils";
+import { fromatDateWithTime, userStatus } from "../../utils/utils";
 import { useEffect, useState } from "react";
+import type {
+  ClientUsersResponse,
+  ClientUsersResult,
+} from "../../../model/client-users.interface";
+import { getAllClients } from "../../../store/clientSlice";
+import { useAppDispatch } from "../../../store/store";
 
 const Users = () => {
-  const [users, setUsers] = useState<any[]>([]);
-
+  const [users, setUsers] = useState<ClientUsersResult[]>([]);
+  const dispatch = useAppDispatch();
   useEffect(() => {
-    setUsers(users);
+    dispatch(getAllClients())
+      .unwrap()
+      .then((res: ClientUsersResponse) => {
+        if (res.success) {
+          setUsers(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   const handleEditUser = (id: string) => {
@@ -49,46 +64,31 @@ const Users = () => {
         <table className="w-full text-sm text-left rtl:text-right text-text-primary">
           <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
             <tr>
-              <th
-                scope="col"
-                className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm"
-              >
+              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                 Sr No
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-              >
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                 Name
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-              >
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                 Email
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-              >
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                 Role
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-              >
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                Organization ID
+              </th>
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                Status
+              </th>
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                 Created At
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-              >
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                 Updated At
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-              >
+              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                 Action
               </th>
             </tr>
@@ -97,20 +97,32 @@ const Users = () => {
             {users.length > 0 ? (
               users.map((user, index) => (
                 <tr
-                  key={user.id}
+                  key={user.client_id}
                   className="bg-primary border-b border-border-primary hover:bg-secondary"
                 >
                   <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {user.name}
+                    {user.client_name}
                   </td>
                   <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {user.email}
+                    {user.client_email}
                   </td>
                   <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {user.role}
+                    {user.role === "org_admin" ? "Admin" : "User"}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    {user?.organization_id}
+                  </td>
+                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${userStatus(
+                        user?.status
+                      )}`}
+                    >
+                      {user.status}
+                    </span>
                   </td>
                   <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
                     {fromatDateWithTime(user.created_at)}
@@ -121,11 +133,15 @@ const Users = () => {
                   <td className="px-6 py-4 font-roboto text-sm">
                     <div className="flex items-center gap-3 justify-center">
                       <SquarePen
-                        onClick={() => handleEditUser(user.id)}
+                        onClick={() =>
+                          handleEditUser(user.client_id.toString())
+                        }
                         className="w-5 h-5 text-status-info cursor-pointer"
                       />
                       <Trash2
-                        onClick={() => handleDeleteUser(user.id)}
+                        onClick={() =>
+                          handleDeleteUser(user.client_id.toString())
+                        }
                         className="w-5 h-5 text-status-danger cursor-pointer"
                       />
                     </div>

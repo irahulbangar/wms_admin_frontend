@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { getAllUsers } from "../../store/adminSlice";
 import { Error } from "../utils/toast";
 import Loader from "./Loader";
-import { fromatDateWithTime } from "../utils/utils";
+import { fromatDateWithTime, userStatus } from "../utils/utils";
 
 const Users = () => {
   const dispatch = useAppDispatch();
@@ -80,10 +80,7 @@ const Users = () => {
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th
-                    scope="col"
-                    className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm"
-                  >
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                     Sr No
                   </th>
                   <th
@@ -92,34 +89,22 @@ const Users = () => {
                   >
                     Name
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-                  >
+                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                     Email
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-                  >
+                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                     Role
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-                  >
+                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                     Created At
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-                  >
+                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                     Updated At
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-text-primary text-center font-roboto text-sm"
-                  >
+                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                     Action
                   </th>
                 </tr>
@@ -142,6 +127,15 @@ const Users = () => {
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
                         {user.role}
+                      </td>
+                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${userStatus(
+                            user?.status
+                          )}`}
+                        >
+                          {user.status}
+                        </span>
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
                         {fromatDateWithTime(user.created_at)}

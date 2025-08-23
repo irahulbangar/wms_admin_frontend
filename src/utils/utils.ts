@@ -8,3 +8,13 @@ export const fromatDateWithTime = (date: string) => {
     hourCycle: "h23",
   });
 };
+
+export const userStatus = (status: string) => {
+  if (status === "Active" || status === "active") {
+    return "bg-green-100 text-status-success";
+  } else if (status === "Inactive" || status === "inactive") {
+    return "bg-red-100 text-status-danger";
+  } else {
+    return "bg-yellow-100 text-status-warning";
+  }
+};
