@@ -10,6 +10,7 @@ import {
   Home,
   ChevronRight,
   Trash2,
+  ChevronDown,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
@@ -59,6 +60,9 @@ const Devices = () => {
   const dispatch = useAppDispatch();
   const [departmentData, setDepartmentData] = useState<DepartmentResult[]>([]);
   const [departmentId, setDepartmentId] = useState<number>(0);
+  const [collapsedDepartments, setCollapsedDepartments] = useState<Set<string>>(
+    new Set()
+  );
 
   const getDepartment = useCallback(async () => {
     setIsLoading(true);
@@ -326,6 +330,18 @@ const Devices = () => {
 
   const groupedDevices = groupDevicesByDepartment(filteredDevices);
 
+  const toggleDepartmentCollapse = (deptId: string) => {
+    setCollapsedDepartments((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(deptId)) {
+        newSet.delete(deptId);
+      } else {
+        newSet.add(deptId);
+      }
+      return newSet;
+    });
+  };
+
   const handleBackToProjects = () => {
     navigate("/organization/projects");
   };
@@ -339,7 +355,7 @@ const Devices = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto pb-5">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto">
       <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
         <button
           onClick={handleBackToHome}
@@ -433,6 +449,7 @@ const Devices = () => {
             </button>
           )}
         </div>
+
         <button
           onClick={handleAddDevice}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
@@ -447,7 +464,7 @@ const Devices = () => {
           <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
       ) : (
-        <div className="relative overflow-x-auto shadow-sm pb-0 flex-1">
+        <div className="relative overflow-x-auto pb-0 flex-1">
           {Object.keys(groupedDevices).length > 0 ? (
             Object.entries(groupedDevices).map(([deptId, deptDevices]) => {
               const department = departmentData.find(
@@ -457,16 +474,28 @@ const Devices = () => {
                 department?.department_name || `Department ${deptId}`;
 
               return (
-                <div key={deptId}>
+                <div key={deptId} className="mb-2">
                   <div className="bg-primary px-4 py-3 border-b border-border-primary flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-text-primary font-roboto">
-                        {departmentName}
-                      </h3>
-                      <p className="text-sm text-text-secondary font-roboto">
-                        {deptDevices.length} device
-                        {deptDevices.length !== 1 ? "s" : ""}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => toggleDepartmentCollapse(deptId)}
+                        className="p-1 hover:bg-secondary/50 bg-secondary/50 cursor-pointer rounded transition-colors"
+                      >
+                        {collapsedDepartments.has(deptId) ? (
+                          <ChevronDown className="w-5 h-5 text-text-primary" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-text-primary" />
+                        )}
+                      </button>
+                      <div>
+                        <h3 className="text-lg font-semibold text-text-primary font-roboto">
+                          {departmentName}
+                        </h3>
+                        <p className="text-sm text-text-secondary font-roboto">
+                          {deptDevices.length} device
+                          {deptDevices.length !== 1 ? "s" : ""}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Edit className="w-5 h-5 text-status-info cursor-pointer" />
@@ -474,115 +503,117 @@ const Devices = () => {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
-                      <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-                        <tr>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Sr No
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Device Name
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Project Name
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Device Family Name
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Device Type ID
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Device Status
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            IMEI Number
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Created At
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Updated At
-                          </th>
-                          <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {deptDevices.map((device, index) => (
-                          <tr
-                            key={`${deptId}-${device.device_id}`}
-                            className="border-b border-border-primary bg-primary hover:bg-primary/50"
-                          >
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {index + 1}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {device.device_name}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {
-                                project.find(
-                                  (p) =>
-                                    p.project_id.toString() ===
-                                    device?.project_id.toString()
-                                )?.project_name
-                              }
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {
-                                deviceFamily.find(
-                                  (df) =>
-                                    df.devicefamilyid === device?.devicefid
-                                )?.name
-                              }
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {
-                                deviceType.find(
-                                  (dt) => dt.id === device?.devicetypeid
-                                )?.topics
-                              }
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
-                                  device?.device_status
-                                )}`}
-                              >
-                                {device.device_status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {device.imeino || "N/A"}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {fromatDateWithTime(device.created_at)}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              {fromatDateWithTime(device.updated_at)}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                              <div className="flex items-center justify-center gap-2">
-                                <Edit
-                                  onClick={() =>
-                                    handleEditDevice(
-                                      device.device_id,
-                                      device.project_id,
-                                      device.department_id
-                                    )
-                                  }
-                                  className="w-5 h-5 text-status-info cursor-pointer"
-                                />
-                              </div>
-                            </td>
+                  {!collapsedDepartments.has(deptId) && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
+                        <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                          <tr>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Sr No
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Device Name
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Project Name
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Device Family Name
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Device Type ID
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Device Status
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              IMEI Number
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Created At
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Updated At
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                              Actions
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {deptDevices.map((device, index) => (
+                            <tr
+                              key={`${deptId}-${device.device_id}`}
+                              className="border-b border-border-primary bg-primary hover:bg-primary/50"
+                            >
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {index + 1}
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {device.device_name}
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {
+                                  project.find(
+                                    (p) =>
+                                      p.project_id.toString() ===
+                                      device?.project_id.toString()
+                                  )?.project_name
+                                }
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {
+                                  deviceFamily.find(
+                                    (df) =>
+                                      df.devicefamilyid === device?.devicefid
+                                  )?.name
+                                }
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {
+                                  deviceType.find(
+                                    (dt) => dt.id === device?.devicetypeid
+                                  )?.topics
+                                }
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
+                                    device?.device_status
+                                  )}`}
+                                >
+                                  {device.device_status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {device.imeino || "N/A"}
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {fromatDateWithTime(device.created_at)}
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                {fromatDateWithTime(device.updated_at)}
+                              </td>
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                                <div className="flex items-center justify-center gap-2">
+                                  <Edit
+                                    onClick={() =>
+                                      handleEditDevice(
+                                        device.device_id,
+                                        device.project_id,
+                                        device.department_id
+                                      )
+                                    }
+                                    className="w-5 h-5 text-status-info cursor-pointer"
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               );
             })
