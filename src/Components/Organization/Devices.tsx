@@ -29,6 +29,8 @@ import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
+import type { DepartmentResult } from "../../../model/department.interface";
+import { getDepartments } from "../../../store/departmentSlice";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -54,6 +56,26 @@ const Devices = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
   const dispatch = useAppDispatch();
+  const [departmentData, setDepartmentData] = useState<DepartmentResult[]>([]);
+  const [departmentId, setDepartmentId] = useState<number>(0);
+
+  const getDepartment = useCallback(async () => {
+    setIsLoading(true);
+    await dispatch(getDepartments())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDepartmentData(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get departments");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
 
   const getOrganization = useCallback(async () => {
     setIsLoading(true);
@@ -131,6 +153,7 @@ const Devices = () => {
     getProject();
     getDeviceFamily();
     getDeviceType();
+    getDepartment();
 
     if (organization_id && project_id) {
       setIsLoading(true);
@@ -182,6 +205,7 @@ const Devices = () => {
     getProject,
     getDeviceFamily,
     getDeviceType,
+    getDepartment,
   ]);
 
   useEffect(() => {
@@ -243,10 +267,15 @@ const Devices = () => {
     setProjectId(parseInt(selectedProject));
   };
 
-  const handleEditDevice = (deviceId: number, projectId: number) => {
+  const handleEditDevice = (
+    deviceId: number,
+    projectId: number,
+    departmentId: number
+  ) => {
     setEditingDeviceId(deviceId);
     setIsEditDeviceOpen(true);
     setProjectId(projectId);
+    setDepartmentId(departmentId);
   };
 
   const handleDeviceUpdate = () => {
@@ -430,6 +459,9 @@ const Devices = () => {
                   IMEI Number
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  IMEI Number
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
                   Created At
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
@@ -454,23 +486,35 @@ const Devices = () => {
                       {device.device_name}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {project.find((p) => p.project_id === device?.project_id)
-                        ?.project_name ||
-                        device?.project_id ||
-                        "N/A"}
+                      {
+                        project.find(
+                          (p) =>
+                            p.project_id.toString() ===
+                            device?.project_id.toString()
+                        )?.project_name
+                      }
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {device?.department_id || "N/A"}
+                      {
+                        departmentData.find(
+                          (dept) =>
+                            dept.department_id.toString() ===
+                            device?.department_id.toString()
+                        )?.department_name
+                      }
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {deviceFamily.find(
-                        (df) => df.devicefamilyid === device?.devicefid
-                      )?.name ||
-                        device?.devicefid ||
-                        "N/A"}
+                      {
+                        deviceFamily.find(
+                          (df) => df.devicefamilyid === device?.devicefid
+                        )?.name
+                      }
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {device?.devicetypeid}
+                      {
+                        deviceType.find((dt) => dt.id === device?.devicetypeid)
+                          ?.topics
+                      }
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                       <span
@@ -496,7 +540,8 @@ const Devices = () => {
                           onClick={() =>
                             handleEditDevice(
                               device.device_id,
-                              device.project_id
+                              device.project_id,
+                              device.department_id
                             )
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"
@@ -577,6 +622,8 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
+          departmentData={departmentData}
+          departmentId={departmentId}
         />
       )}
 
@@ -589,6 +636,8 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
+          departmentData={departmentData}
+          departmentId={departmentId}
         />
       )}
     </div>

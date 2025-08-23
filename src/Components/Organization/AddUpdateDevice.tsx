@@ -12,10 +12,7 @@ import {
 
 import { Error, Success } from "../../utils/toast";
 import type { DepartmentResult } from "../../../model/department.interface";
-import {
-  createDepartment,
-  getDepartments,
-} from "../../../store/departmentSlice";
+import { createDepartment } from "../../../store/departmentSlice";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -28,6 +25,8 @@ interface AddUpdateDeviceProps {
   project_id: number | null;
   familyData: DeviceFamilyResult[];
   typeData: DeviceTypeResult[];
+  departmentData: DepartmentResult[];
+  departmentId: number;
 }
 
 const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
@@ -38,6 +37,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   project_id,
   familyData,
   typeData,
+  departmentData,
+  departmentId,
 }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,25 +50,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_name: "",
     device_status: "Online",
     imeiNo: "",
-    department_id: 0,
+    department_id: departmentId,
   });
-  const [departmentData, setDepartmentData] = useState<DepartmentResult[]>([]);
   const [newDepartmentName, setNewDepartmentName] = useState("");
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
-
-  useEffect(() => {
-    dispatch(getDepartments())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          setDepartmentData(res.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error("Failed to load departments");
-      });
-  }, [dispatch]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -180,12 +166,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         setShowAddDepartmentPopup(false);
         setNewDepartmentName("");
 
-        // Refresh departments and update local state
-        const departmentsResult = await dispatch(getDepartments()).unwrap();
-        if (departmentsResult.success) {
-          setDepartmentData(departmentsResult.data);
-        }
-
         setErrors((prev) => {
           const newErrors = { ...prev };
           delete newErrors.department_name;
@@ -229,10 +209,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_name: "",
         device_status: "Online",
         imeiNo: "",
-        department_id: 0,
+        department_id: departmentId,
       });
     }
-  }, [type, deviceId, dispatch, project_id]);
+  }, [type, deviceId, dispatch, project_id, departmentId]);
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
