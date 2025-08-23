@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { fromatDateWithTime, userStatus } from "../../utils/utils";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   ClientUsersResponse,
@@ -59,7 +59,7 @@ const Users = () => {
     navigate(path);
   };
 
-  const getOrganizationData = () => {
+  const getOrganizationData = useCallback(() => {
     setIsLoading(true);
     dispatch(getOrganizations())
       .unwrap()
@@ -72,9 +72,9 @@ const Users = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [dispatch]);
 
-  const getClients = () => {
+  const getClients = useCallback(() => {
     setIsLoading(true);
     dispatch(getAllClients())
       .unwrap()
@@ -91,7 +91,7 @@ const Users = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
@@ -110,7 +110,7 @@ const Users = () => {
   useEffect(() => {
     getClients();
     getOrganizationData();
-  }, []);
+  }, [getClients, getOrganizationData]);
 
   const handleEditUser = (clientId: number, organizationId: number) => {
     setModalType("update");
