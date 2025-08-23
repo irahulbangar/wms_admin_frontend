@@ -26,9 +26,10 @@ export const clientSlice = createSlice({
 export interface CreateClientPayload {
   client_name: string;
   client_email: string;
+  client_phone: string;
   client_password: string;
-  client_role: string;
-  client_status: string;
+  role: string;
+  status: string;
   organization_id: number;
 }
 
@@ -86,15 +87,20 @@ export const getClientById = createAsyncThunk(
   "client/getClientById",
   async (id: number, thunkAPI) => {
     try {
-      const response = await api().get(
-        `/clients/${id}`,
+      const response = await api().get(`/clients/${id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+      });
 
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+      // Handle both single client and array responses
+      if (response.data.success && response.data.data) {
+        return {
+          success: true,
+          data: response.data.data,
+          message: response.data.message,
+        };
+      }
 
       return response.data;
     } catch (error: unknown) {
@@ -123,6 +129,28 @@ export const updateClient = createAsyncThunk(
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to update client";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// DELETE /clients/delete-client/:id
+export const deleteClient = createAsyncThunk(
+  "client/deleteClient",
+  async (id: number, thunkAPI) => {
+    try {
+      const response = await api().delete<ClientUsersResponse>(
+        `/clients/delete-client/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete client";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }

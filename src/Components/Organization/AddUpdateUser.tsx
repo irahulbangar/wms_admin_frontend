@@ -15,6 +15,7 @@ interface AddUpdateUserProps {
   type: "add" | "update";
   clientId: number;
   onClose: () => void;
+  organizationId?: number; // Make organization_id optional
 }
 
 const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
@@ -22,16 +23,20 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
   type,
   clientId,
   onClose,
+  organizationId = 0, // Default to 0 if not provided
 }) => {
   const [formData, setFormData] = useState<CreateClientPayload>({
     client_name: "",
     client_email: "",
+    client_phone: "",
     client_password: "",
-    client_role: "",
-    client_status: "",
-    organization_id: 0,
+    role: "",
+    status: "",
+    organization_id: organizationId, // Use the prop value
   } as CreateClientPayload);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const dispatch = useAppDispatch();
 
   const handleInputChange = (
@@ -51,21 +56,37 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {} as Record<string, string>;
+
     if (!formData.client_name.trim()) {
       newErrors.client_name = "Client Name is required";
     }
+
     if (!formData.client_email.trim()) {
       newErrors.client_email = "Client Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.client_email)) {
+      newErrors.client_email = "Please enter a valid email address";
     }
-    if (!formData.client_password.trim()) {
+
+    if (!formData.client_phone.trim()) {
+      newErrors.client_phone = "Client Phone is required";
+    } else if (!/^\d{10}$/.test(formData.client_phone)) {
+      newErrors.client_phone = "Please enter a valid 10-digit phone number";
+    }
+
+    if (type === "add" && !formData.client_password.trim()) {
       newErrors.client_password = "Client Password is required";
+    } else if (type === "add" && formData.client_password.length < 6) {
+      newErrors.client_password = "Password must be at least 6 characters";
     }
-    if (!formData.client_role.trim()) {
-      newErrors.client_role = "Client Role is required";
+
+    if (!formData.role.trim()) {
+      newErrors.role = "Client Role is required";
     }
-    if (!formData.client_status.trim()) {
-      newErrors.client_status = "Client Status is required";
+
+    if (!formData.status.trim()) {
+      newErrors.status = "Client Status is required";
     }
+
     setErrors(newErrors as Record<string, string>);
     return Object.keys(newErrors).length === 0;
   };
@@ -75,17 +96,21 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
     if (!validateForm()) {
       return;
     }
-    try {
-      const clientData = {
-        client_name: formData.client_name,
-        client_email: formData.client_email,
-        client_password: formData.client_password,
-        client_role: formData.client_role,
-        client_status: formData.client_status,
-        organization_id: formData.organization_id as number,
-      };
 
+    setIsLoading(true);
+
+    try {
       if (type === "add") {
+        const clientData: CreateClientPayload = {
+          client_name: formData.client_name,
+          client_email: formData.client_email,
+          client_phone: formData.client_phone,
+          client_password: formData.client_password,
+          role: formData.role,
+          status: formData.status,
+          organization_id: (formData.organization_id as number) || 1,
+        };
+
         dispatch(createClient(clientData))
           .unwrap()
           .then((res) => {
@@ -97,9 +122,23 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           })
           .catch((err) => {
             Error(err);
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
       } else {
-        dispatch(updateClient(clientData as UpdateClientPayload))
+        const clientData: UpdateClientPayload = {
+          client_id: clientId,
+          client_name: formData.client_name,
+          client_email: formData.client_email,
+          client_phone: formData.client_phone,
+          client_password: formData.client_password,
+          role: formData.role,
+          status: formData.status,
+          organization_id: formData.organization_id as number,
+        };
+
+        dispatch(updateClient(clientData))
           .unwrap()
           .then((res) => {
             if (res.success) {
@@ -110,35 +149,52 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           })
           .catch((err) => {
             Error(err);
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
       }
     } catch (error: unknown) {
       Error(error as string);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    // Set organization_id from prop
+    setFormData((prev) => ({ ...prev, organization_id: organizationId }));
+  }, [organizationId]);
+
+  useEffect(() => {
     if (type === "update" && clientId > 0) {
+      setIsFetching(true);
       dispatch(getClientById(clientId))
         .unwrap()
         .then((res) => {
-          if (res.success) {
-            setFormData({
-              client_name: res.data.client_name,
-              client_email: res.data.client_email,
-              client_password: res.data.client_password,
-              client_role: res.data.client_role,
-              client_status: res.data.client_status,
-              organization_id: res.data.organization_id as number,
-            } as CreateClientPayload);
-            onClose();
+          if (res.success && res.data) {
+            // Handle both single object and array responses
+            const clientData = Array.isArray(res.data) ? res.data[0] : res.data;
+            if (clientData) {
+              setFormData({
+                client_name: clientData.client_name || "",
+                client_email: clientData.client_email || "",
+                client_phone: clientData.client_phone || "",
+                client_password: "", // Don't populate password for security
+                role: clientData.role || "", // Map from role to client_role
+                status: clientData.status || "", // Map from status to client_status
+                organization_id: clientData.organization_id || organizationId, // Use existing or prop value
+              } as CreateClientPayload);
+            }
           }
         })
         .catch((err) => {
           Error(err);
+        })
+        .finally(() => {
+          setIsFetching(false);
         });
     }
-  }, [type, clientId, dispatch, onClose]);
+  }, [type, clientId, dispatch, organizationId]);
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
@@ -146,111 +202,205 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
             {type === "update" ? "Update User" : "Add New User"}
+            {isFetching && type === "update" && (
+              <span className="ml-2 text-sm text-text-muted">
+                Loading user data...
+              </span>
+            )}
           </h2>
           <button
-            onClick={() => {
-              onClose();
-            }}
-            className="text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+            onClick={() => onClose()}
+            disabled={isLoading || isFetching}
+            className={`text-text-muted hover:text-text-primary transition-colors cursor-pointer ${
+              isLoading || isFetching ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Hidden field for organization_id */}
+          <input
+            type="hidden"
+            name="organization_id"
+            value={formData.organization_id}
+          />
+
           <div>
             <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
               Client Name
             </label>
             <input
               type="text"
+              name="client_name"
               value={formData.client_name}
+              disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                 errors.client_name
                   ? "border-status-danger"
                   : "border-border-primary"
-              }`}
+              } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               placeholder="Enter Client Name"
               onChange={handleInputChange}
             />
+            {errors.client_name && (
+              <span className="text-status-danger text-sm">
+                {errors.client_name}
+              </span>
+            )}
           </div>
+
           <div>
             <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
               Client Email
             </label>
             <input
               type="email"
+              name="client_email"
               value={formData.client_email}
+              disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                 errors.client_email
                   ? "border-status-danger"
                   : "border-border-primary"
-              }`}
+              } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               placeholder="Enter Client Email"
               onChange={handleInputChange}
             />
+            {errors.client_email && (
+              <span className="text-status-danger text-sm">
+                {errors.client_email}
+              </span>
+            )}
           </div>
           <div>
             <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-              Client Password
+              Client Phone
             </label>
             <input
-              type="text"
-              value={formData.client_password}
+              type="number"
+              name="client_phone"
+              value={formData.client_phone}
+              disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
-                errors.client_password
+                errors.client_email
                   ? "border-status-danger"
                   : "border-border-primary"
-              }`}
-              placeholder="Enter Client Password"
+              } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
+              placeholder="Enter Client Phone"
               onChange={handleInputChange}
             />
+            {errors.client_phone && (
+              <span className="text-status-danger text-sm">
+                {errors.client_phone}
+              </span>
+            )}
           </div>
+
+          {type === "add" && (
+            <div>
+              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                Client Password
+              </label>
+              <input
+                type="password"
+                name="client_password"
+                value={formData.client_password}
+                disabled={isFetching}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                  errors.client_password
+                    ? "border-status-danger"
+                    : "border-border-primary"
+                } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
+                placeholder="Enter Client Password"
+                onChange={handleInputChange}
+              />
+              {errors.client_password && (
+                <span className="text-status-danger text-sm">
+                  {errors.client_password}
+                </span>
+              )}
+            </div>
+          )}
+
           <div>
             <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-              Client Role
+              Role
             </label>
             <select
-              value={formData.client_role}
+              name="role"
+              value={formData.role}
+              disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
-                errors.client_role
-                  ? "border-status-danger"
-                  : "border-border-primary"
-              }`}
+                errors.role ? "border-status-danger" : "border-border-primary"
+              } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
+              onChange={handleInputChange}
             >
+              <option value="">Select Role</option>
               <option value="org_admin">Admin</option>
               <option value="org_user">User</option>
             </select>
+            {errors.client_role && (
+              <span className="text-status-danger text-sm">
+                {errors.client_role}
+              </span>
+            )}
           </div>
+
           <div>
             <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-              Client Status
+              Status
             </label>
             <select
-              value={formData.client_status}
+              name="status"
+              value={formData.status}
+              disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
                 errors.client_status
                   ? "border-status-danger"
                   : "border-border-primary"
-              }`}
+              } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
+              onChange={handleInputChange}
             >
+              <option value="">Select Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
+            {errors.client_status && (
+              <span className="text-status-danger text-sm">
+                {errors.client_status}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-4 pt-4">
             <button
               type="button"
               onClick={() => onClose()}
-              className="px-4 py-2 text-text-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors font-roboto cursor-pointer"
+              disabled={isLoading || isFetching}
+              className={`px-4 py-2 text-text-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors font-roboto cursor-pointer ${
+                isLoading || isFetching ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-roboto cursor-pointer"
+              disabled={isLoading}
+              className={`px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-roboto cursor-pointer ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              {type === "update" ? "Update User" : "Add User"}
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  {type === "update" ? "Updating..." : "Adding..."}
+                </span>
+              ) : type === "update" ? (
+                "Update User"
+              ) : (
+                "Add User"
+              )}
             </button>
           </div>
         </form>
