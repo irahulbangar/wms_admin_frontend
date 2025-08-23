@@ -218,7 +218,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
 
       {!collapsed && (
         <div className="p-4 border-t border-border-primary">
-          <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary">
+          <div className="flex items-center space-x-3 p-3 rounded-xl bg-hover-bg-primary">
             <User className="w-10 h-10 text-text-primary rounded-full bg-primary p-2" />
             <div className="flex-1 min-w-0">
               <div className="flex-1 min-w-0">

@@ -203,7 +203,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 name="deviceFId"
                 value={formData.deviceFId}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                   errors.deviceFId
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -231,7 +231,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 name="deviceTypeId"
                 value={formData.deviceTypeId}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                   errors.deviceTypeId
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -261,7 +261,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 value={formData.device_name}
                 onChange={handleInputChange}
                 placeholder="Enter device name"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                   errors.device_name
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -282,7 +282,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 name="device_status"
                 value={formData.device_status}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary"
+                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
               >
                 <option value="Online">Online</option>
                 <option value="Offline">Offline</option>
@@ -302,7 +302,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 onChange={handleInputChange}
                 placeholder="Enter IMEI number"
                 maxLength={15}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                   errors.imeiNo
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -334,7 +334,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     }));
                   }
                 }}
-                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary"
+                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
               >
                 <option value="0">Select Department</option>
                 {departmentData.map((department) => (

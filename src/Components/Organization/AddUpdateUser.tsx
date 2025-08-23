@@ -236,7 +236,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               name="client_name"
               value={formData.client_name}
               disabled={isFetching}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.client_name
                   ? "border-status-danger"
                   : "border-border-primary"
@@ -260,7 +260,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               name="client_email"
               value={formData.client_email}
               disabled={isFetching}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.client_email
                   ? "border-status-danger"
                   : "border-border-primary"
@@ -283,7 +283,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               name="client_phone"
               value={formData.client_phone}
               disabled={isFetching}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.client_email
                   ? "border-status-danger"
                   : "border-border-primary"
@@ -308,7 +308,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 name="client_password"
                 value={formData.client_password}
                 disabled={isFetching}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                   errors.client_password
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -332,7 +332,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               name="organization_id"
               value={formData.organization_id}
               disabled={isFetching}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.role ? "border-status-danger" : "border-border-primary"
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               onChange={handleInputChange}
@@ -359,7 +359,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               name="role"
               value={formData.role}
               disabled={isFetching}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.role ? "border-status-danger" : "border-border-primary"
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               onChange={handleInputChange}
@@ -381,7 +381,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               name="status"
               value={formData.status}
               disabled={isFetching}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.status ? "border-status-danger" : "border-border-primary"
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               onChange={handleInputChange}
@@ -415,16 +415,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 isLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  {type === "update" ? "Updating..." : "Adding..."}
-                </span>
-              ) : type === "update" ? (
-                "Update User"
-              ) : (
-                "Add User"
-              )}
+              {type === "update" ? "Update User" : "Add User"}
             </button>
           </div>
         </form>

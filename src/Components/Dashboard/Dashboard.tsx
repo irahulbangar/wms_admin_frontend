@@ -12,7 +12,6 @@ import { useState, useEffect } from "react";
 const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -79,7 +78,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
           <div

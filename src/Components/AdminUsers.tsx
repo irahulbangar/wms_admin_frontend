@@ -54,7 +54,7 @@ const Users = () => {
                 Admin Users
               </h1>
             </div>
-            <div className="flex items-center justify-end gap-4 px-4 rounded-lg flex-1">
+            <div className="flex items-center justify-end gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <input
@@ -63,11 +63,11 @@ const Users = () => {
                   className="w-96 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
+              <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
+                <PlusCircle className="w-4 h-4" />
+                Add User
+              </button>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
-              <PlusCircle className="w-4 h-4" />
-              Add User
-            </button>
           </div>
 
           <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">

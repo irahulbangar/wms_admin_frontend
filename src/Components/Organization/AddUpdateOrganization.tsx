@@ -215,7 +215,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             value={formData.name}
             onChange={handleInputChange}
             required
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.name ? "border-status-danger" : "border-border-primary"
             }`}
             placeholder="Enter organization name"
@@ -232,7 +232,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             value={formData.address}
             onChange={handleInputChange}
             rows={3}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.address ? "border-status-danger" : "border-border-primary"
             }`}
             placeholder="Enter organization address"
@@ -249,7 +249,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="contactPerson"
             value={formData.contactPerson}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.contactPerson
                 ? "border-status-danger"
                 : "border-border-primary"
@@ -270,7 +270,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="contactNumber"
             value={formData.contactNumber}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.contactNumber
                 ? "border-status-danger"
                 : "border-border-primary"
@@ -292,7 +292,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             value={formData.email}
             onChange={handleInputChange}
             required
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.email ? "border-status-danger" : "border-border-primary"
             }`}
             placeholder="Enter email"
@@ -308,7 +308,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="status"
             value={formData.status}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.status ? "border-status-danger" : "border-border-primary"
             }`}
           >
@@ -326,7 +326,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="notes"
             value={formData.notes}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success"
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
             placeholder="Enter notes"
           />
 

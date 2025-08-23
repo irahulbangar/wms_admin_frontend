@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({
     <div
       className={`bg-primary backdrop-blur-xl border-b border-border-primary px-6 py-4 shadow-sm fixed top-0 ${
         sidebarCollapsed ? "left-20" : "left-72"
-      } right-0 z-10`}
+      } right-0 z-50`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({
             <input
               type="text"
               placeholder="Search Anything"
-              className="w-full pl-10 pr-4 py-2.5 bg-input-bg border-input-border font-roboto text-text-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-primary border border-border-secondary font-roboto text-text-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
         </div>

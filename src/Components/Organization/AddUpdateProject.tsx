@@ -224,7 +224,7 @@ const AddUpdateProject = ({
                 name="project_name"
                 value={formData.project_name}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-roboto ${
+                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
                   errors.project_name
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -246,7 +246,7 @@ const AddUpdateProject = ({
                 value={formData.latitude}
                 placeholder="Enter latitude"
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-roboto ${
+                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
                   errors.latitude
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -265,7 +265,7 @@ const AddUpdateProject = ({
                 value={formData.longitude}
                 placeholder="Enter longitude"
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-roboto ${
+                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
                   errors.longitude
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -283,7 +283,7 @@ const AddUpdateProject = ({
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-roboto ${
+                className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
                   errors.address
                     ? "border-status-danger"
                     : "border-border-primary"
@@ -301,7 +301,7 @@ const AddUpdateProject = ({
                 name="status"
                 value={formData.status}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-roboto"
+                className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>

@@ -83,10 +83,8 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
     }
   };
 
-  console.log(departmentId, projectId, "departmentId, projectId");
-
   return (
-    <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-100">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
@@ -111,7 +109,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               placeholder="Enter department name"
               value={newDepartmentName}
               onChange={(e) => setNewDepartmentName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary ${
                 errors.department_name
                   ? "border-status-danger"
                   : "border-border-primary"

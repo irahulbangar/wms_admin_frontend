@@ -245,7 +245,8 @@ const Projects = () => {
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded">
               {organizations.find(
-                (org) => org.organization_id === selectedOrganizationId
+                (org) =>
+                  org.organization_id.toString() === selectedOrganizationId
               )?.org_name || selectedOrganizationId}
             </span>
           </>
@@ -390,7 +391,7 @@ const Projects = () => {
                               project.organization_id
                             )
                           }
-                          className="w-5 h-5 text-teal-500 cursor-pointer"
+                          className="w-5 h-5 text-fuchsia-500 cursor-pointer"
                         />
 
                         <Edit
