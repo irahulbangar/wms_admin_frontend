@@ -309,6 +309,22 @@ const Devices = () => {
     }
   };
 
+  const groupDevicesByDepartment = (devices: DeviceResult[]) => {
+    const grouped: { [key: string]: DeviceResult[] } = {};
+
+    devices.forEach((device) => {
+      const deptId = device.department_id?.toString() || "unknown";
+      if (!grouped[deptId]) {
+        grouped[deptId] = [];
+      }
+      grouped[deptId].push(device);
+    });
+
+    return grouped;
+  };
+
+  const groupedDevices = groupDevicesByDepartment(filteredDevices);
+
   const handleBackToProjects = () => {
     navigate("/organization/projects");
   };
@@ -431,185 +447,179 @@ const Devices = () => {
         </div>
       ) : (
         <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-          <table className="w-full text-base text-left rtl:text-right text-text-primary">
-            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-              <tr>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Sr No
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Device Name
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Project Name
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Department ID
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Device Family Name
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Device Type ID
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Device Status
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  IMEI Number
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  IMEI Number
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Created At
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Updated At
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredDevices.length > 0 ? (
-                filteredDevices.map((device, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-border-primary bg-primary hover:bg-secondary"
-                  >
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {device.device_name}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {
-                        project.find(
-                          (p) =>
-                            p.project_id.toString() ===
-                            device?.project_id.toString()
-                        )?.project_name
-                      }
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {
-                        departmentData.find(
-                          (dept) =>
-                            dept.department_id.toString() ===
-                            device?.department_id.toString()
-                        )?.department_name
-                      }
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {
-                        deviceFamily.find(
-                          (df) => df.devicefamilyid === device?.devicefid
-                        )?.name
-                      }
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {
-                        deviceType.find((dt) => dt.id === device?.devicetypeid)
-                          ?.topics
-                      }
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
-                          device?.device_status
-                        )}`}
-                      >
-                        {device.device_status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {device.imeino || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {fromatDateWithTime(device.created_at)}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      {fromatDateWithTime(device.updated_at)}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                      <div className="flex items-center justify-center gap-2">
-                        <Edit
-                          onClick={() =>
-                            handleEditDevice(
-                              device.device_id,
-                              device.project_id,
-                              device.department_id
-                            )
-                          }
-                          className="w-5 h-5 text-status-info cursor-pointer"
-                        />
+          {Object.keys(groupedDevices).length > 0 ? (
+            Object.entries(groupedDevices).map(([deptId, deptDevices]) => {
+              const department = departmentData.find(
+                (dept) => dept.department_id.toString() === deptId
+              );
+              const departmentName =
+                department?.department_name || `Department ${deptId}`;
 
-                        {/* <Trash2
-                          onClick={() => {}}
-                          className="w-5 h-5 text-status-danger cursor-pointer"
-                        /> */}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={10}
-                    className="px-6 py-4 text-text-primary text-center font-roboto text-sm"
-                  >
-                    <NoDataFound
-                      icon={
-                        <Monitor className="w-16 h-16 text-text-muted mx-auto mb-4" />
-                      }
-                      title={
-                        searchTerm || selectedOrganization !== "all"
-                          ? "No devices match your search/filter"
-                          : selectedOrganization === "all"
-                          ? "No devices found"
-                          : `No devices found for ${
-                              organization.find(
-                                (org) =>
-                                  org.organization_id === selectedOrganization
-                              )?.org_name ||
-                              `Organization ${selectedOrganization}`
-                            }`
-                      }
-                      description={
-                        searchTerm || selectedOrganization !== "all"
-                          ? "Try adjusting your search terms or filter criteria"
-                          : selectedOrganization === "all"
-                          ? "Add your first device to get started"
-                          : `Add your first project for ${
-                              organization.find(
-                                (org) =>
-                                  org.organization_id === selectedOrganization
-                              )?.org_name ||
-                              `Organization ${selectedOrganization}`
-                            } to get started`
-                      }
-                      buttonText={
-                        searchTerm || selectedOrganization !== "all"
-                          ? "Clear Search"
-                          : "Add Device"
-                      }
-                      buttonOnClick={() => {
-                        if (searchTerm || selectedOrganization !== "all") {
-                          setSearchTerm("");
-                          setSelectedOrganization("all");
-                        } else {
-                          handleAddDevice();
-                        }
-                      }}
-                    />
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              return (
+                <div key={deptId} className="mb-6">
+                  <div className="bg-secondary/30 px-4 py-3 border-b border-border-primary">
+                    <h3 className="text-lg font-semibold text-text-primary font-roboto">
+                      {departmentName}
+                    </h3>
+                    <p className="text-sm text-text-secondary font-roboto">
+                      {deptDevices.length} device
+                      {deptDevices.length !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+
+                  <table className="w-full text-base text-left rtl:text-right text-text-primary">
+                    <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                      <tr>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Sr No
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Device Name
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Project Name
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Device Family Name
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Device Type ID
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Device Status
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          IMEI Number
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Created At
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Updated At
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {deptDevices.map((device, index) => (
+                        <tr
+                          key={`${deptId}-${device.device_id}`}
+                          className="border-b border-border-primary bg-primary hover:bg-secondary"
+                        >
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {index + 1}
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {device.device_name}
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {
+                              project.find(
+                                (p) =>
+                                  p.project_id.toString() ===
+                                  device?.project_id.toString()
+                              )?.project_name
+                            }
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {
+                              deviceFamily.find(
+                                (df) => df.devicefamilyid === device?.devicefid
+                              )?.name
+                            }
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {
+                              deviceType.find(
+                                (dt) => dt.id === device?.devicetypeid
+                              )?.topics
+                            }
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${deviceStatus(
+                                device?.device_status
+                              )}`}
+                            >
+                              {device.device_status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {device.imeino || "N/A"}
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {fromatDateWithTime(device.created_at)}
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            {fromatDateWithTime(device.updated_at)}
+                          </td>
+                          <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+                            <div className="flex items-center justify-center gap-2">
+                              <Edit
+                                onClick={() =>
+                                  handleEditDevice(
+                                    device.device_id,
+                                    device.project_id,
+                                    device.department_id
+                                  )
+                                }
+                                className="w-5 h-5 text-status-info cursor-pointer"
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })
+          ) : (
+            <div className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
+              <NoDataFound
+                icon={
+                  <Monitor className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                }
+                title={
+                  searchTerm || selectedOrganization !== "all"
+                    ? "No devices match your search/filter"
+                    : selectedOrganization === "all"
+                    ? "No devices found"
+                    : `No devices found for ${
+                        organization.find(
+                          (org) => org.organization_id === selectedOrganization
+                        )?.org_name || `Organization ${selectedOrganization}`
+                      }`
+                }
+                description={
+                  searchTerm || selectedOrganization !== "all"
+                    ? "Try adjusting your search terms or filter criteria"
+                    : selectedOrganization === "all"
+                    ? "Add your first device to get started"
+                    : `Add your first project for ${
+                        organization.find(
+                          (org) => org.organization_id === selectedOrganization
+                        )?.org_name || `Organization ${selectedOrganization}`
+                      } to get started`
+                }
+                buttonText={
+                  searchTerm || selectedOrganization !== "all"
+                    ? "Clear Search"
+                    : "Add Device"
+                }
+                buttonOnClick={() => {
+                  if (searchTerm || selectedOrganization !== "all") {
+                    setSearchTerm("");
+                    setSelectedOrganization("all");
+                  } else {
+                    handleAddDevice();
+                  }
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 
