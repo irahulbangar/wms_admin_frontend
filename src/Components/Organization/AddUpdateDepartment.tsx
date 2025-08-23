@@ -50,6 +50,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               Success(res.message);
               setShowAddDepartmentPopup(false);
               setNewDepartmentName("");
+              onUpdateSuccess();
             } else {
               Error(res.message);
             }

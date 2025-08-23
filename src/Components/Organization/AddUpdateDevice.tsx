@@ -387,6 +387,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           departmentId={departmentId}
           onUpdateSuccess={() => {
             setShowAddDepartmentPopup(false);
+            onUpdateSuccess?.({
+              success: true,
+              data: { department_id: departmentId },
+            });
           }}
         />
       )}
