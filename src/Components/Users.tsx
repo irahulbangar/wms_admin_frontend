@@ -5,7 +5,7 @@ import type {
   AdminUsers,
   AdminUsersResponse,
 } from "../../model/admin-users.interface";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAllUsers } from "../../store/adminSlice";
 import { Error } from "../utils/toast";
 import Loader from "./Loader";
@@ -15,11 +15,8 @@ const Users = () => {
   const dispatch = useAppDispatch();
   const [users, setUsers] = useState<AdminUsers[]>([]);
   const [loading, setLoading] = useState(false);
-  const hasCalledAPI = useRef(false);
 
   useEffect(() => {
-    if (hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
     setLoading(true);
     dispatch(getAllUsers())
       .unwrap()
@@ -93,6 +90,9 @@ const Users = () => {
                     Email
                   </th>
                   <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                    Phone
+                  </th>
+                  <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                     Role
                   </th>
                   <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
@@ -110,23 +110,26 @@ const Users = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.length > 0 ? (
-                  users.map((user, index) => (
+                {users?.length > 0 ? (
+                  users?.map((user, index) => (
                     <tr
-                      key={user.id}
+                      key={user?.id}
                       className="bg-primary border-b border-border-primary hover:bg-secondary"
                     >
                       <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
                         {index + 1}
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                        {user.name}
+                        {user?.name}
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                        {user.email}
+                        {user?.email}
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                        {user.role}
+                        {user?.contact_number}
+                      </td>
+                      <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                        {user?.role}
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
                         <span
@@ -134,23 +137,23 @@ const Users = () => {
                             user?.status
                           )}`}
                         >
-                          {user.status}
+                          {user?.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                        {fromatDateWithTime(user.created_at)}
+                        {fromatDateWithTime(user?.created_at)}
                       </td>
                       <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                        {fromatDateWithTime(user.updated_at)}
+                        {fromatDateWithTime(user?.updated_at)}
                       </td>
                       <td className="px-6 py-4 font-roboto text-sm">
                         <div className="flex items-center gap-3 justify-center">
                           <SquarePen
-                            onClick={() => handleEditUser(user.id)}
+                            onClick={() => handleEditUser(user?.id)}
                             className="w-5 h-5 text-status-info cursor-pointer"
                           />
                           <Trash2
-                            onClick={() => handleDeleteUser(user.id)}
+                            onClick={() => handleDeleteUser(user?.id)}
                             className="w-5 h-5 text-status-danger cursor-pointer"
                           />
                         </div>
@@ -160,7 +163,7 @@ const Users = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className="text-center font-roboto text-text-secondary text-sm"
                     >
                       <NoDataFound

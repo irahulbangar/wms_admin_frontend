@@ -82,6 +82,8 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
     }
   };
 
+  console.log(departmentId, projectId, "departmentId, projectId");
+
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4">

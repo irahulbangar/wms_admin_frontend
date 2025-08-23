@@ -310,7 +310,7 @@ const Users = () => {
               ) : (
                 <tr>
                   <td
-                    colSpan={9}
+                    colSpan={10}
                     className="text-center font-roboto text-text-secondary text-sm"
                   >
                     <NoDataFound

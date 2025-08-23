@@ -356,10 +356,28 @@ const Devices = () => {
     navigate("/");
   };
 
-  const handleEditDepartment = (deptId: string, projectId: number) => {
-    setIsEditDepartmentOpen(true);
-    setDepartmentId(parseInt(deptId));
-    setProjectId(projectId);
+  const handleEditDepartment = (deptId: string) => {
+    // Check if a project is selected in the dropdown
+    if (selectedProject === "all") {
+      Warning(
+        "Please select a project from the dropdown before updating the department"
+      );
+      return;
+    }
+
+    // Find the project ID from the devices in this department
+    const deptDevices = groupedDevices[deptId] || [];
+    const firstDevice = deptDevices[0];
+
+    if (firstDevice && firstDevice.project_id) {
+      setIsEditDepartmentOpen(true);
+      setDepartmentId(parseInt(deptId));
+      setProjectId(parseInt(selectedProject));
+    } else {
+      Warning(
+        "No project found for this department. Please ensure devices are assigned to this department."
+      );
+    }
   };
 
   const handleDepartmentUpdate = () => {
@@ -416,9 +434,15 @@ const Devices = () => {
               onChange={(e) => setSelectedOrganization(e.target.value)}
               className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
             >
-              <option value="all">All Organization</option>
+              <option value="all" className="text-text-primary font-roboto">
+                All Organization
+              </option>
               {organization.map((org) => (
-                <option key={org.organization_id} value={org.organization_id}>
+                <option
+                  key={org.organization_id}
+                  value={org.organization_id}
+                  className="text-text-primary font-roboto"
+                >
                   {org.org_name}
                 </option>
               ))}
@@ -430,9 +454,15 @@ const Devices = () => {
               onChange={(e) => setSelectedProject(e.target.value)}
               className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
             >
-              <option value="all">All Project</option>
+              <option value="all" className="text-text-primary font-roboto">
+                All Project
+              </option>
               {project.map((proj) => (
-                <option key={proj.project_id} value={proj.project_id}>
+                <option
+                  key={proj.project_id}
+                  value={proj.project_id}
+                  className="text-text-primary font-roboto"
+                >
                   {proj.project_name}
                 </option>
               ))}
@@ -495,7 +525,7 @@ const Devices = () => {
                         onClick={() => toggleDepartmentCollapse(deptId)}
                         className="p-1 hover:bg-secondary/50 bg-secondary/50 cursor-pointer rounded transition-colors"
                       >
-                        {collapsedDepartments.has(deptId) ? (
+                        {collapsedDepartments?.has(deptId) ? (
                           <ChevronDown className="w-5 h-5 text-text-primary" />
                         ) : (
                           <ChevronRight className="w-5 h-5 text-text-primary" />
@@ -506,28 +536,21 @@ const Devices = () => {
                           {departmentName}
                         </h3>
                         <p className="text-sm text-text-secondary font-roboto">
-                          {deptDevices.length} device
-                          {deptDevices.length !== 1 ? "s" : ""}
+                          {deptDevices?.length} device
+                          {deptDevices?.length !== 1 ? "s" : ""}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Edit
-                        onClick={() =>
-                          handleEditDepartment(
-                            deptId,
-                            project.find(
-                              (p) => p.project_id === parseInt(deptId)
-                            )?.project_id || 0
-                          )
-                        }
+                        onClick={() => handleEditDepartment(deptId)}
                         className="w-5 h-5 text-status-info cursor-pointer"
                       />
                       <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
                     </div>
                   </div>
 
-                  {!collapsedDepartments.has(deptId) && (
+                  {!collapsedDepartments?.has(deptId) && (
                     <div className="overflow-x-auto">
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
@@ -565,38 +588,38 @@ const Devices = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {deptDevices.map((device, index) => (
+                          {deptDevices?.map((device, index) => (
                             <tr
-                              key={`${deptId}-${device.device_id}`}
+                              key={`${deptId}-${device?.device_id}`}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                                 {index + 1}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                                {device.device_name}
+                                {device?.device_name}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                                 {
-                                  project.find(
+                                  project?.find(
                                     (p) =>
-                                      p.project_id.toString() ===
-                                      device?.project_id.toString()
+                                      p?.project_id?.toString() ===
+                                      device?.project_id?.toString()
                                   )?.project_name
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                                 {
-                                  deviceFamily.find(
+                                  deviceFamily?.find(
                                     (df) =>
-                                      df.devicefamilyid === device?.devicefid
+                                      df?.devicefamilyid === device?.devicefid
                                   )?.name
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                                 {
-                                  deviceType.find(
-                                    (dt) => dt.id === device?.devicetypeid
+                                  deviceType?.find(
+                                    (dt) => dt?.id === device?.devicetypeid
                                   )?.topics
                                 }
                               </td>
@@ -606,26 +629,26 @@ const Devices = () => {
                                     device?.device_status
                                   )}`}
                                 >
-                                  {device.device_status}
+                                  {device?.device_status}
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                                {device.imeino || "N/A"}
+                                {device?.imeino || "N/A"}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                                {fromatDateWithTime(device.created_at)}
+                                {fromatDateWithTime(device?.created_at)}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
-                                {fromatDateWithTime(device.updated_at)}
+                                {fromatDateWithTime(device?.updated_at)}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-sm">
                                 <div className="flex items-center justify-center gap-2">
                                   <Edit
                                     onClick={() =>
                                       handleEditDevice(
-                                        device.device_id,
-                                        device.project_id,
-                                        device.department_id
+                                        device?.device_id,
+                                        device?.project_id,
+                                        device?.department_id
                                       )
                                     }
                                     className="w-5 h-5 text-status-info cursor-pointer"
@@ -716,12 +739,12 @@ const Devices = () => {
         />
       )}
 
-      {isEditDepartmentOpen && (
+      {isEditDepartmentOpen && projectId && (
         <AddUpdateDepartment
           setShowAddDepartmentPopup={setIsEditDepartmentOpen}
           type="update"
           departmentId={departmentId}
-          projectId={projectId || undefined}
+          projectId={projectId}
           onUpdateSuccess={handleDepartmentUpdate}
         />
       )}
