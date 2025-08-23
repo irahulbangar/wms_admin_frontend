@@ -116,7 +116,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           .then((res) => {
             if (res.success) {
               setShowAddModal(false);
-              Success("Client created successfully");
+              Success(res.message);
               onClose();
             }
           })
@@ -143,25 +143,25 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           .then((res) => {
             if (res.success) {
               setShowAddModal(false);
-              Success("Client updated successfully");
+              Success(res.message);
               onClose();
             }
           })
           .catch((err) => {
-            Error(err);
+            Error(err.message);
           })
           .finally(() => {
             setIsLoading(false);
           });
       }
     } catch (error: unknown) {
-      Error(error as string);
+      Error((error as string) || "Something went wrong");
       setIsLoading(false);
+      setIsFetching(false);
     }
   };
 
   useEffect(() => {
-    // Set organization_id from prop
     setFormData((prev) => ({ ...prev, organization_id: organizationId }));
   }, [organizationId]);
 
@@ -172,23 +172,22 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
         .unwrap()
         .then((res) => {
           if (res.success && res.data) {
-            // Handle both single object and array responses
             const clientData = Array.isArray(res.data) ? res.data[0] : res.data;
             if (clientData) {
               setFormData({
                 client_name: clientData.client_name || "",
                 client_email: clientData.client_email || "",
                 client_phone: clientData.client_phone || "",
-                client_password: "", // Don't populate password for security
-                role: clientData.role || "", // Map from role to client_role
-                status: clientData.status || "", // Map from status to client_status
-                organization_id: clientData.organization_id || organizationId, // Use existing or prop value
+                client_password: "",
+                role: clientData.role || "",
+                status: clientData.status || "",
+                organization_id: clientData.organization_id || organizationId,
               } as CreateClientPayload);
             }
           }
         })
         .catch((err) => {
-          Error(err);
+          Error(err.message);
         })
         .finally(() => {
           setIsFetching(false);
@@ -219,7 +218,6 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Hidden field for organization_id */}
           <input
             type="hidden"
             name="organization_id"
@@ -340,10 +338,8 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               <option value="org_admin">Admin</option>
               <option value="org_user">User</option>
             </select>
-            {errors.client_role && (
-              <span className="text-status-danger text-sm">
-                {errors.client_role}
-              </span>
+            {errors.role && (
+              <span className="text-status-danger text-sm">{errors.role}</span>
             )}
           </div>
 
@@ -356,9 +352,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               value={formData.status}
               disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
-                errors.client_status
-                  ? "border-status-danger"
-                  : "border-border-primary"
+                errors.status ? "border-status-danger" : "border-border-primary"
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               onChange={handleInputChange}
             >
@@ -366,9 +360,9 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-            {errors.client_status && (
+            {errors.status && (
               <span className="text-status-danger text-sm">
-                {errors.client_status}
+                {errors.status}
               </span>
             )}
           </div>
