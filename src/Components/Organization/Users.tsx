@@ -114,9 +114,6 @@ const Users = () => {
           <h1 className="text-2xl font-bold text-text-primary font-roboto">
             Organization Users
           </h1>
-          <p className="text-text-secondary font-roboto">
-            Manage your organization's users
-          </p>
         </div>
         <div className="flex items-center gap-4 px-4 rounded-lg flex-1">
           <div className="flex-1 relative">
@@ -166,6 +163,9 @@ const Users = () => {
                   Email
                 </th>
                 <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Phone
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
                   Role
                 </th>
                 <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
@@ -200,6 +200,9 @@ const Users = () => {
                     </td>
                     <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
                       {user.client_email}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      {user.client_phone}
                     </td>
                     <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
                       {user.role === "org_admin" ? "Admin" : "User"}
