@@ -1,4 +1,12 @@
-import { Search, PlusCircle, User, SquarePen, Trash2, X } from "lucide-react";
+import {
+  Search,
+  PlusCircle,
+  User,
+  SquarePen,
+  Trash2,
+  X,
+  Loader2,
+} from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { fromatDateWithTime, userStatus } from "../../utils/utils";
 import { useEffect, useState } from "react";
@@ -6,10 +14,12 @@ import type {
   ClientUsersResponse,
   ClientUsersResult,
 } from "../../../model/client-users.interface";
-import { getAllClients, deleteClient } from "../../../store/clientSlice";
+import { getAllClients } from "../../../store/clientSlice";
 import { useAppDispatch } from "../../../store/store";
 import AddUpdateUser from "./AddUpdateUser";
-import { Error, Success } from "../../utils/toast";
+import { Error } from "../../utils/toast";
+import type { OrganizationResult } from "../../../model/organizations.interface";
+import { getOrganizations } from "../../../store/organizationSlice";
 
 const Users = () => {
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
@@ -19,8 +29,29 @@ const Users = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [clientId, setClientId] = useState(0);
   const [modalType, setModalType] = useState<"add" | "update">("add");
+  const [organizationId, setOrganizationId] = useState(0);
+  const [organizationData, setOrganizationData] = useState<
+    OrganizationResult[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const getOrganizationData = () => {
+    setIsLoading(true);
+    dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        setOrganizationData(res.data);
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const getClients = () => {
+    setIsLoading(true);
     dispatch(getAllClients())
       .unwrap()
       .then((res: ClientUsersResponse) => {
@@ -32,10 +63,12 @@ const Users = () => {
       .catch((err) => {
         console.log(err);
         Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
-  // Filter users based on search term
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredUsers(users);
@@ -52,11 +85,13 @@ const Users = () => {
 
   useEffect(() => {
     getClients();
+    getOrganizationData();
   }, []);
 
-  const handleEditUser = (clientId: number) => {
+  const handleEditUser = (clientId: number, organizationId: number) => {
     setModalType("update");
     setClientId(clientId);
+    setOrganizationId(organizationId);
     setShowAddModal(true);
   };
 
@@ -66,26 +101,10 @@ const Users = () => {
     setShowAddModal(true);
   };
 
-  const handleDeleteUser = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      dispatch(deleteClient(id))
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            Success("User deleted successfully");
-            getClients(); // Refresh the list
-          }
-        })
-        .catch((err) => {
-          Error(err);
-        });
-    }
-  };
-
   const handleCloseAddModal = () => {
     setShowAddModal(false);
     setClientId(0);
-    getClients(); // Refresh the list after modal closes
+    getClients();
   };
 
   return (
@@ -101,7 +120,7 @@ const Users = () => {
         </div>
         <div className="flex items-center gap-4 px-4 rounded-lg flex-1">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
               placeholder="Search users..."
@@ -128,126 +147,124 @@ const Users = () => {
         </button>
       </div>
 
-      {/* Search results count */}
-      {searchTerm.trim() && (
-        <div className="text-sm text-text-secondary font-roboto">
-          Showing {filteredUsers.length} of {users.length} users
+      {isLoading ? (
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+          <Loader2 className="w-12 h-12 text-text-primary animate-spin" />
         </div>
-      )}
-
-      <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-        <table className="w-full text-sm text-left rtl:text-right text-text-primary">
-          <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-            <tr>
-              <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
-                Sr No
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Name
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Email
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Role
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Organization ID
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Status
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Created At
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Updated At
-              </th>
-              <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((user, index) => (
-                <tr
-                  key={user.client_id}
-                  className="bg-primary border-b border-border-primary hover:bg-secondary"
-                >
-                  <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {user.client_name}
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {user.client_email}
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {user.role === "org_admin" ? "Admin" : "User"}
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {user?.organization_id}
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${userStatus(
-                        user?.status
-                      )}`}
-                    >
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {fromatDateWithTime(user.created_at)}
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
-                    {fromatDateWithTime(user.updated_at)}
-                  </td>
-                  <td className="px-6 py-4 font-roboto text-sm">
-                    <div className="flex items-center gap-3 justify-center">
-                      <SquarePen
-                        onClick={() => handleEditUser(user.client_id)}
-                        className="w-5 h-5 text-status-info cursor-pointer"
-                      />
-                      <Trash2
-                        onClick={() => handleDeleteUser(user.client_id)}
-                        className="w-5 h-5 text-status-danger cursor-pointer"
-                      />
-                    </div>
+      ) : (
+        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+          <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+              <tr>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center font-roboto text-sm">
+                  Sr No
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Role
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Organization ID
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Created At
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Updated At
+                </th>
+                <th className="px-6 py-3 text-text-primary text-center font-roboto text-sm">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user, index) => (
+                  <tr
+                    key={user.client_id}
+                    className="bg-primary border-b border-border-primary hover:bg-secondary"
+                  >
+                    <td className="w-4 p-4 text-center font-roboto text-text-secondary text-sm">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      {user.client_name}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      {user.client_email}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      {user.role === "org_admin" ? "Admin" : "User"}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      {user?.organization_id}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${userStatus(
+                          user?.status
+                        )}`}
+                      >
+                        {user.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      {fromatDateWithTime(user.created_at)}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-center text-text-secondary text-sm">
+                      {fromatDateWithTime(user.updated_at)}
+                    </td>
+                    <td className="px-6 py-4 font-roboto text-sm">
+                      <div className="flex items-center gap-3 justify-center">
+                        <SquarePen
+                          onClick={() =>
+                            handleEditUser(user.client_id, user.organization_id)
+                          }
+                          className="w-5 h-5 text-status-info cursor-pointer"
+                        />
+                        <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="text-center font-roboto text-text-secondary text-sm"
+                  >
+                    <NoDataFound
+                      icon={
+                        <User className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                      }
+                      title={
+                        searchTerm.trim()
+                          ? "No search results found"
+                          : "No users found"
+                      }
+                      description={
+                        searchTerm.trim()
+                          ? "Try adjusting your search terms"
+                          : "Add your first user to get started"
+                      }
+                      buttonText="Add User"
+                      buttonOnClick={handleAddUser}
+                    />
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="text-center font-roboto text-text-secondary text-sm"
-                >
-                  <NoDataFound
-                    icon={
-                      <User className="w-16 h-16 text-text-muted mx-auto mb-4" />
-                    }
-                    title={
-                      searchTerm.trim()
-                        ? "No search results found"
-                        : "No users found"
-                    }
-                    description={
-                      searchTerm.trim()
-                        ? "Try adjusting your search terms"
-                        : "Add your first user to get started"
-                    }
-                    buttonText="Add User"
-                    buttonOnClick={handleAddUser}
-                  />
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {showAddModal && (
         <AddUpdateUser
@@ -255,7 +272,8 @@ const Users = () => {
           setShowAddModal={setShowAddModal}
           type={modalType}
           onClose={handleCloseAddModal}
-          organizationId={0} // You can set this to the actual organization ID if needed
+          organizationId={organizationId}
+          organizationData={organizationData}
         />
       )}
     </div>

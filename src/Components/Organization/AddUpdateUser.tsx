@@ -9,13 +9,15 @@ import {
 } from "../../../store/clientSlice";
 import { useAppDispatch } from "../../../store/store";
 import { Error, Success } from "../../utils/toast";
+import type { OrganizationResult } from "../../../model/organizations.interface";
 
 interface AddUpdateUserProps {
   setShowAddModal: (show: boolean) => void;
   type: "add" | "update";
   clientId: number;
   onClose: () => void;
-  organizationId?: number; // Make organization_id optional
+  organizationId: number;
+  organizationData: OrganizationResult[];
 }
 
 const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
@@ -23,7 +25,8 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
   type,
   clientId,
   onClose,
-  organizationId = 0, // Default to 0 if not provided
+  organizationId,
+  organizationData,
 }) => {
   const [formData, setFormData] = useState<CreateClientPayload>({
     client_name: "",
@@ -32,7 +35,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
     client_password: "",
     role: "",
     status: "",
-    organization_id: organizationId, // Use the prop value
+    organization_id: organizationId,
   } as CreateClientPayload);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -321,6 +324,33 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
             </div>
           )}
 
+          <div>
+            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+              Organization
+            </label>
+            <select
+              name="organization_id"
+              value={formData.organization_id}
+              disabled={isFetching}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success bg-primary text-text-primary ${
+                errors.role ? "border-status-danger" : "border-border-primary"
+              } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
+              onChange={handleInputChange}
+            >
+              <option value="">Select Organization</option>
+              {organizationData.map((organization) => (
+                <option
+                  key={organization.organization_id}
+                  value={organization.organization_id}
+                >
+                  {organization.org_name}
+                </option>
+              ))}
+            </select>
+            {errors.role && (
+              <span className="text-status-danger text-sm">{errors.role}</span>
+            )}
+          </div>
           <div>
             <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
               Role
