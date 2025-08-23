@@ -446,7 +446,7 @@ const Devices = () => {
           <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
       ) : (
-        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 flex-1">
           {Object.keys(groupedDevices).length > 0 ? (
             Object.entries(groupedDevices).map(([deptId, deptDevices]) => {
               const department = departmentData.find(
@@ -457,7 +457,7 @@ const Devices = () => {
 
               return (
                 <div key={deptId} className="mb-6">
-                  <div className="bg-secondary/30 px-4 py-3 border-b border-border-primary">
+                  <div className="bg-secondary/50 px-4 py-3 border-b border-border-primary">
                     <h3 className="text-lg font-semibold text-text-primary font-roboto">
                       {departmentName}
                     </h3>
