@@ -427,12 +427,12 @@ const Devices = () => {
       </div>
 
       <div className="flex items-center w-full gap-4 justify-between flex-wrap">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 pl-1">
           <div className="flex-shrink-0">
             <select
               value={selectedOrganization}
               onChange={(e) => setSelectedOrganization(e.target.value)}
-              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
+              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-54"
             >
               <option value="all" className="text-text-primary font-roboto">
                 All Organization
@@ -452,7 +452,7 @@ const Devices = () => {
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-primary text-text-primary w-54"
+              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-54"
             >
               <option value="all" className="text-text-primary font-roboto">
                 All Project
@@ -477,7 +477,7 @@ const Devices = () => {
               placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-96 pl-10 pr-4 py-2 text-text-primary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-success font-roboto"
+              className="w-96 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             {searchTerm && (
               <button
@@ -567,22 +567,22 @@ const Devices = () => {
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                               Device Family
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                               Device Type
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                               Device Status
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                               IMEI Number
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                               Created At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                               Updated At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
                               Actions
                             </th>
                           </tr>
