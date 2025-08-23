@@ -414,7 +414,7 @@ const Projects = () => {
                 <tr>
                   <td
                     colSpan={10}
-                    className="px-6 py-4 text-text-primary text-center font-roboto text-sm"
+                    className="text-text-primary text-center font-roboto text-sm h-full"
                   >
                     <NoDataFound
                       icon={
