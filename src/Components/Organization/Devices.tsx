@@ -173,8 +173,8 @@ const Devices = () => {
         .unwrap()
         .then((res) => {
           if (res.success) {
-            setDevices(res.data);
-            setFilteredDevices(res.data);
+            setDevices(res?.data);
+            setFilteredDevices(res?.data);
             setSelectedOrganization(organization_id);
             setSelectedProject(project_id);
           }
@@ -192,8 +192,8 @@ const Devices = () => {
         .unwrap()
         .then((res) => {
           if (res.success) {
-            setDevices(res.data);
-            setFilteredDevices(res.data);
+            setDevices(res?.data);
+            setFilteredDevices(res?.data);
           }
         })
         .catch((err) => {
@@ -291,8 +291,8 @@ const Devices = () => {
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setDevices(res.data);
-          setFilteredDevices(res.data);
+          setDevices(res?.data);
+          setFilteredDevices(res?.data);
         }
       })
       .catch((err) => {
@@ -590,7 +590,7 @@ const Devices = () => {
                         <tbody>
                           {deptDevices?.map((device, index) => (
                             <tr
-                              key={`${deptId}-${device?.device_id}`}
+                              key={`${deptId}-${device?.device_id} ${index}`}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
@@ -609,19 +609,10 @@ const Devices = () => {
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                                {
-                                  deviceFamily?.find(
-                                    (df) =>
-                                      df?.devicefamilyid === device?.devicefid
-                                  )?.name
-                                }
+                                {device?.device_family}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                                {
-                                  deviceType?.find(
-                                    (dt) => dt?.id === device?.devicetypeid
-                                  )?.topics
-                                }
+                                {device?.device_type}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 <span
