@@ -609,10 +609,19 @@ const Devices = () => {
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                                {device?.device_family}
+                                {
+                                  deviceFamily?.find(
+                                    (df) =>
+                                      df?.devicefamilyid === device?.devicefid
+                                  )?.name
+                                }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                                {device?.device_type}
+                                {
+                                  deviceType?.find(
+                                    (dt) => dt?.id === device?.devicetypeid
+                                  )?.topics
+                                }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 <span
