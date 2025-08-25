@@ -259,7 +259,8 @@ body {
 
 @font-face {
   font-family: "Roboto";
-  src: url("./assets/Fonts/Roboto/Roboto-Regular.ttf");
+  src: url("./assets/Fonts/Roboto/KFOlCnqEu92Fr1MmEU9fBBc4AMP6lQ.woff2")
+    format("woff2");
   font-weight: 400;
   font-style: normal;
 }
