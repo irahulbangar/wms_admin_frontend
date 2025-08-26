@@ -210,18 +210,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center space-x-3">
                     {item.icon}
-                    {isOpen && (
-                      <span className="font-medium ml-2 font-roboto text-lg">
-                        {item.label}
-                      </span>
-                    )}
+                    <span className="font-medium ml-2 font-roboto text-lg">
+                      {item.label}
+                    </span>
                   </div>
                   {isOpen && item.submenu && (
                     <ChevronDown className="w-4 h-4 transition-transform" />
                   )}
                 </button>
 
-                {isOpen && item.submenu && expanded.has(item.id) && (
+                {item.submenu && expanded.has(item.id) && (
                   <div className="ml-8 mt-2 space-y-1">
                     {item.submenu?.map((submenu: SubmenuItem) => {
                       return (

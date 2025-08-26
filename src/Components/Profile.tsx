@@ -58,7 +58,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-full">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-text-primary font-roboto">
           Profile Settings
