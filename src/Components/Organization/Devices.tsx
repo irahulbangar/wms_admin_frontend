@@ -65,6 +65,11 @@ const Devices = () => {
     new Set()
   );
   const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
+  const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
+    useState(false);
+  const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
+  const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
+  const [projectSearchTerm, setProjectSearchTerm] = useState("");
 
   const getDepartment = useCallback(async () => {
     setIsLoading(true);
@@ -262,6 +267,31 @@ const Devices = () => {
     deviceFamily,
   ]);
 
+  const filteredOrganizations = organization.filter((org) =>
+    org.org_name.toLowerCase().includes(organizationSearchTerm.toLowerCase())
+  );
+
+  const filteredProjects = project.filter((proj) =>
+    proj.project_name.toLowerCase().includes(projectSearchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".organization-dropdown")) {
+        setIsOrganizationDropdownOpen(false);
+      }
+      if (!target.closest(".project-dropdown")) {
+        setIsProjectDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleAddDevice = () => {
     if (selectedOrganization === "all" || selectedProject === "all") {
       Warning(
@@ -357,7 +387,6 @@ const Devices = () => {
   };
 
   const handleEditDepartment = (deptId: string) => {
-    // Check if a project is selected in the dropdown
     if (selectedProject === "all") {
       Warning(
         "Please select a project from the dropdown before updating the department"
@@ -365,7 +394,6 @@ const Devices = () => {
       return;
     }
 
-    // Find the project ID from the devices in this department
     const deptDevices = groupedDevices[deptId] || [];
     const firstDevice = deptDevices[0];
 
@@ -428,56 +456,166 @@ const Devices = () => {
 
       <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
-          <div className="flex-shrink-0 md:w-54 w-full">
-            <select
-              value={selectedOrganization}
-              onChange={(e) => setSelectedOrganization(e.target.value)}
-              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54"
-            >
-              <option value="all" className="text-text-primary font-roboto">
-                All Organization
-              </option>
-              {organization.map((org) => (
-                <option
-                  key={org.organization_id}
-                  value={org.organization_id}
-                  className="text-text-primary font-roboto"
+          <div className="flex-shrink-0 md:w-54 w-full relative organization-dropdown">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Select organization..."
+                value={
+                  selectedOrganization === "all"
+                    ? "All Organization"
+                    : organization.find(
+                        (org) =>
+                          org.organization_id.toString() ===
+                          selectedOrganization
+                      )?.org_name || "Select organization..."
+                }
+                readOnly
+                className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                onClick={() =>
+                  setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
+                }
+              />
+              <ChevronDown
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
+                  isOrganizationDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+
+            {isOrganizationDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-secondary rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-secondary">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                    <input
+                      type="text"
+                      placeholder="Search organizations..."
+                      value={organizationSearchTerm}
+                      onChange={(e) =>
+                        setOrganizationSearchTerm(e.target.value)
+                      }
+                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-secondary"
+                  onClick={() => {
+                    setSelectedOrganization("all");
+                    setIsOrganizationDropdownOpen(false);
+                    setOrganizationSearchTerm("");
+                  }}
                 >
-                  {org.org_name}
-                </option>
-              ))}
-            </select>
+                  All Organization
+                </div>
+
+                {filteredOrganizations.length > 0 ? (
+                  filteredOrganizations.map((org) => (
+                    <div
+                      key={org.organization_id}
+                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-secondary"
+                      onClick={() => {
+                        setSelectedOrganization(org.organization_id.toString());
+                        setIsOrganizationDropdownOpen(false);
+                        setOrganizationSearchTerm(org.org_name);
+                      }}
+                    >
+                      {org.org_name}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-text-secondary text-sm">
+                    No organizations found
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-          <div className="flex-shrink-0 md:w-54 w-full">
-            <select
-              value={selectedProject}
-              onChange={(e) => setSelectedProject(e.target.value)}
-              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54"
-            >
-              <option value="all" className="text-text-primary font-roboto">
-                All Project
-              </option>
-              {project.map((proj) => (
-                <option
-                  key={proj.project_id}
-                  value={proj.project_id}
-                  className="text-text-primary font-roboto"
+          <div className="flex-shrink-0 md:w-54 w-full relative project-dropdown">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Select project..."
+                value={
+                  selectedProject === "all"
+                    ? "All Project"
+                    : project.find(
+                        (proj) => proj.project_id.toString() === selectedProject
+                      )?.project_name || "Select project..."
+                }
+                readOnly
+                className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
+              />
+              <ChevronDown
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
+                  isProjectDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+
+            {isProjectDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                    <input
+                      type="text"
+                      placeholder="Search projects..."
+                      value={projectSearchTerm}
+                      onChange={(e) => setProjectSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                  onClick={() => {
+                    setSelectedProject("all");
+                    setIsProjectDropdownOpen(false);
+                    setProjectSearchTerm("");
+                  }}
                 >
-                  {proj.project_name}
-                </option>
-              ))}
-            </select>
+                  All Project
+                </div>
+
+                {filteredProjects.length > 0 ? (
+                  filteredProjects.map((proj) => (
+                    <div
+                      key={proj.project_id}
+                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                      onClick={() => {
+                        setSelectedProject(proj.project_id.toString());
+                        setIsProjectDropdownOpen(false);
+                        setProjectSearchTerm(proj.project_name);
+                      }}
+                    >
+                      {proj.project_name}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-text-secondary text-sm">
+                    No projects found
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
-          <div className="flex-shrink-0 relative md:w-96 w-full">
+          <div className="flex-shrink-0 relative md:w-60 lg:w-92 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
               placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="md:w-96 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             {searchTerm && (
               <button
@@ -495,7 +633,7 @@ const Devices = () => {
 
           <button
             onClick={handleAddDevice}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
             Add Device
