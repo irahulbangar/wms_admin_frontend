@@ -43,7 +43,7 @@ export const createClient = createAsyncThunk(
   async (payload: CreateClientPayload, thunkAPI) => {
     try {
       const response = await api().post<ClientUsersResponse>(
-        "/clients/create-client",
+        "/clients/admin/create-client",
         payload,
         {
           headers: {
@@ -66,7 +66,7 @@ export const getAllClients = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await api().get<ClientUsersResponse>(
-        "/clients/all-clients",
+        "/clients/admin/all-clients",
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -87,7 +87,7 @@ export const getClientById = createAsyncThunk(
   "client/getClientById",
   async (id: number, thunkAPI) => {
     try {
-      const response = await api().get(`/clients/${id}`, {
+      const response = await api().get(`/clients/admin/${id}`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
@@ -117,7 +117,7 @@ export const updateClient = createAsyncThunk(
   async (payload: UpdateClientPayload, thunkAPI) => {
     try {
       const response = await api().put<ClientUsersResponse>(
-        `/clients/update-client/${payload.client_id}`,
+        `/clients/admin/update-client/${payload.client_id}`,
         payload,
         {
           headers: {
@@ -140,7 +140,7 @@ export const deleteClient = createAsyncThunk(
   async (id: number, thunkAPI) => {
     try {
       const response = await api().delete<ClientUsersResponse>(
-        `/clients/delete-client/${id}`,
+        `/clients/admin/delete-client/${id}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
