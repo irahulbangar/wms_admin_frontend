@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -33,7 +33,6 @@ const Organization = () => {
   const [organizationToDelete, setOrganizationToDelete] =
     useState<OrganizationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const hasCalledAPI = useRef(false);
 
   const dispatch = useAppDispatch();
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
@@ -58,12 +57,6 @@ const Organization = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  };
-
-  const initialLoadOrganizations = () => {
-    if (hasCalledAPI.current) return;
-    hasCalledAPI.current = true;
-    refreshOrganizations();
   };
 
   const filterOrganizations = (searchTerm: string) => {
@@ -92,7 +85,7 @@ const Organization = () => {
   }, [organizations]);
 
   useEffect(() => {
-    initialLoadOrganizations();
+    refreshOrganizations();
   }, []);
 
   const handleEditOrganization = (id: string) => {
@@ -230,34 +223,34 @@ const Organization = () => {
           <table className="w-full text-sm text-left rtl:text-right text-text-primary">
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                   Sr No
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                   Organization Name
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                   Address
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Contact Person
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Contact Number
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Email
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Notes
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Status
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Actions
                 </th>
               </tr>

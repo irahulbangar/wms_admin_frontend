@@ -555,34 +555,34 @@ const Devices = () => {
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                           <tr>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Sr No
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Device Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Project Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Device Family
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Device Type
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Device Status
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               IMEI Number
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Created At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Updated At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Actions
                             </th>
                           </tr>
