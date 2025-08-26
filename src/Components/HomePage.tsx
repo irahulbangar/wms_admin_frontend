@@ -16,10 +16,7 @@ import Projects from "./Organization/Project";
 import AdminUsers from "./AdminUsers";
 
 const HomePage = () => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    const saved = localStorage.getItem("sidebar-collapsed");
-    return saved ? JSON.parse(saved) : false;
-  });
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState("dashboard");
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,10 +27,6 @@ const HomePage = () => {
       navigate("/");
     }
   }, [isAuthenticated, isLoading, navigate]);
-
-  useEffect(() => {
-    localStorage.setItem("sidebar-collapsed", JSON.stringify(sidebarCollapsed));
-  }, [sidebarCollapsed]);
 
   useEffect(() => {
     if (location.pathname === "/organization") {
@@ -130,26 +123,19 @@ const HomePage = () => {
     <div className="min-h-full transition-all duration-500">
       <div className="flex h-screen overflow-hidden">
         <Sidebar
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           currentPage={currentPage}
           onPageChange={handlePageChange}
+          isOpen={sidebarOpen}
+          setIsOpen={setSidebarOpen}
         />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Header
-            sidebarCollapsed={sidebarCollapsed}
-            onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
-          <main
-            className={`flex-1 h-full bg-input-bg p-6 space-y-6 mt-22 overflow-y-auto pb-16 ${
-              sidebarCollapsed ? "ml-20" : "ml-72"
-            }`}
-          >
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-input-bg p-4 md:p-6 space-y-4 md:space-y-6">
             {renderContent()}
           </main>
-          <Footer sidebarCollapsed={sidebarCollapsed} />
+          <Footer />
         </div>
       </div>
     </div>

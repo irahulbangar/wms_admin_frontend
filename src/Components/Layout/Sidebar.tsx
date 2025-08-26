@@ -8,6 +8,7 @@ import {
   Settings,
   User,
   Users,
+  X,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAppSelector } from "../../../store/store";
@@ -89,13 +90,18 @@ const menuItems = [
 ];
 
 interface SidebarProps {
-  collapsed: boolean;
-  onToggle: () => void;
   currentPage: string;
   onPageChange: (page: string) => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }
 
-const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  currentPage,
+  onPageChange,
+  isOpen,
+  setIsOpen,
+}) => {
   const { admin } = useAppSelector((state) => state.admin);
   const [expanded, setExpanded] = useState(() => {
     const saved = localStorage.getItem("sidebar-expanded");
@@ -147,93 +153,125 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }: SidebarProps) => {
   };
 
   return (
-    <div
-      className={`transition-all duration-300 ease-in-out bg-primary backdrop-blur-xl border-r border-border-primary flex flex-col z-10 h-full fixed top-0 left-0 ${
-        collapsed ? "w-20" : "w-72"
-      }`}
-    >
-      <div className="px-5 py-3.5 border-b border-border-primary shadow-xs flex items-center justify-center">
-        <img src="/logo.png" alt="logo" className="h-16 w-32 object-contain" />
-      </div>
+    <>
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 bg-opacity-20 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-50 w-64 bg-primary border-r border-border-primary
+          transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <div
+          className={`flex items-center px-5 py-3.5 border-b border-border-primary ${
+            isOpen ? "justify-between" : "justify-center"
+          }`}
+        >
+          <div className="flex items-center justify-center">
+            <img
+              src="/logo.png"
+              alt="logo"
+              className="h-16 w-32 object-contain"
+            />
+          </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto h-full">
-        {menuItems.map((item) => {
-          return (
-            <div key={item.id}>
-              <button
-                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer ${
-                  isMenuItemActive(item)
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
-                    : "text-text-primary hover:bg-hover-bg-primary"
-                }`}
-                onClick={() => {
-                  if (item.submenu) {
-                    toggleExpanded(item.id);
-                  } else {
-                    onPageChange(item.id);
-                  }
-                }}
-              >
-                <div className="flex items-center space-x-3">
-                  {item.icon}
-                  {!collapsed && (
-                    <span className="font-medium ml-2 font-roboto text-lg">
-                      {item.label}
-                    </span>
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto h-full">
+          {menuItems?.map((item) => {
+            return (
+              <div key={item.id}>
+                <button
+                  className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer ${
+                    isMenuItemActive(item)
+                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
+                      : "text-text-primary hover:bg-hover-bg-primary"
+                  }`}
+                  onClick={() => {
+                    if (item.submenu) {
+                      toggleExpanded(item.id);
+                    } else {
+                      onPageChange(item.id);
+                      if (window.innerWidth < 1024) {
+                        setTimeout(() => setIsOpen(false), 100);
+                      }
+                    }
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    {item.icon}
+                    {isOpen && (
+                      <span className="font-medium ml-2 font-roboto text-lg">
+                        {item.label}
+                      </span>
+                    )}
+                  </div>
+                  {isOpen && item.submenu && (
+                    <ChevronDown className="w-4 h-4 transition-transform" />
                   )}
-                </div>
-                {!collapsed && item.submenu && (
-                  <ChevronDown className="w-4 h-4 transition-transform" />
+                </button>
+
+                {isOpen && item.submenu && expanded.has(item.id) && (
+                  <div className="ml-8 mt-2 space-y-1">
+                    {item.submenu?.map((submenu: SubmenuItem) => {
+                      return (
+                        <button
+                          key={submenu.id}
+                          className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all cursor-pointer ${
+                            currentPage === submenu.id
+                              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
+                              : "text-text-primary hover:text-text-primary hover:bg-hover-bg-primary"
+                          }`}
+                          onClick={() => {
+                            handleSubmenuClick(submenu);
+                            if (window.innerWidth < 1024) {
+                              setTimeout(() => setIsOpen(false), 100);
+                            }
+                          }}
+                        >
+                          {submenu.icon}
+                          <span className="font-medium ml-2 font-roboto text-base">
+                            {submenu.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
-              </button>
+              </div>
+            );
+          })}
+        </nav>
 
-              {!collapsed && item.submenu && expanded.has(item.id) && (
-                <div className="ml-8 mt-2 space-y-1">
-                  {item.submenu?.map((submenu: SubmenuItem) => {
-                    return (
-                      <button
-                        key={submenu.id}
-                        className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all cursor-pointer ${
-                          currentPage === submenu.id
-                            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
-                            : "text-text-primary hover:text-text-primary hover:bg-hover-bg-primary"
-                        }`}
-                        onClick={() => {
-                          handleSubmenuClick(submenu);
-                        }}
-                      >
-                        {submenu.icon}
-                        <span className="font-medium ml-2 font-roboto text-base">
-                          {submenu.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-
-      {!collapsed && (
-        <div className="p-4 border-t border-border-primary">
-          <div className="flex items-center space-x-3 p-3 rounded-xl bg-hover-bg-primary">
-            <User className="w-10 h-10 text-text-primary rounded-full bg-primary p-2" />
-            <div className="flex-1 min-w-0">
+        {!isOpen && (
+          <div className="p-4 border-t border-border-primary">
+            <div className="flex items-center space-x-3 p-3 rounded-xl bg-hover-bg-primary">
+              <User className="w-10 h-10 text-text-primary rounded-full bg-primary p-2" />
               <div className="flex-1 min-w-0">
-                <p className="text-base font-medium text-text-primary truncate">
-                  {admin?.name}
-                </p>
-                <p className="text-sm text-text-secondary truncate">
-                  {admin?.role}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-medium text-text-primary truncate">
+                    {admin?.name}
+                  </p>
+                  <p className="text-sm text-text-secondary truncate">
+                    {admin?.role}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -168,8 +168,8 @@ const Organization = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 h-full overflow-y-auto pb-5">
-      <div className="flex items-center w-full sticky top-0">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto">
+      <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col sticky top-0">
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-text-primary">
             Organizations
@@ -178,8 +178,8 @@ const Organization = () => {
             Manage your organization's information and settings
           </p>
         </div>
-        <div className="flex items-center justify-end gap-4 flex-wrap">
-          <div className="relative">
+        <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
+          <div className="relative md:w-96 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
               type="text"
@@ -190,7 +190,7 @@ const Organization = () => {
                 setSearchTerm(value);
                 filterOrganizations(value);
               }}
-              className="w-96 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="md:w-96 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             {searchTerm && (
               <button

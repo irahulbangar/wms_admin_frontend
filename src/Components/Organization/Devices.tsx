@@ -426,13 +426,13 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-center w-full gap-4 justify-between flex-wrap">
-        <div className="flex items-center gap-4 pl-1">
-          <div className="flex-shrink-0">
+      <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
+        <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
+          <div className="flex-shrink-0 md:w-54 w-full">
             <select
               value={selectedOrganization}
               onChange={(e) => setSelectedOrganization(e.target.value)}
-              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-54"
+              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54"
             >
               <option value="all" className="text-text-primary font-roboto">
                 All Organization
@@ -448,11 +448,11 @@ const Devices = () => {
               ))}
             </select>
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 md:w-54 w-full">
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-54"
+              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54"
             >
               <option value="all" className="text-text-primary font-roboto">
                 All Project
@@ -469,15 +469,15 @@ const Devices = () => {
             </select>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex-shrink-0 relative">
+        <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
+          <div className="flex-shrink-0 relative md:w-96 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
               placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-96 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="md:w-96 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             {searchTerm && (
               <button
