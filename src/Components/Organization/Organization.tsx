@@ -164,7 +164,7 @@ const Organization = () => {
   };
 
   const handleViewPlants = (organizationId: string) => {
-    navigate(`/organization/projects/${organizationId}`);
+    navigate(`/organization/plants/${organizationId}`);
   };
 
   return (

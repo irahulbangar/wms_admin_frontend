@@ -25,7 +25,6 @@ import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
 import AddUpdatePlant from "./AddUpdatePlant";
-import Pagination from "../Pagination";
 
 const Plants = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
@@ -49,24 +48,6 @@ const Plants = () => {
   const [deleteProject, setDeleteProject] = useState<ProjectResult | null>(
     null
   );
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  const totalPages = Math.ceil(filteredProjects.length / rowsPerPage);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleRowsPerPageChange = (rows: number) => {
-    setRowsPerPage(rows);
-    setCurrentPage(1);
-  };
-
-  useEffect(() => {
-    setCurrentPage(1);
-    setSelectedRows(new Set());
-  }, [filterBy, searchTerm, selectedOrganizationId]);
 
   const handleConfirmDelete = async () => {
     if (deleteProject) {
@@ -317,7 +298,7 @@ const Plants = () => {
         </div>
       ) : (
         <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-          <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+          <table className="w-full text-sm text-left rtl:text-right text-text-primary mb-16">
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
@@ -481,20 +462,6 @@ const Plants = () => {
               )}
             </tbody>
           </table>
-
-          {filteredProjects.length > 0 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={filteredProjects.length}
-              itemsPerPage={rowsPerPage}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleRowsPerPageChange}
-              selectedItems={selectedRows.size}
-              showItemsPerPage={true}
-              showSelectionInfo={true}
-            />
-          )}
         </div>
       )}
 

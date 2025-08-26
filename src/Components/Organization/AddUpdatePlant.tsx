@@ -156,6 +156,9 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           } else {
             Error(res.message);
           }
+        })
+        .catch((error) => {
+          Error(`Failed to add project: ${error}`);
         });
     } else {
       if (!projectId) {
@@ -184,6 +187,9 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           } else {
             Error(res.message);
           }
+        })
+        .catch((error) => {
+          Error(`Failed to update project: ${error}`);
         });
     }
   };

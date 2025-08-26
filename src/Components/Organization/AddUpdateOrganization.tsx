@@ -62,7 +62,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     if (!formData.contactNumber.trim()) {
       newErrors.contactNumber = "Contact number is required";
     } else if (
-      !/^[+]?[0-9\s\-()]{10,15}$/.test(formData.contactNumber.toString()) ||
+      !/^[+]?[0-9\s\-()]{10}$/.test(formData.contactNumber.toString()) ||
       formData.contactNumber.toString().trim().length < 10
     ) {
       newErrors.contactNumber = "Please enter a valid contact number";
@@ -72,10 +72,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!formData.status) {
-      newErrors.status = "Status is required";
     }
 
     setErrors(newErrors);
