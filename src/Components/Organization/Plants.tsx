@@ -10,6 +10,7 @@ import {
   X,
   Home,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
@@ -48,6 +49,8 @@ const Plants = () => {
   const [deleteProject, setDeleteProject] = useState<ProjectResult | null>(
     null
   );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
 
   const handleConfirmDelete = async () => {
     if (deleteProject) {
@@ -162,6 +165,26 @@ const Plants = () => {
     setFilteredProjects(filtered);
   }, [projects, filterBy, searchTerm]);
 
+  const filteredOrganizations = organizations.filter((organization) =>
+    organization.org_name
+      .toLowerCase()
+      .includes(organizationSearchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".organization-dropdown")) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleAddProject = () => {
     if (selectedOrganizationId === "all") {
       Warning("Please select an organization first before adding a project");
@@ -248,27 +271,85 @@ const Plants = () => {
       </div>
 
       <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
-        <div className="flex-shrink-0 md:w-54 w-full">
-          <select
-            value={selectedOrganizationId}
-            onChange={(e) => {
-              const newOrgId = e.target.value;
-              setSelectedOrganizationId(newOrgId);
-              if (newOrgId === "all") {
-                getProjects();
-              } else {
-                getProjectByOrganizationId(newOrgId);
+        <div className="flex-shrink-0 md:w-54 w-full relative organization-dropdown">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Select organization..."
+              value={
+                selectedOrganizationId === "all"
+                  ? "All Organization"
+                  : organizations.find(
+                      (org) =>
+                        org.organization_id.toString() ===
+                        selectedOrganizationId
+                    )?.org_name || "Select organization..."
               }
-            }}
-            className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54"
-          >
-            <option value="all">All Organization</option>
-            {organizations.map((organization, index) => (
-              <option key={index} value={organization.organization_id}>
-                {organization.org_name}
-              </option>
-            ))}
-          </select>
+              readOnly
+              className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            />
+            <ChevronDown
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
+            />
+          </div>
+
+          {isDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+              <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <input
+                    type="text"
+                    placeholder="Search organizations..."
+                    value={organizationSearchTerm}
+                    onChange={(e) => setOrganizationSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </div>
+
+              <div
+                className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                onClick={() => {
+                  setSelectedOrganizationId("all");
+                  setIsDropdownOpen(false);
+                  setOrganizationSearchTerm("");
+                  getProjects();
+                }}
+              >
+                All Organization
+              </div>
+
+              {filteredOrganizations.length > 0 ? (
+                filteredOrganizations.map((organization, index) => (
+                  <div
+                    key={index}
+                    className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                    onClick={() => {
+                      setSelectedOrganizationId(
+                        organization.organization_id.toString()
+                      );
+                      setIsDropdownOpen(false);
+                      setOrganizationSearchTerm(organization.org_name);
+                      getProjectByOrganizationId(
+                        organization.organization_id.toString()
+                      );
+                    }}
+                  >
+                    {organization.org_name}
+                  </div>
+                ))
+              ) : (
+                <div className="px-3 py-2 text-text-muted text-sm">
+                  No organizations found
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
