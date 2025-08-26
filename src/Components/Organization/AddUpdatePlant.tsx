@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X } from "lucide-react";
 import { Success, Error } from "../../utils/toast";
 import { useAppDispatch } from "../../../store/store";
 import {
@@ -28,15 +28,14 @@ interface AddUpdateProjectProps {
   }) => void;
 }
 
-const AddUpdatePlant = ({
+const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
   setShowModal,
   type,
   projectId,
   organizationId,
   onUpdateSuccess,
-}: AddUpdateProjectProps) => {
+}) => {
   const dispatch = useAppDispatch();
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<ProjectFormData>({
     project_name: "",
     latitude: "",
@@ -56,25 +55,26 @@ const AddUpdatePlant = ({
   const loadProjectData = async () => {
     if (!projectId) return;
 
-    setIsLoading(true);
-    try {
-      const result = await dispatch(getProjectById(projectId)).unwrap();
-      if (result.success && result.data) {
-        const project = result.data as unknown as ProjectResult;
-        const newFormData = {
-          project_name: project.project_name || "",
-          latitude: project.latitude || "",
-          longitude: project.longitude || "",
-          address: project.address || "",
-          status: project.status,
-        };
-        setFormData(newFormData);
-      }
-    } catch (error) {
-      Error(`Failed to load project data: ${error}`);
-    } finally {
-      setIsLoading(false);
-    }
+    await dispatch(getProjectById(projectId))
+      .unwrap()
+      .then((res) => {
+        if (res.success && res.data) {
+          const project = res.data as unknown as ProjectResult;
+          const newFormData = {
+            project_name: project.project_name || "",
+            latitude: project.latitude || "",
+            longitude: project.longitude || "",
+            address: project.address || "",
+            status: project.status,
+          };
+          setFormData(newFormData);
+        } else {
+          Error(res.message);
+        }
+      })
+      .catch((error) => {
+        Error(`Failed to load project data: ${error}`);
+      });
   };
 
   const validateForm = (): boolean => {
@@ -135,79 +135,61 @@ const AddUpdatePlant = ({
       return;
     }
 
-    setIsLoading(true);
+    if (type === "add") {
+      const projectPayload = {
+        ...formData,
+        organization_id: organizationId,
+      };
 
-    try {
-      if (type === "add") {
-        const projectPayload = {
-          ...formData,
-          organization_id: organizationId,
-        };
-
-        console.log("Adding project with payload:", projectPayload);
-        await dispatch(addProject(projectPayload))
-          .unwrap()
-          .then((res) => {
-            if (res.success) {
-              Success(res.message);
-              setShowModal(false);
-              if (onUpdateSuccess) {
-                onUpdateSuccess({
-                  success: true,
-                  data: res.data,
-                });
-              }
-            } else {
-              Error(res.message);
+      await dispatch(addProject(projectPayload))
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            Success(res.message);
+            setShowModal(false);
+            if (onUpdateSuccess) {
+              onUpdateSuccess({
+                success: true,
+                data: res.data,
+              });
             }
-          });
-      } else {
-        if (!projectId) {
-          Error("Project ID is required for update");
-          return;
-        }
-
-        const projectPayload = {
-          ...formData,
-          id: projectId,
-          organization_id: organizationId,
-        };
-
-        console.log("Updating project with payload:", projectPayload);
-
-        await dispatch(updateProjectById(projectPayload))
-          .unwrap()
-          .then((res) => {
-            if (res.success) {
-              Success(res.message);
-              setShowModal(false);
-              if (onUpdateSuccess) {
-                onUpdateSuccess({
-                  success: true,
-                  data: res.data,
-                });
-              }
-            } else {
-              Error(res.message);
-            }
-          });
+          } else {
+            Error(res.message);
+          }
+        });
+    } else {
+      if (!projectId) {
+        Error("Project ID is required for update");
+        return;
       }
-    } catch (error) {
-      console.log("Error:", error);
-      Error(
-        type === "add"
-          ? `Failed to add project: ${error}`
-          : `Failed to update project: ${error}`
-      );
-    } finally {
-      setIsLoading(false);
+
+      const projectPayload = {
+        ...formData,
+        id: projectId,
+        organization_id: organizationId,
+      };
+
+      await dispatch(updateProjectById(projectPayload))
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            Success(res.message);
+            setShowModal(false);
+            if (onUpdateSuccess) {
+              onUpdateSuccess({
+                success: true,
+                data: res.data,
+              });
+            }
+          } else {
+            Error(res.message);
+          }
+        });
     }
   };
 
   const handleClose = () => {
-    if (!isLoading) {
-      setShowModal(false);
-    }
+    setShowModal(false);
   };
 
   return (
@@ -219,14 +201,13 @@ const AddUpdatePlant = ({
           </h2>
           <button
             onClick={handleClose}
-            disabled={isLoading}
             className="text-text-secondary hover:text-text-primary transition-colors disabled:opacity-50 cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form className="p-6 space-y-4">
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Project Name
           </label>
@@ -316,16 +297,15 @@ const AddUpdatePlant = ({
             <button
               type="button"
               onClick={handleClose}
-              disabled={isLoading}
               className="px-6 py-2 border border-border-primary text-text-primary rounded-lg hover:bg-secondary transition-colors disabled:opacity-50 cursor-pointer font-roboto"
             >
               Cancel
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer font-roboto"
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {type === "add" ? "Add Project" : "Update Project"}
             </button>
           </div>
