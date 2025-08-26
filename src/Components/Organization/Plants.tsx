@@ -343,10 +343,10 @@ const Plants = () => {
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {index + 1}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {project.project_name}
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      {project?.project_name}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {
                         organizations.find(
                           (org) =>
@@ -355,14 +355,14 @@ const Plants = () => {
                         )?.org_name
                       }
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {project.latitude}
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      {project?.latitude}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {project.longitude}
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      {project?.longitude}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {project.address}
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      {project?.address}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <span
@@ -373,19 +373,19 @@ const Plants = () => {
                         {project?.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {fromatDateWithTime(project.created_at)}
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      {fromatDateWithTime(project?.created_at)}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {fromatDateWithTime(project.updated_at)}
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      {fromatDateWithTime(project?.updated_at)}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <div className="flex items-center justify-center gap-2">
                         <Eye
                           onClick={() =>
                             handleViewDevices(
-                              project.project_id,
-                              project.organization_id
+                              project?.project_id,
+                              project?.organization_id
                             )
                           }
                           className="w-5 h-5 text-fuchsia-500 cursor-pointer"
@@ -393,13 +393,13 @@ const Plants = () => {
 
                         <Edit
                           onClick={() =>
-                            handleEditProject(project.project_id.toString())
+                            handleEditProject(project?.project_id.toString())
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"
                         />
                         {/* <Trash2
                           onClick={() =>
-                            handleDeleteProject(project.project_id.toString())
+                            handleDeleteProject(project?.project_id.toString())
                           }
                           className="w-5 h-5 text-status-danger cursor-pointer"
                         /> */}

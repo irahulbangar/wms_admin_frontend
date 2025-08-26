@@ -41,7 +41,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
     latitude: "",
     longitude: "",
     address: "",
-    status: "",
+    status: "active",
   });
 
   const [errors, setErrors] = useState<Partial<ProjectFormData>>({});
@@ -65,7 +65,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
             latitude: project.latitude || "",
             longitude: project.longitude || "",
             address: project.address || "",
-            status: project.status,
+            status: project.status || "active",
           };
           setFormData(newFormData);
         } else {
@@ -94,10 +94,6 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
 
     if (!formData.address.trim()) {
       newErrors.address = "Address is required";
-    }
-
-    if (!formData.status.trim()) {
-      newErrors.status = "Status is required";
     }
 
     setErrors(newErrors);
@@ -290,8 +286,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
             Status
           </label>
           <select
-            name="status"
-            value={formData.status}
+            defaultValue="active"
             onChange={handleInputChange}
             className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
           >
