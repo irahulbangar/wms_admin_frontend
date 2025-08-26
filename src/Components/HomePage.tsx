@@ -12,7 +12,7 @@ import AdminSetting from "./AdminSetting";
 import Setting from "./Organization/Setting";
 import Organization from "./Organization/Organization";
 import Loader from "./Loader";
-import Projects from "./Organization/Project";
+import Plants from "./Organization/Plants";
 import AdminUsers from "./AdminUsers";
 
 const HomePage = () => {
@@ -31,10 +31,10 @@ const HomePage = () => {
   useEffect(() => {
     if (location.pathname === "/organization") {
       setCurrentPage("organization");
-    } else if (location.pathname === "/organization/projects") {
-      setCurrentPage("projects");
-    } else if (location.pathname.startsWith("/organization/projects/")) {
-      setCurrentPage("projects");
+    } else if (location.pathname === "/organization/plants") {
+      setCurrentPage("plants");
+    } else if (location.pathname.startsWith("/organization/plants/")) {
+      setCurrentPage("plants");
     } else if (location.pathname === "/organization/devices") {
       setCurrentPage("devices");
     } else if (location.pathname.startsWith("/organization/devices/")) {
@@ -65,8 +65,8 @@ const HomePage = () => {
       case "organization":
         navigate("/organization");
         break;
-      case "projects":
-        navigate("/organization/projects");
+      case "plants":
+        navigate("/organization/plants");
         break;
       case "devices":
         navigate("/organization/devices");
@@ -100,8 +100,8 @@ const HomePage = () => {
         return <Dashboard />;
       case "organization":
         return <Organization />;
-      case "projects":
-        return <Projects />;
+      case "plants":
+        return <Plants />;
       case "devices":
         return <Devices />;
       case "users":

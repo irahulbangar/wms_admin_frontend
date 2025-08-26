@@ -28,7 +28,7 @@ interface AddUpdateProjectProps {
   }) => void;
 }
 
-const AddUpdateProject = ({
+const AddUpdatePlant = ({
   setShowModal,
   type,
   projectId,
@@ -333,4 +333,4 @@ const AddUpdateProject = ({
   );
 };
 
-export default AddUpdateProject;
+export default AddUpdatePlant;

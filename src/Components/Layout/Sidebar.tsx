@@ -38,10 +38,10 @@ const menuItems = [
         href: "/organization",
       },
       {
-        id: "projects",
-        label: "Projects",
+        id: "plants",
+        label: "Plants",
         icon: <FileText className="w-5 h-5" />,
-        href: "/organization/projects",
+        href: "/organization/plants",
       },
       {
         id: "devices",

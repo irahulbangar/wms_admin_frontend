@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
-import AddUpdateProject from "./AddUpdateProject";
 import { useAppDispatch } from "../../../store/store";
 import {
   getAllProjects,
@@ -25,8 +24,9 @@ import { Error, Success, Warning } from "../../utils/toast";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
+import AddUpdatePlant from "./AddUpdatePlant";
 
-const Projects = () => {
+const Plants = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -471,7 +471,7 @@ const Projects = () => {
       )}
 
       {showAddModal && (
-        <AddUpdateProject
+        <AddUpdatePlant
           setShowModal={handleModalClose}
           type={showAddModalType}
           projectId={projectId}
@@ -531,4 +531,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default Plants;

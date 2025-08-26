@@ -40,7 +40,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/projects"
+                  path="/organization/plants"
                   element={
                     <ProtectedRoute>
                       <HomePage />
@@ -48,7 +48,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/projects/:organization_id"
+                  path="/organization/plants/:organization_id"
                   element={
                     <ProtectedRoute>
                       <HomePage />
