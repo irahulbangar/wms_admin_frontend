@@ -6,20 +6,24 @@ import {
   ArrowDownRight,
   Building,
   Smartphone,
+  FileText,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
 import { getOrganizations } from "../../../store/organizationSlice";
 import type { AppDispatch } from "../../../store/store";
 import { Error } from "../../utils/toast";
 import { useDispatch } from "react-redux";
+import type { ProjectResult } from "../../../model/project.interface";
+import { getAllProjects } from "../../../store/projectSlice";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const dispatch = useDispatch<AppDispatch>();
+  const [projects, setProjects] = useState<ProjectResult[]>([]);
 
-  const fetchOrganizations = async () => {
+  const fetchOrganizations = useCallback(async () => {
     await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
@@ -32,16 +36,32 @@ const Dashboard = () => {
       .catch((err) => {
         Error(err);
       });
-  };
+  }, [dispatch]);
+
+  const fetchProjects = useCallback(async () => {
+    await dispatch(getAllProjects())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setProjects(res?.data);
+        } else {
+          Error(res.message || "Failed to fetch projects");
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      });
+  }, [dispatch]);
 
   useEffect(() => {
     fetchOrganizations();
+    fetchProjects();
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [fetchOrganizations, fetchProjects]);
 
   const stats = [
     {
@@ -63,6 +83,16 @@ const Dashboard = () => {
       color: "bg-status-info",
       bgColor: "bg-status-info/20",
       textColor: "text-status-info",
+    },
+    {
+      title: "Total Plants",
+      value: projects.length,
+      change: "+8.2%",
+      changeType: "increase",
+      icon: FileText,
+      color: "bg-status-success",
+      bgColor: "bg-status-success/20",
+      textColor: "text-status-success",
     },
     {
       title: "Total Devices",

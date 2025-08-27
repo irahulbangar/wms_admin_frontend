@@ -1,6 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { GetProjectsResponse } from "../model/project.interface";
+import type {
+  GetProjectsResponse,
+  ProjectResult,
+} from "../model/project.interface";
 
 interface ProjectResponse {
   success: boolean;
@@ -8,17 +11,38 @@ interface ProjectResponse {
   data?: Record<string, unknown>;
 }
 
+interface ProjectState {
+  projects: ProjectResult[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: ProjectState = {
+  projects: [],
+  loading: false,
+  error: null,
+};
+
 export const projectSlice = createSlice({
   name: "project",
-  initialState: {
-    projects: [],
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     setProjects: (state, action) => {
       state.projects = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getAllProjects.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getAllProjects.fulfilled, (state, action) => {
+      state.loading = false;
+      state.projects = action.payload.data;
+    });
+    builder.addCase(getAllProjects.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "Failed to fetch projects";
+    });
   },
 });
 
@@ -161,3 +185,7 @@ export const deleteProjectById = createAsyncThunk(
     }
   }
 );
+
+export const { setProjects } = projectSlice.actions;
+
+export default projectSlice.reducer;

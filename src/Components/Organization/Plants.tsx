@@ -19,6 +19,7 @@ import {
   getAllProjects,
   getProjectsByOrganizationId,
   deleteProjectById,
+  setProjects,
 } from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
 import { Error, Success, Warning } from "../../utils/toast";
@@ -45,8 +46,8 @@ const Plants = () => {
     organization_id || "all"
   );
   const dispatch = useAppDispatch();
-  const [projects, setProjects] = useState<ProjectResult[]>([]);
   const { organizations } = useAppSelector((state) => state.organization);
+  const { projects } = useAppSelector((state) => state.project);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteProject, setDeleteProject] = useState<ProjectResult | null>(
     null
@@ -75,20 +76,24 @@ const Plants = () => {
     navigate("/");
   };
 
-  const getProjects = useCallback(async () => {
+  const fetchProjects = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    try {
-      const res = await dispatch(getAllProjects()).unwrap();
-      if (res.success) {
-        setProjects(res.data);
-      }
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.toString() : String(err);
-      Error(errorMessage || "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    await dispatch(getAllProjects())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          dispatch(setProjects(res.data));
+        } else {
+          Error(res.message || "Failed to fetch projects");
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [dispatch]);
 
   const getProjectByOrganizationId = useCallback(
@@ -146,14 +151,15 @@ const Plants = () => {
       getProjectByOrganizationId(organization_id);
     } else {
       setSelectedOrganizationId("all");
-      getProjects();
+      fetchProjects();
     }
   }, [
     organization_id,
     getProjectByOrganizationId,
-    getProjects,
+    fetchProjects,
     getAllOrganizations,
     organizations.length,
+    projects.length,
   ]);
 
   useEffect(() => {
@@ -218,7 +224,7 @@ const Plants = () => {
       if (result.success) {
         Success("Project deleted successfully");
         if (selectedOrganizationId === "all") {
-          getProjects();
+          fetchProjects();
         } else {
           getProjectByOrganizationId(selectedOrganizationId);
         }
@@ -232,7 +238,7 @@ const Plants = () => {
     setShowAddModal(false);
     setShowAddModalType("add");
     setProjectId("");
-    getProjects();
+    fetchProjects();
   };
 
   const handleProjectUpdate = (updatedData: {
@@ -329,7 +335,7 @@ const Plants = () => {
                   setSelectedOrganizationId("all");
                   setIsDropdownOpen(false);
                   setOrganizationSearchTerm("");
-                  getProjects();
+                  fetchProjects();
                 }}
               >
                 All Organization

@@ -24,8 +24,7 @@ import {
   getOrganizations,
   setOrganizations,
 } from "../../../store/organizationSlice";
-import type { ProjectResult } from "../../../model/project.interface";
-import { getAllProjects } from "../../../store/projectSlice";
+import { getAllProjects, setProjects } from "../../../store/projectSlice";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import { getDeviceByFamilyWise } from "../../../store/deviceSlice";
 import { fromatDateWithTime } from "../../utils/utils";
@@ -55,7 +54,7 @@ const Devices = () => {
   );
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
   const { organizations } = useAppSelector((state) => state.organization);
-  const [projects, setProjects] = useState<ProjectResult[]>([]);
+  const { projects } = useAppSelector((state) => state.project);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,13 +109,14 @@ const Devices = () => {
       });
   }, [dispatch]);
 
-  const getProject = useCallback(async () => {
+  const fetchProjects = useCallback(async () => {
+    if (isLoading) return;
     setIsLoading(true);
     await dispatch(getAllProjects())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setProjects(res.data);
+          dispatch(setProjects(res.data));
         }
       })
       .catch((err) => {
@@ -164,14 +164,14 @@ const Devices = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (organizations.length === 0) {
+    if (organizations.length === 0 || projects.length === 0) {
       getOrganization();
+      fetchProjects();
+    } else {
+      getDeviceFamily();
+      getDeviceType();
+      getDepartment();
     }
-
-    getProject();
-    getDeviceFamily();
-    getDeviceType();
-    getDepartment();
 
     if (organization_id && project_id) {
       setIsLoading(true);
@@ -219,10 +219,13 @@ const Devices = () => {
     organization_id,
     project_id,
     dispatch,
-    getProject,
+    getOrganization,
+    fetchProjects,
     getDeviceFamily,
     getDeviceType,
     getDepartment,
+    organizations.length,
+    projects.length,
   ]);
 
   useEffect(() => {
