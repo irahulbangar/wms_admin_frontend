@@ -151,7 +151,9 @@ const Plants = () => {
       getProjectByOrganizationId(organization_id);
     } else {
       setSelectedOrganizationId("all");
-      fetchProjects();
+      if (projects.length === 0) {
+        fetchProjects();
+      }
     }
   }, [
     organization_id,

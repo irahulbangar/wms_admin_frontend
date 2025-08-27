@@ -18,7 +18,7 @@ import type {
   ClientUsersResponse,
   ClientUsersResult,
 } from "../../../model/client-users.interface";
-import { getAllClients } from "../../../store/clientSlice";
+import { getAllClients, setClients } from "../../../store/clientSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import AddUpdateUser from "./AddUpdateUser";
 import { Error } from "../../utils/toast";
@@ -29,7 +29,6 @@ import {
 
 const OrganizationUsers = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<ClientUsersResult[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<ClientUsersResult[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useAppDispatch();
@@ -38,6 +37,7 @@ const OrganizationUsers = () => {
   const [modalType, setModalType] = useState<"add" | "update">("add");
   const [organizationId, setOrganizationId] = useState(0);
   const { organizations } = useAppSelector((state) => state.organization);
+  const { clients } = useAppSelector((state) => state.client);
   const [isLoading, setIsLoading] = useState(false);
 
   // Breadcrumb data
@@ -76,12 +76,13 @@ const OrganizationUsers = () => {
   }, [dispatch]);
 
   const getClients = useCallback(() => {
+    if (isLoading) return;
     setIsLoading(true);
     dispatch(getAllClients())
       .unwrap()
       .then((res: ClientUsersResponse) => {
         if (res.success) {
-          setUsers(res.data);
+          dispatch(setClients(res.data));
           setFilteredUsers(res.data);
         }
       })
@@ -96,9 +97,9 @@ const OrganizationUsers = () => {
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
-      setFilteredUsers(users);
+      setFilteredUsers(clients);
     } else {
-      const filtered = users.filter(
+      const filtered = clients.filter(
         (user) =>
           user.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.client_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -106,14 +107,14 @@ const OrganizationUsers = () => {
       );
       setFilteredUsers(filtered);
     }
-  }, [searchTerm, users]);
+  }, [searchTerm, clients]);
 
   useEffect(() => {
-    getClients();
-    if (organizations.length === 0) {
+    if (organizations.length === 0 && clients.length === 0) {
+      getClients();
       getOrganizationData();
     }
-  }, [getClients, getOrganizationData, organizations.length]);
+  }, [getClients, getOrganizationData, organizations.length, clients.length]);
 
   const handleEditUser = (clientId: number, organizationId: number) => {
     setModalType("update");

@@ -7,10 +7,14 @@ import type {
 
 interface ClientState {
   clients: ClientUsersResult[];
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: ClientState = {
   clients: [],
+  loading: false,
+  error: null,
 };
 
 export const clientSlice = createSlice({
@@ -20,6 +24,25 @@ export const clientSlice = createSlice({
     setClients: (state, action) => {
       state.clients = action.payload;
     },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getAllClients.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getAllClients.fulfilled, (state, action) => {
+      state.loading = false;
+      state.clients = action.payload.data;
+    });
+    builder.addCase(getAllClients.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "Failed to fetch clients";
+    });
   },
 });
 
@@ -156,4 +179,6 @@ export const deleteClient = createAsyncThunk(
   }
 );
 
-export const { setClients } = clientSlice.actions;
+export const { setClients, setLoading, setError } = clientSlice.actions;
+
+export default clientSlice.reducer;

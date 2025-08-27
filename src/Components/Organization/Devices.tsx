@@ -15,9 +15,10 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
 import {
-  getDevices,
+  getAllDevices,
   getDeviceByOrganizationIdAndProjectId,
   getDevicesByDeviceType,
+  setDevices,
 } from "../../../store/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import {
@@ -43,7 +44,6 @@ const Devices = () => {
     project_id: string;
   }>();
 
-  const [devices, setDevices] = useState<DeviceResult[]>([]);
   const [filteredDevices, setFilteredDevices] = useState<DeviceResult[]>([]);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [isEditDeviceOpen, setIsEditDeviceOpen] = useState(false);
@@ -55,6 +55,7 @@ const Devices = () => {
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
   const { organizations } = useAppSelector((state) => state.organization);
   const { projects } = useAppSelector((state) => state.project);
+  const { devices } = useAppSelector((state) => state.device);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -184,7 +185,7 @@ const Devices = () => {
         .unwrap()
         .then((res) => {
           if (res.success) {
-            setDevices(res?.data);
+            dispatch(setDevices(res?.data));
             setFilteredDevices(res?.data);
             setSelectedOrganization(organization_id);
             setSelectedProject(project_id);
@@ -198,22 +199,24 @@ const Devices = () => {
           setIsLoading(false);
         });
     } else {
-      setIsLoading(true);
-      dispatch(getDevices())
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            setDevices(res?.data);
-            setFilteredDevices(res?.data);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error("Failed to get devices");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      if (devices.length === 0) {
+        setIsLoading(true);
+        dispatch(getAllDevices())
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              dispatch(setDevices(res?.data));
+              setFilteredDevices(res?.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error("Failed to get devices");
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }
     }
   }, [
     organization_id,
@@ -224,8 +227,6 @@ const Devices = () => {
     getDeviceFamily,
     getDeviceType,
     getDepartment,
-    organizations.length,
-    projects.length,
   ]);
 
   useEffect(() => {
@@ -233,7 +234,7 @@ const Devices = () => {
 
     if (searchTerm) {
       filtered = filtered.filter(
-        (device) =>
+        (device: DeviceResult) =>
           device.device_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (device.imeino &&
             device.imeino.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -254,14 +255,15 @@ const Devices = () => {
         .filter((p) => p.organization_id === parseInt(selectedOrganization))
         .map((p) => p.project_id);
 
-      filtered = filtered.filter((device) =>
+      filtered = filtered.filter((device: DeviceResult) =>
         orgProjectIds.includes(device.project_id)
       );
     }
 
     if (selectedProject !== "all") {
       filtered = filtered.filter(
-        (device) => device.project_id === parseInt(selectedProject)
+        (device: DeviceResult) =>
+          device.project_id === parseInt(selectedProject)
       );
     }
 
@@ -324,12 +326,13 @@ const Devices = () => {
   };
 
   const handleDeviceUpdate = () => {
+    if (isLoading) return;
     setIsLoading(true);
-    dispatch(getDevices())
+    dispatch(getAllDevices())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setDevices(res?.data);
+          dispatch(setDevices(res?.data));
           setFilteredDevices(res?.data);
         }
       })
@@ -462,7 +465,7 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
+      <div className="flex items-start md:items-center md:justify-between justify-center lg:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div className="flex-shrink-0 md:w-54 w-full relative organization-dropdown">
             <div className="relative">
@@ -678,7 +681,7 @@ const Devices = () => {
                         )}
                       </button>
                       <div>
-                        <h3 className="text-lg font-semibold text-text-primary font-roboto">
+                        <h3 className="text-lg font-medium text-text-primary font-roboto">
                           {departmentName}
                         </h3>
                         <p className="text-sm text-text-secondary font-roboto">
@@ -739,13 +742,13 @@ const Devices = () => {
                               key={`${deptId}-${device?.device_id} ${index}`}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {index + 1}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {device?.device_name}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {
                                   projects?.find(
                                     (p) =>
@@ -754,7 +757,7 @@ const Devices = () => {
                                   )?.project_name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {
                                   deviceFamily?.find(
                                     (df) =>
@@ -762,14 +765,14 @@ const Devices = () => {
                                   )?.name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {
                                   deviceType?.find(
                                     (dt) => dt?.id === device?.devicetypeid
                                   )?.topics
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 <span
                                   className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${deviceStatus(
                                     device?.device_status
@@ -778,16 +781,16 @@ const Devices = () => {
                                   {device?.device_status}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {device?.imeino || "N/A"}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {fromatDateWithTime(device?.created_at)}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {fromatDateWithTime(device?.updated_at)}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 <div className="flex items-center justify-center gap-2">
                                   <Edit
                                     onClick={() =>

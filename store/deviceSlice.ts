@@ -1,20 +1,47 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { DeviceResponse } from "../model/devices.interface";
+import type { DeviceResponse, DeviceResult } from "../model/devices.interface";
 import type { DeviceFamilyResponse } from "../model/device-family.interface";
 import type { DeviceTypeResponse } from "../model/device-type.interface";
 
+interface DeviceState {
+  devices: DeviceResult[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: DeviceState = {
+  devices: [],
+  loading: false,
+  error: null,
+};
+
 export const deviceSlice = createSlice({
   name: "device",
-  initialState: {
-    devices: [],
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     setDevices: (state, action) => {
       state.devices = action.payload;
     },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getAllDevices.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getAllDevices.fulfilled, (state, action) => {
+      state.loading = false;
+      state.devices = action.payload.data;
+    });
+    builder.addCase(getAllDevices.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "Failed to fetch devices";
+    });
   },
 });
 
@@ -53,8 +80,8 @@ export const createDevice = createAsyncThunk(
 );
 
 // Get device
-export const getDevices = createAsyncThunk(
-  "device/getDevices",
+export const getAllDevices = createAsyncThunk(
+  "device/getAllDevices",
   async (_, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
@@ -223,3 +250,7 @@ export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
     }
   }
 );
+
+export const { setDevices, setLoading, setError } = deviceSlice.actions;
+
+export default deviceSlice.reducer;
