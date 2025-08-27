@@ -383,7 +383,7 @@ const Devices = () => {
   };
 
   const handleBackToProjects = () => {
-    navigate("/organization/projects");
+    navigate("/organization/plants");
   };
 
   const handleBackToOrganizations = () => {
@@ -446,7 +446,7 @@ const Devices = () => {
             onClick={handleBackToProjects}
             className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
           >
-            <span>Projects</span>
+            <span>Plants</span>
           </button>
         </>
 

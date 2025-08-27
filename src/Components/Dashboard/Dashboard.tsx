@@ -16,13 +16,14 @@ import { Error } from "../../utils/toast";
 import { useDispatch } from "react-redux";
 import type { ProjectResult } from "../../../model/project.interface";
 import { getAllProjects } from "../../../store/projectSlice";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const dispatch = useDispatch<AppDispatch>();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
-
+  const navigate = useNavigate();
   const fetchOrganizations = useCallback(async () => {
     await dispatch(getOrganizations())
       .unwrap()
@@ -73,6 +74,7 @@ const Dashboard = () => {
       color: "bg-status-success",
       bgColor: "bg-status-success/20",
       textColor: "text-status-success",
+      href: "/organization/users",
     },
     {
       title: "Total Organization",
@@ -83,6 +85,7 @@ const Dashboard = () => {
       color: "bg-status-info",
       bgColor: "bg-status-info/20",
       textColor: "text-status-info",
+      href: "/organization",
     },
     {
       title: "Total Plants",
@@ -93,6 +96,7 @@ const Dashboard = () => {
       color: "bg-status-success",
       bgColor: "bg-status-success/20",
       textColor: "text-status-success",
+      href: "/organization/plants",
     },
     {
       title: "Total Devices",
@@ -103,8 +107,13 @@ const Dashboard = () => {
       color: "bg-status-warning",
       bgColor: "bg-status-warning/20",
       textColor: "text-status-warning",
+      href: "/organization/devices",
     },
   ];
+
+  const handleNavigate = (href: string) => {
+    navigate(href);
+  };
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -131,11 +140,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat, index) => (
           <div
+            onClick={() => handleNavigate(stat.href)}
             key={index}
-            className="bg-primary rounded-lg shadow-sm border border-border-primary p-6 hover:shadow-md transition-shadow"
+            className="bg-primary rounded-lg shadow-sm border border-border-primary p-6 hover:shadow-md transition-shadow cursor-pointer"
           >
             <div className="flex items-center justify-between">
               <div>
