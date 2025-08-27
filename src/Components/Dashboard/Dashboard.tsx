@@ -2,8 +2,6 @@ import {
   Users,
   Calendar,
   Clock,
-  ArrowUpRight,
-  ArrowDownRight,
   Building,
   Smartphone,
   FileText,
@@ -125,8 +123,6 @@ const Dashboard = () => {
     {
       title: "Total Users",
       value: users.length,
-      change: "+12.5%",
-      changeType: "increase",
       icon: Users,
       color: "bg-status-success",
       bgColor: "bg-status-success/20",
@@ -136,8 +132,6 @@ const Dashboard = () => {
     {
       title: "Total Organization",
       value: organizations.length,
-      change: "+8.2%",
-      changeType: "increase",
       icon: Building,
       color: "bg-status-info",
       bgColor: "bg-status-info/20",
@@ -147,8 +141,6 @@ const Dashboard = () => {
     {
       title: "Total Plants",
       value: projects.length,
-      change: "+8.2%",
-      changeType: "increase",
       icon: FileText,
       color: "bg-status-success",
       bgColor: "bg-status-success/20",
@@ -158,8 +150,6 @@ const Dashboard = () => {
     {
       title: "Total Devices",
       value: devices.length,
-      change: "-3.1%",
-      changeType: "decrease",
       icon: Smartphone,
       color: "bg-status-warning",
       bgColor: "bg-status-warning/20",
@@ -222,21 +212,6 @@ const Dashboard = () => {
                   <div className={`p-3 rounded-full ${stat.bgColor}`}>
                     <stat.icon className={`w-6 h-6 text-text-primary`} />
                   </div>
-                </div>
-                <div className="flex items-center mt-4">
-                  {stat.changeType === "increase" ? (
-                    <ArrowUpRight className="w-4 h-4 text-status-success mr-1" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4 text-status-danger mr-1" />
-                  )}
-                  <span
-                    className={`text-sm font-medium ${stat.textColor} font-roboto`}
-                  >
-                    {stat.change}
-                  </span>
-                  <span className="text-sm text-text-secondary ml-1 font-roboto">
-                    from last month
-                  </span>
                 </div>
               </div>
             ))}
