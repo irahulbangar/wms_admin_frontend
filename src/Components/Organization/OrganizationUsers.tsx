@@ -19,11 +19,13 @@ import type {
   ClientUsersResult,
 } from "../../../model/client-users.interface";
 import { getAllClients } from "../../../store/clientSlice";
-import { useAppDispatch } from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import AddUpdateUser from "./AddUpdateUser";
 import { Error } from "../../utils/toast";
-import type { OrganizationResult } from "../../../model/organizations.interface";
-import { getOrganizations } from "../../../store/organizationSlice";
+import {
+  getOrganizations,
+  setOrganizations,
+} from "../../../store/organizationSlice";
 
 const OrganizationUsers = () => {
   const navigate = useNavigate();
@@ -35,9 +37,7 @@ const OrganizationUsers = () => {
   const [clientId, setClientId] = useState(0);
   const [modalType, setModalType] = useState<"add" | "update">("add");
   const [organizationId, setOrganizationId] = useState(0);
-  const [organizationData, setOrganizationData] = useState<
-    OrganizationResult[]
-  >([]);
+  const { organizations } = useAppSelector((state) => state.organization);
   const [isLoading, setIsLoading] = useState(false);
 
   // Breadcrumb data
@@ -59,12 +59,13 @@ const OrganizationUsers = () => {
     navigate(path);
   };
 
-  const getOrganizationData = useCallback(() => {
+  const getOrganizationData = useCallback(async () => {
+    if (isLoading) return;
     setIsLoading(true);
-    dispatch(getOrganizations())
+    await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
-        setOrganizationData(res.data);
+        dispatch(setOrganizations(res.data));
       })
       .catch((err) => {
         Error(err);
@@ -109,8 +110,10 @@ const OrganizationUsers = () => {
 
   useEffect(() => {
     getClients();
-    getOrganizationData();
-  }, [getClients, getOrganizationData]);
+    if (organizations.length === 0) {
+      getOrganizationData();
+    }
+  }, [getClients, getOrganizationData, organizations.length]);
 
   const handleEditUser = (clientId: number, organizationId: number) => {
     setModalType("update");
@@ -271,7 +274,7 @@ const OrganizationUsers = () => {
                     </td>
                     <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {
-                        organizationData.find(
+                        organizations.find(
                           (org) =>
                             org.organization_id.toString() ===
                             user.organization_id.toString()
@@ -344,7 +347,7 @@ const OrganizationUsers = () => {
           type={modalType}
           onClose={handleCloseAddModal}
           organizationId={organizationId}
-          organizationData={organizationData}
+          organizationData={organizations}
         />
       )}
     </div>

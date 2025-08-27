@@ -14,7 +14,7 @@ interface LoginResponse {
   success: boolean;
   token: string;
   admin: Admin;
-  message?: string;
+  message: string;
 }
 
 interface AdminState {

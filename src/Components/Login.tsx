@@ -12,6 +12,8 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   const navigate = useNavigate();
@@ -35,20 +37,40 @@ const Login: React.FC = () => {
     localStorage.clear();
 
     try {
-      const result = await dispatch(loginAdmin({ email, password })).unwrap();
-
-      if (result.success) {
-        navigate("/home");
-        Success("You have been logged in successfully.");
-      } else {
-        Error("Invalid email or password.");
-      }
+      await dispatch(loginAdmin({ email, password }))
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            navigate("/home");
+            Success(res.message);
+          } else {
+            Error(res.message);
+          }
+        });
     } catch (error) {
       console.error("Login error:", error);
       Error(
         typeof error === "string" ? error : "An error occurred during login."
       );
     }
+  };
+
+  const getEmailBorderClass = () => {
+    if (isEmailFocused && !email) {
+      return "border-status-danger focus:border-status-danger focus:ring-status-danger/20";
+    } else if (email) {
+      return "border-status-success focus:border-status-success focus:ring-status-success/20";
+    }
+    return "border-border-primary focus:border-border-primary focus:ring-border-primary/20";
+  };
+
+  const getPasswordBorderClass = () => {
+    if (isPasswordFocused && !password) {
+      return "border-status-danger focus:border-status-danger focus:ring-status-danger/20";
+    } else if (password) {
+      return "border-status-success focus:border-status-success focus:ring-status-success/20";
+    }
+    return "border-border-primary focus:border-border-primary focus:ring-border-primary/20";
   };
 
   return (
@@ -100,8 +122,11 @@ const Login: React.FC = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-success focus:border-status-success/50 transition-colors font-roboto"
+            onFocus={() => setIsEmailFocused(true)}
+            onBlur={() => setIsEmailFocused(false)}
+            className={`w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 transition-colors font-roboto ${getEmailBorderClass()}`}
             placeholder="Enter your email"
+            inputMode="email"
           />
 
           <label
@@ -119,8 +144,11 @@ const Login: React.FC = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 pr-10 border border-border-secondary text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-success focus:border-status-success/50 transition-colors font-roboto"
+              onFocus={() => setIsPasswordFocused(true)}
+              onBlur={() => setIsPasswordFocused(false)}
+              className={`w-full px-3 py-2 pr-10 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 transition-colors font-roboto ${getPasswordBorderClass()}`}
               placeholder="Enter your password"
+              inputMode="text"
             />
             <button
               type="button"

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
-import { useAppDispatch } from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import {
   getAllProjects,
   getProjectsByOrganizationId,
@@ -23,8 +23,10 @@ import {
 import type { ProjectResult } from "../../../model/project.interface";
 import { Error, Success, Warning } from "../../utils/toast";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
-import { getOrganizations } from "../../../store/organizationSlice";
-import type { OrganizationResult } from "../../../model/organizations.interface";
+import {
+  getOrganizations,
+  setOrganizations,
+} from "../../../store/organizationSlice";
 import AddUpdatePlant from "./AddUpdatePlant";
 
 const Plants = () => {
@@ -44,7 +46,7 @@ const Plants = () => {
   );
   const dispatch = useAppDispatch();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
-  const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
+  const { organizations } = useAppSelector((state) => state.organization);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteProject, setDeleteProject] = useState<ProjectResult | null>(
     null
@@ -115,21 +117,29 @@ const Plants = () => {
   );
 
   const getAllOrganizations = useCallback(async () => {
-    try {
-      const res = await dispatch(getOrganizations()).unwrap();
-      if (res.success) {
-        setOrganizations(res.data);
-      }
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.toString() : String(err);
-      Error(errorMessage || "An error occurred");
-    }
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          dispatch(setOrganizations(res.data));
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [dispatch]);
 
   useEffect(() => {
     setProjects([]);
     setIsLoading(false);
-    getAllOrganizations();
+    if (organizations.length === 0) {
+      getAllOrganizations();
+    }
 
     if (organization_id) {
       setSelectedOrganizationId(organization_id);
@@ -143,6 +153,7 @@ const Plants = () => {
     getProjectByOrganizationId,
     getProjects,
     getAllOrganizations,
+    organizations.length,
   ]);
 
   useEffect(() => {

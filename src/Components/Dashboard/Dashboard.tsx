@@ -8,11 +8,34 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import type { OrganizationResult } from "../../../model/organizations.interface";
+import { getOrganizations } from "../../../store/organizationSlice";
+import type { AppDispatch } from "../../../store/store";
+import { Error } from "../../utils/toast";
+import { useDispatch } from "react-redux";
 
 const Dashboard = () => {
+  const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const dispatch = useDispatch<AppDispatch>();
+
+  const fetchOrganizations = async () => {
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setOrganizations(res?.data);
+        } else {
+          Error(res.message || "Failed to fetch organizations");
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      });
+  };
 
   useEffect(() => {
+    fetchOrganizations();
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -33,7 +56,7 @@ const Dashboard = () => {
     },
     {
       title: "Total Organization",
-      value: "1,234",
+      value: organizations.length,
       change: "+8.2%",
       changeType: "increase",
       icon: Building,

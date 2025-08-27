@@ -10,10 +10,11 @@ import {
   Eye,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
-import { useAppDispatch } from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import {
-  getOrganizations,
   deleteOrganization,
+  getOrganizations,
+  setOrganizations,
 } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
 import AddUpdateOrganization from "./AddUpdateOrganization";
@@ -33,22 +34,20 @@ const Organization = () => {
   const [organizationToDelete, setOrganizationToDelete] =
     useState<OrganizationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { organizations } = useAppSelector((state) => state.organization);
   const dispatch = useAppDispatch();
-  const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
   const [filteredOrganizations, setFilteredOrganizations] = useState<
     OrganizationResult[]
   >([]);
 
   const refreshOrganizations = () => {
     if (isLoading) return;
-
     setIsLoading(true);
     dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setOrganizations(res.data);
+          dispatch(setOrganizations(res.data));
         }
       })
       .catch((err) => {
@@ -85,7 +84,9 @@ const Organization = () => {
   }, [organizations]);
 
   useEffect(() => {
-    refreshOrganizations();
+    if (organizations.length === 0) {
+      refreshOrganizations();
+    }
   }, []);
 
   const handleEditOrganization = (id: string) => {
@@ -97,24 +98,25 @@ const Organization = () => {
   const handleConfirmDelete = async () => {
     if (!organizationToDelete || isLoading) return;
     setIsLoading(true);
-    try {
-      const result = await dispatch(
-        deleteOrganization(organizationToDelete.organization_id)
-      ).unwrap();
-      if (result.success) {
-        Success("Organization deleted successfully");
-        refreshOrganizations();
-        setShowDeletePopup(false);
-        setOrganizationToDelete(null);
-      } else {
-        Error(result.message || "Failed to delete organization");
-      }
-    } catch (error) {
-      console.log(error);
-      Error("Failed to delete organization");
-    } finally {
-      setIsLoading(false);
-    }
+
+    await dispatch(deleteOrganization(organizationToDelete.organization_id))
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          Success(res.message);
+          refreshOrganizations();
+          setShowDeletePopup(false);
+          setOrganizationToDelete(null);
+        } else {
+          Error(res.message || "Failed to delete organization");
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleDeletePopupClose = () => {
@@ -138,24 +140,22 @@ const Organization = () => {
   }) => {
     if (updatedData && updatedData.success && updatedData.data) {
       const data = updatedData.data;
-      setOrganizations((prevOrganizations) =>
-        prevOrganizations.map((org) =>
-          org.organization_id === organizationId
-            ? {
-                ...org,
-                org_name: (data.org_name as string) || org.org_name,
-                address: (data.address as string) || org.address,
-                contact_person:
-                  (data.contact_person as string) || org.contact_person,
-                contact_number:
-                  (data.contact_number as string) || org.contact_number,
-                email: (data.email as string) || org.email,
-                note: (data.note as string) || org.note,
-                status: (data.status as string) || org.status,
-                updated_at: new Date().toISOString(),
-              }
-            : org
-        )
+      organizations.map((org) =>
+        org.organization_id === organizationId
+          ? {
+              ...org,
+              org_name: (data.org_name as string) || org.org_name,
+              address: (data.address as string) || org.address,
+              contact_person:
+                (data.contact_person as string) || org.contact_person,
+              contact_number:
+                (data.contact_number as string) || org.contact_number,
+              email: (data.email as string) || org.email,
+              note: (data.note as string) || org.note,
+              status: (data.status as string) || org.status,
+              updated_at: new Date().toISOString(),
+            }
+          : org
       );
     }
     setShowAddModal(false);

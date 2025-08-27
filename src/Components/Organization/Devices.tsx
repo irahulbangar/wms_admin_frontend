@@ -19,9 +19,11 @@ import {
   getDeviceByOrganizationIdAndProjectId,
   getDevicesByDeviceType,
 } from "../../../store/deviceSlice";
-import { useAppDispatch } from "../../../store/store";
-import { getOrganizations } from "../../../store/organizationSlice";
-import type { OrganizationResult } from "../../../model/organizations.interface";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
+import {
+  getOrganizations,
+  setOrganizations,
+} from "../../../store/organizationSlice";
 import type { ProjectResult } from "../../../model/project.interface";
 import { getAllProjects } from "../../../store/projectSlice";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
@@ -52,8 +54,8 @@ const Devices = () => {
     organization_id || "all"
   );
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
-  const [organization, setOrganization] = useState<OrganizationResult[]>([]);
-  const [project, setProject] = useState<ProjectResult[]>([]);
+  const { organizations } = useAppSelector((state) => state.organization);
+  const [projects, setProjects] = useState<ProjectResult[]>([]);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,12 +92,13 @@ const Devices = () => {
   }, [dispatch]);
 
   const getOrganization = useCallback(async () => {
+    if (isLoading) return;
     setIsLoading(true);
     await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setOrganization(res.data);
+          dispatch(setOrganizations(res.data));
         }
       })
       .catch((err) => {
@@ -113,7 +116,7 @@ const Devices = () => {
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setProject(res.data);
+          setProjects(res.data);
         }
       })
       .catch((err) => {
@@ -161,7 +164,10 @@ const Devices = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    getOrganization();
+    if (organizations.length === 0) {
+      getOrganization();
+    }
+
     getProject();
     getDeviceFamily();
     getDeviceType();
@@ -213,7 +219,6 @@ const Devices = () => {
     organization_id,
     project_id,
     dispatch,
-    getOrganization,
     getProject,
     getDeviceFamily,
     getDeviceType,
@@ -242,7 +247,7 @@ const Devices = () => {
     }
 
     if (selectedOrganization !== "all") {
-      const orgProjectIds = project
+      const orgProjectIds = projects
         .filter((p) => p.organization_id === parseInt(selectedOrganization))
         .map((p) => p.project_id);
 
@@ -263,15 +268,15 @@ const Devices = () => {
     searchTerm,
     selectedOrganization,
     selectedProject,
-    project,
+    projects,
     deviceFamily,
   ]);
 
-  const filteredOrganizations = organization.filter((org) =>
+  const filteredOrganizations = organizations.filter((org) =>
     org.org_name.toLowerCase().includes(organizationSearchTerm.toLowerCase())
   );
 
-  const filteredProjects = project.filter((proj) =>
+  const filteredProjects = projects.filter((proj) =>
     proj.project_name.toLowerCase().includes(projectSearchTerm.toLowerCase())
   );
 
@@ -446,7 +451,7 @@ const Devices = () => {
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded">
-              {project.find(
+              {projects.find(
                 (proj) => proj.project_id === parseInt(selectedProject)
               )?.project_name || "Project"}
             </span>
@@ -464,7 +469,7 @@ const Devices = () => {
                 value={
                   selectedOrganization === "all"
                     ? "All Organization"
-                    : organization.find(
+                    : organizations.find(
                         (org) =>
                           org.organization_id.toString() ===
                           selectedOrganization
@@ -542,7 +547,7 @@ const Devices = () => {
                 value={
                   selectedProject === "all"
                     ? "All Project"
-                    : project.find(
+                    : projects.find(
                         (proj) => proj.project_id.toString() === selectedProject
                       )?.project_name || "Select project..."
                 }
@@ -739,7 +744,7 @@ const Devices = () => {
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {
-                                  project?.find(
+                                  projects?.find(
                                     (p) =>
                                       p?.project_id?.toString() ===
                                       device?.project_id?.toString()
@@ -814,7 +819,7 @@ const Devices = () => {
                     : selectedOrganization === "all"
                     ? "No devices found"
                     : `No devices found for ${
-                        organization.find(
+                        organizations.find(
                           (org) => org.organization_id === selectedOrganization
                         )?.org_name || `Organization ${selectedOrganization}`
                       }`
@@ -825,7 +830,7 @@ const Devices = () => {
                     : selectedOrganization === "all"
                     ? "Add your first device to get started"
                     : `Add your first project for ${
-                        organization.find(
+                        organizations.find(
                           (org) => org.organization_id === selectedOrganization
                         )?.org_name || `Organization ${selectedOrganization}`
                       } to get started`

@@ -1,18 +1,42 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { GetOrganizationsResponse } from "../model/organizations.interface";
+import type {
+  GetOrganizationsResponse,
+  OrganizationResult,
+} from "../model/organizations.interface";
+
+interface OrganizationState {
+  organizations: OrganizationResult[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: OrganizationState = {
+  organizations: [],
+  loading: false,
+  error: null,
+};
 
 export const organizationSlice = createSlice({
   name: "organization",
-  initialState: {
-    organizations: [],
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     setOrganizations: (state, action) => {
       state.organizations = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getOrganizations.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getOrganizations.fulfilled, (state, action) => {
+      state.loading = false;
+      state.organizations = action.payload.data;
+    });
+    builder.addCase(getOrganizations.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "Failed to fetch organizations";
+    });
   },
 });
 
