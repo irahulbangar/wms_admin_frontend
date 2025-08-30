@@ -394,21 +394,66 @@ const Devices = () => {
     }
 
     setIsLoading(true);
-    dispatch(getAllDevices())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          dispatch(setDevices(res?.data));
-          setFilteredDevices(res?.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error("Failed to update device");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+
+    if (organization_id && project_id) {
+      dispatch(
+        getDeviceByOrganizationIdAndProjectId({
+          projectId: parseInt(project_id),
+          organizationId: parseInt(organization_id),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDevices(res?.data));
+            setFilteredDevices(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to update device");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else if (selectedOrganization !== "all" && selectedProject !== "all") {
+      dispatch(
+        getDeviceByOrganizationIdAndProjectId({
+          projectId: parseInt(selectedProject),
+          organizationId: parseInt(selectedOrganization),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDevices(res?.data));
+            setFilteredDevices(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to update device");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      dispatch(getAllDevices())
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDevices(res?.data));
+            setFilteredDevices(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to update device");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
   };
 
   const deviceStatus = (status: string) => {
