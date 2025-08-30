@@ -85,7 +85,7 @@ export const getAllDevices = createAsyncThunk(
   async (_, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get<DeviceResponse>("/devices/all-devices", {
+      const response = await api().get<DeviceResponse>("/device/all-devices", {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
@@ -175,7 +175,7 @@ export const getDeviceByFamilyWise = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceFamilyResponse>(
-        `/devices/device-families`,
+        `/device/all-device-family`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,

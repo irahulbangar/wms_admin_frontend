@@ -107,9 +107,7 @@ export const loginAdmin = createAsyncThunk(
       if (response.data.success) {
         sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
         sessionStorage.setItem("accessToken", response.data.token);
-        const decodedToken = jwtDecode<{ admin: Admin }>(
-          response.data.token
-        ).admin;
+        const decodedToken = jwtDecode(response.data.token);
         sessionStorage.setItem("admin", JSON.stringify(decodedToken));
         thunkAPI.dispatch(setAdmin(decodedToken));
         thunkAPI.dispatch(setToken(response.data.token));

@@ -45,7 +45,7 @@ export const getOrganizations = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await api().get<GetOrganizationsResponse>(
-        "/organization/all-organizations",
+        "/organization/admin/all-organizations",
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,

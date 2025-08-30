@@ -52,7 +52,7 @@ export const getAllProjects = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await api().get<GetProjectsResponse>(
-        "/project/all-projects",
+        "/project/admin/all-projects",
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,

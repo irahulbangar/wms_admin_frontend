@@ -236,15 +236,15 @@ const Devices = () => {
       filtered = filtered.filter(
         (device: DeviceResult) =>
           device.device_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (device.imeino &&
-            device.imeino.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (device.hwid &&
+            device.hwid.toLowerCase().includes(searchTerm.toLowerCase())) ||
           device.device_status
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          device.devicetypeid.toString().includes(searchTerm) ||
-          device.devicefid.toString().includes(searchTerm) ||
+          device.device_type_id.toString().includes(searchTerm) ||
+          device.device_family_id.toString().includes(searchTerm) ||
           deviceFamily
-            .find((df) => df.devicefamilyid === device.devicefid)
+            .find((df) => df.devicefamilyid === device.device_family_id)
             ?.name.toLowerCase()
             .includes(searchTerm.toLowerCase())
       );
@@ -763,14 +763,15 @@ const Devices = () => {
                                 {
                                   deviceFamily?.find(
                                     (df) =>
-                                      df?.devicefamilyid === device?.devicefid
+                                      df?.devicefamilyid ===
+                                      device?.device_family_id
                                   )?.name
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {
                                   deviceType?.find(
-                                    (dt) => dt?.id === device?.devicetypeid
+                                    (dt) => dt?.id === device?.device_type_id
                                   )?.topics
                                 }
                               </td>
@@ -784,7 +785,7 @@ const Devices = () => {
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                                {device?.imeino || "N/A"}
+                                {device?.hwid || "N/A"}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {fromatDateWithTime(device?.created_at)}
