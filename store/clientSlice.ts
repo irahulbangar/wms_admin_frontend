@@ -110,7 +110,7 @@ export const getClientById = createAsyncThunk(
   "client/getClientById",
   async (id: number, thunkAPI) => {
     try {
-      const response = await api().get(`/clients/admin/${id}`, {
+      const response = await api().get(`/clients/admin/client/${id}`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
