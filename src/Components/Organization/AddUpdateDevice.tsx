@@ -13,6 +13,7 @@ import {
 import { Error, Success } from "../../utils/toast";
 import type { DepartmentResult } from "../../../model/department.interface";
 import AddUpdateDepartment from "./AddUpdateDepartment";
+import { getDepartments } from "../../../store/departmentSlice";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -193,6 +194,23 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       resetForm();
     }
   }, [deviceId, type]);
+
+  const refreshDepartmentData = async () => {
+    await dispatch(getDepartments())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setShowAddDepartmentPopup(false);
+          onUpdateSuccess?.({
+            success: true,
+            data: { refreshDepartments: true },
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
@@ -405,11 +423,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           projectId={project_id || 0}
           departmentId={departmentId}
           onUpdateSuccess={() => {
-            setShowAddDepartmentPopup(false);
-            onUpdateSuccess?.({
-              success: true,
-              data: { department_id: departmentId },
-            });
+            refreshDepartmentData();
           }}
         />
       )}

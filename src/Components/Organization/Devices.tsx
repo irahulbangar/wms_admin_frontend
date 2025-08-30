@@ -389,8 +389,16 @@ const Devices = () => {
     setDepartmentId(departmentId);
   };
 
-  const handleDeviceUpdate = () => {
+  const handleDeviceUpdate = (result?: {
+    data?: { refreshDepartments?: boolean };
+  }) => {
     if (isLoading) return;
+
+    if (result?.data?.refreshDepartments) {
+      getDepartment();
+      return;
+    }
+
     setIsLoading(true);
     dispatch(getAllDevices())
       .unwrap()
