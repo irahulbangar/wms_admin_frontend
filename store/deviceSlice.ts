@@ -63,7 +63,7 @@ export const createDevice = createAsyncThunk(
   async (device: CreateDevicePayload, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().post("/devices/create-device", device, {
+      const response = await api().post("/device/admin/create-device", device, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
@@ -83,11 +83,14 @@ export const getAllDevices = createAsyncThunk(
   async (_, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get<DeviceResponse>("/device/all-devices", {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await api().get<DeviceResponse>(
+        "/device/admin/all-devices",
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
@@ -103,7 +106,7 @@ export const getDeviceById = createAsyncThunk(
   async (id: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get(`/devices/${id}`, {
+      const response = await api().get(`/device/admin/device/${id}`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
@@ -124,7 +127,7 @@ export const updateDevice = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().put(
-        `/devices/update-device/${device_id}`,
+        `/device/admin/update-device/${device_id}`,
         device,
         {
           headers: {
@@ -148,7 +151,7 @@ export const getDeviceByProjectId = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceResponse>(
-        `/devices/device-by-projectId/${projectId}`,
+        `/device/admin/device-by-projectId/${projectId}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -181,7 +184,7 @@ export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceResponse>(
-        `/devices/projectId-and-organizationId/${projectId}/${organizationId}`,
+        `/device/admin/project-organization/${projectId}/${organizationId}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,

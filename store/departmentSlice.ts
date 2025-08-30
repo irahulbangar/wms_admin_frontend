@@ -29,7 +29,7 @@ export const createDepartment = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().post(
-        "/departments/create-department",
+        "/department/admin/create-department",
         department,
         {
           headers: {
@@ -51,7 +51,7 @@ export const getDepartments = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DepartmentResponse>(
-        "/departments/all-departments",
+        "/department/admin/all-departments",
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -75,7 +75,7 @@ export const updateDepartment = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().put(
-        `/departments/update-department/${department.department_id}`,
+        `/department/admin/update-department/${department.department_id}`,
         department,
         {
           headers: {

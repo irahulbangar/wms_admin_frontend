@@ -458,9 +458,9 @@ const Devices = () => {
         {selectedProject !== "all" && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded">
+            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
               {projects.find(
-                (proj) => proj.project_id === parseInt(selectedProject)
+                (proj) => proj.project_id.toString() === selectedProject
               )?.project_name || "Project"}
             </span>
           </>
