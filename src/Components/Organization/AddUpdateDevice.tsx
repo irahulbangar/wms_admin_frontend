@@ -48,7 +48,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_family_id: 0,
     device_type_id: 0,
     device_name: "",
-    device_status: "Online",
+    device_status: "active",
     hwid: "",
     department_id: departmentId,
   });
@@ -60,7 +60,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       device_family_id: 0,
       device_type_id: 0,
       device_name: "",
-      device_status: "Online",
+      device_status: "active",
       hwid: "",
       department_id: departmentId,
     });
@@ -181,7 +181,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_family_id: 0,
         device_type_id: 0,
         device_name: "",
-        device_status: "Online",
+        device_status: "active",
         hwid: "",
         department_id: departmentId,
       });
@@ -306,8 +306,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
               >
-                <option value="Online">Active</option>
-                <option value="Offline">Inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </select>
             </div>
 

@@ -39,9 +39,9 @@ import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 
 const Devices = () => {
   const navigate = useNavigate();
-  const { organization_id, project_id } = useParams<{
-    organization_id: string;
+  const { project_id, organization_id } = useParams<{
     project_id: string;
+    organization_id: string;
   }>();
 
   const [filteredDevices, setFilteredDevices] = useState<DeviceResult[]>([]);
@@ -613,13 +613,13 @@ const Devices = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Select project..."
+                placeholder="Select plant..."
                 value={
                   selectedProject === "all"
-                    ? "All Project"
+                    ? "All Plant"
                     : projects.find(
                         (proj) => proj.project_id.toString() === selectedProject
-                      )?.project_name || "Select project..."
+                      )?.project_name || "Select plant..."
                 }
                 readOnly
                 className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
@@ -639,7 +639,7 @@ const Devices = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
                     <input
                       type="text"
-                      placeholder="Search projects..."
+                      placeholder="Search plants..."
                       value={projectSearchTerm}
                       onChange={(e) => setProjectSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -656,7 +656,7 @@ const Devices = () => {
                     setProjectSearchTerm("");
                   }}
                 >
-                  All Project
+                  All Plant
                 </div>
 
                 {filteredProjects.length > 0 ? (
@@ -675,7 +675,7 @@ const Devices = () => {
                   ))
                 ) : (
                   <div className="px-3 py-2 text-text-secondary text-sm">
-                    No projects found
+                    No plants found
                   </div>
                 )}
               </div>
