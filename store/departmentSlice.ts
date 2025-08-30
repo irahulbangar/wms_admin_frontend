@@ -90,4 +90,45 @@ export const updateDepartment = createAsyncThunk(
   }
 );
 
+// Get department by id
+export const getDepartmentById = createAsyncThunk(
+  "department/getDepartmentById",
+  async (department_id: number, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().get(`/department/admin/${department_id}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+      });
+      return response.data;
+    } catch (error: unknown) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// GET department by project id
+export const getDepartmentByProjectId = createAsyncThunk(
+  "department/getDepartmentByProjectId",
+  async (project_id: number, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().get(
+        `/department/admin/department-project/${project_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const { setDepartments } = departmentSlice.actions;
+
+export default departmentSlice.reducer;

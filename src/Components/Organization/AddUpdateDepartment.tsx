@@ -1,8 +1,9 @@
 import { X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../store/store";
 import {
   createDepartment,
+  getDepartmentById,
   updateDepartment,
 } from "../../../store/departmentSlice";
 import { Error, Success } from "../../utils/toast";
@@ -25,6 +26,26 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
   const dispatch = useAppDispatch();
   const [newDepartmentName, setNewDepartmentName] = useState("");
   const [errors, setErrors] = useState({ department_name: "" });
+  const [departmentData, setDepartmentData] = useState({
+    department_name: "",
+  });
+
+  const getDepartmentData = async () => {
+    await dispatch(getDepartmentById(departmentId || 0))
+      .unwrap()
+      .then((res) => {
+        setDepartmentData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    if (type === "update" && departmentId) {
+      getDepartmentData();
+    }
+  }, [type, departmentId]);
 
   const handleAddDepartment = async () => {
     if (!newDepartmentName.trim()) {
@@ -107,7 +128,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               type="text"
               name="department_name"
               placeholder="Enter department name"
-              value={newDepartmentName}
+              value={newDepartmentName || departmentData?.department_name}
               onChange={(e) => setNewDepartmentName(e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary ${
                 errors.department_name

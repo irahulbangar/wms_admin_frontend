@@ -168,11 +168,10 @@ const Devices = () => {
     if (organizations.length === 0 || projects.length === 0) {
       getOrganization();
       fetchProjects();
-    } else {
-      getDeviceFamily();
-      getDeviceType();
-      getDepartment();
     }
+    getDeviceFamily();
+    getDeviceType();
+    getDepartment();
 
     if (organization_id && project_id) {
       setIsLoading(true);
@@ -773,7 +772,7 @@ const Devices = () => {
                 (dept) => dept.department_id.toString() === deptId
               );
               const departmentName =
-                department?.department_name || `Department ${deptId}`;
+                department?.department_name.trim() || `Department ${deptId}`;
 
               return (
                 <div key={deptId} className="mb-2">
