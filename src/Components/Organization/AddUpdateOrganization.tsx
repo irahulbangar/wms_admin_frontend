@@ -137,11 +137,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         .then((res: { success: boolean; data?: Record<string, unknown> }) => {
           if (res.success) {
             Success("Organization updated successfully");
-            if (onUpdateSuccess) {
-              onUpdateSuccess(res);
-            } else {
-              setShowAddModal(false);
-            }
+            setShowAddModal(false);
           }
         })
         .catch((err: string) => {

@@ -99,7 +99,9 @@ const Organization = () => {
     if (!organizationToDelete || isLoading) return;
     setIsLoading(true);
 
-    await dispatch(deleteOrganization(organizationToDelete.organization_id))
+    await dispatch(
+      deleteOrganization(organizationToDelete.organization_id.toString())
+    )
       .unwrap()
       .then((res) => {
         if (res.success) {
@@ -141,7 +143,7 @@ const Organization = () => {
     if (updatedData && updatedData.success && updatedData.data) {
       const data = updatedData.data;
       organizations.map((org) =>
-        org.organization_id === organizationId
+        org.organization_id === parseInt(organizationId)
           ? {
               ...org,
               organization_name:
@@ -300,7 +302,9 @@ const Organization = () => {
                       <div className="flex items-center gap-3 justify-center">
                         <Eye
                           onClick={() =>
-                            handleViewPlants(organization?.organization_id)
+                            handleViewPlants(
+                              organization?.organization_id.toString()
+                            )
                           }
                           className="w-5 h-5 text-teal-500 cursor-pointer"
                         />
@@ -308,7 +312,7 @@ const Organization = () => {
                         <SquarePen
                           onClick={() =>
                             handleEditOrganization(
-                              organization?.organization_id
+                              organization?.organization_id.toString()
                             )
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"

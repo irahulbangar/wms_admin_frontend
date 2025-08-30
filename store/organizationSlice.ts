@@ -77,11 +77,11 @@ interface UpdateOrganizationPayload extends AddOrganizationPayload {
 }
 
 export const addOrganization = createAsyncThunk(
-  "organization/addOrganization",
+  "organization/admin/addOrganization",
   async (organization: AddOrganizationPayload, thunkAPI) => {
     try {
       const response = await api().post(
-        "/organization/create-organization",
+        "/organization/admin/create-organization",
         organization,
         {
           headers: {
@@ -99,12 +99,12 @@ export const addOrganization = createAsyncThunk(
 );
 
 export const updateOrganization = createAsyncThunk(
-  "organization/updateOrganization",
+  "organization/admin/updateOrganization",
   async (organization: UpdateOrganizationPayload, thunkAPI) => {
     try {
       const { id, ...organizationData } = organization;
       const response = await api().put(
-        `/organization/update-organization/${id}`,
+        `/organization/admin/update-organization/${id}`,
         organizationData,
         {
           headers: {
@@ -127,7 +127,7 @@ export const getOrganizationById = createAsyncThunk(
   "organization/getOrganizationById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get(`/organization/${id}`, {
+      const response = await api().get(`/organization/admin/${id}`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
@@ -146,7 +146,7 @@ export const deleteOrganization = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       const response = await api().delete(
-        `/organization/delete-organization/${id}`,
+        `/organization/admin/delete-organization/${id}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
