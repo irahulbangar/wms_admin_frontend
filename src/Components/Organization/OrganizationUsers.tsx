@@ -103,7 +103,9 @@ const OrganizationUsers = () => {
         (user) =>
           user.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.client_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.role.toLowerCase().includes(searchTerm.toLowerCase())
+          user.organization_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
       setFilteredUsers(filtered);
     }
@@ -232,10 +234,7 @@ const OrganizationUsers = () => {
                   Phone
                 </th>
                 <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Organization ID
+                  Organization
                 </th>
                 <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Status
@@ -258,22 +257,19 @@ const OrganizationUsers = () => {
                     key={user.client_id}
                     className="bg-primary border-b border-border-primary hover:bg-secondary"
                   >
-                    <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base">
+                    <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base capitalize">
                       {index + 1}
                     </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
                       {user.client_name}
                     </td>
                     <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                       {user.client_email}
                     </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
                       {user.client_phone}
                     </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
-                      {user.role === "org_admin" ? "Admin" : "User"}
-                    </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
                       {
                         organizations.find(
                           (org) =>
@@ -282,7 +278,7 @@ const OrganizationUsers = () => {
                         )?.organization_name
                       }
                     </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-primary text-base">
+                    <td className="px-6 py-4 font-roboto text-center text-text-primary text-base capitalize">
                       <span
                         className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
                           user?.status

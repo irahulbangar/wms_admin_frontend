@@ -51,7 +51,6 @@ export interface CreateClientPayload {
   client_email: string;
   client_phone: string;
   client_password: string;
-  role: string;
   status: string;
   organization_id: number;
 }

@@ -33,9 +33,8 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
     client_email: "",
     client_phone: "",
     client_password: "",
-    role: "",
-    status: "",
-    organization_id: organizationId,
+    status: "active",
+    organization_id: 0,
   } as CreateClientPayload);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -82,11 +81,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
       newErrors.client_password = "Password must be at least 6 characters";
     }
 
-    if (!formData.role.trim()) {
-      newErrors.role = "Client Role is required";
-    }
-
-    if (!formData.status.trim()) {
+    if (!formData.status) {
       newErrors.status = "Client Status is required";
     }
 
@@ -109,8 +104,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           client_email: formData.client_email,
           client_phone: formData.client_phone,
           client_password: formData.client_password,
-          role: formData.role,
-          status: formData.status,
+          status: formData.status || "active",
           organization_id: (formData.organization_id as number) || 1,
         };
 
@@ -122,6 +116,14 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               Success(res.message);
               onClose();
             }
+            setFormData({
+              client_name: "",
+              client_email: "",
+              client_phone: "",
+              client_password: "",
+              status: "active",
+              organization_id: 0,
+            } as CreateClientPayload);
           })
           .catch((err) => {
             Error(err);
@@ -136,8 +138,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           client_email: formData.client_email,
           client_phone: formData.client_phone,
           client_password: formData.client_password,
-          role: formData.role,
-          status: formData.status,
+          status: formData.status || "active",
           organization_id: formData.organization_id as number,
         };
 
@@ -182,8 +183,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 client_email: clientData.client_email || "",
                 client_phone: clientData.client_phone || "",
                 client_password: "",
-                role: clientData.role || "",
-                status: clientData.status || "",
+                status: clientData.status || "active",
                 organization_id: clientData.organization_id || organizationId,
               } as CreateClientPayload);
             }
@@ -333,11 +333,12 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               value={formData.organization_id}
               disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                errors.role ? "border-status-danger" : "border-border-primary"
+                errors.organization_id
+                  ? "border-status-danger"
+                  : "border-border-primary"
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               onChange={handleInputChange}
             >
-              <option value="">Select Organization</option>
               {organizationData.map((organization) => (
                 <option
                   key={organization.organization_id}
@@ -347,29 +348,10 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 </option>
               ))}
             </select>
-            {errors.role && (
-              <span className="text-status-danger text-sm">{errors.role}</span>
-            )}
-          </div>
-          <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-              Role
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              disabled={isFetching}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                errors.role ? "border-status-danger" : "border-border-primary"
-              } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
-              onChange={handleInputChange}
-            >
-              <option value="">Select Role</option>
-              <option value="org_admin">Admin</option>
-              <option value="org_user">User</option>
-            </select>
-            {errors.role && (
-              <span className="text-status-danger text-sm">{errors.role}</span>
+            {errors.organization_id && (
+              <span className="text-status-danger text-sm">
+                {errors.organization_id}
+              </span>
             )}
           </div>
 
@@ -386,7 +368,6 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               onChange={handleInputChange}
             >
-              <option value="">Select Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
