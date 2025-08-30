@@ -5,9 +5,10 @@ export interface DeviceTypeResponse {
 }
 
 export interface DeviceTypeResult {
-  id: number;
-  devicefid: number;
-  topics: string;
+  device_type_id: number;
+  device_type_name: string;
+  topic: string;
   created_at: string;
   updated_at: string;
+  device_family_id: number;
 }

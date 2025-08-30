@@ -17,7 +17,6 @@ import type { DeviceResult } from "../../../model/devices.interface";
 import {
   getAllDevices,
   getDeviceByOrganizationIdAndProjectId,
-  getDevicesByDeviceType,
   setDevices,
 } from "../../../store/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -36,6 +35,7 @@ import type { DepartmentResult } from "../../../model/department.interface";
 import { getDepartments } from "../../../store/departmentSlice";
 import AddUpdateDepartment from "./AddUpdateDepartment";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
+import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -148,7 +148,7 @@ const Devices = () => {
   }, [dispatch]);
 
   const getDeviceType = useCallback(async () => {
-    await dispatch(getDevicesByDeviceType())
+    await dispatch(getDeviceTypes())
       .unwrap()
       .then((res) => {
         if (res.success) {
@@ -771,8 +771,10 @@ const Devices = () => {
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {
                                   deviceType?.find(
-                                    (dt) => dt?.id === device?.device_type_id
-                                  )?.topics
+                                    (dt) =>
+                                      dt?.device_type_id ===
+                                      device?.device_type_id
+                                  )?.topic
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">

@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { DeviceResponse, DeviceResult } from "../model/devices.interface";
-import type { DeviceTypeResponse } from "../model/device-type.interface";
 
 interface DeviceState {
   devices: DeviceResult[];
@@ -167,32 +166,7 @@ export const getDeviceByProjectId = createAsyncThunk(
   }
 );
 
-// Get devices by device type
-export const getDevicesByDeviceType = createAsyncThunk(
-  "device/getDevicesByDeviceType",
-  async (_, thunkAPI) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().get<DeviceTypeResponse>(
-        `/devices/device-types`,
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to get devices by device type";
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-interface getProjectByOrganizationId {
+interface GetProjectByOrganizationId {
   projectId: number;
   organizationId: number;
 }
@@ -201,7 +175,7 @@ interface getProjectByOrganizationId {
 export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
   "device/getDeviceByOrganizationIdAndProjectId",
   async (
-    { projectId, organizationId }: getProjectByOrganizationId,
+    { projectId, organizationId }: GetProjectByOrganizationId,
     thunkAPI
   ) => {
     const { rejectWithValue } = thunkAPI;
