@@ -265,28 +265,28 @@ const Organization = () => {
                     key={organization?.organization_id}
                     className="bg-primary border-b border-border-primary hover:bg-secondary"
                   >
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {index + 1}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {organization?.organization_name}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {organization?.address}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {organization?.contact_person}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {organization?.contact_number}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.email}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {organization?.note}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <span
                         className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
                           organization?.status
@@ -295,10 +295,10 @@ const Organization = () => {
                         {organization?.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {fromatDateWithTime(organization?.created_at)}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <div className="flex items-center gap-3 justify-center">
                         <Eye
                           onClick={() =>
@@ -380,6 +380,7 @@ const Organization = () => {
           onUpdateSuccess={
             showAddModalType === "update" ? handleOrganizationUpdate : undefined
           }
+          refreshOrganizations={refreshOrganizations}
         />
       )}
     </div>

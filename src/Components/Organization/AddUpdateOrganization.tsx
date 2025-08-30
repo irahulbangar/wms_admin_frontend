@@ -16,6 +16,7 @@ interface AddUpdateOrganizationProps {
     success: boolean;
     data?: Record<string, unknown>;
   }) => void;
+  refreshOrganizations?: () => void;
 }
 
 const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
@@ -23,6 +24,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   type,
   organizationId,
   onUpdateSuccess,
+  refreshOrganizations,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -121,6 +123,10 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           if (res.success) {
             Success("Organization added successfully");
             setShowAddModal(false);
+            // Refresh organizations list after successful creation
+            if (refreshOrganizations) {
+              refreshOrganizations();
+            }
           }
         })
         .catch((err: string) => {
@@ -138,6 +144,10 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           if (res.success) {
             Success("Organization updated successfully");
             setShowAddModal(false);
+            // Refresh organizations list after successful update
+            if (refreshOrganizations) {
+              refreshOrganizations();
+            }
           }
         })
         .catch((err: string) => {
@@ -217,23 +227,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-            Address
-          </label>
-          <textarea
-            name="address"
-            value={formData.address}
-            onChange={handleInputChange}
-            rows={3}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
-              errors.address ? "border-status-danger" : "border-border-primary"
-            }`}
-            placeholder="Enter organization address"
-          />
-          {errors.address && (
-            <p className="text-status-danger text-sm mt-1">{errors.address}</p>
-          )}
-
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Contact Person
           </label>
           <input
@@ -291,6 +284,23 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           />
           {errors.email && (
             <p className="text-status-danger text-sm mt-1">{errors.email}</p>
+          )}
+
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            Address
+          </label>
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={handleInputChange}
+            rows={3}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
+              errors.address ? "border-status-danger" : "border-border-primary"
+            }`}
+            placeholder="Enter organization address"
+          />
+          {errors.address && (
+            <p className="text-status-danger text-sm mt-1">{errors.address}</p>
           )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
