@@ -48,7 +48,7 @@ export const projectSlice = createSlice({
 
 // Get all projects
 export const getAllProjects = createAsyncThunk(
-  "project/getAllProjects",
+  "project/admin/getAllProjects",
   async (_, thunkAPI) => {
     try {
       const response = await api().get<GetProjectsResponse>(
@@ -70,7 +70,7 @@ export const getAllProjects = createAsyncThunk(
 
 // Get project by id
 export const getProjectById = createAsyncThunk(
-  "project/getProjectById",
+  "project/admin/getProjectById",
   async (id: string, thunkAPI) => {
     try {
       const response = await api().get<GetProjectsResponse>(`/project/${id}`, {
@@ -89,11 +89,11 @@ export const getProjectById = createAsyncThunk(
 
 // Get all projects by organization id
 export const getProjectsByOrganizationId = createAsyncThunk(
-  "project/getProjectsByOrganizationId",
+  "project/admin/getProjectsByOrganizationId",
   async (organization_id: string, thunkAPI) => {
     try {
       const response = await api().get<GetProjectsResponse>(
-        `/project/organization-projects/${organization_id}`,
+        `/project/admin/organization-projects/${organization_id}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -120,11 +120,11 @@ interface ProjectPayload {
 
 // Add project
 export const addProject = createAsyncThunk(
-  "project/addProject",
+  "project/admin/addProject",
   async (project: ProjectPayload, thunkAPI) => {
     try {
       const response = await api().post<ProjectResponse>(
-        `/project/create-project`,
+        `/project/admin/create-project`,
         project,
         {
           headers: {
@@ -143,11 +143,11 @@ export const addProject = createAsyncThunk(
 
 // Update project by id
 export const updateProjectById = createAsyncThunk(
-  "project/updateProjectById",
+  "project/admin/updateProjectById",
   async (project: ProjectPayload & { id: string }, thunkAPI) => {
     try {
       const response = await api().put<ProjectResponse>(
-        `/project/update-project/${project.id}`,
+        `/project/admin/update-project/${project.id}`,
         project,
         {
           headers: {

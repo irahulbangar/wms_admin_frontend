@@ -104,12 +104,19 @@ const Plants = () => {
         const targetOrgId = orgId || organization_id;
         if (!targetOrgId) return;
 
-        const res = await dispatch(
-          getProjectsByOrganizationId(targetOrgId)
-        ).unwrap();
-        if (res.success) {
-          setProjects(res.data);
-        }
+        await dispatch(getProjectsByOrganizationId(targetOrgId))
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              dispatch(setProjects(res.data));
+            }
+          })
+          .catch((err) => {
+            Error(err);
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error ? err.toString() : String(err);
@@ -142,9 +149,7 @@ const Plants = () => {
   useEffect(() => {
     setProjects([]);
     setIsLoading(false);
-    if (organizations.length === 0) {
-      getAllOrganizations();
-    }
+    getAllOrganizations();
 
     if (organization_id) {
       setSelectedOrganizationId(organization_id);
@@ -160,8 +165,6 @@ const Plants = () => {
     getProjectByOrganizationId,
     fetchProjects,
     getAllOrganizations,
-    organizations.length,
-    projects.length,
   ]);
 
   useEffect(() => {
@@ -183,6 +186,14 @@ const Plants = () => {
 
     setFilteredProjects(filtered);
   }, [projects, filterBy, searchTerm]);
+
+  useEffect(() => {
+    if (selectedOrganizationId === "all") {
+      fetchProjects();
+    } else if (selectedOrganizationId !== "all") {
+      getProjectByOrganizationId(selectedOrganizationId);
+    }
+  }, [selectedOrganizationId, fetchProjects, getProjectByOrganizationId]);
 
   const filteredOrganizations = organizations.filter((organization) =>
     organization.organization_name
@@ -240,7 +251,6 @@ const Plants = () => {
     setShowAddModal(false);
     setShowAddModalType("add");
     setProjectId("");
-    fetchProjects();
   };
 
   const handleProjectUpdate = (updatedData: {
@@ -444,7 +454,7 @@ const Plants = () => {
                       {index + 1}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {project?.project_name}
+                      {project?.project_name || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {
@@ -456,13 +466,13 @@ const Plants = () => {
                       }
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {project?.latitude}
+                      {project?.latitude || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {project?.longitude}
+                      {project?.longitude || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {project?.address}
+                      {project?.address || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <span
@@ -470,14 +480,14 @@ const Plants = () => {
                           project?.status
                         )}`}
                       >
-                        {project?.status}
+                        {project?.status || "N/A"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {fromatDateWithTime(project?.created_at)}
+                      {fromatDateWithTime(project?.created_at) || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {fromatDateWithTime(project?.updated_at)}
+                      {fromatDateWithTime(project?.updated_at) || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <div className="flex items-center justify-center gap-2">
@@ -525,7 +535,8 @@ const Plants = () => {
                           : `No projects found for ${
                               organizations.find(
                                 (org) =>
-                                  org.organization_id === selectedOrganizationId
+                                  org.organization_id.toString() ===
+                                  selectedOrganizationId
                               )?.organization_name ||
                               `Organization ${selectedOrganizationId}`
                             }`
@@ -538,7 +549,8 @@ const Plants = () => {
                           : `Add your first project for ${
                               organizations.find(
                                 (org) =>
-                                  org.organization_id === selectedOrganizationId
+                                  org.organization_id.toString() ===
+                                  selectedOrganizationId
                               )?.organization_name ||
                               `Organization ${selectedOrganizationId}`
                             } to get started`
