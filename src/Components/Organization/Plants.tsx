@@ -386,7 +386,7 @@ const Plants = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
-              placeholder="Search projects..."
+              placeholder="Search plants..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="md:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -397,7 +397,7 @@ const Plants = () => {
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
-            Add Project
+            Add Plant
           </button>
         </div>
       </div>
@@ -415,7 +415,7 @@ const Plants = () => {
                   Sr No
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Project Name
+                  Plant Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Organization
