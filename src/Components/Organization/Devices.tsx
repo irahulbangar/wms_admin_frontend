@@ -278,7 +278,9 @@ const Devices = () => {
   ]);
 
   const filteredOrganizations = organizations.filter((org) =>
-    org.org_name.toLowerCase().includes(organizationSearchTerm.toLowerCase())
+    org.organization_name
+      .toLowerCase()
+      .includes(organizationSearchTerm.toLowerCase())
   );
 
   const filteredProjects = projects.filter((proj) =>
@@ -465,7 +467,7 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center md:justify-between justify-center lg:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
+      <div className="flex items-start md:items-center md:justify-between justify-center lg:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap lg:flex-nowrap">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div className="flex-shrink-0 md:w-54 w-full relative organization-dropdown">
             <div className="relative">
@@ -479,7 +481,7 @@ const Devices = () => {
                         (org) =>
                           org.organization_id.toString() ===
                           selectedOrganization
-                      )?.org_name || "Select organization..."
+                      )?.organization_name || "Select organization..."
                 }
                 readOnly
                 className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
@@ -531,10 +533,10 @@ const Devices = () => {
                       onClick={() => {
                         setSelectedOrganization(org.organization_id.toString());
                         setIsOrganizationDropdownOpen(false);
-                        setOrganizationSearchTerm(org.org_name);
+                        setOrganizationSearchTerm(org.organization_name);
                       }}
                     >
-                      {org.org_name}
+                      {org.organization_name}
                     </div>
                   ))
                 ) : (
@@ -827,7 +829,8 @@ const Devices = () => {
                     : `No devices found for ${
                         organizations.find(
                           (org) => org.organization_id === selectedOrganization
-                        )?.org_name || `Organization ${selectedOrganization}`
+                        )?.organization_name ||
+                        `Organization ${selectedOrganization}`
                       }`
                 }
                 description={
@@ -838,7 +841,8 @@ const Devices = () => {
                     : `Add your first project for ${
                         organizations.find(
                           (org) => org.organization_id === selectedOrganization
-                        )?.org_name || `Organization ${selectedOrganization}`
+                        )?.organization_name ||
+                        `Organization ${selectedOrganization}`
                       } to get started`
                 }
                 buttonText={

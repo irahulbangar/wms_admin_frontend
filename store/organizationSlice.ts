@@ -64,7 +64,7 @@ export const getOrganizations = createAsyncThunk(
 );
 
 interface AddOrganizationPayload {
-  org_name: string;
+  organization_name: string;
   address: string;
   contact_person: string;
   contact_number: string;

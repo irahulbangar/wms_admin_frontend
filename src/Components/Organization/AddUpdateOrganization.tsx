@@ -105,7 +105,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     }
 
     const organizationData = {
-      org_name: formData.name,
+      organization_name: formData.name,
       address: formData.address,
       contact_person: formData.contactPerson,
       contact_number: formData.contactNumber,
@@ -161,7 +161,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         .unwrap()
         .then((res) => {
           setFormData({
-            name: res.data.org_name,
+            name: res.data.organization_name,
             address: res.data.address,
             contactPerson: res.data.contact_person,
             contactNumber: res.data.contact_number,

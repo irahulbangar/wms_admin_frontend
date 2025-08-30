@@ -6,7 +6,7 @@ export interface GetOrganizationsResponse {
 
 export interface OrganizationResult {
   organization_id: string;
-  org_name: string;
+  organization_name: string;
   address: string;
   contact_person: string;
   contact_number: string;

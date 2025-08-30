@@ -68,7 +68,7 @@ const Organization = () => {
       const searchLower = searchTerm.toLowerCase();
 
       return (
-        organization.org_name?.toLowerCase().includes(searchLower) ||
+        organization.organization_name?.toLowerCase().includes(searchLower) ||
         organization.contact_person?.toLowerCase().includes(searchLower) ||
         organization.contact_number?.toLowerCase().includes(searchLower) ||
         organization.email?.toLowerCase().includes(searchLower) ||
@@ -144,7 +144,8 @@ const Organization = () => {
         org.organization_id === organizationId
           ? {
               ...org,
-              org_name: (data.org_name as string) || org.org_name,
+              organization_name:
+                (data.organization_name as string) || org.organization_name,
               address: (data.address as string) || org.address,
               contact_person:
                 (data.contact_person as string) || org.contact_person,
@@ -266,7 +267,7 @@ const Organization = () => {
                       {index + 1}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {organization?.org_name}
+                      {organization?.organization_name}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.address}

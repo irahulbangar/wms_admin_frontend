@@ -343,7 +343,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                   key={organization.organization_id}
                   value={organization.organization_id}
                 >
-                  {organization.org_name}
+                  {organization.organization_name}
                 </option>
               ))}
             </select>

@@ -185,7 +185,7 @@ const Plants = () => {
   }, [projects, filterBy, searchTerm]);
 
   const filteredOrganizations = organizations.filter((organization) =>
-    organization.org_name
+    organization.organization_name
       .toLowerCase()
       .includes(organizationSearchTerm.toLowerCase())
   );
@@ -283,7 +283,7 @@ const Plants = () => {
               {organizations.find(
                 (org) =>
                   org.organization_id.toString() === selectedOrganizationId
-              )?.org_name || selectedOrganizationId}
+              )?.organization_name || selectedOrganizationId}
             </span>
           </>
         )}
@@ -302,7 +302,7 @@ const Plants = () => {
                       (org) =>
                         org.organization_id.toString() ===
                         selectedOrganizationId
-                    )?.org_name || "Select organization..."
+                    )?.organization_name || "Select organization..."
               }
               readOnly
               className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
@@ -353,13 +353,13 @@ const Plants = () => {
                         organization.organization_id.toString()
                       );
                       setIsDropdownOpen(false);
-                      setOrganizationSearchTerm(organization.org_name);
+                      setOrganizationSearchTerm(organization.organization_name);
                       getProjectByOrganizationId(
                         organization.organization_id.toString()
                       );
                     }}
                   >
-                    {organization.org_name}
+                    {organization.organization_name}
                   </div>
                 ))
               ) : (
@@ -452,7 +452,7 @@ const Plants = () => {
                           (org) =>
                             org.organization_id.toString() ===
                             project.organization_id.toString()
-                        )?.org_name
+                        )?.organization_name
                       }
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
@@ -526,7 +526,7 @@ const Plants = () => {
                               organizations.find(
                                 (org) =>
                                   org.organization_id === selectedOrganizationId
-                              )?.org_name ||
+                              )?.organization_name ||
                               `Organization ${selectedOrganizationId}`
                             }`
                       }
@@ -539,7 +539,7 @@ const Plants = () => {
                               organizations.find(
                                 (org) =>
                                   org.organization_id === selectedOrganizationId
-                              )?.org_name ||
+                              )?.organization_name ||
                               `Organization ${selectedOrganizationId}`
                             } to get started`
                       }

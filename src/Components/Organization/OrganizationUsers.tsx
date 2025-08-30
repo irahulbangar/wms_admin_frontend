@@ -279,7 +279,7 @@ const OrganizationUsers = () => {
                           (org) =>
                             org.organization_id.toString() ===
                             user.organization_id.toString()
-                        )?.org_name
+                        )?.organization_name
                       }
                     </td>
                     <td className="px-6 py-4 font-roboto text-center text-text-primary text-base">
