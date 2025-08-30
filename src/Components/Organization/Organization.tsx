@@ -208,7 +208,11 @@ const Organization = () => {
             )}
           </div>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={() => {
+              setShowAddModalType("add");
+              setOrganizationId("");
+              setShowAddModal(true);
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
@@ -269,22 +273,22 @@ const Organization = () => {
                       {index + 1}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {organization?.organization_name}
+                      {organization?.organization_name || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {organization?.address}
+                      {organization?.address || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {organization?.contact_person}
+                      {organization?.contact_person || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {organization?.contact_number}
+                      {organization?.contact_number || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {organization?.email}
+                      {organization?.email || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {organization?.note}
+                      {organization?.note || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <span
@@ -292,11 +296,11 @@ const Organization = () => {
                           organization?.status
                         )}`}
                       >
-                        {organization?.status}
+                        {organization?.status || "N/A"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {fromatDateWithTime(organization?.created_at)}
+                      {fromatDateWithTime(organization?.created_at) || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       <div className="flex items-center gap-3 justify-center">

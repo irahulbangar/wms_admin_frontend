@@ -113,7 +113,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       contact_number: formData.contactNumber,
       email: formData.email,
       note: formData.notes,
-      status: formData.status,
+      status: formData.status || "active",
     };
 
     if (type === "add") {
@@ -123,7 +123,16 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           if (res.success) {
             Success("Organization added successfully");
             setShowAddModal(false);
-            // Refresh organizations list after successful creation
+            setFormData({
+              name: "",
+              address: "",
+              contactPerson: "",
+              contactNumber: "",
+              email: "",
+              notes: "",
+              status: "active",
+            });
+            setErrors({});
             if (refreshOrganizations) {
               refreshOrganizations();
             }
@@ -144,7 +153,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           if (res.success) {
             Success("Organization updated successfully");
             setShowAddModal(false);
-            // Refresh organizations list after successful update
             if (refreshOrganizations) {
               refreshOrganizations();
             }
@@ -173,7 +181,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             contactNumber: res.data.contact_number,
             email: res.data.email,
             notes: res.data.note,
-            status: res.data.status,
+            status: res.data.status || "active",
           });
         })
         .catch((err) => {
@@ -187,7 +195,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         contactNumber: "",
         email: "",
         notes: "",
-        status: "",
+        status: "active",
       });
     }
   }, [type, organizationId, dispatch]);
