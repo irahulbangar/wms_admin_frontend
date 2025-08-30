@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { DeviceResponse, DeviceResult } from "../model/devices.interface";
-import type { DeviceFamilyResponse } from "../model/device-family.interface";
 import type { DeviceTypeResponse } from "../model/device-type.interface";
 
 interface DeviceState {
@@ -163,31 +162,6 @@ export const getDeviceByProjectId = createAsyncThunk(
         error instanceof Error
           ? error.message
           : "Failed to get device by project id";
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Get device by family wise
-export const getDeviceByFamilyWise = createAsyncThunk(
-  "device/getDeviceByFamilyWise",
-  async (_, thunkAPI) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().get<DeviceFamilyResponse>(
-        `/device/all-device-family`,
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to get device by family wise";
       return rejectWithValue(errorMessage);
     }
   }

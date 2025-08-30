@@ -5,10 +5,9 @@ export interface DeviceFamilyResponse {
 }
 
 export interface DeviceFamilyResult {
-  id: number;
+  device_family_id: number;
   name: string;
   type: string;
   created_at: string;
   updated_at: string;
-  devicefamilyid: number;
 }

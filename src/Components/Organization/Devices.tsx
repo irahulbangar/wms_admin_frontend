@@ -27,7 +27,6 @@ import {
 } from "../../../store/organizationSlice";
 import { getAllProjects, setProjects } from "../../../store/projectSlice";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
-import { getDeviceByFamilyWise } from "../../../store/deviceSlice";
 import { fromatDateWithTime } from "../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Warning } from "../../utils/toast";
@@ -36,6 +35,7 @@ import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import type { DepartmentResult } from "../../../model/department.interface";
 import { getDepartments } from "../../../store/departmentSlice";
 import AddUpdateDepartment from "./AddUpdateDepartment";
+import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -131,7 +131,7 @@ const Devices = () => {
 
   const getDeviceFamily = useCallback(async () => {
     setIsLoading(true);
-    await dispatch(getDeviceByFamilyWise())
+    await dispatch(getDeviceFamiliy())
       .unwrap()
       .then((res) => {
         if (res.success) {
@@ -244,7 +244,7 @@ const Devices = () => {
           device.device_type_id.toString().includes(searchTerm) ||
           device.device_family_id.toString().includes(searchTerm) ||
           deviceFamily
-            .find((df) => df.devicefamilyid === device.device_family_id)
+            .find((df) => df.device_family_id === device.device_family_id)
             ?.name.toLowerCase()
             .includes(searchTerm.toLowerCase())
       );
@@ -763,7 +763,7 @@ const Devices = () => {
                                 {
                                   deviceFamily?.find(
                                     (df) =>
-                                      df?.devicefamilyid ===
+                                      df?.device_family_id ===
                                       device?.device_family_id
                                   )?.name
                                 }
