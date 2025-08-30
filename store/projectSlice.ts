@@ -73,11 +73,14 @@ export const getProjectById = createAsyncThunk(
   "project/admin/getProjectById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get<GetProjectsResponse>(`/project/${id}`, {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await api().get<GetProjectsResponse>(
+        `/project/admin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const errorMessage =

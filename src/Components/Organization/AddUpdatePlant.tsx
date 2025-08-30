@@ -26,6 +26,7 @@ interface AddUpdateProjectProps {
     success: boolean;
     data?: Record<string, unknown>;
   }) => void;
+  refreshProjects?: () => void;
 }
 
 const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
@@ -34,6 +35,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
   projectId,
   organizationId,
   onUpdateSuccess,
+  refreshProjects,
 }) => {
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState<ProjectFormData>({
@@ -143,6 +145,9 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           if (res.success) {
             Success(res.message);
             setShowModal(false);
+            if (refreshProjects) {
+              refreshProjects();
+            }
             if (onUpdateSuccess) {
               onUpdateSuccess({
                 success: true,
@@ -174,6 +179,9 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           if (res.success) {
             Success(res.message);
             setShowModal(false);
+            if (refreshProjects) {
+              refreshProjects();
+            }
             if (onUpdateSuccess) {
               onUpdateSuccess({
                 success: true,
@@ -209,7 +217,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           </button>
         </div>
 
-        <form className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Project Name
           </label>
@@ -286,7 +294,8 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
             Status
           </label>
           <select
-            defaultValue="active"
+            name="status"
+            value={formData.status}
             onChange={handleInputChange}
             className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
           >
@@ -303,8 +312,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
               Cancel
             </button>
             <button
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer font-roboto"
             >
               {type === "add" ? "Add Project" : "Update Project"}

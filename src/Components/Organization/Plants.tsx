@@ -289,7 +289,7 @@ const Plants = () => {
         {selectedOrganizationId !== "all" && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded">
+            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
               {organizations.find(
                 (org) =>
                   org.organization_id.toString() === selectedOrganizationId
@@ -588,6 +588,11 @@ const Plants = () => {
               : selectedOrganizationId
           }
           onUpdateSuccess={handleProjectUpdate}
+          refreshProjects={
+            selectedOrganizationId === "all"
+              ? fetchProjects
+              : () => getProjectByOrganizationId(selectedOrganizationId)
+          }
         />
       )}
 
