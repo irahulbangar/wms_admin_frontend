@@ -149,7 +149,9 @@ const Plants = () => {
   useEffect(() => {
     setProjects([]);
     setIsLoading(false);
-    getAllOrganizations();
+    if (organizations.length === 0) {
+      getAllOrganizations();
+    }
 
     if (organization_id) {
       setSelectedOrganizationId(organization_id);
