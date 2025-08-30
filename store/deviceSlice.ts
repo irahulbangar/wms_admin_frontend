@@ -46,10 +46,10 @@ export const deviceSlice = createSlice({
 export interface CreateDevicePayload {
   device_name: string;
   device_status: string;
-  imeiNo: string;
+  hwid: string;
   project_id: number;
-  deviceTypeId: number;
-  deviceFId: number;
+  device_type_id: number;
+  device_family_id: number;
   department_id: number;
 }
 

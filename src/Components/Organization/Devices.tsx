@@ -176,6 +176,10 @@ const Devices = () => {
 
     if (organization_id && project_id) {
       setIsLoading(true);
+      // Set dropdown values BEFORE making API call
+      setSelectedOrganization(organization_id);
+      setSelectedProject(project_id);
+
       dispatch(
         getDeviceByOrganizationIdAndProjectId({
           projectId: parseInt(project_id),
@@ -187,8 +191,6 @@ const Devices = () => {
           if (res.success) {
             dispatch(setDevices(res?.data));
             setFilteredDevices(res?.data);
-            setSelectedOrganization(organization_id);
-            setSelectedProject(project_id);
           }
         })
         .catch((err) => {
@@ -199,6 +201,10 @@ const Devices = () => {
           setIsLoading(false);
         });
     } else {
+      // If no URL params, show all devices
+      setSelectedOrganization("all");
+      setSelectedProject("all");
+
       if (devices.length === 0) {
         setIsLoading(true);
         dispatch(getAllDevices())
@@ -227,6 +233,62 @@ const Devices = () => {
     getDeviceFamily,
     getDeviceType,
     getDepartment,
+  ]);
+
+  // Handle organization and project selection changes from dropdowns
+  useEffect(() => {
+    // Skip if this is the initial load from URL params
+    if (organization_id && project_id) {
+      return;
+    }
+
+    if (selectedOrganization === "all" && selectedProject === "all") {
+      // Show all devices
+      if (devices.length === 0) {
+        dispatch(getAllDevices())
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              dispatch(setDevices(res?.data));
+              setFilteredDevices(res?.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error("Failed to get devices");
+          });
+      }
+    } else if (selectedOrganization !== "all" && selectedProject !== "all") {
+      // Show devices for specific organization and project
+      setIsLoading(true);
+      dispatch(
+        getDeviceByOrganizationIdAndProjectId({
+          projectId: parseInt(selectedProject),
+          organizationId: parseInt(selectedOrganization),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDevices(res?.data));
+            setFilteredDevices(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to get devices");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [
+    selectedOrganization,
+    selectedProject,
+    dispatch,
+    devices.length,
+    organization_id,
+    project_id,
   ]);
 
   useEffect(() => {

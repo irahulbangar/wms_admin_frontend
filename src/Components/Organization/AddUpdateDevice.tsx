@@ -45,11 +45,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<CreateDevicePayload>({
     project_id: project_id || 0,
-    deviceFId: 0,
-    deviceTypeId: 0,
+    device_family_id: 0,
+    device_type_id: 0,
     device_name: "",
     device_status: "Online",
-    imeiNo: "",
+    hwid: "",
     department_id: departmentId,
   });
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
@@ -59,7 +59,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "deviceFId" || name === "deviceTypeId") {
+    if (name === "device_family_id" || name === "device_type_id") {
       setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -77,11 +77,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.deviceFId) {
-      newErrors.deviceFId = "Device Family is required";
+    if (!formData.device_family_id) {
+      newErrors.device_family_id = "Device Family is required";
     }
-    if (!formData.deviceTypeId) {
-      newErrors.deviceTypeId = "Device Type is required";
+    if (!formData.device_type_id) {
+      newErrors.device_type_id = "Device Type is required";
     }
     if (!formData.device_name.trim()) {
       newErrors.device_name = "Device Name is required";
@@ -89,8 +89,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     if (!formData.device_status) {
       newErrors.device_status = "Device Status is required";
     }
-    if (formData.imeiNo && formData.imeiNo.length !== 15) {
-      newErrors.imeiNo = "IMEI number must be exactly 15 characters";
+    if (formData.hwid && formData.hwid.length !== 15) {
+      newErrors.hwid = "HWID number must be exactly 15 characters";
     }
 
     setErrors(newErrors);
@@ -108,11 +108,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     try {
       const deviceData = {
         project_id: project_id || 0,
-        deviceFId: formData.deviceFId,
-        deviceTypeId: formData.deviceTypeId,
+        device_family_id: formData.device_family_id,
+        device_type_id: formData.device_type_id,
         device_name: formData.device_name,
         device_status: formData.device_status,
-        imeiNo: formData.imeiNo,
+        hwid: formData.hwid,
         department_id: formData.department_id,
       };
 
@@ -150,12 +150,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             const deviceData = res.data;
             setFormData({
               project_id: project_id || 0,
-              deviceFId: deviceData.devicefid,
-              deviceTypeId: deviceData.devicetypeid,
+              device_family_id: deviceData.device_family_id,
+              device_type_id: deviceData.device_type_id,
               device_name: deviceData.device_name,
               device_status: deviceData.device_status,
-              imeiNo: deviceData.imeino,
-              department_id: deviceData.departmentid,
+              hwid: deviceData.hwid,
+              department_id: deviceData.department_id,
             });
           }
         })
@@ -165,11 +165,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     } else if (type === "add") {
       setFormData({
         project_id: project_id || 0,
-        deviceFId: 0,
-        deviceTypeId: 0,
+        device_family_id: 0,
+        device_type_id: 0,
         device_name: "",
         device_status: "Online",
-        imeiNo: "",
+        hwid: "",
         department_id: departmentId,
       });
     }
@@ -200,25 +200,28 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 Device Family
               </label>
               <select
-                name="deviceFId"
-                value={formData.deviceFId}
+                name="device_family_id"
+                value={formData.device_family_id}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.deviceFId
+                  errors.device_family_id
                     ? "border-status-danger"
                     : "border-border-primary"
                 }`}
               >
                 <option value="0">Select Device Family</option>
                 {familyData.map((family) => (
-                  <option key={family.id} value={family.devicefamilyid}>
+                  <option
+                    key={family.device_family_id}
+                    value={family.device_family_id}
+                  >
                     {family.name}
                   </option>
                 ))}
               </select>
-              {errors.deviceFId && (
+              {errors.device_family_id && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
-                  {errors.deviceFId}
+                  {errors.device_family_id}
                 </p>
               )}
             </div>
@@ -228,25 +231,25 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 Device Type
               </label>
               <select
-                name="deviceTypeId"
-                value={formData.deviceTypeId}
+                name="device_type_id"
+                value={formData.device_type_id}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.deviceTypeId
+                  errors.device_type_id
                     ? "border-status-danger"
                     : "border-border-primary"
                 }`}
               >
                 <option value="0">Select Device Type</option>
                 {typeData.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.topics}
+                  <option key={type.device_type_id} value={type.device_type_id}>
+                    {type.device_type_name}
                   </option>
                 ))}
               </select>
-              {errors.deviceTypeId && (
+              {errors.device_type_id && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
-                  {errors.deviceTypeId}
+                  {errors.device_type_id}
                 </p>
               )}
             </div>
@@ -284,33 +287,30 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
               >
-                <option value="Online">Online</option>
-                <option value="Offline">Offline</option>
-                <option value="Maintenance">Maintenance</option>
+                <option value="Online">Active</option>
+                <option value="Offline">Inactive</option>
               </select>
             </div>
 
             {/* IMEI Number */}
             <div>
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                IMEI Number
+                HWID Number
               </label>
               <input
                 type="text"
-                name="imeiNo"
-                value={formData.imeiNo}
+                name="hwid"
+                value={formData.hwid}
                 onChange={handleInputChange}
-                placeholder="Enter IMEI number"
+                placeholder="Enter HWID number"
                 maxLength={15}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.imeiNo
-                    ? "border-status-danger"
-                    : "border-border-primary"
+                  errors.hwid ? "border-status-danger" : "border-border-primary"
                 }`}
               />
-              {errors.imeiNo && (
+              {errors.hwid && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
-                  {errors.imeiNo}
+                  {errors.hwid}
                 </p>
               )}
             </div>
