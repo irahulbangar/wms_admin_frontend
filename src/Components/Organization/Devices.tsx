@@ -176,7 +176,6 @@ const Devices = () => {
 
     if (organization_id && project_id) {
       setIsLoading(true);
-      // Set dropdown values BEFORE making API call
       setSelectedOrganization(organization_id);
       setSelectedProject(project_id);
 
@@ -201,7 +200,6 @@ const Devices = () => {
           setIsLoading(false);
         });
     } else {
-      // If no URL params, show all devices
       setSelectedOrganization("all");
       setSelectedProject("all");
 
@@ -235,15 +233,12 @@ const Devices = () => {
     getDepartment,
   ]);
 
-  // Handle organization and project selection changes from dropdowns
   useEffect(() => {
-    // Skip if this is the initial load from URL params
     if (organization_id && project_id) {
       return;
     }
 
     if (selectedOrganization === "all" && selectedProject === "all") {
-      // Show all devices
       if (devices.length === 0) {
         dispatch(getAllDevices())
           .unwrap()
@@ -259,7 +254,6 @@ const Devices = () => {
           });
       }
     } else if (selectedOrganization !== "all" && selectedProject !== "all") {
-      // Show devices for specific organization and project
       setIsLoading(true);
       dispatch(
         getDeviceByOrganizationIdAndProjectId({
@@ -418,12 +412,10 @@ const Devices = () => {
   };
 
   const deviceStatus = (status: string) => {
-    if (status === "Online" || status === "online") {
+    if (status === "active" || status === "Active") {
       return "bg-green-100 text-status-success";
-    } else if (status === "Offline" || status === "offline") {
+    } else if (status === "inactive" || status === "Inactive") {
       return "bg-red-100 text-status-danger";
-    } else if (status === "Maintenance" || status === "maintenance") {
-      return "bg-yellow-100 text-status-warning";
     } else {
       return "bg-blue-100 text-status-info";
     }
