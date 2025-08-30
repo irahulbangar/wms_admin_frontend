@@ -54,6 +54,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
 
+  const resetForm = () => {
+    setFormData({
+      project_id: project_id || 0,
+      device_family_id: 0,
+      device_type_id: 0,
+      device_name: "",
+      device_status: "Online",
+      hwid: "",
+      department_id: departmentId,
+    });
+    setErrors({});
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -174,6 +187,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       });
     }
   }, [type, deviceId, dispatch, project_id, departmentId]);
+
+  useEffect(() => {
+    if (type === "update" && deviceId) {
+      resetForm();
+    }
+  }, [deviceId, type]);
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
