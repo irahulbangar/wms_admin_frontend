@@ -178,6 +178,28 @@ export const deleteClient = createAsyncThunk(
   }
 );
 
+// GET clients by organization id
+export const getClientsByOrganizationId = createAsyncThunk(
+  "client/getClientsByOrganizationId",
+  async (organizationId: number, thunkAPI) => {
+    try {
+      const response = await api().get(
+        `/clients/admin/organization/${organizationId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch clients";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setClients, setLoading, setError } = clientSlice.actions;
 
 export default clientSlice.reducer;

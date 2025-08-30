@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Home,
   Building2,
+  ChevronDown,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
@@ -18,7 +19,11 @@ import type {
   ClientUsersResponse,
   ClientUsersResult,
 } from "../../../model/client-users.interface";
-import { getAllClients, setClients } from "../../../store/clientSlice";
+import {
+  getAllClients,
+  getClientsByOrganizationId,
+  setClients,
+} from "../../../store/clientSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import AddUpdateUser from "./AddUpdateUser";
 import { Error } from "../../utils/toast";
@@ -35,12 +40,58 @@ const OrganizationUsers = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [clientId, setClientId] = useState(0);
   const [modalType, setModalType] = useState<"add" | "update">("add");
-  const [organizationId, setOrganizationId] = useState(0);
+  const [organizationId, setOrganizationId] = useState<number>(0);
   const { organizations } = useAppSelector((state) => state.organization);
   const { clients } = useAppSelector((state) => state.client);
   const [isLoading, setIsLoading] = useState(false);
+  const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
+  const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
+    useState(false);
+  const [organizationClients, setOrganizationClients] = useState<
+    ClientUsersResult[]
+  >([]);
 
-  // Breadcrumb data
+  const fetchOrganizationClients = useCallback(async () => {
+    if (isLoading || organizationId === 0) return;
+    setIsLoading(true);
+    try {
+      await dispatch(getClientsByOrganizationId(organizationId))
+        .unwrap()
+        .then((res) => {
+          if (res?.data) {
+            setOrganizationClients(res.data);
+            setFilteredUsers(res.data);
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching organization clients:", err);
+          Error(err as string);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } catch (err) {
+      console.error("Error fetching organization clients:", err);
+      Error(err as string);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [dispatch, organizationId]);
+
+  useEffect(() => {
+    if (organizationId !== 0) {
+      fetchOrganizationClients();
+    } else {
+      setFilteredUsers(clients);
+    }
+  }, [organizationId, clients, fetchOrganizationClients]);
+
+  useEffect(() => {
+    if (organizationId !== 0 && organizationClients.length > 0) {
+      setFilteredUsers(organizationClients);
+    }
+  }, [organizationClients, organizationId]);
+
   const breadcrumbs = [
     { label: "Home", icon: <Home className="w-4 h-4" />, path: "/home" },
     {
@@ -96,10 +147,12 @@ const OrganizationUsers = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    const dataSource = organizationId === 0 ? clients : organizationClients;
+
     if (searchTerm.trim() === "") {
-      setFilteredUsers(clients);
+      setFilteredUsers(dataSource);
     } else {
-      const filtered = clients.filter(
+      const filtered = dataSource.filter(
         (user) =>
           user.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.client_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -109,7 +162,7 @@ const OrganizationUsers = () => {
       );
       setFilteredUsers(filtered);
     }
-  }, [searchTerm, clients]);
+  }, [searchTerm, clients, organizationClients, organizationId]);
 
   useEffect(() => {
     if (organizations.length === 0 && clients.length === 0) {
@@ -134,12 +187,15 @@ const OrganizationUsers = () => {
   const handleCloseAddModal = () => {
     setShowAddModal(false);
     setClientId(0);
-    getClients();
+    if (organizationId === 0) {
+      getClients();
+    } else {
+      fetchOrganizationClients();
+    }
   };
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
-      {/* Breadcrumb Navigation */}
       <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
         <nav
           className="flex items-center space-x-2 text-sm font-roboto"
@@ -179,9 +235,92 @@ const OrganizationUsers = () => {
       </div>
 
       <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
-        <h1 className="text-2xl font-bold text-text-primary font-roboto">
-          Organization Users
-        </h1>
+        <div className="flex items-start flex-col md:items-center md:flex-row gap-4 w-full md:w-auto">
+          <h1 className="text-2xl font-bold text-text-primary font-roboto">
+            Organization Users
+          </h1>
+
+          <div className="flex-shrink-0 md:w-54 w-full relative organization-dropdown">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Select organization..."
+                value={
+                  organizationId === 0
+                    ? "All Organization"
+                    : organizations.find(
+                        (org) => org.organization_id === organizationId
+                      )?.organization_name || "Select organization..."
+                }
+                readOnly
+                className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                onClick={() =>
+                  setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
+                }
+              />
+              <ChevronDown
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
+                  isOrganizationDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+
+            {isOrganizationDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <input
+                      type="text"
+                      placeholder="Search organizations..."
+                      value={organizationSearchTerm}
+                      onChange={(e) =>
+                        setOrganizationSearchTerm(e.target.value)
+                      }
+                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                  onClick={() => {
+                    setOrganizationId(0);
+                    setOrganizationSearchTerm("");
+                    setIsOrganizationDropdownOpen(false);
+                    getClients();
+                  }}
+                >
+                  All Organization
+                </div>
+
+                {organizations
+                  .filter((org) =>
+                    org.organization_name
+                      .toLowerCase()
+                      .includes(organizationSearchTerm.toLowerCase())
+                  )
+                  .map((organization, index) => (
+                    <div
+                      key={index}
+                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                      onClick={() => {
+                        setOrganizationId(organization.organization_id);
+                        setOrganizationSearchTerm(
+                          organization.organization_name
+                        );
+                        setIsOrganizationDropdownOpen(false);
+                        fetchOrganizationClients();
+                      }}
+                    >
+                      {organization.organization_name}
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="relative">
@@ -343,7 +482,7 @@ const OrganizationUsers = () => {
           setShowAddModal={setShowAddModal}
           type={modalType}
           onClose={handleCloseAddModal}
-          organizationId={organizationId}
+          organizationId={organizationId as number}
           organizationData={organizations}
         />
       )}
