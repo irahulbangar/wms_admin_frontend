@@ -13,6 +13,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import store from "../store/store";
+import DiagramPage from "./Components/DiagramPage";
 
 function App() {
   return (
@@ -108,6 +109,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/diagram/:project_id"
+                  element={
+                    <ProtectedRoute>
+                      <DiagramPage />
                     </ProtectedRoute>
                   }
                 />

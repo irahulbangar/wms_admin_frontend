@@ -11,6 +11,7 @@ import {
   Home,
   ChevronRight,
   ChevronDown,
+  ChartNetwork,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
@@ -509,12 +510,16 @@ const Plants = () => {
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"
                         />
-                        {/* <Trash2
+                        <span
+                          title="Edit diagram"
+                          aria-label="Edit diagram"
+                          className="inline-flex cursor-pointer"
                           onClick={() =>
-                            handleDeleteProject(project?.project_id.toString())
+                            navigate(`/diagram/${project?.project_id}}`)
                           }
-                          className="w-5 h-5 text-status-danger cursor-pointer"
-                        /> */}
+                        >
+                          <ChartNetwork className="w-5 h-5 text-text-primary" />
+                        </span>
                       </div>
                     </td>
                   </tr>
