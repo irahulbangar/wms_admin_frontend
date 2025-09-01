@@ -515,7 +515,7 @@ const Plants = () => {
                           aria-label="Edit diagram"
                           className="inline-flex cursor-pointer"
                           onClick={() =>
-                            navigate(`/diagram/${project?.project_id}}`)
+                            navigate(`/diagram/${project?.project_id}`)
                           }
                         >
                           <ChartNetwork className="w-5 h-5 text-text-primary" />
