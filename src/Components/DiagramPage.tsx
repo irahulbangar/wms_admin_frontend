@@ -45,7 +45,7 @@ const initialNodes = [
     data: { label: "FM3", type: "input" },
     position: { x: 500, y: 20 },
     parentId: "1",
-    sourcePosition: "right",
+    sourcePosition: "left",
     targetPosition: "left",
   },
   {
@@ -76,7 +76,7 @@ const initialNodes = [
     data: { label: "FM6", type: "input" },
     position: { x: 500, y: 150 },
     parentId: "2",
-    sourcePosition: "right",
+    sourcePosition: "left",
     targetPosition: "left",
   },
   {
