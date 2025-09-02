@@ -1,4 +1,4 @@
-import { ChevronsLeft, RotateCw } from "lucide-react";
+import { ChevronsLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -11,6 +11,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useState, useEffect } from "react";
+import { Success } from "../utils/toast";
 
 type NodeDirection = "left" | "right" | "up" | "down" | "bidirectional";
 
@@ -170,132 +171,6 @@ const DiagramPage = () => {
     setHasChanges(true);
   };
 
-  const calculateNewPosition = (
-    node: ExtendedNode,
-    newDirection: NodeDirection,
-    parentNode?: ExtendedNode
-  ) => {
-    const currentPos = { ...node.position };
-    const parentWidth = (parentNode?.style?.width as number) || 700;
-    const parentHeight = (parentNode?.style?.height as number) || 350;
-
-    let newX = currentPos.x;
-    let newY = currentPos.y;
-
-    switch (newDirection) {
-      case "left":
-        newX = 20;
-        newY = currentPos.y;
-        break;
-      case "right":
-        newX = parentWidth - 80;
-        newY = currentPos.y;
-        break;
-      case "up":
-        newX = currentPos.x;
-        newY = 20;
-        break;
-      case "down":
-        newX = currentPos.x;
-        newY = parentHeight - 80;
-        break;
-      case "bidirectional":
-        newX = (parentWidth - 80) / 2;
-        newY = (parentHeight - 80) / 2;
-        break;
-    }
-
-    // Ensure position stays within parent boundaries
-    newX = Math.max(20, Math.min(newX, parentWidth - 80));
-    newY = Math.max(20, Math.min(newY, parentHeight - 80));
-
-    return { x: newX, y: newY };
-  };
-
-  const updateNodePositions = (
-    node: ExtendedNode,
-    newDirection: NodeDirection
-  ) => {
-    let sourcePosition: Position = "right" as Position;
-    let targetPosition: Position = "left" as Position;
-
-    switch (newDirection) {
-      case "left":
-        sourcePosition = "left" as Position;
-        targetPosition = "right" as Position;
-        break;
-      case "right":
-        sourcePosition = "right" as Position;
-        targetPosition = "left" as Position;
-        break;
-      case "up":
-        sourcePosition = "top" as Position;
-        targetPosition = "bottom" as Position;
-        break;
-      case "down":
-        sourcePosition = "bottom" as Position;
-        targetPosition = "top" as Position;
-        break;
-      case "bidirectional":
-        sourcePosition = "right" as Position;
-        targetPosition = "left" as Position;
-        break;
-    }
-
-    return { sourcePosition, targetPosition };
-  };
-
-  const changeNodeDirection = (nodeId: string, newDirection: NodeDirection) => {
-    setNodes((prevNodes) => {
-      return prevNodes.map((node) => {
-        if (node.id === nodeId) {
-          const parentNode = prevNodes.find((n) => n.id === node.parentId);
-          const newPosition = calculateNewPosition(
-            node as ExtendedNode,
-            newDirection,
-            parentNode as ExtendedNode
-          );
-          const { sourcePosition, targetPosition } = updateNodePositions(
-            node as ExtendedNode,
-            newDirection
-          );
-
-          return {
-            ...node,
-            position: newPosition,
-            data: {
-              ...node.data,
-              direction: newDirection,
-            },
-            sourcePosition,
-            targetPosition,
-          };
-        }
-        return node;
-      });
-    });
-    setHasChanges(true);
-  };
-
-  const getNextDirection = (currentDirection: NodeDirection): NodeDirection => {
-    const directions: NodeDirection[] = ["left", "right", "up", "down"];
-    const currentIndex = directions.indexOf(currentDirection);
-    return directions[(currentIndex + 1) % directions.length];
-  };
-
-  const handleDirectionChange = (nodeId: string) => {
-    const node = nodes.find((n) => n.id === nodeId) as ExtendedNode;
-    if (
-      node &&
-      node.data.direction &&
-      node.data.direction !== "bidirectional"
-    ) {
-      const currentDirection = node.data.direction;
-      const newDirection = getNextDirection(currentDirection);
-      changeNodeDirection(nodeId, newDirection);
-    }
-  };
-
   const handleSaveDiagram = () => {
     saveDiagramToStorage();
     alert(
@@ -309,6 +184,7 @@ const DiagramPage = () => {
         "Are you sure you want to reset the diagram to its initial state? This will clear all saved positions."
       )
     ) {
+      Success("Diagram reset successfully!");
       setNodes(initialNodes);
       setEdges(initialEdges);
       localStorage.removeItem(STORAGE_KEYS.NODES);
@@ -365,26 +241,6 @@ const DiagramPage = () => {
                   🔄 Reset
                 </button>
               </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {nodes
-                .filter(
-                  (node) =>
-                    node.type !== "group" &&
-                    node.data.direction !== "bidirectional"
-                )
-                .map((node) => (
-                  <button
-                    key={node.id}
-                    onClick={() => handleDirectionChange(node.id)}
-                    className="px-3 py-1 bg-secondary border border-border-primary rounded-md hover:bg-secondary/80 transition-colors text-xs flex items-center gap-1"
-                    title={`Change ${node.data.label} direction`}
-                  >
-                    <RotateCw size={12} />
-                    {node.data.label} ({node.data.direction})
-                  </button>
-                ))}
             </div>
 
             <div className="mt-2 text-xs text-gray-400">
