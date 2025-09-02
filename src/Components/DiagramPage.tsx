@@ -37,11 +37,15 @@ interface FMData {
   isActive?: boolean;
 }
 
-interface ExtendedNode extends Node {
-  data: TankData | FMData;
+interface GroupData {
+  label: string;
+  type: string;
 }
 
-// Custom Tank Node Component
+interface ExtendedNode extends Node {
+  data: TankData | FMData | GroupData;
+}
+
 const TankNode = ({ data }: { data: TankData }) => {
   const percentage =
     data.capacity && data.currentLevel
@@ -52,43 +56,46 @@ const TankNode = ({ data }: { data: TankData }) => {
   const unit = data.unit || "kL";
 
   return (
-    <div className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden">
-      <div className="absolute inset-0 flex flex-col">
-        <div
-          className="w-full bg-status-info transition-all duration-500 ease-in-out"
-          style={{
-            height: `${fillHeight}%`,
-            marginTop: "auto",
-          }}
+    <>
+      <div className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden">
+        <div className="absolute inset-0 flex flex-col">
+          <div
+            className="w-full bg-status-info transition-all duration-500 ease-in-out"
+            style={{
+              height: `${fillHeight}%`,
+              marginTop: "auto",
+            }}
+          />
+        </div>
+
+        <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs whitespace-nowrap font-roboto text-text-primary">
+          {data.label}
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs font-bold text-text-primary bg-secondary/80 px-1 rounded">
+            {percentage}%
+          </span>
+        </div>
+
+        <Handle
+          type="target"
+          position={HandlePosition.Left}
+          className="w-3 h-3 bg-status-info"
+        />
+        <Handle
+          type="source"
+          position={HandlePosition.Right}
+          className="w-3 h-3 bg-status-info"
         />
       </div>
-
-      {/* Percentage Display */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-bold text-text-primary bg-secondary/80 px-1 rounded">
-          {percentage}%
-        </span>
-      </div>
-
-      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-muted whitespace-nowrap font-roboto z-100">
+      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2  text-xs whitespace-nowrap font-roboto text-text-primary">
         {data.currentLevel || 0}/{data.capacity || 0} {unit}
       </div>
-
-      <Handle
-        type="target"
-        position={HandlePosition.Left}
-        className="w-3 h-3 bg-status-info"
-      />
-      <Handle
-        type="source"
-        position={HandlePosition.Right}
-        className="w-3 h-3 bg-status-info"
-      />
-    </div>
+    </>
   );
 };
 
-// Custom FM Node Component
 const FMNode = ({ data }: { data: FMData }) => {
   const unit = data.unit || "kL";
   const isActive = data.isActive !== false; // Default to active
@@ -137,17 +144,30 @@ const FMNode = ({ data }: { data: FMData }) => {
   );
 };
 
+const GroupNode = ({ data }: { data: GroupData }) => {
+  return (
+    <div className="relative w-full h-full bg-transparent rounded-lg">
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm">
+        <span className="text-sm font-semibold text-text-primary font-roboto">
+          {data.label}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const nodeTypes = {
   tank: TankNode,
   fm: FMNode,
+  group: GroupNode,
 };
 
 const initialNodes: ExtendedNode[] = [
   {
     id: "1",
-    data: { label: "Group A", type: "output" },
+    data: { label: "ENTC Department", type: "output" },
     position: { x: 50, y: 50 },
-    style: { width: 700, height: 350, borderRadius: 10 },
+    style: { width: 625, height: 350, borderRadius: 10 },
     type: "group",
   },
   {
@@ -180,7 +200,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 20, y: 270 },
+    position: { x: 20, y: 250 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "right" as Position,
@@ -196,7 +216,7 @@ const initialNodes: ExtendedNode[] = [
       currentLevel: 2.5,
       unit: "kL",
     },
-    position: { x: 280, y: 150 },
+    position: { x: 280, y: 125 },
     parentId: "1",
     targetPosition: "left" as Position,
     sourcePosition: "right" as Position,
@@ -214,7 +234,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 500, y: 20 },
+    position: { x: 490, y: 20 },
     parentId: "1",
     sourcePosition: "left" as Position,
     targetPosition: "left" as Position,
@@ -232,7 +252,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 500, y: 270 },
+    position: { x: 490, y: 250 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "left" as Position,
@@ -240,9 +260,9 @@ const initialNodes: ExtendedNode[] = [
   },
   {
     id: "2",
-    data: { label: "Group B", type: "output" },
-    position: { x: 800, y: 50 },
-    style: { width: 700, height: 350, borderRadius: 10 },
+    data: { label: "IT Department", type: "output" },
+    position: { x: 725, y: 50 },
+    style: { width: 625, height: 350, borderRadius: 10 },
     type: "group",
   },
   {
