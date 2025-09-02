@@ -8,139 +8,17 @@ import ReactFlow, {
   type Node,
   type Position,
   type NodeDragHandler,
-  Handle,
-  Position as HandlePosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useState, useEffect } from "react";
 import { Success } from "../utils/toast";
 
-type NodeDirection = "left" | "right" | "up" | "down" | "bidirectional";
-
-interface TankData {
-  label: string;
-  type: string;
-  direction?: NodeDirection;
-  capacity?: number;
-  currentLevel?: number;
-  unit?: string;
-}
-
-interface FMData {
-  label: string;
-  type: string;
-  direction?: NodeDirection;
-  totalVolume?: number;
-  totalizerReading?: number;
-  flowRate?: number;
-  unit?: string;
-  isActive?: boolean;
-}
-
 interface ExtendedNode extends Node {
-  data: TankData | FMData;
+  data: {
+    label: string;
+    type: string;
+  };
 }
-
-// Custom Tank Node Component
-const TankNode = ({ data }: { data: TankData }) => {
-  const percentage =
-    data.capacity && data.currentLevel
-      ? Math.round((data.currentLevel / data.capacity) * 100)
-      : 0;
-
-  const fillHeight = Math.min(percentage, 100);
-  const unit = data.unit || "kL";
-
-  return (
-    <div className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden">
-      <div className="absolute inset-0 flex flex-col">
-        <div
-          className="w-full bg-status-info transition-all duration-500 ease-in-out"
-          style={{
-            height: `${fillHeight}%`,
-            marginTop: "auto",
-          }}
-        />
-      </div>
-
-      {/* Percentage Display */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-bold text-text-primary bg-secondary/80 px-1 rounded">
-          {percentage}%
-        </span>
-      </div>
-
-      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-muted whitespace-nowrap font-roboto z-100">
-        {data.currentLevel || 0}/{data.capacity || 0} {unit}
-      </div>
-
-      <Handle
-        type="target"
-        position={HandlePosition.Left}
-        className="w-3 h-3 bg-status-info"
-      />
-      <Handle
-        type="source"
-        position={HandlePosition.Right}
-        className="w-3 h-3 bg-status-info"
-      />
-    </div>
-  );
-};
-
-// Custom FM Node Component
-const FMNode = ({ data }: { data: FMData }) => {
-  const unit = data.unit || "kL";
-  const isActive = data.isActive !== false; // Default to active
-
-  return (
-    <div
-      className={`relative w-24 h-16 bg-secondary border rounded-lg p-1 ${
-        isActive ? "border-status-success" : "border-border-primary"
-      }`}
-    >
-      <div className="text-xs font-bold text-center mb-1">{data.label}</div>
-
-      <div
-        className={`absolute top-1 right-1 w-2 h-2 rounded-full ${
-          isActive ? "bg-status-success animate-pulse" : "bg-status-danger"
-        }`}
-      />
-
-      <div className="text-xs text-center mb-1">
-        <div className="text-text-muted font-roboto">Flow:</div>
-        <div className="font-semibold text-status-info font-roboto">
-          {data.flowRate || 0} {unit}/h
-        </div>
-      </div>
-
-      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-text-muted whitespace-nowrap font-roboto">
-        <div>
-          Total: {data.totalVolume || 0} {unit}
-        </div>
-        <div>
-          Totalizer: {data.totalizerReading || 0} {unit}
-        </div>
-      </div>
-
-      <Handle
-        type="target"
-        position={HandlePosition.Left}
-        className="w-3 h-3 bg-status-success"
-      />
-      <Handle
-        type="source"
-        position={HandlePosition.Right}
-        className="w-3 h-3 bg-status-success"
-      />
-    </div>
-  );
-};
-
-const nodeTypes = {
-  tank: TankNode,
-  fm: FMNode,
-};
 
 const initialNodes: ExtendedNode[] = [
   {
@@ -152,91 +30,43 @@ const initialNodes: ExtendedNode[] = [
   },
   {
     id: "fm1",
-    data: {
-      label: "FM1",
-      type: "output",
-      direction: "right",
-      totalVolume: 1250.5,
-      totalizerReading: 1250.5,
-      flowRate: 15.2,
-      unit: "kL",
-      isActive: true,
-    },
+    data: { label: "FM1", type: "output" },
     position: { x: 20, y: 20 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "right" as Position,
-    type: "fm",
   },
   {
     id: "fm2",
-    data: {
-      label: "FM2",
-      type: "output",
-      direction: "right",
-      totalVolume: 890.3,
-      totalizerReading: 890.3,
-      flowRate: 8.7,
-      unit: "kL",
-      isActive: true,
-    },
+    data: { label: "FM2", type: "output" },
     position: { x: 20, y: 270 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "right" as Position,
-    type: "fm",
   },
   {
     id: "tank1",
-    data: {
-      label: "Tank 1",
-      type: "bidirectional",
-      direction: "bidirectional",
-      capacity: 10,
-      currentLevel: 2.5,
-      unit: "kL",
-    },
+    data: { label: "Tank", type: "bidirectional" },
     position: { x: 280, y: 150 },
     parentId: "1",
     targetPosition: "left" as Position,
     sourcePosition: "right" as Position,
-    type: "tank",
   },
   {
     id: "fm3",
-    data: {
-      label: "FM3",
-      type: "input",
-      direction: "left",
-      totalVolume: 2100.8,
-      totalizerReading: 2100.8,
-      flowRate: 22.1,
-      unit: "kL",
-      isActive: true,
-    },
+    data: { label: "FM3", type: "input" },
     position: { x: 500, y: 20 },
     parentId: "1",
     sourcePosition: "left" as Position,
     targetPosition: "left" as Position,
-    type: "fm",
   },
   {
     id: "fm4",
-    data: {
-      label: "FM4",
-      type: "input",
-      direction: "left",
-      totalVolume: 1567.2,
-      totalizerReading: 1567.2,
-      flowRate: 12.5,
-      unit: "kL",
-      isActive: true,
-    },
+    data: { label: "FM4", type: "input" },
     position: { x: 500, y: 270 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "left" as Position,
-    type: "fm",
   },
   {
     id: "2",
@@ -247,55 +77,27 @@ const initialNodes: ExtendedNode[] = [
   },
   {
     id: "fm5",
-    data: {
-      label: "FM5",
-      type: "input",
-      direction: "left",
-      totalVolume: 980.4,
-      totalizerReading: 980.4,
-      flowRate: 9.8,
-      unit: "kL",
-      isActive: true,
-    },
+    data: { label: "FM5", type: "input" },
     position: { x: 20, y: 150 },
     parentId: "2",
     sourcePosition: "right" as Position,
     targetPosition: "left" as Position,
-    type: "fm",
   },
   {
     id: "fm6",
-    data: {
-      label: "FM6",
-      type: "input",
-      direction: "left",
-      totalVolume: 3200.1,
-      totalizerReading: 3200.1,
-      flowRate: 28.5,
-      unit: "kL",
-      isActive: true,
-    },
+    data: { label: "FM6", type: "input" },
     position: { x: 500, y: 150 },
     parentId: "2",
     sourcePosition: "left" as Position,
     targetPosition: "left" as Position,
-    type: "fm",
   },
   {
     id: "tank2",
-    data: {
-      label: "Tank 2",
-      type: "bidirectional",
-      direction: "bidirectional",
-      capacity: 15,
-      currentLevel: 7.5,
-      unit: "kL",
-    },
+    data: { label: "Tank", type: "bidirectional" },
     position: { x: 270, y: 150 },
     parentId: "2",
     sourcePosition: "right" as Position,
     targetPosition: "left" as Position,
-    type: "tank",
   },
 ];
 
@@ -368,13 +170,15 @@ const DiagramPage = () => {
 
   const handleSaveDiagram = () => {
     saveDiagramToStorage();
-    Success("Diagram saved successfully!");
+    alert(
+      "Diagram saved successfully! Your changes will be restored on page reload."
+    );
   };
 
   const handleResetDiagram = () => {
     if (
       confirm(
-        "Are you sure you want to reset the diagram to its initial state? This will clear all saved positions and data."
+        "Are you sure you want to reset the diagram to its initial state? This will clear all saved positions."
       )
     ) {
       Success("Diagram reset successfully!");
@@ -465,7 +269,6 @@ const DiagramPage = () => {
               onNodeDragStart={handleNodeDragStart}
               onNodeDragStop={handleNodeDragStop}
               onNodeDrag={handleNodeDragStop}
-              nodeTypes={nodeTypes}
             >
               <Background variant={BackgroundVariant.Dots} />
             </ReactFlow>
