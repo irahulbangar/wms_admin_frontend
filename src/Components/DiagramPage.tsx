@@ -12,7 +12,7 @@ import ReactFlow, {
   Position as HandlePosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Success } from "../utils/toast";
 
 type NodeDirection = "left" | "right" | "up" | "down" | "bidirectional";
@@ -148,83 +148,11 @@ const FMNode = ({ data }: { data: FMData }) => {
   );
 };
 
-const GroupNode = ({
-  data,
-  nodes,
-}: {
-  data: GroupData;
-  nodes: ExtendedNode[];
-}) => {
+const GroupNode = ({ data }: { data: GroupData }) => {
   const unit = data.unit || "kL";
 
-  const calculateTotalStock = () => {
-    const groupNode = nodes.find(
-      (node) =>
-        node.type === "group" && (node.data as GroupData).label === data.label
-    );
-
-    if (!groupNode) return { current: 0, capacity: 0 };
-
-    const departmentTanks = nodes.filter(
-      (node) => node.type === "tank" && node.parentId === groupNode.id
-    );
-
-    const totals = departmentTanks.reduce(
-      (acc, tank) => {
-        const tankData = tank.data as TankData;
-        return {
-          current: acc.current + (tankData.currentLevel || 0),
-          capacity: acc.capacity + (tankData.capacity || 0),
-        };
-      },
-      { current: 0, capacity: 0 }
-    );
-
-    return totals;
-  };
-
-  const stockData = calculateTotalStock();
-
-  const calculateTotalInOut = () => {
-    const groupNode = nodes.find(
-      (node) =>
-        node.type === "group" && (node.data as GroupData).label === data.label
-    );
-
-    if (!groupNode) return { totalIn: 0, totalOut: 0 };
-
-    const departmentFMs = nodes.filter(
-      (node) => node.type === "fm" && node.parentId === groupNode.id
-    );
-
-    const totals = departmentFMs.reduce(
-      (acc, fm) => {
-        const fmData = fm.data as FMData;
-        const totalVolume = fmData.totalVolume || 0;
-
-        if (data.label === "ENTC Department") {
-          if (fm.id === "fm1" || fm.id === "fm2") {
-            acc.totalIn += totalVolume;
-          } else if (fm.id === "fm3" || fm.id === "fm4") {
-            acc.totalOut += totalVolume;
-          }
-        } else if (data.label === "IT Department") {
-          if (fm.id === "fm5") {
-            acc.totalIn += totalVolume;
-          } else if (fm.id === "fm6") {
-            acc.totalOut += totalVolume;
-          }
-        }
-
-        return acc;
-      },
-      { totalIn: 0, totalOut: 0 }
-    );
-
-    return totals;
-  };
-
-  const inOutData = calculateTotalInOut();
+  const stockData = { current: 2.5, capacity: 10 };
+  const inOutData = { totalIn: 2140.8, totalOut: 3667.3 };
 
   return (
     <div className="relative w-full h-full bg-transparent rounded-lg">
@@ -240,13 +168,13 @@ const GroupNode = ({
             <div className="flex items-center gap-2">
               <div className="text-text-muted">Total Stock :</div>
               <div className="font-semibold text-text-primary">
-                {stockData.current.toFixed(1)} {unit}
+                {stockData.capacity.toFixed(0)} {unit}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="text-text-muted">Total Capacity :</div>
               <div className="font-semibold text-text-primary">
-                {stockData.capacity.toFixed(0)} {unit}
+                {stockData.current.toFixed(0)} {unit}
               </div>
             </div>
           </div>
@@ -278,11 +206,15 @@ const GroupNode = ({
   );
 };
 
-const createNodeTypes = (nodes: ExtendedNode[]) => ({
+const GroupNodeWrapper = ({ data }: { data: GroupData }) => {
+  return <GroupNode data={data} />;
+};
+
+const nodeTypes = {
   tank: TankNode,
   fm: FMNode,
-  group: (props: { data: GroupData }) => <GroupNode {...props} nodes={nodes} />,
-});
+  group: GroupNodeWrapper,
+};
 
 const initialNodes: ExtendedNode[] = [
   {
@@ -483,11 +415,7 @@ const DiagramPage = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    loadSavedDiagram();
-  }, []);
-
-  const loadSavedDiagram = () => {
+  const loadSavedDiagram = useCallback(() => {
     try {
       const savedNodes = localStorage.getItem(STORAGE_KEYS.NODES);
       const savedEdges = localStorage.getItem(STORAGE_KEYS.EDGES);
@@ -504,7 +432,11 @@ const DiagramPage = () => {
     } catch (error) {
       console.error("Error loading saved diagram:", error);
     }
-  };
+  }, [setNodes, setEdges]);
+
+  useEffect(() => {
+    loadSavedDiagram();
+  }, [loadSavedDiagram]);
 
   const saveDiagramToStorage = () => {
     try {
@@ -625,7 +557,7 @@ const DiagramPage = () => {
               onNodeDragStart={handleNodeDragStart}
               onNodeDragStop={handleNodeDragStop}
               onNodeDrag={handleNodeDragStop}
-              nodeTypes={createNodeTypes(nodes)}
+              nodeTypes={nodeTypes}
             >
               <Background variant={BackgroundVariant.Dots} />
             </ReactFlow>
