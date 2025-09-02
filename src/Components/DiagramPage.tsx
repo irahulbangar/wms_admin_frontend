@@ -102,7 +102,7 @@ const TankNode = ({ data }: { data: TankData }) => {
 
 const FMNode = ({ data }: { data: FMData }) => {
   const unit = data.unit || "kL";
-  const isActive = data.isActive !== false; // Default to active
+  const isActive = data.isActive !== false;
 
   return (
     <div
@@ -228,7 +228,7 @@ const GroupNode = ({
 
   return (
     <div className="relative w-full h-full bg-transparent rounded-lg">
-      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm">
+      <div className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm">
         <span className="text-sm font-semibold text-text-primary font-roboto">
           {data.label}
         </span>
@@ -236,22 +236,40 @@ const GroupNode = ({
 
       <div className="">
         <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
-          <div className="text-center flex items-center gap-2">
-            <div className="text-text-muted">Total Stock :</div>
-            <div className="font-semibold text-text-primary">
-              {stockData.current.toFixed(1)}/{stockData.capacity.toFixed(0)}{" "}
-              {unit}
+          <div className="text-center flex items-start flex-col">
+            <div className="flex items-center gap-2">
+              <div className="text-text-muted">Total Stock :</div>
+              <div className="font-semibold text-text-primary">
+                {stockData.current.toFixed(1)} {unit}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-text-muted">Total Capacity :</div>
+              <div className="font-semibold text-text-primary">
+                {stockData.capacity.toFixed(0)} {unit}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="text-text-muted">Total In :</div>
-            <div className="font-semibold text-text-primary">
-              {inOutData.totalIn.toFixed(1)} {unit}
-            </div>
-            <div className="w-px h-8 bg-border-primary"></div>
-            <div className="text-text-muted">Total Out :</div>
-            <div className="font-semibold text-text-primary">
-              {inOutData.totalOut.toFixed(1)} {unit}
+            <div className="flex flex-col">
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-muted">Total In :</div>
+                <div className="font-semibold text-text-primary">
+                  {inOutData.totalIn.toFixed(1)} {unit}
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-muted">Total Out :</div>
+                <div className="font-semibold text-text-primary">
+                  {inOutData.totalOut.toFixed(1)} {unit}
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-muted">Total Balance :</div>
+                <div className="font-semibold text-text-primary">
+                  {inOutData.totalOut.toFixed(1)} {unit}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -290,7 +308,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 20, y: 55 },
+    position: { x: 20, y: 70 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "right" as Position,
@@ -308,7 +326,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 20, y: 250 },
+    position: { x: 20, y: 230 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "right" as Position,
@@ -342,7 +360,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 490, y: 55 },
+    position: { x: 490, y: 70 },
     parentId: "1",
     sourcePosition: "left" as Position,
     targetPosition: "left" as Position,
@@ -360,7 +378,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 490, y: 250 },
+    position: { x: 490, y: 230 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "left" as Position,
