@@ -5,6 +5,7 @@ import ReactFlow, {
   BackgroundVariant,
   useEdgesState,
   useNodesState,
+  useReactFlow,
   type Node,
   type Position,
   type NodeDragHandler,
@@ -148,11 +149,65 @@ const FMNode = ({ data }: { data: FMData }) => {
   );
 };
 
-const GroupNode = ({ data }: { data: GroupData }) => {
+const GroupNode = ({ data, id }: { data: GroupData; id: string }) => {
   const unit = data.unit || "kL";
+  const { getNodes } = useReactFlow();
+  const allNodes = getNodes();
 
-  const stockData = { current: 2.5, capacity: 10 };
-  const inOutData = { totalIn: 2140.8, totalOut: 3667.3 };
+  const calculateTotalStock = () => {
+    const departmentTanks = allNodes.filter(
+      (node) => node.type === "tank" && node.parentId === id
+    );
+
+    const totals = departmentTanks.reduce(
+      (acc, tank) => {
+        const tankData = tank.data as TankData;
+        return {
+          current: acc.current + (tankData.currentLevel || 0),
+          capacity: acc.capacity + (tankData.capacity || 0),
+        };
+      },
+      { current: 0, capacity: 0 }
+    );
+
+    return totals;
+  };
+
+  const calculateTotalInOut = () => {
+    const departmentFMs = allNodes.filter(
+      (node) => node.type === "fm" && node.parentId === id
+    );
+
+    const totals = departmentFMs.reduce(
+      (acc, fm) => {
+        const fmData = fm.data as FMData;
+        const totalVolume = fmData.totalVolume || 0;
+
+        if (data.label === "ENTC Department") {
+          if (fm.id === "fm1" || fm.id === "fm2") {
+            acc.totalIn += totalVolume;
+          } else if (fm.id === "fm3" || fm.id === "fm4") {
+            acc.totalOut += totalVolume;
+          }
+        } else if (data.label === "IT Department") {
+          if (fm.id === "fm5") {
+            acc.totalIn += totalVolume;
+          } else if (fm.id === "fm6") {
+            acc.totalOut += totalVolume;
+          }
+        }
+
+        return acc;
+      },
+      { totalIn: 0, totalOut: 0 }
+    );
+
+    return totals;
+  };
+
+  const stockData = calculateTotalStock();
+  const inOutData = calculateTotalInOut();
+  const totalBalance = inOutData.totalOut - inOutData.totalIn;
 
   return (
     <div className="relative w-full h-full bg-transparent rounded-lg">
@@ -168,13 +223,13 @@ const GroupNode = ({ data }: { data: GroupData }) => {
             <div className="flex items-center gap-2">
               <div className="text-text-muted">Total Stock :</div>
               <div className="font-semibold text-text-primary">
-                {stockData.capacity.toFixed(0)} {unit}
+                {stockData.current.toFixed(1)} {unit}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="text-text-muted">Total Capacity :</div>
               <div className="font-semibold text-text-primary">
-                {stockData.current.toFixed(0)} {unit}
+                {stockData.capacity.toFixed(0)} {unit}
               </div>
             </div>
           </div>
@@ -195,7 +250,7 @@ const GroupNode = ({ data }: { data: GroupData }) => {
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-muted">Total Balance :</div>
                 <div className="font-semibold text-text-primary">
-                  {inOutData.totalOut.toFixed(1)} {unit}
+                  {totalBalance.toFixed(1)} {unit}
                 </div>
               </div>
             </div>
@@ -206,8 +261,8 @@ const GroupNode = ({ data }: { data: GroupData }) => {
   );
 };
 
-const GroupNodeWrapper = ({ data }: { data: GroupData }) => {
-  return <GroupNode data={data} />;
+const GroupNodeWrapper = ({ data, id }: { data: GroupData; id: string }) => {
+  return <GroupNode data={data} id={id} />;
 };
 
 const nodeTypes = {
