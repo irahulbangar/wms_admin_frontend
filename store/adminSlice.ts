@@ -3,6 +3,16 @@ import { api } from "../api.service";
 import { jwtDecode } from "jwt-decode";
 import type { AdminUsersResponse } from "../model/admin-users.interface";
 
+// Extend JwtPayload to include custom properties
+interface CustomJwtPayload {
+  exp?: number;
+  email?: string;
+  name?: string;
+  role?: string;
+  contact_number?: string;
+  status?: string;
+}
+
 interface Admin {
   id: string;
   email: string;
@@ -62,7 +72,7 @@ export const adminSlice = createSlice({
         const admin = sessionStorage.getItem("admin");
 
         if (token && admin) {
-          const decodedToken = jwtDecode(token);
+          const decodedToken = jwtDecode<CustomJwtPayload>(token);
           const currentTime = Date.now() / 1000;
 
           if (decodedToken.exp && decodedToken.exp < currentTime) {
@@ -104,12 +114,20 @@ export const loginAdmin = createAsyncThunk(
     try {
       thunkAPI.dispatch(setLoading(true));
       const response = await api().post<LoginResponse>("/admin/login", data);
+      console.log("response.data", response.data);
       if (response.data.success) {
         sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
         sessionStorage.setItem("accessToken", response.data.token);
-        const decodedToken = jwtDecode(response.data.token);
-        sessionStorage.setItem("admin", JSON.stringify(decodedToken));
-        thunkAPI.dispatch(setAdmin(decodedToken));
+        const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
+        const admin = {
+          email: decodedToken.email,
+          name: decodedToken.name,
+          role: decodedToken.role,
+          contact_number: decodedToken.contact_number,
+          status: decodedToken.status,
+        };
+        sessionStorage.setItem("admin", JSON.stringify(admin));
+        thunkAPI.dispatch(setAdmin(admin));
         thunkAPI.dispatch(setToken(response.data.token));
       }
       return response.data;
