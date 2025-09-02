@@ -293,7 +293,12 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
     },
     position: { x: 50, y: 50 },
-    style: { width: 625, height: 350, borderRadius: 10 },
+    style: {
+      width: 625,
+      height: 350,
+      borderRadius: 10,
+      border: "2px dashed #ccc",
+    },
     type: "group",
   },
   {
@@ -392,7 +397,12 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
     },
     position: { x: 725, y: 50 },
-    style: { width: 625, height: 350, borderRadius: 10 },
+    style: {
+      width: 625,
+      height: 350,
+      borderRadius: 10,
+      border: "2px dashed #ccc",
+    },
     type: "group",
   },
   {
