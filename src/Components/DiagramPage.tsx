@@ -40,6 +40,10 @@ interface FMData {
 interface GroupData {
   label: string;
   type: string;
+  totalStock?: number;
+  totalIn?: number;
+  totalOut?: number;
+  unit?: string;
 }
 
 interface ExtendedNode extends Node {
@@ -144,28 +148,132 @@ const FMNode = ({ data }: { data: FMData }) => {
   );
 };
 
-const GroupNode = ({ data }: { data: GroupData }) => {
+const GroupNode = ({
+  data,
+  nodes,
+}: {
+  data: GroupData;
+  nodes: ExtendedNode[];
+}) => {
+  const unit = data.unit || "kL";
+
+  const calculateTotalStock = () => {
+    const groupNode = nodes.find(
+      (node) =>
+        node.type === "group" && (node.data as GroupData).label === data.label
+    );
+
+    if (!groupNode) return { current: 0, capacity: 0 };
+
+    const departmentTanks = nodes.filter(
+      (node) => node.type === "tank" && node.parentId === groupNode.id
+    );
+
+    const totals = departmentTanks.reduce(
+      (acc, tank) => {
+        const tankData = tank.data as TankData;
+        return {
+          current: acc.current + (tankData.currentLevel || 0),
+          capacity: acc.capacity + (tankData.capacity || 0),
+        };
+      },
+      { current: 0, capacity: 0 }
+    );
+
+    return totals;
+  };
+
+  const stockData = calculateTotalStock();
+
+  const calculateTotalInOut = () => {
+    const groupNode = nodes.find(
+      (node) =>
+        node.type === "group" && (node.data as GroupData).label === data.label
+    );
+
+    if (!groupNode) return { totalIn: 0, totalOut: 0 };
+
+    const departmentFMs = nodes.filter(
+      (node) => node.type === "fm" && node.parentId === groupNode.id
+    );
+
+    const totals = departmentFMs.reduce(
+      (acc, fm) => {
+        const fmData = fm.data as FMData;
+        const totalVolume = fmData.totalVolume || 0;
+
+        if (data.label === "ENTC Department") {
+          if (fm.id === "fm1" || fm.id === "fm2") {
+            acc.totalIn += totalVolume;
+          } else if (fm.id === "fm3" || fm.id === "fm4") {
+            acc.totalOut += totalVolume;
+          }
+        } else if (data.label === "IT Department") {
+          if (fm.id === "fm5") {
+            acc.totalIn += totalVolume;
+          } else if (fm.id === "fm6") {
+            acc.totalOut += totalVolume;
+          }
+        }
+
+        return acc;
+      },
+      { totalIn: 0, totalOut: 0 }
+    );
+
+    return totals;
+  };
+
+  const inOutData = calculateTotalInOut();
+
   return (
     <div className="relative w-full h-full bg-transparent rounded-lg">
-      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm">
+      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm">
         <span className="text-sm font-semibold text-text-primary font-roboto">
           {data.label}
         </span>
+      </div>
+
+      <div className="">
+        <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
+          <div className="text-center flex items-center gap-2">
+            <div className="text-text-muted">Total Stock :</div>
+            <div className="font-semibold text-text-primary">
+              {stockData.current.toFixed(1)}/{stockData.capacity.toFixed(0)}{" "}
+              {unit}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-text-muted">Total In :</div>
+            <div className="font-semibold text-text-primary">
+              {inOutData.totalIn.toFixed(1)} {unit}
+            </div>
+            <div className="w-px h-8 bg-border-primary"></div>
+            <div className="text-text-muted">Total Out :</div>
+            <div className="font-semibold text-text-primary">
+              {inOutData.totalOut.toFixed(1)} {unit}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-const nodeTypes = {
+const createNodeTypes = (nodes: ExtendedNode[]) => ({
   tank: TankNode,
   fm: FMNode,
-  group: GroupNode,
-};
+  group: (props: { data: GroupData }) => <GroupNode {...props} nodes={nodes} />,
+});
 
 const initialNodes: ExtendedNode[] = [
   {
     id: "1",
-    data: { label: "ENTC Department", type: "output" },
+    data: {
+      label: "ENTC Department",
+      type: "output",
+      unit: "kL",
+    },
     position: { x: 50, y: 50 },
     style: { width: 625, height: 350, borderRadius: 10 },
     type: "group",
@@ -182,7 +290,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 20, y: 20 },
+    position: { x: 20, y: 55 },
     parentId: "1",
     sourcePosition: "right" as Position,
     targetPosition: "right" as Position,
@@ -234,7 +342,7 @@ const initialNodes: ExtendedNode[] = [
       unit: "kL",
       isActive: true,
     },
-    position: { x: 490, y: 20 },
+    position: { x: 490, y: 55 },
     parentId: "1",
     sourcePosition: "left" as Position,
     targetPosition: "left" as Position,
@@ -260,7 +368,11 @@ const initialNodes: ExtendedNode[] = [
   },
   {
     id: "2",
-    data: { label: "IT Department", type: "output" },
+    data: {
+      label: "IT Department",
+      type: "output",
+      unit: "kL",
+    },
     position: { x: 725, y: 50 },
     style: { width: 625, height: 350, borderRadius: 10 },
     type: "group",
@@ -485,7 +597,7 @@ const DiagramPage = () => {
               onNodeDragStart={handleNodeDragStart}
               onNodeDragStop={handleNodeDragStop}
               onNodeDrag={handleNodeDragStop}
-              nodeTypes={nodeTypes}
+              nodeTypes={createNodeTypes(nodes)}
             >
               <Background variant={BackgroundVariant.Dots} />
             </ReactFlow>
