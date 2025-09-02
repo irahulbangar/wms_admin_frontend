@@ -467,7 +467,6 @@ const DiagramPage = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [hasChanges, setHasChanges] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
 
   const navigate = useNavigate();
 
@@ -505,12 +504,7 @@ const DiagramPage = () => {
     }
   };
 
-  const handleNodeDragStart: NodeDragHandler = () => {
-    setIsDragging(true);
-  };
-
   const handleNodeDragStop: NodeDragHandler = () => {
-    setIsDragging(false);
     setHasChanges(true);
   };
 
@@ -588,9 +582,6 @@ const DiagramPage = () => {
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
                     Unsaved changes detected
-                    {isDragging && (
-                      <span className="text-status-info">(Dragging...)</span>
-                    )}
                   </div>
                 )}
                 {!hasChanges && (
@@ -610,7 +601,6 @@ const DiagramPage = () => {
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
-              onNodeDragStart={handleNodeDragStart}
               onNodeDragStop={handleNodeDragStop}
               onNodeDrag={handleNodeDragStop}
               nodeTypes={nodeTypes}
