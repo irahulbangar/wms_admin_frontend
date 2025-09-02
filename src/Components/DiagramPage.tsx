@@ -11,6 +11,7 @@ import ReactFlow, {
   type NodeDragHandler,
   Handle,
   Position as HandlePosition,
+  Controls,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useState, useEffect, useCallback } from "react";
@@ -615,6 +616,7 @@ const DiagramPage = () => {
               nodeTypes={nodeTypes}
             >
               <Background variant={BackgroundVariant.Dots} />
+              <Controls />
             </ReactFlow>
           </div>
         </main>
