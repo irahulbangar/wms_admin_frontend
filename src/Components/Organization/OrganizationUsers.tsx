@@ -518,7 +518,7 @@ const OrganizationUsers = () => {
           onClose={handleCloseUserPlants}
           userId={clientId}
           organizationId={organizationId.toString()}
-          type={modalType}
+          type="add"
         />
       )}
     </div>

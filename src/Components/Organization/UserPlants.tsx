@@ -34,9 +34,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   type,
 }) => {
   const dispatch = useAppDispatch();
-  const [selectedProject, setSelectedProject] = useState<number>(0);
-  const [selectedRole, setSelectedRole] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
+
   const [userPlants, setUserPlants] = useState<UserPlantResult[]>([]);
   const [projects, setProjects] = useState<ProjectResult[]>([]);
   const [loading] = useState<boolean>(false);
@@ -108,11 +106,25 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Form validation
+    if (!formData.project_id) {
+      Error("Please select a project");
+      return;
+    }
+    if (!formData.role) {
+      Error("Please select a role");
+      return;
+    }
+    if (!formData.status) {
+      Error("Please select a status");
+      return;
+    }
+
     if (type === "add") {
       const userPlantData = {
         project_id: formData.project_id,
-        role: formData.role,
-        status: formData.status,
+        role: formData.role || "org_user",
+        status: formData.status || "active",
       };
       dispatch(createUserPlant({ user_id: userId as number, ...userPlantData }))
         .unwrap()
@@ -124,6 +136,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
               role: "",
               status: "",
             });
+            fetchUserPlants();
           }
         })
         .catch((error) => {
@@ -154,7 +167,12 @@ const UserPlants: React.FC<UserPlantsProps> = ({
           </label>
           <select
             value={formData.project_id}
-            onChange={(e) => setSelectedProject(parseInt(e.target.value))}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                project_id: parseInt(e.target.value),
+              }))
+            }
             className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
           >
             {projects.map((project) => (
@@ -170,7 +188,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
           </label>
           <select
             value={formData.role}
-            onChange={(e) => setSelectedRole(e.target.value)}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, role: e.target.value }))
+            }
             className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
           >
             {roleOptions.map((option) => (
@@ -185,7 +205,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
           </label>
           <select
             value={formData.status}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, status: e.target.value }))
+            }
             className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
           >
             {statusOptions.map((option) => (
@@ -293,16 +315,16 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                             <User className="w-16 h-16 text-text-muted mx-auto mb-4" />
                           }
                           title={
-                            selectedProject !== 0 ||
-                            selectedRole ||
-                            selectedStatus
+                            formData.project_id !== 0 ||
+                            formData.role ||
+                            formData.status
                               ? "No matching plants found"
                               : "No plants found for this user"
                           }
                           description={
-                            selectedProject !== 0 ||
-                            selectedRole ||
-                            selectedStatus
+                            formData.project_id !== 0 ||
+                            formData.role ||
+                            formData.status
                               ? "Try adjusting your filters or search terms"
                               : "This user doesn't have any plants assigned yet"
                           }
