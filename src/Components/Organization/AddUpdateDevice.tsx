@@ -16,6 +16,8 @@ import AddUpdateDepartment from "./AddUpdateDepartment";
 import { getDepartments } from "../../../store/departmentSlice";
 import AddDeviceFamily from "./AddDeviceFamily";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
+import AddDeviceType from "./AddDeviceType";
+import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -58,6 +60,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
   const [showAddDeviceFamilyPopup, setShowAddDeviceFamilyPopup] =
     useState(false);
+  const [showAddDeviceTypePopup, setShowAddDeviceTypePopup] = useState(false);
+  const [deviceFamilyId, setDeviceFamilyId] = useState(0);
 
   const resetForm = () => {
     setFormData({
@@ -233,6 +237,23 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       });
   };
 
+  const refreshDeviceTypeData = async () => {
+    await dispatch(getDeviceTypes())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setShowAddDeviceTypePopup(false);
+          onUpdateSuccess?.({
+            success: true,
+            data: { refreshDeviceTypes: true },
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -270,7 +291,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     setFormData((prev) => ({
                       ...prev,
                       device_family_id: parseInt(value) || 0,
+                      device_type_id: 0, // Reset device type when family changes
                     }));
+                    setDeviceFamilyId(parseInt(value) || 0);
                   }
                 }}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
@@ -309,19 +332,57 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               <select
                 name="device_type_id"
                 value={formData.device_type_id}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "add_new") {
+                    setShowAddDeviceTypePopup(true);
+                    setFormData((prev) => ({ ...prev, device_type_id: 0 }));
+                  } else {
+                    setShowAddDeviceTypePopup(false);
+                    setFormData((prev) => ({
+                      ...prev,
+                      device_type_id: parseInt(value) || 0,
+                    }));
+                  }
+                }}
+                disabled={!formData.device_family_id}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                   errors.device_type_id
                     ? "border-status-danger"
                     : "border-border-primary"
+                } ${
+                  !formData.device_family_id
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                 }`}
               >
-                <option value="0">Select Device Type</option>
-                {typeData.map((type) => (
-                  <option key={type.device_type_id} value={type.device_type_id}>
-                    {type.device_type_name}
+                <option value="0">
+                  {formData.device_family_id
+                    ? "Select Device Type"
+                    : "Select Device Family First"}
+                </option>
+                {formData.device_family_id &&
+                  typeData
+                    .filter(
+                      (type) =>
+                        type.device_family_id === formData.device_family_id
+                    )
+                    .map((type) => (
+                      <option
+                        key={type.device_type_id}
+                        value={type.device_type_id}
+                      >
+                        {type.device_type_name}
+                      </option>
+                    ))}
+                {formData.device_family_id && (
+                  <option
+                    value="add_new"
+                    className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                  >
+                    + Add New
                   </option>
-                ))}
+                )}
               </select>
               {errors.device_type_id && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
@@ -473,6 +534,18 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           type="add"
           onUpdateSuccess={() => {
             refreshDeviceFamilyData();
+          }}
+        />
+      )}
+
+      {/* Add Device Type Popup */}
+      {showAddDeviceTypePopup && (
+        <AddDeviceType
+          setShowAddDeviceTypePopup={setShowAddDeviceTypePopup}
+          type="add"
+          deviceFamilyId={deviceFamilyId}
+          onUpdateSuccess={() => {
+            refreshDeviceTypeData();
           }}
         />
       )}

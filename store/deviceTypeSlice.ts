@@ -55,6 +55,37 @@ export const getDeviceTypes = createAsyncThunk(
   }
 );
 
+// Create device type
+export const createDeviceType = createAsyncThunk(
+  "deviceType/createDeviceType",
+  async (
+    deviceType: {
+      device_family_id: number;
+      device_type_name: string;
+      topic: string;
+    },
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        "/device-type/admin/create-type",
+        deviceType,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create device type";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setDeviceTypes, setLoading, setError } = deviceTypeSlice.actions;
 
 export default deviceTypeSlice.reducer;
