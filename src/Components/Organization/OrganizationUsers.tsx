@@ -3,13 +3,14 @@ import {
   PlusCircle,
   User,
   SquarePen,
-  Trash2,
+  // Trash2,
   X,
   Loader2,
   ChevronRight,
   Home,
   Building2,
   ChevronDown,
+  User2,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
@@ -31,6 +32,7 @@ import {
   getOrganizations,
   setOrganizations,
 } from "../../../store/organizationSlice";
+import UserPlants from "./UserPlants";
 
 const OrganizationUsers = () => {
   const navigate = useNavigate();
@@ -50,6 +52,7 @@ const OrganizationUsers = () => {
   const [organizationClients, setOrganizationClients] = useState<
     ClientUsersResult[]
   >([]);
+  const [showUserPlants, setShowUserPlants] = useState(false);
 
   const fetchOrganizationClients = useCallback(async () => {
     if (isLoading || organizationId === 0) return;
@@ -192,6 +195,18 @@ const OrganizationUsers = () => {
     } else {
       fetchOrganizationClients();
     }
+  };
+
+  const handleViewPlants = (clientId: string, organizationId: string) => {
+    setShowUserPlants(true);
+    setClientId(parseInt(clientId));
+    setOrganizationId(parseInt(organizationId));
+  };
+
+  const handleCloseUserPlants = () => {
+    setShowUserPlants(false);
+    setClientId(0);
+    setOrganizationId(0);
   };
 
   return (
@@ -440,7 +455,18 @@ const OrganizationUsers = () => {
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"
                         />
-                        <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
+                        <span title="View Plants">
+                          <User2
+                            className="w-5 h-5 text-text-primary cursor-pointer"
+                            onClick={() =>
+                              handleViewPlants(
+                                user.client_id.toString(),
+                                user.organization_id.toString()
+                              )
+                            }
+                          />
+                        </span>
+                        {/* <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" /> */}
                       </div>
                     </td>
                   </tr>
@@ -484,6 +510,15 @@ const OrganizationUsers = () => {
           onClose={handleCloseAddModal}
           organizationId={organizationId as number}
           organizationData={organizations}
+        />
+      )}
+
+      {showUserPlants && (
+        <UserPlants
+          onClose={handleCloseUserPlants}
+          userId={clientId}
+          organizationId={organizationId.toString()}
+          type={modalType}
         />
       )}
     </div>
