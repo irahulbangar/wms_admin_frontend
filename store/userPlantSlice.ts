@@ -107,7 +107,7 @@ export const getUserPlantByUserId = createAsyncThunk(
 );
 
 // PUT user plant by user_plant_id
-export const updateUserPlantByUserPlantId = createAsyncThunk(
+export const updateUserPlantByUserId = createAsyncThunk(
   "userPlant/updateUserPlantByUserPlantId",
   async (userPlant: UserPlantPayloadUpdate, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;

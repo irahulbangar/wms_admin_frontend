@@ -4,7 +4,7 @@ import { useAppDispatch } from "../../../store/store";
 import {
   createUserPlant,
   getUserPlantByUserId,
-  updateUserPlantByUserPlantId,
+  updateUserPlantByUserId,
 } from "../../../store/userPlantSlice";
 import { getProjectsByOrganizationId } from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
@@ -35,7 +35,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
 
   const [userPlants, setUserPlants] = useState<UserPlantResult[]>([]);
   const [projects, setProjects] = useState<ProjectResult[]>([]);
-  const [loading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<UserPlantFormData>({
     project_id: 0,
     role: "",
@@ -58,17 +58,13 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   const fetchUserPlants = useCallback(async () => {
     if (userId) {
       try {
-        await dispatch(getUserPlantByUserId(userId))
-          .unwrap()
-          .then((res) => {
-            if (res.success && res.data) {
-              setUserPlants(res.data);
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching user plants:", error);
-            Error(error as string);
-          });
+        console.log("Fetching user plants for userId:", userId);
+        const result = await dispatch(getUserPlantByUserId(userId)).unwrap();
+        console.log("User plants fetch result:", result);
+        if (result.success && result.data) {
+          setUserPlants(result.data);
+          console.log("User plants set:", result.data);
+        }
       } catch (error) {
         console.error("Error fetching user plants:", error);
         Error(error as string);
@@ -110,7 +106,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
     onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!formData.project_id) {
@@ -132,46 +128,59 @@ const UserPlants: React.FC<UserPlantsProps> = ({
       status: formData.status || "active",
     };
 
-    if (editingUserPlantId) {
-      dispatch(
-        updateUserPlantByUserPlantId({
-          user_id: userId as number,
+    setLoading(true);
+
+    try {
+      if (editingUserPlantId) {
+        console.log("Updating user plant with data:", {
+          user_id: userId,
           ...userPlantData,
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            Success(res.message);
-            setFormData({
-              project_id: 0,
-              role: "",
-              status: "",
-            });
-            setEditingUserPlantId(null);
-            fetchUserPlants();
-          }
-        })
-        .catch((error) => {
-          Error(error as string);
         });
-    } else {
-      dispatch(createUserPlant({ ...userPlantData }))
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            Success(res.message);
-            setFormData({
-              project_id: 0,
-              role: "",
-              status: "",
-            });
-            fetchUserPlants();
-          }
-        })
-        .catch((error) => {
-          Error(error as string);
+        await dispatch(
+          updateUserPlantByUserId({
+            user_id: userId as number,
+            ...userPlantData,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message);
+              setFormData({
+                project_id: 0,
+                role: "",
+                status: "",
+              });
+            }
+          });
+      } else {
+        console.log("Creating user plant with data:", {
+          user_id: userId,
+          ...userPlantData,
         });
+        await dispatch(createUserPlant({ ...userPlantData }))
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message);
+              setFormData({
+                project_id: 0,
+                role: "",
+                status: "",
+              });
+            }
+          })
+          .catch((error) => {
+            Error(error as string);
+          });
+      }
+
+      await fetchUserPlants();
+    } catch (error) {
+      console.error("Operation error:", error);
+      Error(error as string);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -269,9 +278,19 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             </button>
             <button
               type="submit"
+              disabled={loading}
               className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer font-roboto"
             >
-              {editingUserPlantId ? "Update User Plant" : "Add User Plant"}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {editingUserPlantId ? "Updating..." : "Adding..."}
+                </>
+              ) : editingUserPlantId ? (
+                "Update User Plant"
+              ) : (
+                "Add User Plant"
+              )}
             </button>
           </div>
         </form>
