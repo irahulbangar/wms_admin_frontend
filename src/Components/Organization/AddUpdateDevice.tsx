@@ -14,6 +14,8 @@ import { Error, Success } from "../../utils/toast";
 import type { DepartmentResult } from "../../../model/department.interface";
 import AddUpdateDepartment from "./AddUpdateDepartment";
 import { getDepartments } from "../../../store/departmentSlice";
+import AddDeviceFamily from "./AddDeviceFamily";
+import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -54,6 +56,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     department_id: departmentId,
   });
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
+  const [showAddDeviceFamilyPopup, setShowAddDeviceFamilyPopup] =
+    useState(false);
 
   const resetForm = () => {
     setFormData({
@@ -212,6 +216,23 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       });
   };
 
+  const refreshDeviceFamilyData = async () => {
+    await dispatch(getDeviceFamiliy())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setShowAddDeviceFamilyPopup(false);
+          onUpdateSuccess?.({
+            success: true,
+            data: { refreshDeviceFamilies: true },
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -239,7 +260,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               <select
                 name="device_family_id"
                 value={formData.device_family_id}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "add_new") {
+                    setShowAddDeviceFamilyPopup(true);
+                    setFormData((prev) => ({ ...prev, device_family_id: 0 }));
+                  } else {
+                    setShowAddDeviceFamilyPopup(false);
+                    setFormData((prev) => ({
+                      ...prev,
+                      device_family_id: parseInt(value) || 0,
+                    }));
+                  }
+                }}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                   errors.device_family_id
                     ? "border-status-danger"
@@ -255,6 +288,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     {family.name}
                   </option>
                 ))}
+                <option
+                  value="add_new"
+                  className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                >
+                  + Add New
+                </option>
               </select>
               {errors.device_family_id && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
@@ -424,6 +463,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           departmentId={departmentId}
           onUpdateSuccess={() => {
             refreshDepartmentData();
+          }}
+        />
+      )}
+
+      {showAddDeviceFamilyPopup && (
+        <AddDeviceFamily
+          setShowAddDeviceFamilyPopup={setShowAddDeviceFamilyPopup}
+          type="add"
+          onUpdateSuccess={() => {
+            refreshDeviceFamilyData();
           }}
         />
       )}

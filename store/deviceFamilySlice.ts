@@ -57,6 +57,32 @@ export const getDeviceFamiliy = createAsyncThunk(
   }
 );
 
+// Create device family
+export const createDeviceFamily = createAsyncThunk(
+  "deviceFamily/createDeviceFamily",
+  async (deviceFamily: { name: string }, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        "/device-family/admin/create-family",
+        deviceFamily,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to create device family";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setDeviceFamilies, setLoading, setError } =
   deviceFamilySlice.actions;
 
