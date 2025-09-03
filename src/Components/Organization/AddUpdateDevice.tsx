@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Loader2, Edit } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useAppDispatch } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
@@ -376,7 +376,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                         )?.name || "Device Family"
                       }`}
                     >
-                      <Edit className="w-4 h-4 text-status-info" />
+                      {/* <Edit className="w-4 h-4 text-status-info" /> */}
                     </button>
                   </div>
                 )}
@@ -474,7 +474,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                         )?.device_type_name || "Device Type"
                       }`}
                     >
-                      <Edit className="w-4 h-4 text-status-info" />
+                      {/* <Edit className="w-4 h-4 text-status-info" /> */}
                     </button>
                   </div>
                 )}
