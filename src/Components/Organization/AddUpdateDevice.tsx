@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Loader2, Edit } from "lucide-react";
+import { X, Loader2, Edit, Trash2 } from "lucide-react";
 import { useAppDispatch } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
@@ -66,6 +66,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     number | null
   >(null);
   const [editingDeviceFamilyName, setEditingDeviceFamilyName] =
+    useState<string>("");
+  const [editingDeviceTypeId, setEditingDeviceTypeId] = useState<number | null>(
+    null
+  );
+  const [editingDeviceTypeName, setEditingDeviceTypeName] =
+    useState<string>("");
+  const [editingDeviceTypeTopic, setEditingDeviceTypeTopic] =
     useState<string>("");
 
   const resetForm = () => {
@@ -218,6 +225,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
   }, [showAddDeviceFamilyPopup]);
 
+  useEffect(() => {
+    if (!showAddDeviceTypePopup) {
+      setEditingDeviceTypeId(null);
+      setEditingDeviceTypeName("");
+      setEditingDeviceTypeTopic("");
+    }
+  }, [showAddDeviceTypePopup]);
+
   const refreshDepartmentData = async () => {
     await dispatch(getDepartments())
       .unwrap()
@@ -353,7 +368,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                           setShowAddDeviceFamilyPopup(true);
                         }
                       }}
-                      className="p-1 hover:bg-secondary/50 rounded transition-colors"
+                      className="p-1 hover:bg-secondary/50 rounded transition-colors flex items-center gap-2"
                       title={`Edit ${
                         familyData.find(
                           (f) =>
@@ -362,6 +377,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }`}
                     >
                       <Edit className="w-4 h-4 text-status-info" />
+                      <Trash2 className="w-4 h-4 text-status-danger" />
                     </button>
                   </div>
                 )}
@@ -377,61 +393,94 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                 Device Type
               </label>
-              <select
-                name="device_type_id"
-                value={formData.device_type_id}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === "add_new") {
-                    setShowAddDeviceTypePopup(true);
-                    setFormData((prev) => ({ ...prev, device_type_id: 0 }));
-                  } else {
-                    setShowAddDeviceTypePopup(false);
-                    setFormData((prev) => ({
-                      ...prev,
-                      device_type_id: parseInt(value) || 0,
-                    }));
-                  }
-                }}
-                disabled={!formData.device_family_id}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.device_type_id
-                    ? "border-status-danger"
-                    : "border-border-primary"
-                } ${
-                  !formData.device_family_id
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-              >
-                <option value="0">
-                  {formData.device_family_id
-                    ? "Select Device Type"
-                    : "Select Device Family First"}
-                </option>
-                {formData.device_family_id &&
-                  typeData
-                    .filter(
-                      (type) =>
-                        type.device_family_id === formData.device_family_id
-                    )
-                    .map((type) => (
-                      <option
-                        key={type.device_type_id}
-                        value={type.device_type_id}
-                      >
-                        {type.device_type_name}
-                      </option>
-                    ))}
-                {formData.device_family_id && (
-                  <option
-                    value="add_new"
-                    className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
-                  >
-                    + Add New
+              <div className="relative">
+                <select
+                  name="device_type_id"
+                  value={formData.device_type_id}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "add_new") {
+                      setShowAddDeviceTypePopup(true);
+                      setFormData((prev) => ({ ...prev, device_type_id: 0 }));
+                    } else {
+                      setShowAddDeviceTypePopup(false);
+                      setFormData((prev) => ({
+                        ...prev,
+                        device_type_id: parseInt(value) || 0,
+                      }));
+                    }
+                  }}
+                  disabled={!formData.device_family_id}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.device_type_id
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  } ${
+                    !formData.device_family_id
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  <option value="0">
+                    {formData.device_family_id
+                      ? "Select Device Type"
+                      : "Select Device Family First"}
                   </option>
+                  {formData.device_family_id &&
+                    typeData
+                      .filter(
+                        (type) =>
+                          type.device_family_id === formData.device_family_id
+                      )
+                      .map((type) => (
+                        <option
+                          key={type.device_type_id}
+                          value={type.device_type_id}
+                        >
+                          {type.device_type_name}
+                        </option>
+                      ))}
+                  {formData.device_family_id && (
+                    <option
+                      value="add_new"
+                      className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                    >
+                      + Add New
+                    </option>
+                  )}
+                </select>
+
+                {formData.device_type_id !== 0 && (
+                  <div className="absolute right-5 cursor-pointer top-1/2 transform -translate-y-1/2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const selectedType = typeData.find(
+                          (type) =>
+                            type.device_type_id === formData.device_type_id
+                        );
+                        if (selectedType) {
+                          setEditingDeviceTypeId(selectedType.device_type_id);
+                          setEditingDeviceTypeName(
+                            selectedType.device_type_name
+                          );
+                          setEditingDeviceTypeTopic(selectedType.topic);
+                          setShowAddDeviceTypePopup(true);
+                        }
+                      }}
+                      className="p-1 hover:bg-secondary/50 rounded transition-colors flex items-center gap-2"
+                      title={`Edit ${
+                        typeData.find(
+                          (t) => t.device_type_id === formData.device_type_id
+                        )?.device_type_name || "Device Type"
+                      }`}
+                    >
+                      <Edit className="w-4 h-4 text-status-info" />
+                      <Trash2 className="w-4 h-4 text-status-danger" />
+                    </button>
+                  </div>
                 )}
-              </select>
+              </div>
               {errors.device_type_id && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
                   {errors.device_type_id}
@@ -594,10 +643,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       {showAddDeviceTypePopup && (
         <AddDeviceType
           setShowAddDeviceTypePopup={setShowAddDeviceTypePopup}
-          type="add"
+          type={editingDeviceTypeId ? "update" : "add"}
           deviceFamilyId={deviceFamilyId}
+          deviceTypeId={editingDeviceTypeId || undefined}
+          deviceTypeName={editingDeviceTypeName || undefined}
+          deviceTypeTopic={editingDeviceTypeTopic || undefined}
           onUpdateSuccess={() => {
             refreshDeviceTypeData();
+            setEditingDeviceTypeId(null);
+            setEditingDeviceTypeName("");
+            setEditingDeviceTypeTopic("");
           }}
         />
       )}

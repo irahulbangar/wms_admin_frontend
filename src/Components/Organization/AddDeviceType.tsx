@@ -1,13 +1,19 @@
 import { X, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useAppDispatch } from "../../../store/store";
-import { createDeviceType } from "../../../store/deviceTypeSlice";
+import {
+  createDeviceType,
+  updateDeviceType,
+} from "../../../store/deviceTypeSlice";
 import { Error, Success } from "../../utils/toast";
 
 interface AddDeviceTypeProps {
   setShowAddDeviceTypePopup: (show: boolean) => void;
   type: "add" | "update";
   deviceFamilyId: number;
+  deviceTypeId?: number;
+  deviceTypeName?: string;
+  deviceTypeTopic?: string;
   onUpdateSuccess: () => void;
 }
 
@@ -15,13 +21,16 @@ const AddDeviceType: React.FC<AddDeviceTypeProps> = ({
   setShowAddDeviceTypePopup,
   type,
   deviceFamilyId,
+  deviceTypeId,
+  deviceTypeName: initialDeviceTypeName,
+  deviceTypeTopic: initialDeviceTypeTopic,
   onUpdateSuccess,
 }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    device_type_name: "",
-    topic: "",
+    device_type_name: initialDeviceTypeName || "",
+    topic: initialDeviceTypeTopic || "",
   });
   const [errors, setErrors] = useState({ device_type_name: "", topic: "" });
 
@@ -44,27 +53,50 @@ const AddDeviceType: React.FC<AddDeviceTypeProps> = ({
 
     try {
       setIsLoading(true);
-      await dispatch(
-        createDeviceType({
-          device_family_id: deviceFamilyId,
-          device_type_name: formData.device_type_name,
-          topic: formData.topic,
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            Success(res.message);
-            setShowAddDeviceTypePopup(false);
-            setFormData({ device_type_name: "", topic: "" });
-            onUpdateSuccess();
-          } else {
-            Error(res.message);
-          }
-        });
+
+      if (type === "add") {
+        await dispatch(
+          createDeviceType({
+            device_family_id: deviceFamilyId,
+            device_type_name: formData.device_type_name,
+            topic: formData.topic,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message);
+              setShowAddDeviceTypePopup(false);
+              setFormData({ device_type_name: "", topic: "" });
+              onUpdateSuccess();
+            } else {
+              Error(res.message);
+            }
+          });
+      } else if (type === "update" && deviceTypeId) {
+        await dispatch(
+          updateDeviceType({
+            device_type_id: deviceTypeId,
+            device_family_id: deviceFamilyId,
+            device_type_name: formData.device_type_name,
+            topic: formData.topic,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message);
+              setShowAddDeviceTypePopup(false);
+              setFormData({ device_type_name: "", topic: "" });
+              onUpdateSuccess();
+            } else {
+              Error(res.message);
+            }
+          });
+      }
     } catch (error) {
-      console.error("Error creating device type:", error);
-      Error("Failed to create device type");
+      console.error("Error creating/updating device type:", error);
+      Error(`Failed to ${type} device type`);
     } finally {
       setIsLoading(false);
     }

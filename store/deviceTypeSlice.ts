@@ -86,6 +86,42 @@ export const createDeviceType = createAsyncThunk(
   }
 );
 
+// Update device type
+export const updateDeviceType = createAsyncThunk(
+  "deviceType/updateDeviceType",
+  async (
+    data: {
+      device_type_id: number;
+      device_family_id: number;
+      device_type_name: string;
+      topic: string;
+    },
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().put(
+        `/device-type/admin/update-device-type/${data.device_type_id}`,
+        {
+          device_family_id: data.device_family_id,
+          device_type_name: data.device_type_name,
+          topic: data.topic,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update device type";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setDeviceTypes, setLoading, setError } = deviceTypeSlice.actions;
 
 export default deviceTypeSlice.reducer;
