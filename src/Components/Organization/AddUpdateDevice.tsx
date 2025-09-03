@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Edit } from "lucide-react";
 import { useAppDispatch } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
@@ -62,6 +62,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     useState(false);
   const [showAddDeviceTypePopup, setShowAddDeviceTypePopup] = useState(false);
   const [deviceFamilyId, setDeviceFamilyId] = useState(0);
+  const [editingDeviceFamilyId, setEditingDeviceFamilyId] = useState<
+    number | null
+  >(null);
+  const [editingDeviceFamilyName, setEditingDeviceFamilyName] =
+    useState<string>("");
 
   const resetForm = () => {
     setFormData({
@@ -206,6 +211,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
   }, [deviceId, type]);
 
+  useEffect(() => {
+    if (!showAddDeviceFamilyPopup) {
+      setEditingDeviceFamilyId(null);
+      setEditingDeviceFamilyName("");
+    }
+  }, [showAddDeviceFamilyPopup]);
+
   const refreshDepartmentData = async () => {
     await dispatch(getDepartments())
       .unwrap()
@@ -281,46 +293,79 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                 Device Family
               </label>
-              <select
-                name="device_family_id"
-                value={formData.device_family_id}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === "add_new") {
-                    setShowAddDeviceFamilyPopup(true);
-                    setFormData((prev) => ({ ...prev, device_family_id: 0 }));
-                  } else {
-                    setShowAddDeviceFamilyPopup(false);
-                    setFormData((prev) => ({
-                      ...prev,
-                      device_family_id: parseInt(value) || 0,
-                      device_type_id: 0, // Reset device type when family changes
-                    }));
-                    setDeviceFamilyId(parseInt(value) || 0);
-                  }
-                }}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.device_family_id
-                    ? "border-status-danger"
-                    : "border-border-primary"
-                }`}
-              >
-                <option value="0">Select Device Family</option>
-                {familyData.map((family) => (
-                  <option
-                    key={family.device_family_id}
-                    value={family.device_family_id}
-                  >
-                    {family.name}
-                  </option>
-                ))}
-                <option
-                  value="add_new"
-                  className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+              <div className="relative">
+                <select
+                  name="device_family_id"
+                  value={formData.device_family_id}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "add_new") {
+                      setShowAddDeviceFamilyPopup(true);
+                      setFormData((prev) => ({ ...prev, device_family_id: 0 }));
+                    } else {
+                      setShowAddDeviceFamilyPopup(false);
+                      setFormData((prev) => ({
+                        ...prev,
+                        device_family_id: parseInt(value) || 0,
+                        device_type_id: 0, // Reset device type when family changes
+                      }));
+                      setDeviceFamilyId(parseInt(value) || 0);
+                    }
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.device_family_id
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
                 >
-                  + Add New
-                </option>
-              </select>
+                  <option value="0">Select Device Family</option>
+                  {familyData.map((family) => (
+                    <option
+                      key={family.device_family_id}
+                      value={family.device_family_id}
+                    >
+                      {family.name}
+                    </option>
+                  ))}
+                  <option
+                    value="add_new"
+                    className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                  >
+                    + Add New
+                  </option>
+                </select>
+
+                {formData.device_family_id !== 0 && (
+                  <div className="absolute right-5 top-1/2 transform -translate-y-1/2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const selectedFamily = familyData.find(
+                          (family) =>
+                            family.device_family_id ===
+                            formData.device_family_id
+                        );
+                        if (selectedFamily) {
+                          setEditingDeviceFamilyId(
+                            selectedFamily.device_family_id
+                          );
+                          setEditingDeviceFamilyName(selectedFamily.name);
+                          setShowAddDeviceFamilyPopup(true);
+                        }
+                      }}
+                      className="p-1 hover:bg-secondary/50 rounded transition-colors"
+                      title={`Edit ${
+                        familyData.find(
+                          (f) =>
+                            f.device_family_id === formData.device_family_id
+                        )?.name || "Device Family"
+                      }`}
+                    >
+                      <Edit className="w-4 h-4 text-status-info" />
+                    </button>
+                  </div>
+                )}
+              </div>
               {errors.device_family_id && (
                 <p className="text-status-danger text-sm mt-1 font-roboto">
                   {errors.device_family_id}
@@ -534,9 +579,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       {showAddDeviceFamilyPopup && (
         <AddDeviceFamily
           setShowAddDeviceFamilyPopup={setShowAddDeviceFamilyPopup}
-          type="add"
+          type={editingDeviceFamilyId ? "update" : "add"}
+          deviceFamilyId={editingDeviceFamilyId || undefined}
+          deviceFamilyName={editingDeviceFamilyName || undefined}
           onUpdateSuccess={() => {
             refreshDeviceFamilyData();
+            setEditingDeviceFamilyId(null);
+            setEditingDeviceFamilyName("");
           }}
         />
       )}

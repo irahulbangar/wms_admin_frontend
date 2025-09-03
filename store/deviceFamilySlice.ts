@@ -83,6 +83,32 @@ export const createDeviceFamily = createAsyncThunk(
   }
 );
 
+// Update device family
+export const updateDeviceFamily = createAsyncThunk(
+  "deviceFamily/updateDeviceFamily",
+  async (data: { device_family_id: number; name: string }, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().put(
+        `/device-family/admin/update-family/${data.device_family_id}`,
+        { name: data.name },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update device family";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setDeviceFamilies, setLoading, setError } =
   deviceFamilySlice.actions;
 

@@ -1,23 +1,32 @@
 import { X, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useAppDispatch } from "../../../store/store";
-import { createDeviceFamily } from "../../../store/deviceFamilySlice";
+import {
+  createDeviceFamily,
+  updateDeviceFamily,
+} from "../../../store/deviceFamilySlice";
 import { Error, Success } from "../../utils/toast";
 
 interface AddDeviceFamilyProps {
   setShowAddDeviceFamilyPopup: (show: boolean) => void;
   type: "add" | "update";
+  deviceFamilyId?: number;
+  deviceFamilyName?: string;
   onUpdateSuccess: () => void;
 }
 
 const AddDeviceFamily: React.FC<AddDeviceFamilyProps> = ({
   setShowAddDeviceFamilyPopup,
   type,
+  deviceFamilyId,
+  deviceFamilyName: initialDeviceFamilyName,
   onUpdateSuccess,
 }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [deviceFamilyName, setDeviceFamilyName] = useState("");
+  const [deviceFamilyName, setDeviceFamilyName] = useState(
+    initialDeviceFamilyName || ""
+  );
   const [errors, setErrors] = useState({ name: "" });
   const handleAddDeviceFamily = async () => {
     if (!deviceFamilyName.trim()) {
@@ -30,25 +39,46 @@ const AddDeviceFamily: React.FC<AddDeviceFamilyProps> = ({
 
     try {
       setIsLoading(true);
-      await dispatch(
-        createDeviceFamily({
-          name: deviceFamilyName,
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            Success(res.message);
-            setShowAddDeviceFamilyPopup(false);
-            setDeviceFamilyName("");
-            onUpdateSuccess();
-          } else {
-            Error(res.message);
-          }
-        });
+
+      if (type === "add") {
+        await dispatch(
+          createDeviceFamily({
+            name: deviceFamilyName,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message);
+              setShowAddDeviceFamilyPopup(false);
+              setDeviceFamilyName("");
+              onUpdateSuccess();
+            } else {
+              Error(res.message);
+            }
+          });
+      } else if (type === "update" && deviceFamilyId) {
+        await dispatch(
+          updateDeviceFamily({
+            device_family_id: deviceFamilyId,
+            name: deviceFamilyName,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message);
+              setShowAddDeviceFamilyPopup(false);
+              setDeviceFamilyName("");
+              onUpdateSuccess();
+            } else {
+              Error(res.message);
+            }
+          });
+      }
     } catch (error) {
-      console.error("Error creating device family:", error);
-      Error("Failed to create device family");
+      console.error("Error creating/updating device family:", error);
+      Error(`Failed to ${type} device family`);
     } finally {
       setIsLoading(false);
     }
