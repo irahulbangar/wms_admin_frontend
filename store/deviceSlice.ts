@@ -65,7 +65,7 @@ export const createDevice = createAsyncThunk(
     try {
       const response = await api().post("/device/admin/create-device", device, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       return response.data;
@@ -87,7 +87,7 @@ export const getAllDevices = createAsyncThunk(
         "/device/admin/all-devices",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -108,7 +108,7 @@ export const getDeviceById = createAsyncThunk(
     try {
       const response = await api().get(`/device/admin/${id}`, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       return response.data;
@@ -131,7 +131,7 @@ export const updateDevice = createAsyncThunk(
         device,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -154,7 +154,7 @@ export const getDeviceByProjectId = createAsyncThunk(
         `/device/admin/device-by-projectId/${projectId}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -187,7 +187,7 @@ export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
         `/device/admin/project-organization/${projectId}/${organizationId}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

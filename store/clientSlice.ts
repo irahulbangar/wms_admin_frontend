@@ -69,7 +69,7 @@ export const createClient = createAsyncThunk(
         payload,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -91,7 +91,7 @@ export const getAllClients = createAsyncThunk(
         "/clients/admin/all-clients",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -111,7 +111,7 @@ export const getClientById = createAsyncThunk(
     try {
       const response = await api().get(`/clients/admin/client/${id}`, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
 
@@ -143,7 +143,7 @@ export const updateClient = createAsyncThunk(
         payload,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -165,7 +165,7 @@ export const deleteClient = createAsyncThunk(
         `/clients/admin/delete-client/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -187,7 +187,7 @@ export const getClientsByOrganizationId = createAsyncThunk(
         `/clients/admin/organization/${organizationId}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

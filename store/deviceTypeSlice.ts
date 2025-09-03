@@ -42,7 +42,7 @@ export const getDeviceTypes = createAsyncThunk(
         "/device-type/admin/all-device-type",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -73,7 +73,7 @@ export const createDeviceType = createAsyncThunk(
         deviceType,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -109,7 +109,7 @@ export const updateDeviceType = createAsyncThunk(
         },
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

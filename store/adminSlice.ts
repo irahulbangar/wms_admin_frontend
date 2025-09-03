@@ -60,7 +60,6 @@ export const adminSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       state.error = null;
-      sessionStorage.clear();
       localStorage.clear();
     },
     setLoading: (state, action) => {
@@ -68,8 +67,8 @@ export const adminSlice = createSlice({
     },
     checkAuthStatus: (state) => {
       try {
-        const token = sessionStorage.getItem("accessToken");
-        const admin = sessionStorage.getItem("admin");
+        const token = localStorage.getItem("accessToken");
+        const admin = localStorage.getItem("admin");
 
         if (token && admin) {
           const decodedToken = jwtDecode<CustomJwtPayload>(token);
@@ -79,7 +78,6 @@ export const adminSlice = createSlice({
             state.admin = null;
             state.token = null;
             state.isAuthenticated = false;
-            sessionStorage.clear();
             localStorage.clear();
           } else {
             state.admin = JSON.parse(admin);
@@ -96,7 +94,6 @@ export const adminSlice = createSlice({
         state.admin = null;
         state.token = null;
         state.isAuthenticated = false;
-        sessionStorage.clear();
         localStorage.clear();
       }
     },
@@ -115,8 +112,8 @@ export const loginAdmin = createAsyncThunk(
       thunkAPI.dispatch(setLoading(true));
       const response = await api().post<LoginResponse>("/admin/login", data);
       if (response.data.success) {
-        sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
-        sessionStorage.setItem("accessToken", response.data.token);
+        localStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
+        localStorage.setItem("accessToken", response.data.token);
         const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
         const admin = {
           email: decodedToken.email,
@@ -125,7 +122,7 @@ export const loginAdmin = createAsyncThunk(
           contact_number: decodedToken.contact_number,
           status: decodedToken.status,
         };
-        sessionStorage.setItem("admin", JSON.stringify(admin));
+        localStorage.setItem("admin", JSON.stringify(admin));
         thunkAPI.dispatch(setAdmin(admin));
         thunkAPI.dispatch(setToken(response.data.token));
       }
@@ -147,7 +144,7 @@ export const getAllUsers = createAsyncThunk(
     try {
       const response = await api().get<AdminUsersResponse>("/admin/all-users", {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       return response.data;

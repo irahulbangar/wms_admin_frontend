@@ -33,7 +33,6 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    sessionStorage.clear();
     localStorage.clear();
 
     try {

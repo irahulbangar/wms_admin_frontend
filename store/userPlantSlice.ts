@@ -37,7 +37,7 @@ export const getAllUserPlants = createAsyncThunk(
         "/user-plant/admin/all-user-plants",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -72,7 +72,7 @@ export const createUserPlant = createAsyncThunk(
         userPlant,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -93,7 +93,7 @@ export const getUserPlantByUserId = createAsyncThunk(
     try {
       const response = await api().get(`/user-plant/admin/${user_id}`, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       return response.data;
@@ -118,7 +118,7 @@ export const updateUserPlantByUserId = createAsyncThunk(
         userPlant,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

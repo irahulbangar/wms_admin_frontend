@@ -33,7 +33,7 @@ export const createDepartment = createAsyncThunk(
         department,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -54,7 +54,7 @@ export const getDepartments = createAsyncThunk(
         "/department/admin/all-departments",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -79,7 +79,7 @@ export const updateDepartment = createAsyncThunk(
         department,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -98,7 +98,7 @@ export const getDepartmentById = createAsyncThunk(
     try {
       const response = await api().get(`/department/admin/${department_id}`, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       return response.data;
@@ -118,7 +118,7 @@ export const getDepartmentByProjectId = createAsyncThunk(
         `/department/admin/department-project/${project_id}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

@@ -42,7 +42,7 @@ export const getDeviceFamiliy = createAsyncThunk(
         "/device-family/admin/all-device-family",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -68,7 +68,7 @@ export const createDeviceFamily = createAsyncThunk(
         deviceFamily,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -94,7 +94,7 @@ export const updateDeviceFamily = createAsyncThunk(
         { name: data.name },
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

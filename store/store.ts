@@ -10,11 +10,11 @@ const listenerMiddlewareInstance = createListenerMiddleware({
   onError: () => console.error,
 });
 
-// Initialize store with authentication state from sessionStorage
+// Initialize store with authentication state from localStorage
 const getInitialState = () => {
   try {
-    const token = sessionStorage.getItem("accessToken");
-    const admin = sessionStorage.getItem("admin");
+    const token = localStorage.getItem("accessToken");
+    const admin = localStorage.getItem("admin");
 
     if (token && admin) {
       const adminData = JSON.parse(admin);
@@ -30,7 +30,7 @@ const getInitialState = () => {
     }
   } catch (error) {
     console.error("Error restoring auth state:", error);
-    sessionStorage.clear();
+    localStorage.clear();
   }
 
   return {};

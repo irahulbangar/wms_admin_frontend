@@ -55,7 +55,7 @@ export const getAllProjects = createAsyncThunk(
         "/project/admin/all-projects",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -77,7 +77,7 @@ export const getProjectById = createAsyncThunk(
         `/project/admin/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -99,7 +99,7 @@ export const getProjectsByOrganizationId = createAsyncThunk(
         `/project/admin/organization-projects/${organization_id}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -131,7 +131,7 @@ export const addProject = createAsyncThunk(
         project,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -154,7 +154,7 @@ export const updateProjectById = createAsyncThunk(
         project,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -176,7 +176,7 @@ export const deleteProjectById = createAsyncThunk(
         `/project/delete-project/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );

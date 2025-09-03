@@ -48,7 +48,7 @@ export const getOrganizations = createAsyncThunk(
         "/organization/admin/all-organizations",
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -85,7 +85,7 @@ export const addOrganization = createAsyncThunk(
         organization,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -108,7 +108,7 @@ export const updateOrganization = createAsyncThunk(
         organizationData,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -129,7 +129,7 @@ export const getOrganizationById = createAsyncThunk(
     try {
       const response = await api().get(`/organization/admin/${id}`, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       return response.data;
@@ -149,7 +149,7 @@ export const deleteOrganization = createAsyncThunk(
         `/organization/admin/delete-organization/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
