@@ -810,7 +810,7 @@ const Devices = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-full bg-primary rounded-lg mb-5">
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
           <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
       ) : (

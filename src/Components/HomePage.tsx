@@ -132,7 +132,7 @@ const HomePage = () => {
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-input-bg p-4 md:p-6 space-y-4 md:space-y-6">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-input-bg p-4 space-y-4">
             {renderContent()}
           </main>
           <Footer />
