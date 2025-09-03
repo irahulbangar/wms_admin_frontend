@@ -52,9 +52,12 @@ export const getAllUserPlants = createAsyncThunk(
 
 interface UserPlantPayload {
   project_id: number;
-  user_id: number;
   role: string;
   status: string;
+}
+
+interface UserPlantPayloadUpdate extends UserPlantPayload {
+  user_id: number;
 }
 
 // POST USER PLANT
@@ -98,6 +101,32 @@ export const getUserPlantByUserId = createAsyncThunk(
         error instanceof Error
           ? error.message
           : "Failed to get user plant by user id";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// PUT user plant by user_plant_id
+export const updateUserPlantByUserPlantId = createAsyncThunk(
+  "userPlant/updateUserPlantByUserPlantId",
+  async (userPlant: UserPlantPayloadUpdate, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().put(
+        `/user-plant/admin/update-plant/${userPlant.user_id}`,
+        userPlant,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update user plant by user plant id";
       return rejectWithValue(errorMessage);
     }
   }

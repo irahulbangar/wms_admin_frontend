@@ -4,6 +4,7 @@ import { useAppDispatch } from "../../../store/store";
 import {
   createUserPlant,
   getUserPlantByUserId,
+  updateUserPlantByUserPlantId,
 } from "../../../store/userPlantSlice";
 import { getProjectsByOrganizationId } from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
@@ -17,7 +18,6 @@ interface UserPlantsProps {
   onClose: () => void;
   userId?: number;
   organizationId: string;
-  type: "add" | "update";
 }
 
 interface UserPlantFormData {
@@ -30,7 +30,6 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   onClose,
   userId,
   organizationId,
-  type,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -42,6 +41,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
     role: "",
     status: "",
   });
+  const [editingUserPlantId, setEditingUserPlantId] = useState<number | null>(
+    null
+  );
 
   const roleOptions = [
     { value: "org_user", label: "User" },
@@ -99,13 +101,18 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   }, [fetchUserPlants, fetchProjects]);
 
   const handleClose = () => {
+    setEditingUserPlantId(null);
+    setFormData({
+      project_id: 0,
+      role: "",
+      status: "",
+    });
     onClose();
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Form validation
     if (!formData.project_id) {
       Error("Please select a project");
       return;
@@ -119,13 +126,37 @@ const UserPlants: React.FC<UserPlantsProps> = ({
       return;
     }
 
-    if (type === "add") {
-      const userPlantData = {
-        project_id: formData.project_id,
-        role: formData.role || "org_user",
-        status: formData.status || "active",
-      };
-      dispatch(createUserPlant({ user_id: userId as number, ...userPlantData }))
+    const userPlantData = {
+      project_id: formData.project_id,
+      role: formData.role || "org_user",
+      status: formData.status || "active",
+    };
+
+    if (editingUserPlantId) {
+      dispatch(
+        updateUserPlantByUserPlantId({
+          user_id: userId as number,
+          ...userPlantData,
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            Success(res.message);
+            setFormData({
+              project_id: 0,
+              role: "",
+              status: "",
+            });
+            setEditingUserPlantId(null);
+            fetchUserPlants();
+          }
+        })
+        .catch((error) => {
+          Error(error as string);
+        });
+    } else {
+      dispatch(createUserPlant({ ...userPlantData }))
         .unwrap()
         .then((res) => {
           if (res.success) {
@@ -145,7 +176,15 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   };
 
   const handleEditUserPlant = (userPlantId: number) => {
-    console.log(userPlantId);
+    const userPlant = userPlants.find((plant) => plant.user_id === userPlantId);
+    if (userPlant) {
+      setEditingUserPlantId(userPlantId);
+      setFormData({
+        project_id: userPlant.project_id,
+        role: userPlant.role,
+        status: userPlant.status,
+      });
+    }
   };
 
   return (
@@ -154,7 +193,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
-            User Plants
+            {editingUserPlantId ? "Edit User Plant" : "Add User Plants"}
           </h2>
           <button
             onClick={handleClose}
@@ -232,7 +271,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
               type="submit"
               className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer font-roboto"
             >
-              {type === "add" ? "Add User Plant" : "Update User Plant"}
+              {editingUserPlantId ? "Update User Plant" : "Add User Plant"}
             </button>
           </div>
         </form>
