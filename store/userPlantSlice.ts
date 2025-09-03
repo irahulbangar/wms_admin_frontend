@@ -52,12 +52,13 @@ export const getAllUserPlants = createAsyncThunk(
 
 interface UserPlantPayload {
   project_id: number;
+  user_id: number;
   role: string;
   status: string;
 }
 
 interface UserPlantPayloadUpdate extends UserPlantPayload {
-  user_id: number;
+  user_plant_id: number;
 }
 
 // POST USER PLANT
@@ -113,7 +114,7 @@ export const updateUserPlantByUserId = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().put(
-        `/user-plant/admin/update-plant/${userPlant.user_id}`,
+        `/user-plant/admin/update-plant/${userPlant.user_plant_id}`,
         userPlant,
         {
           headers: {

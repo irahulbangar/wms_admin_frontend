@@ -58,12 +58,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   const fetchUserPlants = useCallback(async () => {
     if (userId) {
       try {
-        console.log("Fetching user plants for userId:", userId);
         const result = await dispatch(getUserPlantByUserId(userId)).unwrap();
-        console.log("User plants fetch result:", result);
         if (result.success && result.data) {
           setUserPlants(result.data);
-          console.log("User plants set:", result.data);
         }
       } catch (error) {
         console.error("Error fetching user plants:", error);
@@ -132,12 +129,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
 
     try {
       if (editingUserPlantId) {
-        console.log("Updating user plant with data:", {
-          user_id: userId,
-          ...userPlantData,
-        });
         await dispatch(
           updateUserPlantByUserId({
+            user_plant_id: editingUserPlantId,
             user_id: userId as number,
             ...userPlantData,
           })
@@ -151,14 +145,16 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                 role: "",
                 status: "",
               });
+              setEditingUserPlantId(null);
             }
+          })
+          .catch((error) => {
+            Error(error as string);
           });
       } else {
-        console.log("Creating user plant with data:", {
-          user_id: userId,
-          ...userPlantData,
-        });
-        await dispatch(createUserPlant({ ...userPlantData }))
+        await dispatch(
+          createUserPlant({ user_id: userId as number, ...userPlantData })
+        )
           .unwrap()
           .then((res) => {
             if (res.success) {
@@ -185,7 +181,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   };
 
   const handleEditUserPlant = (userPlantId: number) => {
-    const userPlant = userPlants.find((plant) => plant.user_id === userPlantId);
+    const userPlant = userPlants.find(
+      (plant) => plant.user_plant_id === userPlantId
+    );
     if (userPlant) {
       setEditingUserPlantId(userPlantId);
       setFormData({
@@ -226,6 +224,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             }
             className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
           >
+            <option value="">Select Project</option>
             {projects.map((project) => (
               <option key={project.project_id} value={project.project_id}>
                 {project.project_name}
@@ -244,6 +243,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             }
             className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
           >
+            <option value="">Select Role</option>
             {roleOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -261,6 +261,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             }
             className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
           >
+            <option value="">Select Status</option>
             {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -281,16 +282,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
               disabled={loading}
               className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer font-roboto"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {editingUserPlantId ? "Updating..." : "Adding..."}
-                </>
-              ) : editingUserPlantId ? (
-                "Update User Plant"
-              ) : (
-                "Add User Plant"
-              )}
+              Assign Plants
             </button>
           </div>
         </form>
