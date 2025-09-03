@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Search,
   PlusCircle,
@@ -72,6 +72,35 @@ const Devices = () => {
   const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [projectSearchTerm, setProjectSearchTerm] = useState("");
+
+  // Refs for dropdown containers
+  const organizationDropdownRef = useRef<HTMLDivElement>(null);
+  const projectDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Click outside functionality for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        organizationDropdownRef.current &&
+        !organizationDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOrganizationDropdownOpen(false);
+        setOrganizationSearchTerm("");
+      }
+      if (
+        projectDropdownRef.current &&
+        !projectDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsProjectDropdownOpen(false);
+        setProjectSearchTerm("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const getDepartment = useCallback(async () => {
     setIsLoading(true);
@@ -589,7 +618,10 @@ const Devices = () => {
 
       <div className="flex items-start md:items-center md:justify-between justify-center lg:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap lg:flex-nowrap">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
-          <div className="flex-shrink-0 md:w-54 w-full relative organization-dropdown">
+          <div
+            className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
+            ref={organizationDropdownRef}
+          >
             <div className="relative">
               <input
                 type="text"
@@ -667,7 +699,10 @@ const Devices = () => {
               </div>
             )}
           </div>
-          <div className="flex-shrink-0 md:w-54 w-full relative project-dropdown">
+          <div
+            className="flex-shrink-0 md:w-54 w-full relative project-dropdown"
+            ref={projectDropdownRef}
+          >
             <div className="relative">
               <input
                 type="text"

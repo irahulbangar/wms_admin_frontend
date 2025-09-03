@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   ClientUsersResponse,
@@ -53,6 +53,27 @@ const OrganizationUsers = () => {
     ClientUsersResult[]
   >([]);
   const [showUserPlants, setShowUserPlants] = useState(false);
+
+  // Ref for dropdown container
+  const organizationDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Click outside functionality for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        organizationDropdownRef.current &&
+        !organizationDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOrganizationDropdownOpen(false);
+        setOrganizationSearchTerm("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchOrganizationClients = useCallback(async () => {
     if (isLoading || organizationId === 0) return;
@@ -255,7 +276,10 @@ const OrganizationUsers = () => {
             Organization Users
           </h1>
 
-          <div className="flex-shrink-0 md:w-54 w-full relative organization-dropdown">
+          <div
+            className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
+            ref={organizationDropdownRef}
+          >
             <div className="relative">
               <input
                 type="text"
