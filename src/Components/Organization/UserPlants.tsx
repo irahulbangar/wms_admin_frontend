@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, SquarePen } from "lucide-react";
 import { useAppDispatch } from "../../../store/store";
 import {
   createUserPlant,
@@ -7,12 +7,11 @@ import {
 } from "../../../store/userPlantSlice";
 import { getProjectsByOrganizationId } from "../../../store/projectSlice";
 import type { ProjectResult } from "../../../model/project.interface";
-
-import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 import NoDataFound from "../NoDataFound";
 import { User } from "lucide-react";
 import type { UserPlantResult } from "../../../model/user-plants.interface";
 import { Error, Success } from "../../utils/toast";
+import { handleStatus } from "../../utils/utils";
 
 interface UserPlantsProps {
   onClose: () => void;
@@ -145,6 +144,10 @@ const UserPlants: React.FC<UserPlantsProps> = ({
     }
   };
 
+  const handleEditUserPlant = (userPlantId: number) => {
+    console.log(userPlantId);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-hidden">
@@ -217,7 +220,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             ))}
           </select>
 
-          <div className="flex items-center justify-end gap-4 pt-6">
+          <div className="flex items-center justify-end gap-4">
             <button
               type="button"
               onClick={handleClose}
@@ -261,10 +264,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                       Status
                     </th>
                     <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                      Created At
-                    </th>
-                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                      Updated At
+                      Action
                     </th>
                   </tr>
                 </thead>
@@ -272,7 +272,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                   {userPlants.length > 0 ? (
                     userPlants.map((plant, index) => (
                       <tr
-                        key={plant.user_plant_id}
+                        key={index}
                         className="bg-primary border-b border-border-primary hover:bg-secondary"
                       >
                         <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base">
@@ -297,10 +297,14 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                           </span>
                         </td>
                         <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
-                          {fromatDateWithTime(plant.created_at)}
-                        </td>
-                        <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
-                          {fromatDateWithTime(plant.updated_at)}
+                          <div className="flex items-center gap-2 justify-center">
+                            <SquarePen
+                              onClick={() =>
+                                handleEditUserPlant(plant.user_plant_id)
+                              }
+                              className="w-4 h-4 text-status-info cursor-pointer"
+                            />
+                          </div>
                         </td>
                       </tr>
                     ))
