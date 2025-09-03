@@ -114,7 +114,6 @@ export const loginAdmin = createAsyncThunk(
     try {
       thunkAPI.dispatch(setLoading(true));
       const response = await api().post<LoginResponse>("/admin/login", data);
-      console.log("response.data", response.data);
       if (response.data.success) {
         sessionStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
         sessionStorage.setItem("accessToken", response.data.token);

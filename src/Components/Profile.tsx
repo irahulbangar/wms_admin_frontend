@@ -9,9 +9,6 @@ import {
   Edit3,
   Save,
   X,
-  Shield,
-  Settings,
-  Bell,
 } from "lucide-react";
 import { Success, Info } from "../utils/toast";
 
@@ -235,65 +232,6 @@ const Profile: React.FC = () => {
                 </button>
               </div>
             )}
-          </div>
-
-          <div className="bg-card border border-border-primary rounded-xl p-6 shadow-sm font-roboto">
-            <h3 className="text-lg font-semibold text-text-primary mb-6 font-roboto">
-              Preferences
-            </h3>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Shield className="w-5 h-5 text-text-secondary mr-3" />
-                  <div>
-                    <p className="text-text-primary font-medium font-roboto">
-                      Two-Factor Authentication
-                    </p>
-                    <p className="text-text-secondary text-sm font-roboto">
-                      Add an extra layer of security
-                    </p>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-secondary text-text-primary rounded-lg hover:bg-hover-bg-primary transition-colors font-roboto cursor-pointer font-roboto">
-                  Enable
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Bell className="w-5 h-5 text-text-secondary mr-3" />
-                  <div>
-                    <p className="text-text-primary font-medium font-roboto">
-                      Email Notifications
-                    </p>
-                    <p className="text-text-secondary text-sm font-roboto">
-                      Receive updates via email
-                    </p>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-roboto cursor-pointer font-roboto">
-                  Enabled
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Settings className="w-5 h-5 text-text-secondary mr-3" />
-                  <div>
-                    <p className="text-text-primary font-medium font-roboto">
-                      Privacy Settings
-                    </p>
-                    <p className="text-text-secondary text-sm font-roboto">
-                      Manage your privacy preferences
-                    </p>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-secondary text-text-primary rounded-lg hover:bg-hover-bg-primary transition-colors font-roboto cursor-pointer font-roboto">
-                  Configure
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
