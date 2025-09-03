@@ -73,6 +73,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hwid: "",
       department_id: departmentId,
     });
+    setDeviceFamilyId(0);
     setErrors({});
   };
 
@@ -179,6 +180,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               hwid: deviceData.hwid,
               department_id: deviceData.department_id,
             });
+            setDeviceFamilyId(deviceData.device_family_id);
           }
         })
         .catch((err) => {
@@ -194,6 +196,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         hwid: "",
         department_id: departmentId,
       });
+      setDeviceFamilyId(0);
     }
   }, [type, deviceId, dispatch, project_id, departmentId]);
 

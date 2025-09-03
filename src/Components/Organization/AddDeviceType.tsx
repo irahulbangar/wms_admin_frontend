@@ -24,7 +24,6 @@ const AddDeviceType: React.FC<AddDeviceTypeProps> = ({
     topic: "",
   });
   const [errors, setErrors] = useState({ device_type_name: "", topic: "" });
-  console.log("deviceFamilyId", deviceFamilyId);
 
   const handleAddDeviceType = async () => {
     if (!formData.device_type_name.trim()) {

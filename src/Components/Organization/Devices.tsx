@@ -383,12 +383,26 @@ const Devices = () => {
   };
 
   const handleDeviceUpdate = (result?: {
-    data?: { refreshDepartments?: boolean };
+    data?: {
+      refreshDepartments?: boolean;
+      refreshDeviceFamilies?: boolean;
+      refreshDeviceTypes?: boolean;
+    };
   }) => {
     if (isLoading) return;
 
     if (result?.data?.refreshDepartments) {
       getDepartment();
+      return;
+    }
+
+    if (result?.data?.refreshDeviceFamilies) {
+      getDeviceFamily();
+      return;
+    }
+
+    if (result?.data?.refreshDeviceTypes) {
+      getDeviceType();
       return;
     }
 
