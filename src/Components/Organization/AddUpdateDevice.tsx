@@ -342,12 +342,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       {family.name}
                     </option>
                   ))}
-                  <option
+                  {/* <option
                     value="add_new"
                     className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
                   >
                     + Add New
-                  </option>
+                  </option> */}
                 </select>
 
                 {formData.device_family_id !== 0 && (
@@ -439,14 +439,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                           {type.device_type_name}
                         </option>
                       ))}
-                  {formData.device_family_id && (
+                  {/* {formData.device_family_id && (
                     <option
                       value="add_new"
                       className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
                     >
                       + Add New
                     </option>
-                  )}
+                  )} */}
                 </select>
 
                 {formData.device_type_id !== 0 && (
