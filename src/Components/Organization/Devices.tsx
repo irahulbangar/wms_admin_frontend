@@ -817,7 +817,9 @@ const Devices = () => {
                         onClick={() => handleEditDepartment(deptId)}
                         className="w-5 h-5 text-status-info cursor-pointer"
                       />
-                      <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
+                      {deptDevices?.length < 1 && (
+                        <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
+                      )}
                     </div>
                   </div>
 
