@@ -73,11 +73,9 @@ const Devices = () => {
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [projectSearchTerm, setProjectSearchTerm] = useState("");
 
-  // Refs for dropdown containers
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
   const projectDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Click outside functionality for dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -780,7 +778,7 @@ const Devices = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
-              placeholder="Search devices by name, IMEI, status, type, family name, or family ID..."
+              placeholder="Search devices by name, HWID, status, type, family name, or family ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -882,7 +880,7 @@ const Devices = () => {
                               Device Status
                             </th>
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
-                              IMEI Number
+                              HWID Number
                             </th>
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Created At
