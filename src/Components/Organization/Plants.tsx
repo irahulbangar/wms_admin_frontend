@@ -468,10 +468,10 @@ const Plants = () => {
                         )?.organization_name
                       }
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {project?.latitude || "N/A"}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {project?.longitude || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
@@ -492,7 +492,7 @@ const Plants = () => {
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {fromatDateWithTime(project?.updated_at) || "N/A"}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       <div className="flex items-center justify-center gap-2">
                         <Eye
                           onClick={() =>

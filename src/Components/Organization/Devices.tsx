@@ -923,7 +923,7 @@ const Devices = () => {
                                   )?.name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {
                                   deviceType?.find(
                                     (dt) =>
@@ -941,7 +941,7 @@ const Devices = () => {
                                   {device?.device_status}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {device?.hwid || "N/A"}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">

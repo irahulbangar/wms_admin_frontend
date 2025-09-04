@@ -236,9 +236,6 @@ const Organization = () => {
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                   Organization Name
                 </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
-                  Address
-                </th>
                 <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Contact Person
                 </th>
@@ -247,6 +244,9 @@ const Organization = () => {
                 </th>
                 <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Email
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  Address
                 </th>
                 <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
                   Notes
@@ -276,16 +276,16 @@ const Organization = () => {
                       {organization?.organization_name || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {organization?.address || "-"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {organization?.contact_person || "-"}
                     </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.contact_number || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                       {organization?.email || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      {organization?.address || "-"}
                     </td>
                     <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                       {organization?.note || "N/A"}

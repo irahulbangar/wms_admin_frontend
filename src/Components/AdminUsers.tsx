@@ -112,7 +112,7 @@ const Users = () => {
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {index + 1}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap capitalize">
                         {user?.name}
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
@@ -121,7 +121,7 @@ const Users = () => {
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {user?.contact_number}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap capitalize">
                         {user?.role}
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
