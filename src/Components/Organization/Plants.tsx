@@ -262,6 +262,11 @@ const Plants = () => {
   }) => {
     if (updatedData.success) {
       handleModalClose();
+      if (selectedOrganizationId === "all") {
+        fetchProjects();
+      } else {
+        getProjectByOrganizationId(selectedOrganizationId);
+      }
     }
   };
 

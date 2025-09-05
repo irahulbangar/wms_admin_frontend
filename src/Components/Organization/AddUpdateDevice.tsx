@@ -695,7 +695,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter height"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.height
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
                 <div>
@@ -723,7 +727,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter storage capacity"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.storageCapacity
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
                 <div>
@@ -751,7 +759,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter sensor position"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.sensorPostion
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
                 <div>
@@ -777,7 +789,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter multiplier"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.multiplier
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
                 <div>
@@ -803,7 +819,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter shifter"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.shifter
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
               </>
@@ -835,7 +855,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter input for"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.inputFor
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
                 <div>
@@ -861,7 +885,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter output for"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.outputFor
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
                 <div>
@@ -887,7 +915,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter multiplier"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.multiplier
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
                 <div>
@@ -913,7 +945,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }));
                     }}
                     placeholder="Enter shifter"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.shifter
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
                   />
                 </div>
               </>

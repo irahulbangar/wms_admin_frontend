@@ -207,7 +207,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide">
         <div className="flex items-center justify-between px-6 py-4 sticky top-0 bg-primary pb-4 border-b border-border-primary z-10">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
-            {type === "add" ? "Add New Project" : "Update Project"}
+            {type === "add" ? "Add New Plant" : "Update Plant"}
           </h2>
           <button
             onClick={handleClose}
@@ -219,11 +219,11 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-            Project Name
+            Plant Name
           </label>
           <input
             type="text"
-            name="project_name"
+            name="plant_name"
             value={formData.project_name}
             onChange={handleInputChange}
             className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
@@ -315,7 +315,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
               type="submit"
               className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer font-roboto"
             >
-              {type === "add" ? "Add Project" : "Update Project"}
+              {type === "add" ? "Add Plant" : "Update Plant"}
             </button>
           </div>
         </form>
