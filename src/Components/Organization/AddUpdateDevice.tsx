@@ -107,6 +107,21 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     shifter: 0,
   });
 
+  const [tankInputValues, setTankInputValues] = useState({
+    height: "0",
+    storageCapacity: "0",
+    sensorPostion: "0",
+    multiplier: "0",
+    shifter: "0",
+  });
+
+  const [fmInputValues, setFmInputValues] = useState({
+    inputFor: "0",
+    outputFor: "0",
+    multiplier: "0",
+    shifter: "0",
+  });
+
   const resetForm = () => {
     setFormData({
       project_id: project_id || 0,
@@ -131,6 +146,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       outputFor: 0,
       multiplier: 0,
       shifter: 0,
+    });
+    setTankInputValues({
+      height: "0",
+      storageCapacity: "0",
+      sensorPostion: "0",
+      multiplier: "0",
+      shifter: "0",
+    });
+    setFmInputValues({
+      inputFor: "0",
+      outputFor: "0",
+      multiplier: "0",
+      shifter: "0",
     });
     setErrors({});
   };
@@ -250,24 +278,35 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               .find((f) => f.device_family_id === deviceData.device_family_id)
               ?.name?.toLowerCase();
             if (familyName === "fm") {
-              setFmParams(
-                deviceData.params || {
-                  inputFor: 0,
-                  outputFor: 0,
-                  multiplier: 0,
-                  shifter: 0,
-                }
-              );
+              const fmData = deviceData.params || {
+                inputFor: 0,
+                outputFor: 0,
+                multiplier: 0,
+                shifter: 0,
+              };
+              setFmParams(fmData);
+              setFmInputValues({
+                inputFor: fmData.inputFor.toString(),
+                outputFor: fmData.outputFor.toString(),
+                multiplier: fmData.multiplier.toString(),
+                shifter: fmData.shifter.toString(),
+              });
             } else {
-              setTankParams(
-                deviceData.params || {
-                  height: 0,
-                  storageCapacity: 0,
-                  sensorPostion: 0,
-                  multiplier: 0,
-                  shifter: 0,
-                }
-              );
+              const tankData = deviceData.params || {
+                height: 0,
+                storageCapacity: 0,
+                sensorPostion: 0,
+                multiplier: 0,
+                shifter: 0,
+              };
+              setTankParams(tankData);
+              setTankInputValues({
+                height: tankData.height.toString(),
+                storageCapacity: tankData.storageCapacity.toString(),
+                sensorPostion: tankData.sensorPostion.toString(),
+                multiplier: tankData.multiplier.toString(),
+                shifter: tankData.shifter.toString(),
+              });
             }
           }
         })
@@ -679,19 +718,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="height"
-                    value={
-                      (tankParams as { height: number }).height === 0
-                        ? ""
-                        : (tankParams as { height: number }).height
-                    }
+                    value={tankInputValues.height}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setTankInputValues((prev) => ({
+                        ...prev,
+                        height: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setTankParams((prev) => ({
                         ...prev,
-                        height: value,
+                        height: numericValue,
                       }));
                     }}
                     placeholder="Enter height"
@@ -709,21 +748,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="storageCapacity"
-                    value={
-                      (tankParams as { storageCapacity: number })
-                        .storageCapacity === 0
-                        ? ""
-                        : (tankParams as { storageCapacity: number })
-                            .storageCapacity
-                    }
+                    value={tankInputValues.storageCapacity}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setTankInputValues((prev) => ({
+                        ...prev,
+                        storageCapacity: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setTankParams((prev) => ({
                         ...prev,
-                        storageCapacity: value,
+                        storageCapacity: numericValue,
                       }));
                     }}
                     placeholder="Enter storage capacity"
@@ -741,21 +778,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="sensorPostion"
-                    value={
-                      (tankParams as { sensorPostion: number })
-                        .sensorPostion === 0
-                        ? ""
-                        : (tankParams as { sensorPostion: number })
-                            .sensorPostion
-                    }
+                    value={tankInputValues.sensorPostion}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setTankInputValues((prev) => ({
+                        ...prev,
+                        sensorPostion: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setTankParams((prev) => ({
                         ...prev,
-                        sensorPostion: value,
+                        sensorPostion: numericValue,
                       }));
                     }}
                     placeholder="Enter sensor position"
@@ -773,19 +808,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="multiplier"
-                    value={
-                      (tankParams as { multiplier: number }).multiplier === 0
-                        ? ""
-                        : (tankParams as { multiplier: number }).multiplier
-                    }
+                    value={tankInputValues.multiplier}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setTankInputValues((prev) => ({
+                        ...prev,
+                        multiplier: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setTankParams((prev) => ({
                         ...prev,
-                        multiplier: value,
+                        multiplier: numericValue,
                       }));
                     }}
                     placeholder="Enter multiplier"
@@ -803,19 +838,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="shifter"
-                    value={
-                      (tankParams as { shifter: number }).shifter === 0
-                        ? ""
-                        : (tankParams as { shifter: number }).shifter
-                    }
+                    value={tankInputValues.shifter}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setTankInputValues((prev) => ({
+                        ...prev,
+                        shifter: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setTankParams((prev) => ({
                         ...prev,
-                        shifter: value,
+                        shifter: numericValue,
                       }));
                     }}
                     placeholder="Enter shifter"
@@ -839,19 +874,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="inputFor"
-                    value={
-                      (fmParams as { inputFor: number }).inputFor === 0
-                        ? ""
-                        : (fmParams as { inputFor: number }).inputFor
-                    }
+                    value={fmInputValues.inputFor}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setFmInputValues((prev) => ({
+                        ...prev,
+                        inputFor: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setFmParams((prev) => ({
                         ...prev,
-                        inputFor: value,
+                        inputFor: numericValue,
                       }));
                     }}
                     placeholder="Enter input for"
@@ -869,19 +904,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="outputFor"
-                    value={
-                      (fmParams as { outputFor: number }).outputFor === 0
-                        ? ""
-                        : (fmParams as { outputFor: number }).outputFor
-                    }
+                    value={fmInputValues.outputFor}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setFmInputValues((prev) => ({
+                        ...prev,
+                        outputFor: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setFmParams((prev) => ({
                         ...prev,
-                        outputFor: value,
+                        outputFor: numericValue,
                       }));
                     }}
                     placeholder="Enter output for"
@@ -899,19 +934,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="multiplier"
-                    value={
-                      (fmParams as { multiplier: number }).multiplier === 0
-                        ? ""
-                        : (fmParams as { multiplier: number }).multiplier
-                    }
+                    value={fmInputValues.multiplier}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setFmInputValues((prev) => ({
+                        ...prev,
+                        multiplier: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setFmParams((prev) => ({
                         ...prev,
-                        multiplier: value,
+                        multiplier: numericValue,
                       }));
                     }}
                     placeholder="Enter multiplier"
@@ -929,19 +964,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <input
                     type="text"
                     name="shifter"
-                    value={
-                      (fmParams as { shifter: number }).shifter === 0
-                        ? ""
-                        : (fmParams as { shifter: number }).shifter
-                    }
+                    value={fmInputValues.shifter}
                     onChange={(e) => {
-                      const value =
-                        e.target.value === ""
-                          ? 0
-                          : parseFloat(e.target.value) || 0;
+                      const inputValue = e.target.value;
+                      setFmInputValues((prev) => ({
+                        ...prev,
+                        shifter: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
                       setFmParams((prev) => ({
                         ...prev,
-                        shifter: value,
+                        shifter: numericValue,
                       }));
                     }}
                     placeholder="Enter shifter"
