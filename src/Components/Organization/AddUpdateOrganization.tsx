@@ -64,10 +64,10 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     if (!formData.contactNumber.trim()) {
       newErrors.contactNumber = "Contact number is required";
     } else if (
-      !/^[+]?[0-9\s\-()]{10}$/.test(formData.contactNumber.toString()) ||
-      formData.contactNumber.toString().trim().length < 10
+      !/^[0-9]{10}$/.test(formData.contactNumber.toString().trim()) ||
+      formData.contactNumber.toString().trim().length !== 10
     ) {
-      newErrors.contactNumber = "Please enter a valid contact number";
+      newErrors.contactNumber = "Please enter exactly 10 digits";
     }
 
     if (!formData.email.trim()) {
@@ -263,12 +263,13 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="contactNumber"
             value={formData.contactNumber}
             onChange={handleInputChange}
+            maxLength={10}
             className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.contactNumber
                 ? "border-status-danger"
                 : "border-border-primary"
             }`}
-            placeholder="Enter contact number"
+            placeholder="Enter 10 digit contact number"
           />
           {errors.contactNumber && (
             <p className="text-status-danger text-sm mt-1">

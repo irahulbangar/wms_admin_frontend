@@ -60,7 +60,7 @@ export const getDeviceFamiliy = createAsyncThunk(
 // Create device family
 export const createDeviceFamily = createAsyncThunk(
   "deviceFamily/createDeviceFamily",
-  async (deviceFamily: { name: string }, thunkAPI) => {
+  async (deviceFamily: { name: string; type: string }, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().post(
@@ -86,12 +86,15 @@ export const createDeviceFamily = createAsyncThunk(
 // Update device family
 export const updateDeviceFamily = createAsyncThunk(
   "deviceFamily/updateDeviceFamily",
-  async (data: { device_family_id: number; name: string }, thunkAPI) => {
+  async (
+    data: { device_family_id: number; name: string; type: string },
+    thunkAPI
+  ) => {
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().put(
         `/device-family/admin/update-family/${data.device_family_id}`,
-        { name: data.name },
+        { name: data.name, type: data.type },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

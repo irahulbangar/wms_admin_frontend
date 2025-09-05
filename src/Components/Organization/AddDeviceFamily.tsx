@@ -1,6 +1,6 @@
 import { X, Loader2 } from "lucide-react";
 import React, { useState } from "react";
-import { useAppDispatch } from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import {
   createDeviceFamily,
   updateDeviceFamily,
@@ -12,6 +12,7 @@ interface AddDeviceFamilyProps {
   type: "add" | "update";
   deviceFamilyId?: number;
   deviceFamilyName?: string;
+  deviceFamilyType?: string;
   onUpdateSuccess: () => void;
 }
 
@@ -20,6 +21,7 @@ const AddDeviceFamily: React.FC<AddDeviceFamilyProps> = ({
   type,
   deviceFamilyId,
   deviceFamilyName: initialDeviceFamilyName,
+  deviceFamilyType: initialDeviceFamilyType,
   onUpdateSuccess,
 }) => {
   const dispatch = useAppDispatch();
@@ -27,12 +29,24 @@ const AddDeviceFamily: React.FC<AddDeviceFamilyProps> = ({
   const [deviceFamilyName, setDeviceFamilyName] = useState(
     initialDeviceFamilyName || ""
   );
-  const [errors, setErrors] = useState({ name: "" });
+  const [deviceFamilyType, setDeviceFamilyType] = useState(
+    initialDeviceFamilyType || ""
+  );
+  const [errors, setErrors] = useState({ name: "", type: "" });
+  const { admin } = useAppSelector((state) => state.admin);
+
   const handleAddDeviceFamily = async () => {
     if (!deviceFamilyName.trim()) {
       setErrors((prev) => ({
         ...prev,
         name: "Device family name is required",
+      }));
+      return;
+    }
+    if (!deviceFamilyType.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        type: "Device family type is required",
       }));
       return;
     }
@@ -44,6 +58,7 @@ const AddDeviceFamily: React.FC<AddDeviceFamilyProps> = ({
         await dispatch(
           createDeviceFamily({
             name: deviceFamilyName,
+            type: deviceFamilyType,
           })
         )
           .unwrap()
@@ -62,6 +77,7 @@ const AddDeviceFamily: React.FC<AddDeviceFamilyProps> = ({
           updateDeviceFamily({
             device_family_id: deviceFamilyId,
             name: deviceFamilyName,
+            type: deviceFamilyType,
           })
         )
           .unwrap()
@@ -124,6 +140,32 @@ const AddDeviceFamily: React.FC<AddDeviceFamilyProps> = ({
               </p>
             )}
           </div>
+          {admin?.role === "super_admin" && (
+            <div>
+              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                Device Family Type
+              </label>
+              <input
+                type="text"
+                value={deviceFamilyType}
+                onChange={(e) => {
+                  setDeviceFamilyType(e.target.value);
+                  if (errors.name) {
+                    setErrors((prev) => ({ ...prev, name: "" }));
+                  }
+                }}
+                placeholder="Enter device family type"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                  errors.type ? "border-status-danger" : "border-border-primary"
+                }`}
+              />
+              {errors.type && (
+                <p className="text-status-danger text-sm mt-1 font-roboto">
+                  {errors.type}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-4 pt-4">
             <button

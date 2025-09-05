@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import {
   createClient,
@@ -39,6 +39,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
 
   const handleInputChange = (
@@ -71,8 +72,11 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
 
     if (!formData.client_phone.trim()) {
       newErrors.client_phone = "Client Phone is required";
-    } else if (!/^\d{10}$/.test(formData.client_phone)) {
-      newErrors.client_phone = "Please enter a valid 10-digit phone number";
+    } else if (
+      !/^[0-9]{10}$/.test(formData.client_phone.toString().trim()) ||
+      formData.client_phone.toString().trim().length !== 10
+    ) {
+      newErrors.client_phone = "Please enter exactly 10 digits";
     }
 
     if (type === "add" && !formData.client_password.trim()) {
@@ -279,17 +283,18 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               Client Phone
             </label>
             <input
-              type="number"
+              type="text"
               name="client_phone"
               value={formData.client_phone}
               disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                errors.client_email
+                errors.client_phone
                   ? "border-status-danger"
                   : "border-border-primary"
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
-              placeholder="Enter Client Phone"
+              placeholder="Enter 10 digit Client Phone"
               onChange={handleInputChange}
+              maxLength={10}
             />
             {errors.client_phone && (
               <span className="text-status-danger text-sm">
@@ -303,19 +308,37 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                 Client Password
               </label>
-              <input
-                type="password"
-                name="client_password"
-                value={formData.client_password}
-                disabled={isFetching}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.client_password
-                    ? "border-status-danger"
-                    : "border-border-primary"
-                } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
-                placeholder="Enter Client Password"
-                onChange={handleInputChange}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="client_password"
+                  value={formData.client_password}
+                  disabled={isFetching}
+                  className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.client_password
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
+                  placeholder="Enter Client Password"
+                  onChange={handleInputChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isFetching}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors ${
+                    isFetching
+                      ? "opacity-50 cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
               {errors.client_password && (
                 <span className="text-status-danger text-sm">
                   {errors.client_password}
