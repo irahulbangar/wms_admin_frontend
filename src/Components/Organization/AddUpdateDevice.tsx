@@ -56,6 +56,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_status: "active",
     hwid: "",
     department_id: departmentId,
+    params: {
+      height: 0,
+      storageCapacity: 0,
+      sensorPostion: 0,
+      multiplier: 0,
+      shifter: 0,
+    },
   });
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
   const [showAddDeviceFamilyPopup, setShowAddDeviceFamilyPopup] =
@@ -76,6 +83,26 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     useState<string>("");
   const { admin } = useAppSelector((state) => state.admin);
 
+  const getSelectedDeviceFamilyName = () => {
+    const selectedFamily = familyData.find(
+      (family) => family.device_family_id === formData.device_family_id
+    );
+    return selectedFamily?.type?.toLowerCase() || "";
+  };
+  const [tankParams, setTankParams] = useState<object>({
+    height: 0,
+    storageCapacity: 0,
+    sensorPostion: 0,
+    multiplier: 0,
+    shifter: 0,
+  });
+  const [fmParams, setFmParams] = useState<object>({
+    inputFor: 0,
+    outputFor: 0,
+    multiplier: 0,
+    shifter: 0,
+  });
+
   const resetForm = () => {
     setFormData({
       project_id: project_id || 0,
@@ -85,8 +112,22 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       device_status: "active",
       hwid: "",
       department_id: departmentId,
+      params: tankParams,
     });
     setDeviceFamilyId(0);
+    setTankParams({
+      height: 0,
+      storageCapacity: 0,
+      sensorPostion: 0,
+      multiplier: 0,
+      shifter: 0,
+    });
+    setFmParams({
+      inputFor: 0,
+      outputFor: 0,
+      multiplier: 0,
+      shifter: 0,
+    });
     setErrors({});
   };
 
@@ -150,6 +191,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_status: formData.device_status,
         hwid: formData.hwid,
         department_id: formData.department_id,
+        params: getSelectedDeviceFamilyName() === "fm" ? fmParams : tankParams,
       };
 
       if (type === "add") {
@@ -192,8 +234,33 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_status: deviceData.device_status,
               hwid: deviceData.hwid,
               department_id: deviceData.department_id,
+              params: deviceData.params || {},
             });
             setDeviceFamilyId(deviceData.device_family_id);
+
+            const familyName = familyData
+              .find((f) => f.device_family_id === deviceData.device_family_id)
+              ?.name?.toLowerCase();
+            if (familyName === "fm") {
+              setFmParams(
+                deviceData.params || {
+                  inputFor: 0,
+                  outputFor: 0,
+                  multiplier: 0,
+                  shifter: 0,
+                }
+              );
+            } else {
+              setTankParams(
+                deviceData.params || {
+                  height: 0,
+                  storageCapacity: 0,
+                  sensorPostion: 0,
+                  multiplier: 0,
+                  shifter: 0,
+                }
+              );
+            }
           }
         })
         .catch((err) => {
@@ -208,10 +275,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_status: "active",
         hwid: "",
         department_id: departmentId,
+        params: tankParams,
       });
       setDeviceFamilyId(0);
     }
-  }, [type, deviceId, dispatch, project_id, departmentId]);
+  }, [type, deviceId, dispatch, project_id, departmentId, familyData]);
 
   useEffect(() => {
     if (type === "update" && deviceId) {
@@ -593,6 +661,187 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </option>
               </select>
             </div>
+            {/* Tank Parameters */}
+            {getSelectedDeviceFamilyName() === "tank" && (
+              <>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Height
+                  </label>
+                  <input
+                    type="number"
+                    name="height"
+                    value={(tankParams as { height: number }).height || 0}
+                    onChange={(e) => {
+                      setTankParams((prev) => ({
+                        ...prev,
+                        height: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter height"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Storage Capacity
+                  </label>
+                  <input
+                    type="number"
+                    name="storageCapacity"
+                    value={
+                      (tankParams as { storageCapacity: number })
+                        .storageCapacity || 0
+                    }
+                    onChange={(e) => {
+                      setTankParams((prev) => ({
+                        ...prev,
+                        storageCapacity: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter storage capacity"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Sensor Position
+                  </label>
+                  <input
+                    type="number"
+                    name="sensorPostion"
+                    value={
+                      (tankParams as { sensorPostion: number }).sensorPostion ||
+                      0
+                    }
+                    onChange={(e) => {
+                      setTankParams((prev) => ({
+                        ...prev,
+                        sensorPostion: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter sensor position"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Multiplier
+                  </label>
+                  <input
+                    type="number"
+                    name="multiplier"
+                    value={
+                      (tankParams as { multiplier: number }).multiplier || 0
+                    }
+                    onChange={(e) => {
+                      setTankParams((prev) => ({
+                        ...prev,
+                        multiplier: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter multiplier"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Shifter
+                  </label>
+                  <input
+                    type="number"
+                    name="shifter"
+                    value={(tankParams as { shifter: number }).shifter || 0}
+                    onChange={(e) => {
+                      setTankParams((prev) => ({
+                        ...prev,
+                        shifter: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter shifter"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* FM Parameters */}
+            {getSelectedDeviceFamilyName() === "fm" && (
+              <>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Input For
+                  </label>
+                  <input
+                    type="number"
+                    name="inputFor"
+                    value={(fmParams as { inputFor: number }).inputFor || 0}
+                    onChange={(e) => {
+                      setFmParams((prev) => ({
+                        ...prev,
+                        inputFor: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter input for"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Output For
+                  </label>
+                  <input
+                    type="number"
+                    name="outputFor"
+                    value={(fmParams as { outputFor: number }).outputFor || 0}
+                    onChange={(e) => {
+                      setFmParams((prev) => ({
+                        ...prev,
+                        outputFor: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter output for"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Multiplier
+                  </label>
+                  <input
+                    type="number"
+                    name="multiplier"
+                    value={(fmParams as { multiplier: number }).multiplier || 0}
+                    onChange={(e) => {
+                      setFmParams((prev) => ({
+                        ...prev,
+                        multiplier: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter multiplier"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Shifter
+                  </label>
+                  <input
+                    type="number"
+                    name="shifter"
+                    value={(fmParams as { shifter: number }).shifter || 0}
+                    onChange={(e) => {
+                      setFmParams((prev) => ({
+                        ...prev,
+                        shifter: parseInt(e.target.value) || 0,
+                      }));
+                    }}
+                    placeholder="Enter shifter"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-4 pt-4">
