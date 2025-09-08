@@ -17,7 +17,7 @@ import "reactflow/dist/style.css";
 import { useState, useEffect, useCallback } from "react";
 import { Success } from "../utils/toast";
 import { useAppDispatch } from "../../store/store";
-import { getProjectById } from "../../store/projectSlice";
+import { getProjectById, updateDiagramData } from "../../store/projectSlice";
 import type { SingleProjectResult } from "../../model/single-project.interface";
 import type { DeviceResult } from "../../model/devices.interface";
 import { getDeviceByProjectId } from "../../store/deviceSlice";
@@ -277,190 +277,7 @@ const nodeTypes = {
   group: GroupNodeWrapper,
 };
 
-const initialNodes: ExtendedNode[] = [
-  {
-    id: "1",
-    data: {
-      label: "ENTC Department",
-      type: "output",
-      unit: "kL",
-    },
-    position: { x: 50, y: 50 },
-    style: {
-      width: 625,
-      height: 350,
-      borderRadius: 10,
-      border: "2px dashed #ccc",
-    },
-    type: "group",
-  },
-  {
-    id: "fm1",
-    data: {
-      label: "FM1",
-      type: "output",
-      direction: "right",
-      totalVolume: 1250.5,
-      totalizerReading: 1250.5,
-      flowRate: 15.2,
-      unit: "kL",
-      isActive: true,
-    },
-    position: { x: 20, y: 70 },
-    parentId: "1",
-    sourcePosition: "right" as Position,
-    targetPosition: "right" as Position,
-    type: "fm",
-  },
-  {
-    id: "fm2",
-    data: {
-      label: "FM2",
-      type: "output",
-      direction: "right",
-      totalVolume: 890.3,
-      totalizerReading: 890.3,
-      flowRate: 8.7,
-      unit: "kL",
-      isActive: true,
-    },
-    position: { x: 20, y: 230 },
-    parentId: "1",
-    sourcePosition: "right" as Position,
-    targetPosition: "right" as Position,
-    type: "fm",
-  },
-  {
-    id: "tank1",
-    data: {
-      label: "Tank 1",
-      type: "bidirectional",
-      direction: "bidirectional",
-      capacity: 10,
-      currentLevel: 2.5,
-      unit: "kL",
-    },
-    position: { x: 280, y: 125 },
-    parentId: "1",
-    targetPosition: "left" as Position,
-    sourcePosition: "right" as Position,
-    type: "tank",
-  },
-  {
-    id: "fm3",
-    data: {
-      label: "FM3",
-      type: "input",
-      direction: "left",
-      totalVolume: 2100.8,
-      totalizerReading: 2100.8,
-      flowRate: 22.1,
-      unit: "kL",
-      isActive: true,
-    },
-    position: { x: 490, y: 70 },
-    parentId: "1",
-    sourcePosition: "left" as Position,
-    targetPosition: "left" as Position,
-    type: "fm",
-  },
-  {
-    id: "fm4",
-    data: {
-      label: "FM4",
-      type: "input",
-      direction: "left",
-      totalVolume: 1567.2,
-      totalizerReading: 1567.2,
-      flowRate: 12.5,
-      unit: "kL",
-      isActive: true,
-    },
-    position: { x: 490, y: 230 },
-    parentId: "1",
-    sourcePosition: "right" as Position,
-    targetPosition: "left" as Position,
-    type: "fm",
-  },
-  {
-    id: "2",
-    data: {
-      label: "IT Department",
-      type: "output",
-      unit: "kL",
-    },
-    position: { x: 725, y: 50 },
-    style: {
-      width: 625,
-      height: 350,
-      borderRadius: 10,
-      border: "2px dashed #ccc",
-    },
-    type: "group",
-  },
-  {
-    id: "fm5",
-    data: {
-      label: "FM5",
-      type: "input",
-      direction: "left",
-      totalVolume: 980.4,
-      totalizerReading: 980.4,
-      flowRate: 9.8,
-      unit: "kL",
-      isActive: true,
-    },
-    position: { x: 20, y: 150 },
-    parentId: "2",
-    sourcePosition: "right" as Position,
-    targetPosition: "left" as Position,
-    type: "fm",
-  },
-  {
-    id: "fm6",
-    data: {
-      label: "FM6",
-      type: "input",
-      direction: "left",
-      totalVolume: 3200.1,
-      totalizerReading: 3200.1,
-      flowRate: 28.5,
-      unit: "kL",
-      isActive: true,
-    },
-    position: { x: 500, y: 150 },
-    parentId: "2",
-    sourcePosition: "left" as Position,
-    targetPosition: "left" as Position,
-    type: "fm",
-  },
-  {
-    id: "tank2",
-    data: {
-      label: "Tank 2",
-      type: "bidirectional",
-      direction: "bidirectional",
-      capacity: 15,
-      currentLevel: 7.5,
-      unit: "kL",
-    },
-    position: { x: 270, y: 150 },
-    parentId: "2",
-    sourcePosition: "right" as Position,
-    targetPosition: "left" as Position,
-    type: "tank",
-  },
-];
-
-const initialEdges = [
-  { id: "fm1-tank1", source: "fm1", target: "tank1", animated: true },
-  { id: "fm2-tank1", source: "fm2", target: "tank1", animated: true },
-  { id: "tank1-fm3", source: "tank1", target: "fm3", animated: true },
-  { id: "tank1-fm4", source: "tank1", target: "fm4", animated: true },
-  { id: "fm4-fm5", source: "fm4", target: "fm5", animated: true },
-  { id: "fm5-tank2", source: "fm5", target: "tank2", animated: true },
-  { id: "tank2-fm6", source: "tank2", target: "fm6", animated: true },
-];
+// Static data removed - now loading dynamically from API
 
 const STORAGE_KEYS = {
   NODES: "wms-diagram-nodes",
@@ -469,9 +286,10 @@ const STORAGE_KEYS = {
 };
 
 const DiagramPage = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const projectId = useParams().project_id;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -486,9 +304,17 @@ const DiagramPage = () => {
       .then((res) => {
         if (res.success) {
           setProjectData(res.data);
+          // Load diagram data from API response
+          if (res.data.nodes && res.data.edges) {
+            setNodes(res.data.nodes);
+            setEdges(res.data.edges);
+          }
         }
+      })
+      .catch((err) => {
+        console.error("Error fetching project data:", err);
       });
-  }, [dispatch, projectId]);
+  }, [dispatch, projectId, setNodes, setEdges]);
 
   const fetchDeviceData = useCallback(async () => {
     await dispatch(getDeviceByProjectId(parseInt(projectId as string)))
@@ -507,29 +333,6 @@ const DiagramPage = () => {
     }
   }, [fetchDiagram, fetchDeviceData, projectId]);
 
-  const loadSavedDiagram = useCallback(() => {
-    try {
-      const savedNodes = localStorage.getItem(STORAGE_KEYS.NODES);
-      const savedEdges = localStorage.getItem(STORAGE_KEYS.EDGES);
-
-      if (savedNodes) {
-        const parsedNodes = JSON.parse(savedNodes);
-        setNodes(parsedNodes);
-      }
-
-      if (savedEdges) {
-        const parsedEdges = JSON.parse(savedEdges);
-        setEdges(parsedEdges);
-      }
-    } catch (error) {
-      console.error("Error loading saved diagram:", error);
-    }
-  }, [setNodes, setEdges]);
-
-  useEffect(() => {
-    loadSavedDiagram();
-  }, [loadSavedDiagram]);
-
   const saveDiagramToStorage = () => {
     try {
       localStorage.setItem(STORAGE_KEYS.NODES, JSON.stringify(nodes));
@@ -541,13 +344,61 @@ const DiagramPage = () => {
     }
   };
 
+  // Save diagram to API
+  const saveDiagramToAPI = useCallback(async () => {
+    if (!projectId) return;
+
+    setIsSaving(true);
+    try {
+      const result = await dispatch(
+        updateDiagramData({
+          project_id: parseInt(projectId),
+          nodes: nodes as any,
+          edges: edges as any,
+        })
+      ).unwrap();
+
+      console.log("API save result:", result);
+      setHasChanges(false);
+      Success("Diagram saved to server successfully!");
+    } catch (error) {
+      console.error("Failed to save diagram to server:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [dispatch, projectId, nodes, edges]);
+
   const handleNodeDragStop: NodeDragHandler = () => {
     setHasChanges(true);
   };
 
-  const handleSaveDiagram = () => {
+  // Handle nodes change
+  const handleNodesChange = useCallback(
+    (changes: any) => {
+      onNodesChange(changes);
+      setHasChanges(true);
+    },
+    [onNodesChange]
+  );
+
+  // Handle edges change
+  const handleEdgesChange = useCallback(
+    (changes: any) => {
+      console.log("Edges changed:", changes);
+      onEdgesChange(changes);
+      setHasChanges(true);
+    },
+    [onEdgesChange]
+  );
+
+  const handleSaveDiagram = async () => {
+    console.log("Save button clicked, hasChanges:", hasChanges);
+    console.log("Current nodes:", nodes);
+    console.log("Current edges:", edges);
+
+    // Save to both localStorage and API
     saveDiagramToStorage();
-    Success("Diagram saved successfully!");
+    await saveDiagramToAPI();
   };
 
   const handleResetDiagram = () => {
@@ -589,19 +440,21 @@ const DiagramPage = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={handleSaveDiagram}
-                    disabled={!hasChanges}
+                    disabled={!hasChanges || isSaving}
                     className={`px-3 py-2 rounded-md text-sm flex items-center gap-1 transition-colors font-roboto ${
-                      hasChanges
+                      hasChanges && !isSaving
                         ? "bg-status-info hover:bg-status-info/80 text-white cursor-pointer"
                         : "bg-overlay/30 text-text-muted cursor-not-allowed"
                     }`}
                     title={
-                      hasChanges
-                        ? "Save diagram to browser storage"
+                      isSaving
+                        ? "Saving to server..."
+                        : hasChanges
+                        ? "Save diagram to server"
                         : "No changes to save"
                     }
                   >
-                    💾 Save
+                    {isSaving ? "⏳ Saving..." : "💾 Save"}
                   </button>
 
                   <button
@@ -636,10 +489,9 @@ const DiagramPage = () => {
               className="h-full w-full"
               nodes={nodes}
               edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
+              onNodesChange={handleNodesChange}
+              onEdgesChange={handleEdgesChange}
               onNodeDragStop={handleNodeDragStop}
-              onNodeDrag={handleNodeDragStop}
               nodeTypes={nodeTypes}
             >
               <Background variant={BackgroundVariant.Dots} />

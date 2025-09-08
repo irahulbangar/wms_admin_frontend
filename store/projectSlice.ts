@@ -226,7 +226,7 @@ export const updateDiagramData = createAsyncThunk(
   "project/admin/updateDiagramData",
   async ({ project_id, nodes, edges }: UpdateDiagramDataPayload, thunkAPI) => {
     try {
-      const response = await api().put<ProjectResponse>(
+      const response = await api().put(
         `/project/admin/update-diagram/${project_id}`,
         { nodes, edges },
         {
