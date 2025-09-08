@@ -243,12 +243,6 @@ const nodeTypes = {
   group: GroupNodeWrapper,
 };
 
-const STORAGE_KEYS = {
-  NODES: "wms-diagram-nodes",
-  EDGES: "wms-diagram-edges",
-  LAST_SAVED: "wms-diagram-last-saved",
-};
-
 const DiagramPage = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -392,8 +386,6 @@ const DiagramPage = () => {
         });
       });
 
-      const allDevices = [...tanks, ...fms];
-
       if (tanks.length > 0 && fms.length > 0) {
         const leftFMs = fms.filter(
           (_, index: number) => index < Math.ceil(fms.length / 2)
@@ -514,18 +506,14 @@ const DiagramPage = () => {
         clearTimeout(generationTimeoutRef.current);
       }
     };
-  }, [projectData, deviceData, isLoadingDiagram, convertDevicesToDiagram]);
-
-  const saveDiagramToStorage = () => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.NODES, JSON.stringify(nodes));
-      localStorage.setItem(STORAGE_KEYS.EDGES, JSON.stringify(edges));
-      localStorage.setItem(STORAGE_KEYS.LAST_SAVED, new Date().toISOString());
-      setHasChanges(false);
-    } catch (error) {
-      console.error("Error saving diagram to storage:", error);
-    }
-  };
+  }, [
+    projectData,
+    deviceData,
+    isLoadingDiagram,
+    convertDevicesToDiagram,
+    setNodes,
+    setEdges,
+  ]);
 
   const saveDiagramToAPI = useCallback(async () => {
     if (!projectId) return;
@@ -576,22 +564,18 @@ const DiagramPage = () => {
   );
 
   const handleSaveDiagram = async () => {
-    saveDiagramToStorage();
     await saveDiagramToAPI();
   };
 
   const handleResetDiagram = () => {
     if (
       confirm(
-        "Are you sure you want to reset the diagram to its initial state? This will clear all saved positions and data."
+        "Are you sure you want to reset the diagram to its initial state? This will clear all current positions and data."
       )
     ) {
       Success("Diagram reset successfully!");
       setNodes([]);
       setEdges([]);
-      localStorage.removeItem(STORAGE_KEYS.NODES);
-      localStorage.removeItem(STORAGE_KEYS.EDGES);
-      localStorage.removeItem(STORAGE_KEYS.LAST_SAVED);
       setHasChanges(false);
     }
   };
