@@ -20,17 +20,20 @@ import type {
   NodeData,
   SingleProjectResult,
 } from "../../model/single-project.interface";
-import type { DeviceResult } from "../../model/devices.interface";
+import type {
+  DeviceResult,
+  LastRecord,
+  Params,
+} from "../../model/devices.interface";
 import { getDeviceByProjectId } from "../../store/deviceSlice";
 
-const TankNode = ({ data }: { data: NodeData }) => {
-  const percentage =
-    data.capacity && data.currentLevel
-      ? Math.round((data.currentLevel / data.capacity) * 100)
-      : 0;
+const TankNode = ({ data }: { data: LastRecord & Params }) => {
+  const percentage = data.min_last_level
+    ? Math.round(Number(data.params?.height - data.min_last_level) * 100)
+    : 0;
 
   const fillHeight = Math.min(percentage, 100);
-  const unit = data.unit || "kL";
+  const unit = data.params?.unit || "kL";
 
   return (
     <>
@@ -135,7 +138,7 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
       (acc, tank) => {
         const tankData = tank.data as NodeData;
         return {
-          current: acc.current + (tankData.currentLevel || 0),
+          current: acc.current + (Number(tankData.currentLevel) || 0),
           capacity: acc.capacity + (tankData.capacity || 0),
         };
       },
@@ -279,8 +282,10 @@ const DiagramPage = () => {
 
     Object.values(departmentGroups).forEach((group: any) => {
       group.devices.sort((a: DeviceResult, b: DeviceResult) => {
-        const aIsTank = a.type === "tank" || a.name === "Tank Level";
-        const bIsTank = b.type === "tank" || b.name === "Tank Level";
+        const aIsTank =
+          a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
+        const bIsTank =
+          b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
         if (aIsTank && !bIsTank) return -1;
         if (!aIsTank && bIsTank) return 1;
         return a.device_id - b.device_id;
@@ -289,7 +294,7 @@ const DiagramPage = () => {
 
     Object.values(departmentGroups).forEach((group: any, groupIndex) => {
       const groupId = group.department_id.toString();
-      const groupX = groupIndex * 750 + 50;
+      const groupX = groupIndex * 675 + 50;
       const groupY = 50;
 
       nodes.push({
@@ -301,14 +306,14 @@ const DiagramPage = () => {
         },
         position: { x: groupX, y: groupY },
         style: {
-          width: 700,
-          height: 400,
+          width: 625,
+          height: 350,
           borderRadius: 10,
           border: "2px dashed #ccc",
         },
         type: "group",
-        width: 700,
-        height: 400,
+        width: 625,
+        height: 350,
       });
 
       const tanks = group.devices.filter(
@@ -321,9 +326,9 @@ const DiagramPage = () => {
       );
 
       tanks.forEach((device: DeviceResult, tankIndex: number) => {
-        const deviceId = device.device_id.toString();
-        const deviceX = 300 + tankIndex * 200;
-        const deviceY = 150;
+        const deviceId = `tank${tankIndex + 1}`;
+        const deviceX = 280 + tankIndex * 100;
+        const deviceY = 125;
 
         const nodeData: NodeData = {
           label: device.device_name,
@@ -332,7 +337,7 @@ const DiagramPage = () => {
           unit: "kL",
           isActive: device.device_status === "active",
           capacity: device.params?.storageCapacity || 10,
-          currentLevel: device.params?.height || 2.5,
+          currentLevel: device?.last_record?.min_last_level || 2.5,
         };
 
         nodes.push({
@@ -349,17 +354,17 @@ const DiagramPage = () => {
       });
 
       fms.forEach((device: DeviceResult, fmIndex: number) => {
-        const deviceId = device.device_id.toString();
+        const deviceId = `fm${fmIndex + 1}`;
         const totalFMs = fms.length;
         const fmPerSide = Math.ceil(totalFMs / 2);
 
         let deviceX, deviceY;
         if (fmIndex < fmPerSide) {
-          deviceX = 50;
-          deviceY = 100 + fmIndex * 120;
+          deviceX = 20;
+          deviceY = 70 + fmIndex * 80;
         } else {
-          deviceX = 550;
-          deviceY = 100 + (fmIndex - fmPerSide) * 120;
+          deviceX = 490;
+          deviceY = 70 + (fmIndex - fmPerSide) * 80;
         }
 
         const nodeData: NodeData = {
@@ -368,7 +373,7 @@ const DiagramPage = () => {
           direction: fmIndex < fmPerSide ? "right" : "left",
           unit: "kL",
           isActive: device.device_status === "active",
-          totalVolume: device.last_record?.hrs_max || 0,
+          totalVolume: device.last_record?.min_max || 0,
           totalizerReading: device.last_record?.hrs_min || 0,
           flowRate: device.last_record?.min_avg || 0,
         };
@@ -388,37 +393,42 @@ const DiagramPage = () => {
 
       if (tanks.length > 0 && fms.length > 0) {
         const leftFMs = fms.filter(
-          (_, index: number) => index < Math.ceil(fms.length / 2)
+          (_: DeviceResult, index: number) => index < Math.ceil(fms.length / 2)
         );
         const rightFMs = fms.filter(
-          (_, index: number) => index >= Math.ceil(fms.length / 2)
+          (_: DeviceResult, index: number) => index >= Math.ceil(fms.length / 2)
         );
 
-        leftFMs.forEach((fm: DeviceResult) => {
-          edges.push({
-            id: `fm-${fm.device_id}-tank-${tanks[0].device_id}`,
-            source: fm.device_id.toString(),
-            target: tanks[0].device_id.toString(),
-            animated: true,
-            style: { stroke: "#3b82f6", strokeWidth: 2 },
+        leftFMs.forEach((_: DeviceResult, index: number) => {
+          tanks.forEach((_: DeviceResult, tankIndex: number) => {
+            edges.push({
+              id: `fm${index + 1}-tank${tankIndex + 1}`,
+              source: `fm${index + 1}`,
+              target: `tank${tankIndex + 1}`,
+              animated: true,
+              style: { stroke: "#3b82f6", strokeWidth: 2 },
+            });
           });
         });
 
-        rightFMs.forEach((fm: DeviceResult) => {
-          edges.push({
-            id: `tank-${tanks[0].device_id}-fm-${fm.device_id}`,
-            source: tanks[0].device_id.toString(),
-            target: fm.device_id.toString(),
-            animated: true,
-            style: { stroke: "#10b981", strokeWidth: 2 },
+        rightFMs.forEach((_: DeviceResult, index: number) => {
+          const rightFMIndex = leftFMs.length + index + 1;
+          tanks.forEach((_: DeviceResult, tankIndex: number) => {
+            edges.push({
+              id: `tank${tankIndex + 1}-fm${rightFMIndex}`,
+              source: `tank${tankIndex + 1}`,
+              target: `fm${rightFMIndex}`,
+              animated: true,
+              style: { stroke: "#10b981", strokeWidth: 2 },
+            });
           });
         });
 
         for (let i = 0; i < tanks.length - 1; i++) {
           edges.push({
-            id: `tank-${tanks[i].device_id}-tank-${tanks[i + 1].device_id}`,
-            source: tanks[i].device_id.toString(),
-            target: tanks[i + 1].device_id.toString(),
+            id: `tank${i + 1}-tank${i + 2}`,
+            source: `tank${i + 1}`,
+            target: `tank${i + 2}`,
             animated: true,
             style: { stroke: "#8b5cf6", strokeWidth: 2 },
           });
@@ -426,9 +436,9 @@ const DiagramPage = () => {
       } else {
         for (let i = 0; i < fms.length - 1; i++) {
           edges.push({
-            id: `fm-${fms[i].device_id}-fm-${fms[i + 1].device_id}`,
-            source: fms[i].device_id.toString(),
-            target: fms[i + 1].device_id.toString(),
+            id: `fm${i + 1}-fm${i + 2}`,
+            source: `fm${i + 1}`,
+            target: `fm${i + 2}`,
             animated: true,
             style: { stroke: "#f59e0b", strokeWidth: 2 },
           });
