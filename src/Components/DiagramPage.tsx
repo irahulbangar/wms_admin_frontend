@@ -20,20 +20,19 @@ import type {
   NodeData,
   SingleProjectResult,
 } from "../../model/single-project.interface";
-import type {
-  DeviceResult,
-  LastRecord,
-  Params,
-} from "../../model/devices.interface";
+import type { DeviceResult } from "../../model/devices.interface";
 import { getDeviceByProjectId } from "../../store/deviceSlice";
 
-const TankNode = ({ data }: { data: LastRecord & Params }) => {
-  const percentage = data.min_last_level
-    ? Math.round(Number(data.params?.height - data.min_last_level) * 100)
-    : 0;
+const TankNode = ({ data }: { data: NodeData }) => {
+  const percentage =
+    data.currentLevel && data.storageCapacity
+      ? Math.round((Number(data.currentLevel) * 100) / Number(data.height))
+      : 0;
+
+  console.log("percentage", percentage);
 
   const fillHeight = Math.min(percentage, 100);
-  const unit = data.params?.unit || "kL";
+  const unit = data.unit || "kL";
 
   return (
     <>
@@ -77,7 +76,7 @@ const TankNode = ({ data }: { data: LastRecord & Params }) => {
 };
 
 const FMNode = ({ data }: { data: NodeData }) => {
-  const unit = data.unit || "kL";
+  const unit = data.unit || "Ltr";
   const isActive = data.isActive !== false;
 
   return (
@@ -97,7 +96,7 @@ const FMNode = ({ data }: { data: NodeData }) => {
       <div className="text-xs text-center mb-1">
         <div className="text-text-muted font-roboto">Flow:</div>
         <div className="font-semibold text-status-info font-roboto">
-          {data.flowRate || 0} {unit}/h
+          {data.flowRate || 0} {unit}
         </div>
       </div>
 
@@ -125,7 +124,7 @@ const FMNode = ({ data }: { data: NodeData }) => {
 };
 
 const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
-  const unit = data.unit || "kL";
+  const unit = data.unit || "Ltr";
   const { getNodes } = useReactFlow();
   const allNodes = getNodes();
 
@@ -302,7 +301,7 @@ const DiagramPage = () => {
         data: {
           label: group.department_name,
           type: "output",
-          unit: "kL",
+          unit: "Ltr",
         },
         position: { x: groupX, y: groupY },
         style: {
@@ -334,10 +333,13 @@ const DiagramPage = () => {
           label: device.device_name,
           type: "bidirectional",
           direction: "bidirectional",
-          unit: "kL",
+          unit: "Ltr",
           isActive: device.device_status === "active",
-          capacity: device.params?.storageCapacity || 10,
-          currentLevel: device?.last_record?.min_last_level || 2.5,
+          currentLevel: device?.last_record?.min_last_level || 0,
+          storageCapacity: device.params?.storageCapacity || 0,
+          height: device.params?.height || 0,
+          shifter: device.params?.shifter || 0,
+          multiplier: device.params?.multiplier || 0,
         };
 
         nodes.push({
@@ -371,11 +373,17 @@ const DiagramPage = () => {
           label: device.device_name,
           type: fmIndex < fmPerSide ? "output" : "input",
           direction: fmIndex < fmPerSide ? "right" : "left",
-          unit: "kL",
+          unit: "Ltr",
           isActive: device.device_status === "active",
           totalVolume: device.last_record?.min_max || 0,
           totalizerReading: device.last_record?.hrs_min || 0,
           flowRate: device.last_record?.min_avg || 0,
+          inputFor: device.params?.inputFor || 0,
+          outputFor: device.params?.outputFor || 0,
+          storageCapacity: device.params?.storageCapacity || 0,
+          height: device.params?.height || 0,
+          shifter: device.params?.shifter || 0,
+          multiplier: device.params?.multiplier || 0,
         };
 
         nodes.push({

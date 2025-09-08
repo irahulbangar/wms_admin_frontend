@@ -45,6 +45,13 @@ export interface NodeData {
   totalizerReading?: number;
   capacity?: number;
   currentLevel?: number | string;
+  inputFor?: number;
+  outputFor?: number;
+  storageCapacity?: number;
+  height?: number;
+  shifter?: number;
+  multiplier?: number;
+  sensorPostion?: number;
 }
 
 export interface Style {

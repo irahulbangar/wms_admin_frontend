@@ -56,4 +56,6 @@ export interface Params {
   multiplier?: number;
   sensorPostion?: number;
   storageCapacity?: number;
+  inputFor?: number;
+  outputFor?: number;
 }
