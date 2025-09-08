@@ -141,8 +141,8 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
       (acc, tank) => {
         const tankData = tank.data as NodeData;
         return {
-          current: acc.current + (Number(tankData.currentLevel) || 0),
-          capacity: acc.capacity + (tankData.capacity || 0),
+          current: Number(tankData.currentLevel) || 0,
+          capacity: tankData.capacity || 0,
         };
       },
       { current: 0, capacity: 0 }
@@ -340,11 +340,9 @@ const DiagramPage = () => {
           direction: "bidirectional",
           unit: "Ltr",
           isActive: device.device_status === "active",
-          capacity: Number(device?.params?.storageCapacity) || 0,
-          currentLevel: Number(device?.last_record?.min_last_level) || 0,
-          totalizerReading: Number(device?.last_record?.hrs_min) || 0,
-          flowRate: Number(device?.last_record?.min_avg) || 0,
-          height: Number(device?.params?.height) || 0,
+          capacity: device?.params?.storageCapacity || 0,
+          currentLevel: device.last_record?.min_last_level || 0,
+          height: device?.params?.height || 0,
         };
 
         nodes.push({
@@ -380,12 +378,8 @@ const DiagramPage = () => {
           direction: fmIndex < fmPerSide ? "right" : "left",
           unit: "Ltr",
           isActive: device.device_status === "active",
-          totalVolume: Number(device.last_record?.hrs_max) || 0,
           totalizerReading: Number(device.last_record?.hrs_min) || 0,
           flowRate: Number(device.last_record?.min_avg) || 0,
-          capacity: Number(device?.params?.storageCapacity) || 0,
-          currentLevel: Number(device.last_record?.min_last_level) || 0,
-          height: Number(device?.params?.height) || 0,
         };
 
         nodes.push({
