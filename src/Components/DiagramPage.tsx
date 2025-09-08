@@ -372,7 +372,7 @@ const DiagramPage = () => {
           unit: "Ltr",
           isActive: device.device_status === "active",
           totalVolume: device.last_record?.min_max || 0,
-          totalizerReading: device.last_record?.hrs_min || 0,
+          totalizerReading: device.last_record?.min_max || 0,
           flowRate: device.last_record?.min_avg || 0,
         };
 
