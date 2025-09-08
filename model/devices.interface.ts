@@ -19,6 +19,7 @@ export interface DeviceResult {
   last_record: LastRecord;
   params: Params;
   name: string;
+  type: string;
   device_type_name: string;
   department_name: string;
   project_name: string;
