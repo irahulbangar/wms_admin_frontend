@@ -24,10 +24,13 @@ import type { DeviceResult } from "../../model/devices.interface";
 import { getDeviceByProjectId } from "../../store/deviceSlice";
 
 const TankNode = ({ data }: { data: NodeData }) => {
-  const percentage =
-    data.capacity && data.currentLevel
-      ? Math.round((Number(data.currentLevel) / Number(data.capacity)) * 100)
-      : 0;
+  const currentLevel = Number(data.currentLevel) || 0;
+  const capacity = Number(data.capacity) || 0;
+  const height = Number(data.height) || 0;
+  console.log("Height:", height);
+  console.log("Current Level:", currentLevel);
+
+  const percentage = capacity > 0 ? (currentLevel * 100) / height : 0;
 
   const fillHeight = Math.min(percentage, 100);
   const unit = data.unit || "Ltr";
@@ -67,7 +70,7 @@ const TankNode = ({ data }: { data: NodeData }) => {
         />
       </div>
       <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2  text-xs whitespace-nowrap font-roboto text-text-primary">
-        {data.currentLevel || 0}/{data.capacity || 0} {unit}
+        {currentLevel}/{capacity} {unit}
       </div>
     </>
   );
@@ -76,6 +79,9 @@ const TankNode = ({ data }: { data: NodeData }) => {
 const FMNode = ({ data }: { data: NodeData }) => {
   const unit = data.unit || "Ltr";
   const isActive = data.isActive !== false;
+  const totalVolume = Number(data.totalVolume) || 0;
+  const totalizerReading = Number(data.totalizerReading) || 0;
+  const flowRate = Number(data.flowRate) || 0;
 
   return (
     <div
@@ -94,16 +100,16 @@ const FMNode = ({ data }: { data: NodeData }) => {
       <div className="text-xs text-center mb-1">
         <div className="text-text-muted font-roboto">Flow:</div>
         <div className="font-semibold text-status-info font-roboto">
-          {data.flowRate || 0} {unit}/h
+          {flowRate} {unit}
         </div>
       </div>
 
       <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-text-muted whitespace-nowrap font-roboto">
         <div>
-          Total: {data.totalVolume || 0} {unit}
+          Total: {totalVolume} {unit}
         </div>
         <div>
-          Totalizer: {data.totalizerReading || 0} {unit}
+          Totalizer: {totalizerReading} {unit}
         </div>
       </div>
 
@@ -258,7 +264,6 @@ const DiagramPage = () => {
   const [deviceData, setDeviceData] = useState<DeviceResult[]>([]);
   const diagramGeneratedRef = useRef(false);
   const generationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [storageCapacity, setStorageCapacity] = useState<number>(0);
 
   const convertDevicesToDiagram = useCallback((devices: DeviceResult[]) => {
     const nodes: any[] = [];
@@ -324,6 +329,7 @@ const DiagramPage = () => {
       );
 
       tanks.forEach((device: DeviceResult, tankIndex: number) => {
+        console.log("Device:", device);
         const deviceId = `tank${tankIndex + 1}`;
         const deviceX = 280 + tankIndex * 100;
         const deviceY = 125;
@@ -335,7 +341,10 @@ const DiagramPage = () => {
           unit: "Ltr",
           isActive: device.device_status === "active",
           capacity: device.params?.storageCapacity || 0,
-          currentLevel: device?.last_record?.min_last_level || 0,
+          currentLevel: Number(device?.last_record?.min_last_level) || 0,
+          totalizerReading: Number(device?.last_record?.hrs_min) || 0,
+          flowRate: Number(device?.last_record?.min_avg) || 0,
+          height: device.params?.height || 0,
         };
 
         nodes.push({
@@ -371,9 +380,12 @@ const DiagramPage = () => {
           direction: fmIndex < fmPerSide ? "right" : "left",
           unit: "Ltr",
           isActive: device.device_status === "active",
-          totalVolume: device.last_record?.min_max || 0,
-          totalizerReading: device.last_record?.min_max || 0,
-          flowRate: device.last_record?.min_avg || 0,
+          totalVolume: Number(device.last_record?.hrs_max) || 0,
+          totalizerReading: Number(device.last_record?.hrs_min) || 0,
+          flowRate: Number(device.last_record?.min_avg) || 0,
+          capacity: device.params?.storageCapacity || 0,
+          currentLevel: Number(device.last_record?.min_last_level) || 0,
+          height: device.params?.height || 0,
         };
 
         nodes.push({
