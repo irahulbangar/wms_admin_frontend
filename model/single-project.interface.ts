@@ -45,6 +45,7 @@ export interface NodeData {
   totalizerReading?: number;
   capacity?: number;
   currentLevel?: number | string;
+  height?: number;
 }
 
 export interface Style {
