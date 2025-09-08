@@ -25,14 +25,12 @@ import { getDeviceByProjectId } from "../../store/deviceSlice";
 
 const TankNode = ({ data }: { data: NodeData }) => {
   const percentage =
-    data.currentLevel && data.storageCapacity
-      ? Math.round((Number(data.currentLevel) * 100) / Number(data.height))
+    data.capacity && data.currentLevel
+      ? Math.round((Number(data.currentLevel) / Number(data.capacity)) * 100)
       : 0;
 
-  console.log("percentage", percentage);
-
   const fillHeight = Math.min(percentage, 100);
-  const unit = data.unit || "kL";
+  const unit = data.unit || "Ltr";
 
   return (
     <>
@@ -96,7 +94,7 @@ const FMNode = ({ data }: { data: NodeData }) => {
       <div className="text-xs text-center mb-1">
         <div className="text-text-muted font-roboto">Flow:</div>
         <div className="font-semibold text-status-info font-roboto">
-          {data.flowRate || 0} {unit}
+          {data.flowRate || 0} {unit}/h
         </div>
       </div>
 
@@ -260,6 +258,7 @@ const DiagramPage = () => {
   const [deviceData, setDeviceData] = useState<DeviceResult[]>([]);
   const diagramGeneratedRef = useRef(false);
   const generationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [storageCapacity, setStorageCapacity] = useState<number>(0);
 
   const convertDevicesToDiagram = useCallback((devices: DeviceResult[]) => {
     const nodes: any[] = [];
@@ -335,11 +334,8 @@ const DiagramPage = () => {
           direction: "bidirectional",
           unit: "Ltr",
           isActive: device.device_status === "active",
+          capacity: device.params?.storageCapacity || 0,
           currentLevel: device?.last_record?.min_last_level || 0,
-          storageCapacity: device.params?.storageCapacity || 0,
-          height: device.params?.height || 0,
-          shifter: device.params?.shifter || 0,
-          multiplier: device.params?.multiplier || 0,
         };
 
         nodes.push({
@@ -378,12 +374,6 @@ const DiagramPage = () => {
           totalVolume: device.last_record?.min_max || 0,
           totalizerReading: device.last_record?.hrs_min || 0,
           flowRate: device.last_record?.min_avg || 0,
-          inputFor: device.params?.inputFor || 0,
-          outputFor: device.params?.outputFor || 0,
-          storageCapacity: device.params?.storageCapacity || 0,
-          height: device.params?.height || 0,
-          shifter: device.params?.shifter || 0,
-          multiplier: device.params?.multiplier || 0,
         };
 
         nodes.push({
