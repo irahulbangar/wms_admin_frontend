@@ -82,6 +82,8 @@ const FMNode = ({ data }: { data: NodeData }) => {
   const totalVolume = Number(data.totalVolume) || 0;
   const totalizerReading = Number(data.totalizerReading) || 0;
   const flowRate = Number(data.flowRate) || 0;
+  console.log("Flow Rate:", flowRate);
+  console.log("Totalizer Reading:", totalizerReading);
 
   return (
     <div
@@ -329,7 +331,6 @@ const DiagramPage = () => {
       );
 
       tanks.forEach((device: DeviceResult, tankIndex: number) => {
-        console.log("Device:", device);
         const deviceId = `tank${tankIndex + 1}`;
         const deviceX = 280 + tankIndex * 100;
         const deviceY = 125;
@@ -340,9 +341,9 @@ const DiagramPage = () => {
           direction: "bidirectional",
           unit: "Ltr",
           isActive: device.device_status === "active",
-          capacity: device?.params?.storageCapacity || 0,
-          currentLevel: device.last_record?.min_last_level || 0,
-          height: device?.params?.height || 0,
+          capacity: Number(device?.params?.storageCapacity) || 0,
+          currentLevel: Number(device.last_record?.min_last_level) || 0,
+          height: Number(device?.params?.height) || 0,
         };
 
         nodes.push({
@@ -378,7 +379,7 @@ const DiagramPage = () => {
           direction: fmIndex < fmPerSide ? "right" : "left",
           unit: "Ltr",
           isActive: device.device_status === "active",
-          totalizerReading: Number(device.last_record?.hrs_min) || 0,
+          totalizerReading: Number(device.last_record?.min_max) || 0,
           flowRate: Number(device.last_record?.min_avg) || 0,
         };
 
