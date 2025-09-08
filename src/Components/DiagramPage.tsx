@@ -27,8 +27,6 @@ const TankNode = ({ data }: { data: NodeData }) => {
   const currentLevel = Number(data.currentLevel) || 0;
   const capacity = Number(data.capacity) || 0;
   const height = Number(data.height) || 0;
-  console.log("Height:", height);
-  console.log("Current Level:", currentLevel);
 
   const percentage = capacity > 0 ? (currentLevel * 100) / height : 0;
 
@@ -82,8 +80,6 @@ const FMNode = ({ data }: { data: NodeData }) => {
   const totalVolume = Number(data.totalVolume) || 0;
   const totalizerReading = Number(data.totalizerReading) || 0;
   const flowRate = Number(data.flowRate) || 0;
-  console.log("Flow Rate:", flowRate);
-  console.log("Totalizer Reading:", totalizerReading);
 
   return (
     <div
