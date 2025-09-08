@@ -334,22 +334,22 @@ const DiagramPage = () => {
         const deviceX = 280 + tankIndex * 100;
         const deviceY = 125;
 
-        const nodeData: NodeData = {
+        const tankNodeData: NodeData = {
           label: device.device_name,
           type: "bidirectional",
           direction: "bidirectional",
           unit: "Ltr",
           isActive: device.device_status === "active",
-          capacity: device.params?.storageCapacity || 0,
+          capacity: Number(device?.params?.storageCapacity) || 0,
           currentLevel: Number(device?.last_record?.min_last_level) || 0,
           totalizerReading: Number(device?.last_record?.hrs_min) || 0,
           flowRate: Number(device?.last_record?.min_avg) || 0,
-          height: device.params?.height || 0,
+          height: Number(device?.params?.height) || 0,
         };
 
         nodes.push({
           id: deviceId,
-          data: nodeData,
+          data: tankNodeData,
           position: { x: deviceX, y: deviceY },
           parentId: groupId,
           sourcePosition: "right",
@@ -374,7 +374,7 @@ const DiagramPage = () => {
           deviceY = 70 + (fmIndex - fmPerSide) * 80;
         }
 
-        const nodeData: NodeData = {
+        const fmNodeData: NodeData = {
           label: device.device_name,
           type: fmIndex < fmPerSide ? "output" : "input",
           direction: fmIndex < fmPerSide ? "right" : "left",
@@ -383,14 +383,14 @@ const DiagramPage = () => {
           totalVolume: Number(device.last_record?.hrs_max) || 0,
           totalizerReading: Number(device.last_record?.hrs_min) || 0,
           flowRate: Number(device.last_record?.min_avg) || 0,
-          capacity: device.params?.storageCapacity || 0,
+          capacity: Number(device?.params?.storageCapacity) || 0,
           currentLevel: Number(device.last_record?.min_last_level) || 0,
-          height: device.params?.height || 0,
+          height: Number(device?.params?.height) || 0,
         };
 
         nodes.push({
           id: deviceId,
-          data: nodeData,
+          data: fmNodeData,
           position: { x: deviceX, y: deviceY },
           parentId: groupId,
           sourcePosition: fmIndex < fmPerSide ? "right" : "left",
