@@ -152,7 +152,7 @@ export const getDeviceByProjectId = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceResponse>(
-        `/device/admin/device-by-projectId/${projectId}`,
+        `/device/admin/device-project/${projectId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

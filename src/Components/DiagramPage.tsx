@@ -1,5 +1,5 @@
 import { ChevronsLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -16,6 +16,11 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useState, useEffect, useCallback } from "react";
 import { Success } from "../utils/toast";
+import { useAppDispatch } from "../../store/store";
+import { getProjectById } from "../../store/projectSlice";
+import type { SingleProjectResult } from "../../model/single-project.interface";
+import type { DeviceResult } from "../../model/devices.interface";
+import { getDeviceByProjectId } from "../../store/deviceSlice";
 
 type NodeDirection = "left" | "right" | "up" | "down" | "bidirectional";
 
@@ -467,8 +472,40 @@ const DiagramPage = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [hasChanges, setHasChanges] = useState(false);
-
+  const projectId = useParams().project_id;
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [projectData, setProjectData] = useState<SingleProjectResult | null>(
+    null
+  );
+  const [deviceData, setDeviceData] = useState<DeviceResult[]>([]);
+
+  const fetchDiagram = useCallback(async () => {
+    await dispatch(getProjectById(projectId as string))
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setProjectData(res.data);
+        }
+      });
+  }, [dispatch, projectId]);
+
+  const fetchDeviceData = useCallback(async () => {
+    await dispatch(getDeviceByProjectId(parseInt(projectId as string)))
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDeviceData(res.data);
+        }
+      });
+  }, [dispatch, projectId]);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchDiagram();
+      fetchDeviceData();
+    }
+  }, [fetchDiagram, fetchDeviceData, projectId]);
 
   const loadSavedDiagram = useCallback(() => {
     try {

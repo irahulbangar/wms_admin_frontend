@@ -4,6 +4,7 @@ import type {
   GetProjectsResponse,
   ProjectResult,
 } from "../model/project.interface";
+import type { SingleProjectResponse } from "../model/single-project.interface";
 
 interface ProjectResponse {
   success: boolean;
@@ -73,7 +74,7 @@ export const getProjectById = createAsyncThunk(
   "project/admin/getProjectById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get<GetProjectsResponse>(
+      const response = await api().get<SingleProjectResponse>(
         `/project/admin/${id}`,
         {
           headers: {
@@ -184,6 +185,30 @@ export const deleteProjectById = createAsyncThunk(
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to delete project";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Update the project diagram by id
+export const updateProjectDiagramById = createAsyncThunk(
+  "project/admin/updateProjectDiagramById",
+  async (project_id, thunkAPI) => {
+    try {
+      const response = await api().put<ProjectResponse>(
+        `/project/admin/update-diagram/${project_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update project diagram";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
