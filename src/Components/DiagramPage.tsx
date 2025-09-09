@@ -441,6 +441,75 @@ const DiagramPage = () => {
     }
   }, [dispatch, projectId]);
 
+  const updateNodesWithDynamicData = useCallback(() => {
+    if (deviceData.length === 0 || nodes.length === 0) return;
+
+    setNodes((currentNodes) => {
+      return currentNodes.map((node) => {
+        if (node.type === "tank") {
+          const matchingDevice = deviceData.find(
+            (device) =>
+              device.device_name === node.data.label &&
+              (device.type === "tank" ||
+                device.device_family?.toLowerCase().includes("tank"))
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                currentLevel:
+                  Number(matchingDevice.last_record?.min_last_level) || 0,
+                capacity: Number(matchingDevice?.params?.storageCapacity) || 0,
+                height: Number(matchingDevice?.params?.height) || 0,
+              },
+            };
+          }
+        } else if (node.type === "fm") {
+          const matchingDevice = deviceData.find(
+            (device) =>
+              device.device_name === node.data.label &&
+              (device.type === "fm" ||
+                device.device_family?.toLowerCase().includes("flow"))
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                flowRate: Number(matchingDevice.last_record?.min_avg) || 0,
+                totalizerReading:
+                  Number(matchingDevice.last_record?.min_max) || 0,
+                isActive: matchingDevice.device_status === "active",
+              },
+            };
+          }
+        }
+
+        return node;
+      });
+    });
+  }, [deviceData, nodes.length]);
+
+  useEffect(() => {
+    if (deviceData.length > 0 && nodes.length > 0) {
+      updateNodesWithDynamicData();
+
+      const interval = setInterval(() => {
+        fetchDeviceData();
+      }, 20000);
+
+      return () => clearInterval(interval);
+    }
+  }, [
+    deviceData.length,
+    nodes.length,
+    updateNodesWithDynamicData,
+    fetchDeviceData,
+  ]);
+
   useEffect(() => {
     if (projectId) {
       diagramGeneratedRef.current = false;
@@ -490,17 +559,37 @@ const DiagramPage = () => {
 
     setIsSaving(true);
     try {
+      const cleanNodes = nodes.map((node) => {
+        if (node.type === "tank") {
+          const { currentLevel, ...cleanData } = node.data;
+          return {
+            ...node,
+            data: cleanData,
+          };
+        } else if (node.type === "fm") {
+          const { flowRate, totalizerReading, isActive, ...cleanData } =
+            node.data;
+          return {
+            ...node,
+            data: cleanData,
+          };
+        }
+        return node;
+      });
+
       await dispatch(
         updateDiagramData({
           project_id: parseInt(projectId),
-          nodes: nodes as any,
+          nodes: cleanNodes as any,
           edges: edges as any,
         })
       )
         .unwrap()
         .then(() => {
           setHasChanges(false);
-          Success("Diagram saved to server successfully!");
+          Success(
+            "Diagram structure saved to server successfully! (Dynamic values not saved)"
+          );
         })
         .catch((error) => {
           console.error("Failed to save diagram to server:", error);
@@ -586,6 +675,8 @@ const DiagramPage = () => {
         "Are you sure you want to reset the diagram to its initial state? This will clear all current positions and data."
       )
     ) {
+      fetchDiagram();
+      fetchDeviceData();
       Success("Diagram reset successfully!");
       setNodes([]);
       setEdges([]);
@@ -640,9 +731,9 @@ const DiagramPage = () => {
                     }`}
                     title={
                       isSaving
-                        ? "Saving to server..."
+                        ? "Saving structure to server..."
                         : hasChanges
-                        ? "Save diagram to server"
+                        ? "Save diagram structure (positions & connections only)"
                         : "No changes to save"
                     }
                   >
