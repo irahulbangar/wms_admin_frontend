@@ -254,6 +254,13 @@ const DiagramPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
+    null
+  );
+  const [showDepartmentPopup, setShowDepartmentPopup] = useState(false);
+  const [departmentDimensions, setDepartmentDimensions] = useState<
+    Record<string, { width: number; height: number }>
+  >({});
   const projectId = useParams().project_id;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -264,219 +271,234 @@ const DiagramPage = () => {
   const diagramGeneratedRef = useRef(false);
   const generationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const convertDevicesToDiagram = useCallback((devices: DeviceResult[]) => {
-    const nodes: any[] = [];
-    const edges: any[] = [];
+  const convertDevicesToDiagram = useCallback(
+    (devices: DeviceResult[]) => {
+      const nodes: any[] = [];
+      const edges: any[] = [];
 
-    interface DepartmentGroup {
-      department_id: number;
-      department_name: string;
-      devices: DeviceResult[];
-    }
-
-    const departmentGroups = devices.reduce((acc, device) => {
-      const deptId = device.department_id.toString();
-      if (!acc[deptId]) {
-        acc[deptId] = {
-          department_id: device.department_id,
-          department_name:
-            device.department_name || `Department ${device.department_id}`,
-          devices: [],
-        };
+      interface DepartmentGroup {
+        department_id: number;
+        department_name: string;
+        devices: DeviceResult[];
       }
-      acc[deptId].devices.push(device);
-      return acc;
-    }, {} as Record<string, DepartmentGroup>);
 
-    Object.values(departmentGroups).forEach((group: DepartmentGroup) => {
-      group.devices.sort((a: DeviceResult, b: DeviceResult) => {
-        const aIsTank =
-          a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
-        const bIsTank =
-          b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
-        if (aIsTank && !bIsTank) return -1;
-        if (!aIsTank && bIsTank) return 1;
-        return a.device_id - b.device_id;
+      const departmentGroups = devices.reduce((acc, device) => {
+        const deptId = device.department_id.toString();
+        if (!acc[deptId]) {
+          acc[deptId] = {
+            department_id: device.department_id,
+            department_name:
+              device.department_name || `Department ${device.department_id}`,
+            devices: [],
+          };
+        }
+        acc[deptId].devices.push(device);
+        return acc;
+      }, {} as Record<string, DepartmentGroup>);
+
+      Object.values(departmentGroups).forEach((group: DepartmentGroup) => {
+        group.devices.sort((a: DeviceResult, b: DeviceResult) => {
+          const aIsTank =
+            a.type === "tank" ||
+            a.device_family?.toLowerCase().includes("tank");
+          const bIsTank =
+            b.type === "tank" ||
+            b.device_family?.toLowerCase().includes("tank");
+          if (aIsTank && !bIsTank) return -1;
+          if (!aIsTank && bIsTank) return 1;
+          return a.device_id - b.device_id;
+        });
       });
-    });
 
-    Object.values(departmentGroups).forEach(
-      (group: DepartmentGroup, groupIndex) => {
-        const groupId = group.department_id.toString();
-        const groupX = groupIndex * 675 + 50;
-        const groupY = 50;
+      Object.values(departmentGroups).forEach(
+        (group: DepartmentGroup, groupIndex) => {
+          const groupId = group.department_id.toString();
+          const groupX = groupIndex * 675 + 50;
+          const groupY = 50;
 
-        nodes.push({
-          id: groupId,
-          data: {
-            label: group.department_name,
-            type: "output",
-            unit: "Ltr",
-          },
-          position: { x: groupX, y: groupY },
-          style: {
+          // Get dynamic dimensions for this department
+          const currentDimensions = departmentDimensions[groupId] || {
             width: 625,
             height: 350,
-            borderRadius: 10,
-            border: "2px dashed #ccc",
-          },
-          type: "group",
-          width: 625,
-          height: 350,
-        });
+          };
+          const groupWidth = currentDimensions.width;
+          const groupHeight = currentDimensions.height;
 
-        const tanks = group.devices.filter(
-          (device: DeviceResult) =>
-            device.type === "tank" ||
-            device.device_family?.toLowerCase().includes("tank")
-        );
-        const fms = group.devices.filter(
-          (device: DeviceResult) =>
-            device.type === "fm" ||
-            device.device_family?.toLowerCase().includes("flow")
-        );
+          nodes.push({
+            id: groupId,
+            data: {
+              label: group.department_name,
+              type: "output",
+              unit: "Ltr",
+            },
+            position: { x: groupX, y: groupY },
+            style: {
+              width: groupWidth,
+              height: groupHeight,
+              borderRadius: 10,
+              border: "2px dashed #ccc",
+            },
+            type: "group",
+            width: groupWidth,
+            height: groupHeight,
+          });
 
-        tanks.forEach((device: DeviceResult, tankIndex: number) => {
-          const deviceId = `${groupId}-tank${tankIndex + 1}`;
-
-          const tankWidth = 80;
-          const tankHeight = 96;
-          const tankSpacing = 20;
-          const groupWidth = 625;
-          const groupHeight = 350;
-          const sideMargin = 50;
-
-          const availableWidth = groupWidth - 2 * sideMargin;
-          const maxTanksPerRow = Math.max(
-            1,
-            Math.floor(availableWidth / (tankWidth + tankSpacing))
+          const tanks = group.devices.filter(
+            (device: DeviceResult) =>
+              device.type === "tank" ||
+              device.device_family?.toLowerCase().includes("tank")
           );
-          const totalRows = Math.ceil(tanks.length / maxTanksPerRow);
-
-          const row = Math.floor(tankIndex / maxTanksPerRow);
-          const col = tankIndex % maxTanksPerRow;
-
-          const totalTanksInRow = Math.min(
-            maxTanksPerRow,
-            tanks.length - row * maxTanksPerRow
+          const fms = group.devices.filter(
+            (device: DeviceResult) =>
+              device.type === "fm" ||
+              device.device_family?.toLowerCase().includes("flow")
           );
-          const rowWidth =
-            totalTanksInRow * tankWidth + (totalTanksInRow - 1) * tankSpacing;
-          const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
-          const deviceX = startX + col * (tankWidth + tankSpacing);
+          tanks.forEach((device: DeviceResult, tankIndex: number) => {
+            const deviceId = `${groupId}-tank${tankIndex + 1}`;
 
-          let deviceY;
-          if (totalRows === 1) {
-            deviceY = (groupHeight - tankHeight) / 2;
-          } else {
-            const availableHeight = groupHeight - 100;
-            const rowSpacing = Math.max(
-              20,
-              (availableHeight - totalRows * tankHeight) / (totalRows + 1)
+            const tankWidth = 80;
+            const tankHeight = 96;
+            const tankSpacing = 20;
+            const sideMargin = 50;
+
+            const availableWidth = groupWidth - 2 * sideMargin;
+            const maxTanksPerRow = Math.max(
+              1,
+              Math.floor(availableWidth / (tankWidth + tankSpacing))
             );
-            deviceY = 60 + rowSpacing + row * (tankHeight + rowSpacing);
-          }
+            const totalRows = Math.ceil(tanks.length / maxTanksPerRow);
 
-          const tankNodeData: NodeData = {
-            label: device.device_name,
-            type: "bidirectional",
-            direction: "bidirectional",
-            unit: "Ltr",
-            isActive: device.device_status === "active",
-            capacity: Number(device?.params?.storageCapacity) || 0,
-            currentLevel: Number(device.last_record?.min_last_level) || 0,
-            height: Number(device?.params?.height) || 0,
-          };
+            const row = Math.floor(tankIndex / maxTanksPerRow);
+            const col = tankIndex % maxTanksPerRow;
 
-          nodes.push({
-            id: deviceId,
-            data: tankNodeData,
-            position: { x: deviceX, y: deviceY },
-            parentId: groupId,
-            sourcePosition: "right",
-            targetPosition: "left",
-            type: "tank",
-            width: tankWidth,
-            height: tankHeight,
+            const totalTanksInRow = Math.min(
+              maxTanksPerRow,
+              tanks.length - row * maxTanksPerRow
+            );
+            const rowWidth =
+              totalTanksInRow * tankWidth + (totalTanksInRow - 1) * tankSpacing;
+            const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+            const deviceX = startX + col * (tankWidth + tankSpacing);
+
+            let deviceY;
+            if (totalRows === 1) {
+              deviceY = (groupHeight - tankHeight) / 2;
+            } else {
+              const availableHeight = groupHeight - 100;
+              const rowSpacing = Math.max(
+                20,
+                (availableHeight - totalRows * tankHeight) / (totalRows + 1)
+              );
+              deviceY = 60 + rowSpacing + row * (tankHeight + rowSpacing);
+            }
+
+            const tankNodeData: NodeData = {
+              label: device.device_name,
+              type: "bidirectional",
+              direction: "bidirectional",
+              unit: "Ltr",
+              isActive: device.device_status === "active",
+              capacity: Number(device?.params?.storageCapacity) || 0,
+              currentLevel: Number(device.last_record?.min_last_level) || 0,
+              height: Number(device?.params?.height) || 0,
+            };
+
+            nodes.push({
+              id: deviceId,
+              data: tankNodeData,
+              position: { x: deviceX, y: deviceY },
+              parentId: groupId,
+              sourcePosition: "right",
+              targetPosition: "left",
+              type: "tank",
+              width: tankWidth,
+              height: tankHeight,
+            });
           });
-        });
 
-        fms.forEach((device: DeviceResult, fmIndex: number) => {
-          const deviceId = `${groupId}-fm${fmIndex + 1}`;
-          const totalFMs = fms.length;
-          const fmWidth = 96;
-          const fmHeight = 64;
-          const groupWidth = 625;
-          const groupHeight = 350;
-          const sideMargin = 20;
+          fms.forEach((device: DeviceResult, fmIndex: number) => {
+            const deviceId = `${groupId}-fm${fmIndex + 1}`;
+            const totalFMs = fms.length;
+            const fmWidth = 96;
+            const fmHeight = 64;
+            const sideMargin = 20;
 
-          // Calculate tank area to avoid overlap
-          const availableWidth = groupWidth - 2 * 50; // Same as tank calculation
-          const maxTanksPerRow = Math.max(
-            1,
-            Math.floor(availableWidth / (80 + 20))
-          );
-          const totalTankRows = Math.ceil(tanks.length / maxTanksPerRow);
-          const tankAreaHeight =
-            totalTankRows > 0
-              ? totalTankRows * 96 + (totalTankRows - 1) * 20 + 120
-              : 0;
+            // Calculate tank area to avoid overlap
+            const availableWidth = groupWidth - 2 * 50; // Same as tank calculation
+            const maxTanksPerRow = Math.max(
+              1,
+              Math.floor(availableWidth / (80 + 20))
+            );
+            const totalTankRows = Math.ceil(tanks.length / maxTanksPerRow);
+            const tankAreaHeight =
+              totalTankRows > 0
+                ? totalTankRows * 96 + (totalTankRows - 1) * 20 + 120
+                : 0;
 
-          const fmPerSide = Math.ceil(totalFMs / 2);
-          const availableHeight = groupHeight - tankAreaHeight - 40;
-          const fmVerticalSpacing =
-            totalFMs > 1
-              ? Math.min(80, Math.max(60, availableHeight / totalFMs))
-              : 80;
+            const fmPerSide = Math.ceil(totalFMs / 2);
+            const availableHeight = groupHeight - tankAreaHeight - 40;
+            const fmVerticalSpacing =
+              totalFMs > 1
+                ? Math.min(80, Math.max(60, availableHeight / totalFMs))
+                : 80;
 
-          let deviceX, deviceY;
-          if (fmIndex < fmPerSide) {
-            deviceX = sideMargin;
-            deviceY = 20 + fmIndex * fmVerticalSpacing;
-          } else {
-            deviceX = groupWidth - fmWidth - sideMargin;
-            deviceY = 20 + (fmIndex - fmPerSide) * fmVerticalSpacing;
-          }
+            let deviceX, deviceY;
+            if (fmIndex < fmPerSide) {
+              deviceX = sideMargin;
+              deviceY = 20 + fmIndex * fmVerticalSpacing;
+            } else {
+              deviceX = groupWidth - fmWidth - sideMargin;
+              deviceY = 20 + (fmIndex - fmPerSide) * fmVerticalSpacing;
+            }
 
-          deviceY = Math.min(deviceY, groupHeight - fmHeight - 20);
+            deviceY = Math.min(deviceY, groupHeight - fmHeight - 20);
 
-          const fmNodeData: NodeData = {
-            label: device.device_name,
-            type: fmIndex < fmPerSide ? "output" : "input",
-            direction: fmIndex < fmPerSide ? "right" : "left",
-            unit: "Ltr",
-            isActive: device.device_status === "active",
-            totalizerReading: Number(device.last_record?.min_max) || 0,
-            flowRate: Number(device.last_record?.min_avg) || 0,
-          };
+            const fmNodeData: NodeData = {
+              label: device.device_name,
+              type: fmIndex < fmPerSide ? "output" : "input",
+              direction: fmIndex < fmPerSide ? "right" : "left",
+              unit: "Ltr",
+              isActive: device.device_status === "active",
+              totalizerReading: Number(device.last_record?.min_max) || 0,
+              flowRate: Number(device.last_record?.min_avg) || 0,
+            };
 
-          nodes.push({
-            id: deviceId,
-            data: fmNodeData,
-            position: { x: deviceX, y: deviceY },
-            parentId: groupId,
-            sourcePosition: fmIndex < fmPerSide ? "right" : "left",
-            targetPosition: fmIndex < fmPerSide ? "right" : "left",
-            type: "fm",
-            width: fmWidth,
-            height: fmHeight,
+            nodes.push({
+              id: deviceId,
+              data: fmNodeData,
+              position: { x: deviceX, y: deviceY },
+              parentId: groupId,
+              sourcePosition: fmIndex < fmPerSide ? "right" : "left",
+              targetPosition: fmIndex < fmPerSide ? "right" : "left",
+              type: "fm",
+              width: fmWidth,
+              height: fmHeight,
+            });
           });
-        });
-      }
-    );
+        }
+      );
 
-    return { nodes, edges };
-  }, []);
+      return { nodes, edges };
+    },
+    [departmentDimensions]
+  );
 
   const fetchDiagram = useCallback(async () => {
     try {
       const res = await dispatch(getProjectById(projectId as string)).unwrap();
       if (res.success) {
         setProjectData(res.data);
+
         if (res.data.nodes && res.data.edges && res.data.nodes.length > 0) {
           setNodes(res.data.nodes as any);
           setEdges(res.data.edges as any);
+
+          if ((res.data as any).department_dimensions) {
+            setDepartmentDimensions((res.data as any).department_dimensions);
+          }
+
           setIsLoadingDiagram(false);
         } else {
           console.log(
@@ -489,6 +511,28 @@ const DiagramPage = () => {
       setIsLoadingDiagram(false);
     }
   }, [dispatch, projectId, setNodes, setEdges]);
+
+  // Sync department dimensions with actual node dimensions
+  const syncDepartmentDimensionsWithNodes = useCallback(() => {
+    setNodes((currentNodes) => {
+      return currentNodes.map((node) => {
+        if (node.type === "group" && departmentDimensions[node.id]) {
+          const dimensions = departmentDimensions[node.id];
+          return {
+            ...node,
+            width: dimensions.width,
+            height: dimensions.height,
+            style: {
+              ...node.style,
+              width: `${dimensions.width}px`,
+              height: `${dimensions.height}px`,
+            },
+          };
+        }
+        return node;
+      });
+    });
+  }, [departmentDimensions]);
 
   const fetchDeviceData = useCallback(async () => {
     try {
@@ -617,6 +661,39 @@ const DiagramPage = () => {
     setEdges,
   ]);
 
+  useEffect(() => {
+    if (
+      Object.keys(departmentDimensions).length > 0 &&
+      nodes.length > 0 &&
+      !isLoadingDiagram
+    ) {
+      setNodes((currentNodes) => {
+        return currentNodes.map((node) => {
+          if (node.type === "group" && departmentDimensions[node.id]) {
+            const dimensions = departmentDimensions[node.id];
+            return {
+              ...node,
+              width: dimensions.width,
+              height: dimensions.height,
+              style: {
+                ...node.style,
+                width: `${dimensions.width}px`,
+                height: `${dimensions.height}px`,
+              },
+            };
+          }
+          return node;
+        });
+      });
+    }
+  }, [departmentDimensions, nodes.length, isLoadingDiagram]);
+
+  useEffect(() => {
+    if (Object.keys(departmentDimensions).length > 0 && nodes.length > 0) {
+      syncDepartmentDimensionsWithNodes();
+    }
+  }, [departmentDimensions, syncDepartmentDimensionsWithNodes, nodes.length]);
+
   const saveDiagramToAPI = useCallback(async () => {
     if (!projectId) return;
 
@@ -636,22 +713,39 @@ const DiagramPage = () => {
             ...node,
             data: cleanData,
           };
+        } else if (node.type === "group") {
+          const currentDimensions = departmentDimensions[node.id];
+          if (currentDimensions) {
+            return {
+              ...node,
+              width: currentDimensions.width,
+              height: currentDimensions.height,
+              position: node.position,
+              style: {
+                ...node.style,
+                width: `${currentDimensions.width}px`,
+                height: `${currentDimensions.height}px`,
+              },
+            };
+          }
         }
         return node;
       });
 
-      await dispatch(
-        updateDiagramData({
-          project_id: parseInt(projectId),
-          nodes: cleanNodes as any,
-          edges: edges as any,
-        })
-      )
+      // Include department dimensions in the API call
+      const diagramData = {
+        project_id: parseInt(projectId),
+        nodes: cleanNodes as any,
+        edges: edges as any,
+        department_dimensions: departmentDimensions, // Add department dimensions
+      };
+
+      await dispatch(updateDiagramData(diagramData))
         .unwrap()
         .then(() => {
           setHasChanges(false);
           Success(
-            "Diagram structure saved to server successfully! (Dynamic values not saved)"
+            "Diagram structure and department dimensions saved to server successfully!"
           );
         })
         .catch((error) => {
@@ -663,7 +757,7 @@ const DiagramPage = () => {
     } catch (error) {
       console.error("Failed to save diagram to server:", error);
     }
-  }, [dispatch, projectId, nodes, edges]);
+  }, [dispatch, projectId, nodes, edges, departmentDimensions]);
 
   const handleNodeDragStop: NodeDragHandler = () => {
     setHasChanges(true);
@@ -715,6 +809,186 @@ const DiagramPage = () => {
     setSelectedEdge(null);
   }, []);
 
+  const onNodeClick = useCallback((event: React.MouseEvent, node: any) => {
+    event.stopPropagation();
+    if (node.type === "group") {
+      setSelectedDepartment(node.id);
+      setShowDepartmentPopup(true);
+    }
+  }, []);
+
+  const handleDepartmentDimensionsChange = useCallback(
+    (width: number, height: number) => {
+      if (selectedDepartment) {
+        console.log(
+          `📏 Updating department ${selectedDepartment} dimensions:`,
+          { width, height }
+        );
+
+        // Update department dimensions state
+        setDepartmentDimensions((prev) => ({
+          ...prev,
+          [selectedDepartment]: { width, height },
+        }));
+
+        // Directly update the group node's width and height and reposition child nodes
+        setNodes((currentNodes) => {
+          const updatedNodes = currentNodes.map((node) => {
+            if (node.id === selectedDepartment && node.type === "group") {
+              return {
+                ...node,
+                width: width,
+                height: height,
+                style: {
+                  ...node.style,
+                  width: `${width}px`,
+                  height: `${height}px`,
+                  minWidth: `${width}px`,
+                  minHeight: `${height}px`,
+                  maxWidth: `${width}px`,
+                  maxHeight: `${height}px`,
+                },
+              };
+            }
+            return node;
+          });
+
+          // Reposition child nodes (tanks and FMs) within the new group dimensions
+          return updatedNodes.map((node) => {
+            if (node.parentId === selectedDepartment) {
+              const parentNode = updatedNodes.find(
+                (n) => n.id === selectedDepartment
+              );
+              if (parentNode) {
+                const parentWidth = width;
+                const parentHeight = height;
+
+                if (node.type === "tank") {
+                  // Reposition tank nodes
+                  const tankWidth = 80;
+                  const tankHeight = 96;
+                  const tankSpacing = 20;
+                  const sideMargin = 50;
+
+                  const availableWidth = parentWidth - 2 * sideMargin;
+                  const maxTanksPerRow = Math.max(
+                    1,
+                    Math.floor(availableWidth / (tankWidth + tankSpacing))
+                  );
+
+                  // Get tank index from node ID
+                  const tankIndex = parseInt(node.id.split("-tank")[1]) - 1;
+                  const totalRows = Math.ceil(
+                    updatedNodes.filter(
+                      (n) =>
+                        n.parentId === selectedDepartment && n.type === "tank"
+                    ).length / maxTanksPerRow
+                  );
+
+                  const row = Math.floor(tankIndex / maxTanksPerRow);
+                  const col = tankIndex % maxTanksPerRow;
+
+                  const totalTanksInRow = Math.min(
+                    maxTanksPerRow,
+                    updatedNodes.filter(
+                      (n) =>
+                        n.parentId === selectedDepartment && n.type === "tank"
+                    ).length -
+                      row * maxTanksPerRow
+                  );
+                  const rowWidth =
+                    totalTanksInRow * tankWidth +
+                    (totalTanksInRow - 1) * tankSpacing;
+                  const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+                  const deviceX = startX + col * (tankWidth + tankSpacing);
+
+                  let deviceY;
+                  if (totalRows === 1) {
+                    deviceY = (parentHeight - tankHeight) / 2;
+                  } else {
+                    const availableHeight = parentHeight - 100;
+                    const rowSpacing = Math.max(
+                      20,
+                      (availableHeight - totalRows * tankHeight) /
+                        (totalRows + 1)
+                    );
+                    deviceY = 60 + rowSpacing + row * (tankHeight + rowSpacing);
+                  }
+
+                  return {
+                    ...node,
+                    position: { x: deviceX, y: deviceY },
+                  };
+                } else if (node.type === "fm") {
+                  // Reposition FM nodes
+                  const fmWidth = 96;
+                  const fmHeight = 64;
+                  const sideMargin = 20;
+
+                  // Calculate tank area to avoid overlap
+                  const availableWidth = parentWidth - 2 * 50;
+                  const maxTanksPerRow = Math.max(
+                    1,
+                    Math.floor(availableWidth / (80 + 20))
+                  );
+                  const totalTankRows = Math.ceil(
+                    updatedNodes.filter(
+                      (n) =>
+                        n.parentId === selectedDepartment && n.type === "tank"
+                    ).length / maxTanksPerRow
+                  );
+                  const tankAreaHeight =
+                    totalTankRows > 0
+                      ? totalTankRows * 96 + (totalTankRows - 1) * 20 + 120
+                      : 0;
+
+                  const totalFMs = updatedNodes.filter(
+                    (n) => n.parentId === selectedDepartment && n.type === "fm"
+                  ).length;
+                  const fmPerSide = Math.ceil(totalFMs / 2);
+                  const availableHeight = parentHeight - tankAreaHeight - 40;
+                  const fmVerticalSpacing =
+                    totalFMs > 1
+                      ? Math.min(80, Math.max(60, availableHeight / totalFMs))
+                      : 80;
+
+                  // Get FM index from node ID
+                  const fmIndex = parseInt(node.id.split("-fm")[1]) - 1;
+
+                  let deviceX, deviceY;
+                  if (fmIndex < fmPerSide) {
+                    deviceX = sideMargin;
+                    deviceY = 20 + fmIndex * fmVerticalSpacing;
+                  } else {
+                    deviceX = parentWidth - fmWidth - sideMargin;
+                    deviceY = 20 + (fmIndex - fmPerSide) * fmVerticalSpacing;
+                  }
+
+                  deviceY = Math.min(deviceY, parentHeight - fmHeight - 20);
+
+                  return {
+                    ...node,
+                    position: { x: deviceX, y: deviceY },
+                  };
+                }
+              }
+            }
+            return node;
+          });
+        });
+
+        setHasChanges(true);
+      }
+    },
+    [selectedDepartment]
+  );
+
+  const handleCloseDepartmentPopup = useCallback(() => {
+    setShowDepartmentPopup(false);
+    setSelectedDepartment(null);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Delete" || event.key === "Backspace") {
@@ -735,12 +1009,15 @@ const DiagramPage = () => {
   const handleResetDiagram = () => {
     if (
       confirm(
-        "Are you sure you want to reset the diagram to its initial state? This will clear all current positions and data."
+        "Are you sure you want to reset the diagram to its initial state? This will clear all current positions, data, and department dimensions."
       )
     ) {
+      // Reset department dimensions to default
+      setDepartmentDimensions({});
+
       fetchDiagram();
       fetchDeviceData();
-      Success("Diagram reset successfully!");
+      Success("Diagram and department dimensions reset successfully!");
       setNodes([]);
       setEdges([]);
       setHasChanges(false);
@@ -842,7 +1119,23 @@ const DiagramPage = () => {
               <>
                 <ReactFlow
                   className="h-full w-full"
-                  nodes={nodes}
+                  nodes={nodes.map((node) => {
+                    // Highlight the selected department group
+                    if (
+                      node.id === selectedDepartment &&
+                      node.type === "group"
+                    ) {
+                      return {
+                        ...node,
+                        style: {
+                          ...node.style,
+                          border: "3px solid #3b82f6",
+                          boxShadow: "0 0 15px rgba(59, 130, 246, 0.3)",
+                        },
+                      };
+                    }
+                    return node;
+                  })}
                   edges={edges.map((edge) => ({
                     ...edge,
                     style: {
@@ -861,6 +1154,7 @@ const DiagramPage = () => {
                   onEdgesChange={handleEdgesChange}
                   onNodeDragStop={handleNodeDragStop}
                   onConnect={onConnect}
+                  onNodeClick={onNodeClick}
                   onEdgeClick={onEdgeClick}
                   onPaneClick={onPaneClick}
                   connectionMode={ConnectionMode.Loose}
@@ -878,6 +1172,116 @@ const DiagramPage = () => {
           </div>
         </main>
       </div>
+
+      {/* Department Dimensions Popup */}
+      {showDepartmentPopup && selectedDepartment && (
+        <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-secondary border border-border-primary rounded-lg p-6 w-96 max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-text-primary">
+                Edit Department Dimensions
+              </h3>
+              <button
+                onClick={handleCloseDepartmentPopup}
+                className="text-text-muted hover:text-text-primary text-xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  Department:{" "}
+                  {nodes.find((n) => n.id === selectedDepartment)?.data.label}
+                </label>
+                <div className="text-xs text-text-muted mb-2">
+                  Current size:{" "}
+                  {departmentDimensions[selectedDepartment]?.width || 625}px ×{" "}
+                  {departmentDimensions[selectedDepartment]?.height || 350}px
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-2 text-xs text-blue-800">
+                  <strong>💡 Tip:</strong> The department group (highlighted in
+                  blue) will resize immediately as you change the values below.
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">
+                    Width (px)
+                  </label>
+                  <input
+                    type="number"
+                    min="300"
+                    max="1200"
+                    value={
+                      departmentDimensions[selectedDepartment]?.width || 625
+                    }
+                    onChange={(e) => {
+                      const width = parseInt(e.target.value) || 625;
+                      const height =
+                        departmentDimensions[selectedDepartment]?.height || 350;
+                      handleDepartmentDimensionsChange(width, height);
+                    }}
+                    className="w-full px-3 py-2 border border-border-primary rounded-md bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">
+                    Height (px)
+                  </label>
+                  <input
+                    type="number"
+                    min="200"
+                    max="800"
+                    value={
+                      departmentDimensions[selectedDepartment]?.height || 350
+                    }
+                    onChange={(e) => {
+                      const width =
+                        departmentDimensions[selectedDepartment]?.width || 625;
+                      const height = parseInt(e.target.value) || 350;
+                      handleDepartmentDimensionsChange(width, height);
+                    }}
+                    className="w-full px-3 py-2 border border-border-primary rounded-md bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="text-xs text-text-muted">
+                <p>• Minimum width: 300px, Maximum width: 1200px</p>
+                <p>• Minimum height: 200px, Maximum height: 800px</p>
+                <p>• Changes will reposition devices automatically</p>
+                <p className="text-status-info font-semibold">
+                  • Group will resize immediately as you type
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <button
+                  onClick={handleCloseDepartmentPopup}
+                  className="px-4 py-2 bg-secondary border border-border-primary rounded-md text-text-primary hover:bg-secondary/80 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    // Reset to default dimensions
+                    if (selectedDepartment) {
+                      handleDepartmentDimensionsChange(625, 350);
+                    }
+                  }}
+                  className="px-4 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md transition-colors"
+                >
+                  Reset to Default
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
