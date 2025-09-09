@@ -720,7 +720,7 @@ const DiagramPage = () => {
     try {
       const cleanNodes = nodes.map((node) => {
         if (node.type === "tank") {
-          const { currentLevel, ...cleanData } = node.data;
+          const { _currentLevel, ...cleanData } = node.data;
           return {
             ...node,
             data: cleanData,
@@ -952,14 +952,12 @@ const DiagramPage = () => {
                     (n) => n.parentId === selectedDepartment && n.type === "fm"
                   ).length;
 
-                  // Calculate FM grid layout
                   const maxFMsPerRow = Math.max(
                     1,
                     Math.floor(availableWidth / (fmWidth + fmSpacing))
                   );
                   const totalFMRows = Math.ceil(totalFMs / maxFMsPerRow);
 
-                  // Position FMs in a grid below tanks
                   const fmStartY = tankAreaHeight + 20;
                   const availableHeight = parentHeight - fmStartY - 20;
                   const fmVerticalSpacing =
@@ -978,7 +976,6 @@ const DiagramPage = () => {
                   const row = Math.floor(fmIndex / maxFMsPerRow);
                   const col = fmIndex % maxFMsPerRow;
 
-                  // Center FMs horizontally
                   const totalFMsInRow = Math.min(
                     maxFMsPerRow,
                     totalFMs - row * maxFMsPerRow
