@@ -10,6 +10,10 @@ import ReactFlow, {
   Handle,
   Position as HandlePosition,
   Controls,
+  addEdge,
+  type Connection,
+  type Edge,
+  ConnectionMode,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -135,8 +139,8 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
       (acc, tank) => {
         const tankData = tank.data as NodeData;
         return {
-          current: Number(tankData.currentLevel) || 0,
-          capacity: tankData.capacity || 0,
+          current: acc.current + (Number(tankData.currentLevel) || 0),
+          capacity: acc.capacity + (Number(tankData.capacity) || 0),
         };
       },
       { current: 0, capacity: 0 }
@@ -249,6 +253,8 @@ const DiagramPage = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
+  const [isManualMode, setIsManualMode] = useState(false);
+  const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
   const projectId = useParams().project_id;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -263,6 +269,12 @@ const DiagramPage = () => {
     const nodes: any[] = [];
     const edges: any[] = [];
 
+    interface DepartmentGroup {
+      department_id: number;
+      department_name: string;
+      devices: DeviceResult[];
+    }
+
     const departmentGroups = devices.reduce((acc, device) => {
       const deptId = device.department_id.toString();
       if (!acc[deptId]) {
@@ -275,9 +287,9 @@ const DiagramPage = () => {
       }
       acc[deptId].devices.push(device);
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, DepartmentGroup>);
 
-    Object.values(departmentGroups).forEach((group: any) => {
+    Object.values(departmentGroups).forEach((group: DepartmentGroup) => {
       group.devices.sort((a: DeviceResult, b: DeviceResult) => {
         const aIsTank =
           a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
@@ -289,268 +301,270 @@ const DiagramPage = () => {
       });
     });
 
-    Object.values(departmentGroups).forEach((group: any, groupIndex) => {
-      const groupId = group.department_id.toString();
-      const groupX = groupIndex * 675 + 50;
-      const groupY = 50;
+    Object.values(departmentGroups).forEach(
+      (group: DepartmentGroup, groupIndex) => {
+        const groupId = group.department_id.toString();
+        const groupX = groupIndex * 675 + 50;
+        const groupY = 50;
 
-      nodes.push({
-        id: groupId,
-        data: {
-          label: group.department_name,
-          type: "output",
-          unit: "Ltr",
-        },
-        position: { x: groupX, y: groupY },
-        style: {
+        nodes.push({
+          id: groupId,
+          data: {
+            label: group.department_name,
+            type: "output",
+            unit: "Ltr",
+          },
+          position: { x: groupX, y: groupY },
+          style: {
+            width: 625,
+            height: 350,
+            borderRadius: 10,
+            border: "2px dashed #ccc",
+          },
+          type: "group",
           width: 625,
           height: 350,
-          borderRadius: 10,
-          border: "2px dashed #ccc",
-        },
-        type: "group",
-        width: 625,
-        height: 350,
-      });
-
-      const tanks = group.devices.filter(
-        (device: DeviceResult) =>
-          device.type === "tank" ||
-          device.device_family?.toLowerCase().includes("tank")
-      );
-      const fms = group.devices.filter(
-        (device: DeviceResult) =>
-          device.type === "fm" ||
-          device.device_family?.toLowerCase().includes("flow")
-      );
-
-      tanks.forEach((device: DeviceResult, tankIndex: number) => {
-        const deviceId = `${groupId}-tank${tankIndex + 1}`;
-        const deviceX = 280 + tankIndex * 100;
-        const deviceY = 125;
-
-        const tankNodeData: NodeData = {
-          label: device.device_name,
-          type: "bidirectional",
-          direction: "bidirectional",
-          unit: "Ltr",
-          isActive: device.device_status === "active",
-          capacity: Number(device?.params?.storageCapacity) || 0,
-          currentLevel: Number(device.last_record?.min_last_level) || 0,
-          height: Number(device?.params?.height) || 0,
-        };
-
-        nodes.push({
-          id: deviceId,
-          data: tankNodeData,
-          position: { x: deviceX, y: deviceY },
-          parentId: groupId,
-          sourcePosition: "right",
-          targetPosition: "left",
-          type: "tank",
-          width: 80,
-          height: 96,
         });
-      });
 
-      fms.forEach((device: DeviceResult, fmIndex: number) => {
-        const deviceId = `${groupId}-fm${fmIndex + 1}`;
-        const totalFMs = fms.length;
-        const fmPerSide = Math.ceil(totalFMs / 2);
+        const tanks = group.devices.filter(
+          (device: DeviceResult) =>
+            device.type === "tank" ||
+            device.device_family?.toLowerCase().includes("tank")
+        );
+        const fms = group.devices.filter(
+          (device: DeviceResult) =>
+            device.type === "fm" ||
+            device.device_family?.toLowerCase().includes("flow")
+        );
 
-        let deviceX, deviceY;
-        if (fmIndex < fmPerSide) {
-          deviceX = 20;
-          deviceY = 70 + fmIndex * 80;
-        } else {
-          deviceX = 490;
-          deviceY = 70 + (fmIndex - fmPerSide) * 80;
-        }
+        tanks.forEach((device: DeviceResult, tankIndex: number) => {
+          const deviceId = `${groupId}-tank${tankIndex + 1}`;
+          const deviceX = 280 + tankIndex * 100;
+          const deviceY = 125;
 
-        const fmNodeData: NodeData = {
-          label: device.device_name,
-          type: fmIndex < fmPerSide ? "output" : "input",
-          direction: fmIndex < fmPerSide ? "right" : "left",
-          unit: "Ltr",
-          isActive: device.device_status === "active",
-          totalizerReading: Number(device.last_record?.min_max) || 0,
-          flowRate: Number(device.last_record?.min_avg) || 0,
-        };
+          const tankNodeData: NodeData = {
+            label: device.device_name,
+            type: "bidirectional",
+            direction: "bidirectional",
+            unit: "Ltr",
+            isActive: device.device_status === "active",
+            capacity: Number(device?.params?.storageCapacity) || 0,
+            currentLevel: Number(device.last_record?.min_last_level) || 0,
+            height: Number(device?.params?.height) || 0,
+          };
 
-        nodes.push({
-          id: deviceId,
-          data: fmNodeData,
-          position: { x: deviceX, y: deviceY },
-          parentId: groupId,
-          sourcePosition: fmIndex < fmPerSide ? "right" : "left",
-          targetPosition: fmIndex < fmPerSide ? "right" : "left",
-          type: "fm",
-          width: 96,
-          height: 64,
+          nodes.push({
+            id: deviceId,
+            data: tankNodeData,
+            position: { x: deviceX, y: deviceY },
+            parentId: groupId,
+            sourcePosition: "right",
+            targetPosition: "left",
+            type: "tank",
+            width: 80,
+            height: 96,
+          });
         });
-      });
 
-      if (tanks.length > 0 && fms.length > 0) {
-        if (fms.length === 1) {
-          tanks.forEach((_: DeviceResult, tankIndex: number) => {
-            edges.push({
-              id: `${groupId}-fm1-tank${tankIndex + 1}`,
-              source: `${groupId}-fm1`,
-              target: `${groupId}-tank${tankIndex + 1}`,
-              animated: true,
-              style: { stroke: "#3b82f6", strokeWidth: 2 },
-            });
-          });
-        } else if (fms.length === 2) {
-          // Two FMs: First to tanks, tanks to second
-          tanks.forEach((_: DeviceResult, tankIndex: number) => {
-            edges.push({
-              id: `${groupId}-fm1-tank${tankIndex + 1}`,
-              source: `${groupId}-fm1`,
-              target: `${groupId}-tank${tankIndex + 1}`,
-              animated: true,
-              style: { stroke: "#3b82f6", strokeWidth: 2 },
-            });
-            edges.push({
-              id: `${groupId}-tank${tankIndex + 1}-fm2`,
-              source: `${groupId}-tank${tankIndex + 1}`,
-              target: `${groupId}-fm2`,
-              animated: true,
-              style: { stroke: "#10b981", strokeWidth: 2 },
-            });
-          });
-        } else {
-          // Multiple FMs: Split into input and output
-          const inputFMs = fms.filter(
-            (_: DeviceResult, index: number) =>
-              index < Math.ceil(fms.length / 2)
-          );
-          const outputFMs = fms.filter(
-            (_: DeviceResult, index: number) =>
-              index >= Math.ceil(fms.length / 2)
-          );
+        fms.forEach((device: DeviceResult, fmIndex: number) => {
+          const deviceId = `${groupId}-fm${fmIndex + 1}`;
+          const totalFMs = fms.length;
+          const fmPerSide = Math.ceil(totalFMs / 2);
 
-          inputFMs.forEach((_: DeviceResult, index: number) => {
+          let deviceX, deviceY;
+          if (fmIndex < fmPerSide) {
+            deviceX = 20;
+            deviceY = 70 + fmIndex * 80;
+          } else {
+            deviceX = 490;
+            deviceY = 70 + (fmIndex - fmPerSide) * 80;
+          }
+
+          const fmNodeData: NodeData = {
+            label: device.device_name,
+            type: fmIndex < fmPerSide ? "output" : "input",
+            direction: fmIndex < fmPerSide ? "right" : "left",
+            unit: "Ltr",
+            isActive: device.device_status === "active",
+            totalizerReading: Number(device.last_record?.min_max) || 0,
+            flowRate: Number(device.last_record?.min_avg) || 0,
+          };
+
+          nodes.push({
+            id: deviceId,
+            data: fmNodeData,
+            position: { x: deviceX, y: deviceY },
+            parentId: groupId,
+            sourcePosition: fmIndex < fmPerSide ? "right" : "left",
+            targetPosition: fmIndex < fmPerSide ? "right" : "left",
+            type: "fm",
+            width: 96,
+            height: 64,
+          });
+        });
+
+        if (tanks.length > 0 && fms.length > 0) {
+          if (fms.length === 1) {
             tanks.forEach((_: DeviceResult, tankIndex: number) => {
               edges.push({
-                id: `${groupId}-fm${index + 1}-tank${tankIndex + 1}`,
-                source: `${groupId}-fm${index + 1}`,
+                id: `${groupId}-fm1-tank${tankIndex + 1}`,
+                source: `${groupId}-fm1`,
                 target: `${groupId}-tank${tankIndex + 1}`,
                 animated: true,
                 style: { stroke: "#3b82f6", strokeWidth: 2 },
               });
             });
-          });
-
-          outputFMs.forEach((_: DeviceResult, index: number) => {
-            const outputFMIndex = inputFMs.length + index + 1;
+          } else if (fms.length === 2) {
+            // Two FMs: First to tanks, tanks to second
             tanks.forEach((_: DeviceResult, tankIndex: number) => {
               edges.push({
-                id: `${groupId}-tank${tankIndex + 1}-fm${outputFMIndex}`,
+                id: `${groupId}-fm1-tank${tankIndex + 1}`,
+                source: `${groupId}-fm1`,
+                target: `${groupId}-tank${tankIndex + 1}`,
+                animated: true,
+                style: { stroke: "#3b82f6", strokeWidth: 2 },
+              });
+              edges.push({
+                id: `${groupId}-tank${tankIndex + 1}-fm2`,
                 source: `${groupId}-tank${tankIndex + 1}`,
-                target: `${groupId}-fm${outputFMIndex}`,
+                target: `${groupId}-fm2`,
                 animated: true,
                 style: { stroke: "#10b981", strokeWidth: 2 },
               });
             });
-          });
-        }
+          } else {
+            // Multiple FMs: Split into input and output
+            const inputFMs = fms.filter(
+              (_: DeviceResult, index: number) =>
+                index < Math.ceil(fms.length / 2)
+            );
+            const outputFMs = fms.filter(
+              (_: DeviceResult, index: number) =>
+                index >= Math.ceil(fms.length / 2)
+            );
 
-        for (let i = 0; i < tanks.length - 1; i++) {
-          edges.push({
-            id: `${groupId}-tank${i + 1}-tank${i + 2}`,
-            source: `${groupId}-tank${i + 1}`,
-            target: `${groupId}-tank${i + 2}`,
-            animated: true,
-            style: { stroke: "#8b5cf6", strokeWidth: 2 },
-          });
-        }
-      } else if (fms.length > 0) {
-        for (let i = 0; i < fms.length - 1; i++) {
-          edges.push({
-            id: `${groupId}-fm${i + 1}-fm${i + 2}`,
-            source: `${groupId}-fm${i + 1}`,
-            target: `${groupId}-fm${i + 2}`,
-            animated: true,
-            style: { stroke: "#f59e0b", strokeWidth: 2 },
-          });
+            inputFMs.forEach((_: DeviceResult, index: number) => {
+              tanks.forEach((_: DeviceResult, tankIndex: number) => {
+                edges.push({
+                  id: `${groupId}-fm${index + 1}-tank${tankIndex + 1}`,
+                  source: `${groupId}-fm${index + 1}`,
+                  target: `${groupId}-tank${tankIndex + 1}`,
+                  animated: true,
+                  style: { stroke: "#3b82f6", strokeWidth: 2 },
+                });
+              });
+            });
+
+            outputFMs.forEach((_: DeviceResult, index: number) => {
+              const outputFMIndex = inputFMs.length + index + 1;
+              tanks.forEach((_: DeviceResult, tankIndex: number) => {
+                edges.push({
+                  id: `${groupId}-tank${tankIndex + 1}-fm${outputFMIndex}`,
+                  source: `${groupId}-tank${tankIndex + 1}`,
+                  target: `${groupId}-fm${outputFMIndex}`,
+                  animated: true,
+                  style: { stroke: "#10b981", strokeWidth: 2 },
+                });
+              });
+            });
+          }
+
+          for (let i = 0; i < tanks.length - 1; i++) {
+            edges.push({
+              id: `${groupId}-tank${i + 1}-tank${i + 2}`,
+              source: `${groupId}-tank${i + 1}`,
+              target: `${groupId}-tank${i + 2}`,
+              animated: true,
+              style: { stroke: "#8b5cf6", strokeWidth: 2 },
+            });
+          }
+        } else if (fms.length > 0) {
+          for (let i = 0; i < fms.length - 1; i++) {
+            edges.push({
+              id: `${groupId}-fm${i + 1}-fm${i + 2}`,
+              source: `${groupId}-fm${i + 1}`,
+              target: `${groupId}-fm${i + 2}`,
+              animated: true,
+              style: { stroke: "#f59e0b", strokeWidth: 2 },
+            });
+          }
         }
       }
-    });
+    );
 
     const allDepartments = Object.values(departmentGroups);
     for (let i = 0; i < allDepartments.length - 1; i++) {
-      const currentDept = allDepartments[i] as any;
-      const nextDept = allDepartments[i + 1] as any;
+      const currentDept = allDepartments[i];
+      const nextDept = allDepartments[i + 1];
 
       const currentDeptId = currentDept.department_id.toString();
       const nextDeptId = nextDept.department_id.toString();
 
       const currentOutputFMs = currentDept.devices.filter(
-        (device: DeviceResult, index: number) => {
+        (device: DeviceResult) => {
           const fms = currentDept.devices.filter(
             (d: DeviceResult) =>
               d.type === "fm" || d.device_family?.toLowerCase().includes("flow")
           );
           const fmIndex = fms.findIndex(
-            (fm) => fm.device_id === device.device_id
+            (fm: DeviceResult) => fm.device_id === device.device_id
           );
           return fmIndex >= Math.ceil(fms.length / 2);
         }
       );
 
       // Find input FMs from next department
-      const nextInputFMs = nextDept.devices.filter(
-        (device: DeviceResult, index: number) => {
-          const fms = nextDept.devices.filter(
-            (d: DeviceResult) =>
-              d.type === "fm" || d.device_family?.toLowerCase().includes("flow")
-          );
-          const fmIndex = fms.findIndex(
-            (fm) => fm.device_id === device.device_id
-          );
-          return fmIndex < Math.ceil(fms.length / 2);
-        }
-      );
+      const nextInputFMs = nextDept.devices.filter((device: DeviceResult) => {
+        const fms = nextDept.devices.filter(
+          (d: DeviceResult) =>
+            d.type === "fm" || d.device_family?.toLowerCase().includes("flow")
+        );
+        const fmIndex = fms.findIndex(
+          (fm: DeviceResult) => fm.device_id === device.device_id
+        );
+        return fmIndex < Math.ceil(fms.length / 2);
+      });
 
       // Connect output FMs from current department to input FMs of next department
-      currentOutputFMs.forEach(
-        (outputFM: DeviceResult, outputIndex: number) => {
-          const outputFMNodeId = `${currentDeptId}-fm${
-            currentDept.devices
+      currentOutputFMs.forEach((outputFM: DeviceResult) => {
+        const outputFMNodeId = `${currentDeptId}-fm${
+          currentDept.devices
+            .filter(
+              (d: DeviceResult) =>
+                d.type === "fm" ||
+                d.device_family?.toLowerCase().includes("flow")
+            )
+            .findIndex(
+              (fm: DeviceResult) => fm.device_id === outputFM.device_id
+            ) + 1
+        }`;
+
+        nextInputFMs.forEach((inputFM: DeviceResult) => {
+          const inputFMNodeId = `${nextDeptId}-fm${
+            nextDept.devices
               .filter(
                 (d: DeviceResult) =>
                   d.type === "fm" ||
                   d.device_family?.toLowerCase().includes("flow")
               )
-              .findIndex((fm) => fm.device_id === outputFM.device_id) + 1
+              .findIndex(
+                (fm: DeviceResult) => fm.device_id === inputFM.device_id
+              ) + 1
           }`;
 
-          nextInputFMs.forEach((inputFM: DeviceResult, inputIndex: number) => {
-            const inputFMNodeId = `${nextDeptId}-fm${
-              nextDept.devices
-                .filter(
-                  (d: DeviceResult) =>
-                    d.type === "fm" ||
-                    d.device_family?.toLowerCase().includes("flow")
-                )
-                .findIndex((fm) => fm.device_id === inputFM.device_id) + 1
-            }`;
-
-            edges.push({
-              id: `inter-${currentDeptId}-${outputFMNodeId}-to-${nextDeptId}-${inputFMNodeId}`,
-              source: outputFMNodeId,
-              target: inputFMNodeId,
-              animated: true,
-              style: {
-                stroke: "#e11d48",
-                strokeWidth: 3,
-                strokeDasharray: "5,5",
-              },
-            });
+          edges.push({
+            id: `inter-${currentDeptId}-${outputFMNodeId}-to-${nextDeptId}-${inputFMNodeId}`,
+            source: outputFMNodeId,
+            target: inputFMNodeId,
+            animated: true,
+            style: {
+              stroke: "#e11d48",
+              strokeWidth: 3,
+              strokeDasharray: "5,5",
+            },
           });
-        }
-      );
+        });
+      });
     }
 
     return { nodes, edges };
@@ -665,7 +679,7 @@ const DiagramPage = () => {
   };
 
   const handleNodesChange = useCallback(
-    (changes: any) => {
+    (changes: any[]) => {
       onNodesChange(changes);
       setHasChanges(true);
     },
@@ -673,12 +687,72 @@ const DiagramPage = () => {
   );
 
   const handleEdgesChange = useCallback(
-    (changes: any) => {
+    (changes: any[]) => {
       onEdgesChange(changes);
       setHasChanges(true);
     },
     [onEdgesChange]
   );
+
+  const onConnect = useCallback(
+    (params: Connection) => {
+      const newEdge: Edge = {
+        id: `${params.source}-${params.target}`,
+        source: params.source!,
+        target: params.target!,
+        animated: true,
+        style: {
+          stroke: "#6366f1",
+          strokeWidth: 2,
+          strokeDasharray: isManualMode ? "5,5" : undefined,
+        },
+        type: "smoothstep",
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+      setHasChanges(true);
+      console.log("New edge created:", newEdge.id);
+    },
+    [setEdges, isManualMode]
+  );
+
+  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    event.stopPropagation();
+    setSelectedEdge(edge.id);
+    console.log("Edge selected:", edge.id);
+  }, []);
+
+  const onPaneClick = useCallback(() => {
+    setSelectedEdge(null);
+  }, []);
+
+  const handleDeleteEdge = useCallback(
+    (edgeId: string) => {
+      setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+      setSelectedEdge(null);
+      setHasChanges(true);
+      console.log("Edge deleted:", edgeId);
+      Success(`Edge ${edgeId} deleted successfully!`);
+    },
+    [setEdges, setHasChanges]
+  );
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        (event.key === "Delete" || event.key === "Backspace") &&
+        selectedEdge
+      ) {
+        event.preventDefault();
+        handleDeleteEdge(selectedEdge);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedEdge, handleDeleteEdge]);
 
   const handleSaveDiagram = async () => {
     await saveDiagramToAPI();
@@ -694,6 +768,25 @@ const DiagramPage = () => {
       setNodes([]);
       setEdges([]);
       setHasChanges(false);
+    }
+  };
+
+  const handleToggleManualMode = () => {
+    setIsManualMode(!isManualMode);
+    if (!isManualMode) {
+      Success(
+        "Manual connection mode enabled. Drag from one node to another to create connections."
+      );
+    } else {
+      Success("Automatic connection mode enabled.");
+    }
+  };
+
+  const handleClearAllEdges = () => {
+    if (confirm("Are you sure you want to delete all connections?")) {
+      setEdges([]);
+      setHasChanges(true);
+      Success("All connections cleared!");
     }
   };
 
@@ -718,6 +811,40 @@ const DiagramPage = () => {
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-semibold">Diagram Controls</h3>
                 <div className="flex gap-2">
+                  <button
+                    onClick={handleToggleManualMode}
+                    className={`px-3 py-2 rounded-md text-sm flex items-center gap-1 transition-colors font-roboto ${
+                      isManualMode
+                        ? "bg-status-success hover:bg-status-success/80 text-white"
+                        : "bg-secondary hover:bg-secondary/80 text-text-primary border border-border-primary"
+                    }`}
+                    title={
+                      isManualMode
+                        ? "Manual connection mode active"
+                        : "Enable manual connections"
+                    }
+                  >
+                    {isManualMode ? "🔗 Manual Mode" : "🔗 Connect"}
+                  </button>
+
+                  {selectedEdge && (
+                    <button
+                      onClick={() => handleDeleteEdge(selectedEdge)}
+                      className="px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-md text-sm transition-colors font-roboto"
+                      title="Delete selected edge"
+                    >
+                      🗑️ Delete Selected
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleClearAllEdges}
+                    className="px-3 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md text-sm transition-colors font-roboto"
+                    title="Clear all connections"
+                  >
+                    🗑️ Clear All Edges
+                  </button>
+
                   <button
                     onClick={handleSaveDiagram}
                     disabled={!hasChanges || isSaving}
@@ -762,6 +889,21 @@ const DiagramPage = () => {
                     </div>
                   )}
 
+                  {isManualMode && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-status-info rounded-full animate-pulse"></span>
+                      Manual connection mode - Drag between nodes to connect
+                    </div>
+                  )}
+
+                  {selectedEdge && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
+                      Edge selected: {selectedEdge} - Click Delete or use button
+                      to remove
+                    </div>
+                  )}
+
                   {/* Connection Legend */}
                   <div className="flex items-center gap-4 text-xs">
                     <div className="flex items-center gap-1">
@@ -775,6 +917,10 @@ const DiagramPage = () => {
                     <div className="flex items-center gap-1">
                       <div className="w-3 h-0.5 bg-purple-500"></div>
                       <span>Tank Connection</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-0.5 bg-indigo-500"></div>
+                      <span>Manual Connection</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <div
@@ -798,18 +944,90 @@ const DiagramPage = () => {
                 </div>
               </div>
             ) : (
-              <ReactFlow
-                className="h-full w-full"
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={handleNodesChange}
-                onEdgesChange={handleEdgesChange}
-                onNodeDragStop={handleNodeDragStop}
-                nodeTypes={nodeTypes}
-              >
-                <Background variant={BackgroundVariant.Dots} />
-                <Controls />
-              </ReactFlow>
+              <>
+                {/* Edge Context Menu */}
+                {selectedEdge && (
+                  <div className="absolute top-4 right-4 z-20 bg-secondary border-2 border-status-info rounded-lg shadow-xl p-3 min-w-[200px]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-sm font-semibold text-text-primary">
+                        Selected Edge
+                      </div>
+                      <button
+                        onClick={() => setSelectedEdge(null)}
+                        className="text-text-muted hover:text-text-primary text-lg"
+                        title="Close"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className="text-xs text-text-muted mb-3 break-all">
+                      ID: {selectedEdge}
+                    </div>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleDeleteEdge(selectedEdge)}
+                        className="w-full px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded text-sm transition-colors flex items-center justify-center gap-2"
+                      >
+                        🗑️ Delete Edge
+                      </button>
+                      <div className="text-xs text-text-muted text-center">
+                        Or press Delete key
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Instructions Panel */}
+                {isManualMode && (
+                  <div className="absolute top-4 left-4 z-10 bg-secondary/90 border border-border-primary rounded-lg shadow-lg p-3 max-w-xs">
+                    <div className="text-sm font-semibold text-text-primary mb-2">
+                      Manual Connection Mode
+                    </div>
+                    <div className="text-xs text-text-muted space-y-1">
+                      <div>
+                        • Drag from one node's handle to another to create
+                        connections
+                      </div>
+                      <div>• Click on edges to select and delete them</div>
+                      <div>• Press Delete key to remove selected edges</div>
+                      <div>• Use "Clear Edges" to remove all connections</div>
+                    </div>
+                  </div>
+                )}
+                <ReactFlow
+                  className="h-full w-full"
+                  nodes={nodes}
+                  edges={edges.map((edge) => ({
+                    ...edge,
+                    style: {
+                      ...edge.style,
+                      strokeWidth:
+                        selectedEdge === edge.id
+                          ? 4
+                          : edge.style?.strokeWidth || 2,
+                      stroke:
+                        selectedEdge === edge.id
+                          ? "#f59e0b"
+                          : edge.style?.stroke || "#6366f1",
+                    },
+                  }))}
+                  onNodesChange={handleNodesChange}
+                  onEdgesChange={handleEdgesChange}
+                  onNodeDragStop={handleNodeDragStop}
+                  onConnect={onConnect}
+                  onEdgeClick={onEdgeClick}
+                  onPaneClick={onPaneClick}
+                  connectionMode={ConnectionMode.Loose}
+                  nodeTypes={nodeTypes}
+                  fitView
+                  attributionPosition="bottom-left"
+                  deleteKeyCode={["Backspace", "Delete"]}
+                  multiSelectionKeyCode={["Meta", "Ctrl"]}
+                >
+                  <Background variant={BackgroundVariant.Dots} />
+                  <Controls />
+                </ReactFlow>
+              </>
             )}
           </div>
         </main>
