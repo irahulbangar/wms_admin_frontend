@@ -423,10 +423,11 @@ const DiagramPage = () => {
             const totalFMs = fms.length;
             const fmWidth = 96;
             const fmHeight = 64;
-            const sideMargin = 20;
+            const sideMargin = 50;
+            const fmSpacing = 20;
 
             // Calculate tank area to avoid overlap
-            const availableWidth = groupWidth - 2 * 50; // Same as tank calculation
+            const availableWidth = groupWidth - 2 * sideMargin;
             const maxTanksPerRow = Math.max(
               1,
               Math.floor(availableWidth / (80 + 20))
@@ -437,28 +438,47 @@ const DiagramPage = () => {
                 ? totalTankRows * 96 + (totalTankRows - 1) * 20 + 120
                 : 0;
 
-            const fmPerSide = Math.ceil(totalFMs / 2);
-            const availableHeight = groupHeight - tankAreaHeight - 40;
+            // Calculate FM grid layout
+            const maxFMsPerRow = Math.max(
+              1,
+              Math.floor(availableWidth / (fmWidth + fmSpacing))
+            );
+            const totalFMRows = Math.ceil(totalFMs / maxFMsPerRow);
+
+            // Position FMs in a grid below tanks
+            const fmStartY = tankAreaHeight + 20;
+            const availableHeight = groupHeight - fmStartY - 20;
             const fmVerticalSpacing =
-              totalFMs > 1
-                ? Math.min(80, Math.max(60, availableHeight / totalFMs))
-                : 80;
+              totalFMRows > 1
+                ? Math.min(
+                    80,
+                    Math.max(
+                      60,
+                      (availableHeight - totalFMRows * fmHeight) /
+                        (totalFMRows - 1)
+                    )
+                  )
+                : 0;
 
-            let deviceX, deviceY;
-            if (fmIndex < fmPerSide) {
-              deviceX = sideMargin;
-              deviceY = 20 + fmIndex * fmVerticalSpacing;
-            } else {
-              deviceX = groupWidth - fmWidth - sideMargin;
-              deviceY = 20 + (fmIndex - fmPerSide) * fmVerticalSpacing;
-            }
+            const row = Math.floor(fmIndex / maxFMsPerRow);
+            const col = fmIndex % maxFMsPerRow;
 
-            deviceY = Math.min(deviceY, groupHeight - fmHeight - 20);
+            // Center FMs horizontally
+            const totalFMsInRow = Math.min(
+              maxFMsPerRow,
+              totalFMs - row * maxFMsPerRow
+            );
+            const rowWidth =
+              totalFMsInRow * fmWidth + (totalFMsInRow - 1) * fmSpacing;
+            const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+            const deviceX = startX + col * (fmWidth + fmSpacing);
+            const deviceY = fmStartY + row * (fmHeight + fmVerticalSpacing);
 
             const fmNodeData: NodeData = {
               label: device.device_name,
-              type: fmIndex < fmPerSide ? "output" : "input",
-              direction: fmIndex < fmPerSide ? "right" : "left",
+              type: "bidirectional",
+              direction: "bidirectional",
               unit: "Ltr",
               isActive: device.device_status === "active",
               totalizerReading: Number(device.last_record?.min_max) || 0,
@@ -470,8 +490,8 @@ const DiagramPage = () => {
               data: fmNodeData,
               position: { x: deviceX, y: deviceY },
               parentId: groupId,
-              sourcePosition: fmIndex < fmPerSide ? "right" : "left",
-              targetPosition: fmIndex < fmPerSide ? "right" : "left",
+              sourcePosition: "right",
+              targetPosition: "left",
               type: "fm",
               width: fmWidth,
               height: fmHeight,
@@ -512,7 +532,6 @@ const DiagramPage = () => {
     }
   }, [dispatch, projectId, setNodes, setEdges]);
 
-  // Sync department dimensions with actual node dimensions
   const syncDepartmentDimensionsWithNodes = useCallback(() => {
     setNodes((currentNodes) => {
       return currentNodes.map((node) => {
@@ -732,12 +751,11 @@ const DiagramPage = () => {
         return node;
       });
 
-      // Include department dimensions in the API call
       const diagramData = {
         project_id: parseInt(projectId),
         nodes: cleanNodes as any,
         edges: edges as any,
-        department_dimensions: departmentDimensions, // Add department dimensions
+        department_dimensions: departmentDimensions,
       };
 
       await dispatch(updateDiagramData(diagramData))
@@ -794,7 +812,6 @@ const DiagramPage = () => {
       };
       setEdges((eds) => addEdge(newEdge, eds));
       setHasChanges(true);
-      console.log("New edge created:", newEdge.id);
     },
     [setEdges]
   );
@@ -802,7 +819,6 @@ const DiagramPage = () => {
   const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
     event.stopPropagation();
     setSelectedEdge(edge.id);
-    console.log("Edge selected:", edge.id);
   }, []);
 
   const onPaneClick = useCallback(() => {
@@ -820,18 +836,11 @@ const DiagramPage = () => {
   const handleDepartmentDimensionsChange = useCallback(
     (width: number, height: number) => {
       if (selectedDepartment) {
-        console.log(
-          `📏 Updating department ${selectedDepartment} dimensions:`,
-          { width, height }
-        );
-
-        // Update department dimensions state
         setDepartmentDimensions((prev) => ({
           ...prev,
           [selectedDepartment]: { width, height },
         }));
 
-        // Directly update the group node's width and height and reposition child nodes
         setNodes((currentNodes) => {
           const updatedNodes = currentNodes.map((node) => {
             if (node.id === selectedDepartment && node.type === "group") {
@@ -853,7 +862,6 @@ const DiagramPage = () => {
             return node;
           });
 
-          // Reposition child nodes (tanks and FMs) within the new group dimensions
           return updatedNodes.map((node) => {
             if (node.parentId === selectedDepartment) {
               const parentNode = updatedNodes.find(
@@ -864,7 +872,6 @@ const DiagramPage = () => {
                 const parentHeight = height;
 
                 if (node.type === "tank") {
-                  // Reposition tank nodes
                   const tankWidth = 80;
                   const tankHeight = 96;
                   const tankSpacing = 20;
@@ -876,7 +883,6 @@ const DiagramPage = () => {
                     Math.floor(availableWidth / (tankWidth + tankSpacing))
                   );
 
-                  // Get tank index from node ID
                   const tankIndex = parseInt(node.id.split("-tank")[1]) - 1;
                   const totalRows = Math.ceil(
                     updatedNodes.filter(
@@ -921,13 +927,12 @@ const DiagramPage = () => {
                     position: { x: deviceX, y: deviceY },
                   };
                 } else if (node.type === "fm") {
-                  // Reposition FM nodes
                   const fmWidth = 96;
                   const fmHeight = 64;
-                  const sideMargin = 20;
+                  const sideMargin = 50;
+                  const fmSpacing = 20;
 
-                  // Calculate tank area to avoid overlap
-                  const availableWidth = parentWidth - 2 * 50;
+                  const availableWidth = parentWidth - 2 * sideMargin;
                   const maxTanksPerRow = Math.max(
                     1,
                     Math.floor(availableWidth / (80 + 20))
@@ -946,26 +951,45 @@ const DiagramPage = () => {
                   const totalFMs = updatedNodes.filter(
                     (n) => n.parentId === selectedDepartment && n.type === "fm"
                   ).length;
-                  const fmPerSide = Math.ceil(totalFMs / 2);
-                  const availableHeight = parentHeight - tankAreaHeight - 40;
+
+                  // Calculate FM grid layout
+                  const maxFMsPerRow = Math.max(
+                    1,
+                    Math.floor(availableWidth / (fmWidth + fmSpacing))
+                  );
+                  const totalFMRows = Math.ceil(totalFMs / maxFMsPerRow);
+
+                  // Position FMs in a grid below tanks
+                  const fmStartY = tankAreaHeight + 20;
+                  const availableHeight = parentHeight - fmStartY - 20;
                   const fmVerticalSpacing =
-                    totalFMs > 1
-                      ? Math.min(80, Math.max(60, availableHeight / totalFMs))
-                      : 80;
+                    totalFMRows > 1
+                      ? Math.min(
+                          80,
+                          Math.max(
+                            60,
+                            (availableHeight - totalFMRows * fmHeight) /
+                              (totalFMRows - 1)
+                          )
+                        )
+                      : 0;
 
-                  // Get FM index from node ID
                   const fmIndex = parseInt(node.id.split("-fm")[1]) - 1;
+                  const row = Math.floor(fmIndex / maxFMsPerRow);
+                  const col = fmIndex % maxFMsPerRow;
 
-                  let deviceX, deviceY;
-                  if (fmIndex < fmPerSide) {
-                    deviceX = sideMargin;
-                    deviceY = 20 + fmIndex * fmVerticalSpacing;
-                  } else {
-                    deviceX = parentWidth - fmWidth - sideMargin;
-                    deviceY = 20 + (fmIndex - fmPerSide) * fmVerticalSpacing;
-                  }
+                  // Center FMs horizontally
+                  const totalFMsInRow = Math.min(
+                    maxFMsPerRow,
+                    totalFMs - row * maxFMsPerRow
+                  );
+                  const rowWidth =
+                    totalFMsInRow * fmWidth + (totalFMsInRow - 1) * fmSpacing;
+                  const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
-                  deviceY = Math.min(deviceY, parentHeight - fmHeight - 20);
+                  const deviceX = startX + col * (fmWidth + fmSpacing);
+                  const deviceY =
+                    fmStartY + row * (fmHeight + fmVerticalSpacing);
 
                   return {
                     ...node,
@@ -1012,7 +1036,6 @@ const DiagramPage = () => {
         "Are you sure you want to reset the diagram to its initial state? This will clear all current positions, data, and department dimensions."
       )
     ) {
-      // Reset department dimensions to default
       setDepartmentDimensions({});
 
       fetchDiagram();
@@ -1120,7 +1143,6 @@ const DiagramPage = () => {
                 <ReactFlow
                   className="h-full w-full"
                   nodes={nodes.map((node) => {
-                    // Highlight the selected department group
                     if (
                       node.id === selectedDepartment &&
                       node.type === "group"
@@ -1173,7 +1195,6 @@ const DiagramPage = () => {
         </main>
       </div>
 
-      {/* Department Dimensions Popup */}
       {showDepartmentPopup && selectedDepartment && (
         <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-secondary border border-border-primary rounded-lg p-6 w-96 max-w-md mx-4">
@@ -1268,7 +1289,6 @@ const DiagramPage = () => {
                 </button>
                 <button
                   onClick={() => {
-                    // Reset to default dimensions
                     if (selectedDepartment) {
                       handleDepartmentDimensionsChange(625, 350);
                     }
