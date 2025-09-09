@@ -186,8 +186,14 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
   const totalBalance = inOutData.totalOut - inOutData.totalIn;
 
   return (
-    <div className="relative w-full h-full bg-transparent rounded-lg">
-      <div className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm">
+    <div
+      className="relative w-full h-full bg-transparent rounded-lg"
+      style={{ pointerEvents: "none" }}
+    >
+      <div
+        className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm group-header"
+        style={{ pointerEvents: "auto" }}
+      >
         <span className="text-sm font-semibold text-text-primary font-roboto">
           {data.label}
         </span>
@@ -254,6 +260,77 @@ const DiagramPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
+
+  // Debug selectedEdge changes
+  useEffect(() => {
+    console.log("selectedEdge changed to:", selectedEdge);
+  }, [selectedEdge]);
+
+  // Add event listeners for edge selection inside groups
+  useEffect(() => {
+    const handleEdgeClick = (event: Event) => {
+      const target = event.target as HTMLElement;
+
+      // Check if clicking on an edge path or any edge element
+      if (
+        (target.tagName === "path" &&
+          target.classList.contains("react-flow__edge-path")) ||
+        target.closest(".react-flow__edge")
+      ) {
+        const edgeElement = target.closest(".react-flow__edge");
+        if (edgeElement) {
+          const edgeId = edgeElement.getAttribute("data-id");
+          if (edgeId) {
+            console.log("Edge clicked via useEffect listener:", edgeId);
+            setSelectedEdge(edgeId);
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+        }
+      }
+    };
+
+    // Add event listener to document to catch all edge clicks
+    document.addEventListener("click", handleEdgeClick, true);
+    document.addEventListener("mousedown", handleEdgeClick, true);
+
+    // Also add a MutationObserver to watch for new edge elements
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as HTMLElement;
+              if (element.classList.contains("react-flow__edge")) {
+                element.addEventListener("click", (e) => {
+                  const edgeId = element.getAttribute("data-id");
+                  if (edgeId) {
+                    console.log("Edge clicked via MutationObserver:", edgeId);
+                    setSelectedEdge(edgeId);
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                });
+              }
+            }
+          });
+        }
+      });
+    });
+
+    // Start observing
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      document.removeEventListener("click", handleEdgeClick, true);
+      document.removeEventListener("mousedown", handleEdgeClick, true);
+      observer.disconnect();
+    };
+  }, []);
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
     null
   );
@@ -801,7 +878,7 @@ const DiagramPage = () => {
         animated: true,
         style: {
           stroke: "#6366f1",
-          strokeWidth: 2,
+          strokeWidth: 3,
         },
         type: "smoothstep",
       };
@@ -811,17 +888,72 @@ const DiagramPage = () => {
     [setEdges]
   );
 
-  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-    event.stopPropagation();
-    setSelectedEdge(edge.id);
+  const onEdgeClick = useCallback(
+    (event: React.MouseEvent, edge: Edge) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const sourceNode = nodes.find((n) => n.id === edge.source);
+      const targetNode = nodes.find((n) => n.id === edge.target);
+      const isInsideGroup = sourceNode?.parentId || targetNode?.parentId;
+      setSelectedEdge(edge.id);
+    },
+    [nodes]
+  );
+
+  const onPaneClick = useCallback((event: React.MouseEvent) => {
+    if (event.target === event.currentTarget) {
+      setSelectedEdge(null);
+    }
   }, []);
 
-  const onPaneClick = useCallback(() => {
-    setSelectedEdge(null);
+  const onSelectionChange = useCallback(({ edges }: { edges: Edge[] }) => {
+    if (edges.length > 0) {
+      setSelectedEdge(edges[0].id);
+    } else {
+      setSelectedEdge(null);
+    }
   }, []);
 
-  const onNodeClick = useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleMouseDown = useCallback((event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+
+    if (
+      target.tagName === "path" &&
+      target.classList.contains("react-flow__edge-path")
+    ) {
+      const edgeElement = target.closest(".react-flow__edge");
+      if (edgeElement) {
+        const edgeId = edgeElement.getAttribute("data-id");
+        if (edgeId) {
+          setSelectedEdge(edgeId);
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+    }
+  }, []);
+
+  const handleClick = useCallback((event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+
+    if (target.closest(".react-flow__edge")) {
+      const edgeElement = target.closest(".react-flow__edge");
+      if (edgeElement) {
+        const edgeId = edgeElement.getAttribute("data-id");
+        if (edgeId) {
+          setSelectedEdge(edgeId);
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+    }
+  }, []);
+
+  const onNodeClick = useCallback((event: React.MouseEvent, node: any) => {
+    if (node.type !== "group") {
+      event.stopPropagation();
+    }
   }, []);
 
   const onNodeDoubleClick = useCallback(
@@ -1012,10 +1144,29 @@ const DiagramPage = () => {
     setSelectedDepartment(null);
   }, []);
 
+  const handleDeleteSelectedEdge = useCallback(() => {
+    console.log("Delete selected edge called, selectedEdge:", selectedEdge);
+    if (selectedEdge) {
+      setEdges((currentEdges) => {
+        console.log("Current edges before deletion:", currentEdges.length);
+        const filteredEdges = currentEdges.filter(
+          (edge) => edge.id !== selectedEdge
+        );
+        console.log("Edges after deletion:", filteredEdges.length);
+        return filteredEdges;
+      });
+      setSelectedEdge(null);
+      setHasChanges(true);
+    }
+  }, [selectedEdge, setEdges]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Delete" || event.key === "Backspace") {
         event.preventDefault();
+        if (selectedEdge) {
+          handleDeleteSelectedEdge();
+        }
       }
     };
 
@@ -1023,7 +1174,7 @@ const DiagramPage = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [selectedEdge, handleDeleteSelectedEdge]);
 
   const handleSaveDiagram = async () => {
     await saveDiagramToAPI();
@@ -1075,6 +1226,16 @@ const DiagramPage = () => {
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-semibold">Diagram Controls</h3>
                 <div className="flex gap-2">
+                  {selectedEdge && (
+                    <button
+                      onClick={handleDeleteSelectedEdge}
+                      className="px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-md text-sm transition-colors font-roboto"
+                      title="Delete selected edge"
+                    >
+                      🗑️ Delete Selected Edge
+                    </button>
+                  )}
+
                   <button
                     onClick={handleClearAllEdges}
                     className="px-3 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md text-sm transition-colors font-roboto"
@@ -1113,13 +1274,19 @@ const DiagramPage = () => {
               </div>
 
               <div className="flex items-center gap-6">
+                {selectedEdge && (
+                  <div className="flex items-center gap-2 text-text-muted text-xs">
+                    <span className="w-2 h-2 bg-status-info rounded-full animate-pulse"></span>
+                    Edge selected - Press Delete or use button to remove
+                  </div>
+                )}
                 {hasChanges && (
                   <div className="flex items-center gap-2 text-text-muted text-xs">
                     <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
                     Unsaved changes detected
                   </div>
                 )}
-                {!hasChanges && (
+                {!hasChanges && !selectedEdge && (
                   <div className="flex items-center gap-2 text-text-muted text-xs">
                     <span className="w-2 h-2 bg-status-success rounded-full"></span>
                     All changes saved
@@ -1129,7 +1296,10 @@ const DiagramPage = () => {
             </div>
           </div>
 
-          <div className="h-full w-full p-4 relative">
+          <div
+            className="h-full w-full p-4 relative"
+            style={{ width: "100%", height: "calc(100vh - 120px)" }}
+          >
             {isLoadingDiagram ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
@@ -1138,9 +1308,15 @@ const DiagramPage = () => {
                 </div>
               </div>
             ) : (
-              <>
+              <div
+                onMouseDown={handleMouseDown}
+                onClick={handleClick}
+                style={{ width: "100%", height: "100%" }}
+                className="h-full w-full"
+              >
                 <ReactFlow
                   className="h-full w-full"
+                  style={{ width: "100%", height: "100%" }}
                   nodes={nodes.map((node) => {
                     if (
                       node.id === selectedDepartment &&
@@ -1163,13 +1339,15 @@ const DiagramPage = () => {
                       ...edge.style,
                       strokeWidth:
                         selectedEdge === edge.id
-                          ? 4
-                          : edge.style?.strokeWidth || 2,
+                          ? 6
+                          : edge.style?.strokeWidth || 3,
                       stroke:
                         selectedEdge === edge.id
                           ? "#f59e0b"
                           : edge.style?.stroke || "#6366f1",
+                      zIndex: 10,
                     },
+                    className: "react-flow__edge-clickable",
                   }))}
                   onNodesChange={handleNodesChange}
                   onEdgesChange={handleEdgesChange}
@@ -1179,8 +1357,12 @@ const DiagramPage = () => {
                   onNodeDoubleClick={onNodeDoubleClick}
                   onEdgeClick={onEdgeClick}
                   onPaneClick={onPaneClick}
+                  onSelectionChange={onSelectionChange}
                   connectionMode={ConnectionMode.Loose}
                   nodeTypes={nodeTypes}
+                  edgesUpdatable={true}
+                  edgesFocusable={true}
+                  selectNodesOnDrag={false}
                   fitView
                   attributionPosition="bottom-left"
                   deleteKeyCode={["Backspace", "Delete"]}
@@ -1189,7 +1371,7 @@ const DiagramPage = () => {
                   <Background variant={BackgroundVariant.Dots} />
                   <Controls />
                 </ReactFlow>
-              </>
+              </div>
             )}
           </div>
         </main>
