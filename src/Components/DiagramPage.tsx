@@ -253,7 +253,6 @@ const DiagramPage = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
-  const [isManualMode, setIsManualMode] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
   const projectId = useParams().project_id;
   const navigate = useNavigate();
@@ -544,7 +543,6 @@ const DiagramPage = () => {
         style: {
           stroke: "#6366f1",
           strokeWidth: 2,
-          strokeDasharray: isManualMode ? "5,5" : undefined,
         },
         type: "smoothstep",
       };
@@ -552,7 +550,7 @@ const DiagramPage = () => {
       setHasChanges(true);
       console.log("New edge created:", newEdge.id);
     },
-    [setEdges, isManualMode]
+    [setEdges]
   );
 
   const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
@@ -565,26 +563,10 @@ const DiagramPage = () => {
     setSelectedEdge(null);
   }, []);
 
-  const handleDeleteEdge = useCallback(
-    (edgeId: string) => {
-      setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
-      setSelectedEdge(null);
-      setHasChanges(true);
-      console.log("Edge deleted:", edgeId);
-      Success(`Edge ${edgeId} deleted successfully!`);
-    },
-    [setEdges, setHasChanges]
-  );
-
-  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        (event.key === "Delete" || event.key === "Backspace") &&
-        selectedEdge
-      ) {
+      if (event.key === "Delete" || event.key === "Backspace") {
         event.preventDefault();
-        handleDeleteEdge(selectedEdge);
       }
     };
 
@@ -592,7 +574,7 @@ const DiagramPage = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedEdge, handleDeleteEdge]);
+  }, []);
 
   const handleSaveDiagram = async () => {
     await saveDiagramToAPI();
@@ -608,17 +590,6 @@ const DiagramPage = () => {
       setNodes([]);
       setEdges([]);
       setHasChanges(false);
-    }
-  };
-
-  const handleToggleManualMode = () => {
-    setIsManualMode(!isManualMode);
-    if (!isManualMode) {
-      Success(
-        "Manual connection mode enabled. Drag from one node to another to create connections."
-      );
-    } else {
-      Success("Automatic connection mode enabled.");
     }
   };
 
@@ -651,32 +622,6 @@ const DiagramPage = () => {
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-semibold">Diagram Controls</h3>
                 <div className="flex gap-2">
-                  <button
-                    onClick={handleToggleManualMode}
-                    className={`px-3 py-2 rounded-md text-sm flex items-center gap-1 transition-colors font-roboto ${
-                      isManualMode
-                        ? "bg-status-success hover:bg-status-success/80 text-white"
-                        : "bg-secondary hover:bg-secondary/80 text-text-primary border border-border-primary"
-                    }`}
-                    title={
-                      isManualMode
-                        ? "Manual connection mode active"
-                        : "Enable manual connections"
-                    }
-                  >
-                    {isManualMode ? "🔗 Manual Mode" : "🔗 Connect"}
-                  </button>
-
-                  {selectedEdge && (
-                    <button
-                      onClick={() => handleDeleteEdge(selectedEdge)}
-                      className="px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-md text-sm transition-colors font-roboto"
-                      title="Delete selected edge"
-                    >
-                      🗑️ Delete Selected
-                    </button>
-                  )}
-
                   <button
                     onClick={handleClearAllEdges}
                     className="px-3 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md text-sm transition-colors font-roboto"
@@ -714,63 +659,19 @@ const DiagramPage = () => {
                 </div>
               </div>
 
-              <div className="text-xs text-text-muted">
-                <div className="flex items-center gap-6">
-                  {hasChanges && (
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
-                      Unsaved changes detected
-                    </div>
-                  )}
-                  {!hasChanges && (
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-status-success rounded-full"></span>
-                      All changes saved
-                    </div>
-                  )}
-
-                  {isManualMode && (
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-status-info rounded-full animate-pulse"></span>
-                      Manual connection mode - Drag between nodes to connect
-                    </div>
-                  )}
-
-                  {selectedEdge && (
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
-                      Edge selected: {selectedEdge} - Click Delete or use button
-                      to remove
-                    </div>
-                  )}
-
-                  {/* Connection Legend */}
-                  <div className="flex items-center gap-4 text-xs">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-0.5 bg-blue-500"></div>
-                      <span>Input Flow</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-0.5 bg-green-500"></div>
-                      <span>Output Flow</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-0.5 bg-purple-500"></div>
-                      <span>Tank Connection</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-0.5 bg-indigo-500"></div>
-                      <span>Manual Connection</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div
-                        className="w-3 h-0.5 bg-red-500"
-                        style={{ borderStyle: "dashed" }}
-                      ></div>
-                      <span>Inter-Department</span>
-                    </div>
+              <div className="flex items-center gap-6">
+                {hasChanges && (
+                  <div className="flex items-center gap-2 text-text-muted text-xs">
+                    <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
+                    Unsaved changes detected
                   </div>
-                </div>
+                )}
+                {!hasChanges && (
+                  <div className="flex items-center gap-2 text-text-muted text-xs">
+                    <span className="w-2 h-2 bg-status-success rounded-full"></span>
+                    All changes saved
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -785,55 +686,6 @@ const DiagramPage = () => {
               </div>
             ) : (
               <>
-                {/* Edge Context Menu */}
-                {selectedEdge && (
-                  <div className="absolute top-4 right-4 z-20 bg-secondary border-2 border-status-info rounded-lg shadow-xl p-3 min-w-[200px]">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-sm font-semibold text-text-primary">
-                        Selected Edge
-                      </div>
-                      <button
-                        onClick={() => setSelectedEdge(null)}
-                        className="text-text-muted hover:text-text-primary text-lg"
-                        title="Close"
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <div className="text-xs text-text-muted mb-3 break-all">
-                      ID: {selectedEdge}
-                    </div>
-                    <div className="space-y-2">
-                      <button
-                        onClick={() => handleDeleteEdge(selectedEdge)}
-                        className="w-full px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded text-sm transition-colors flex items-center justify-center gap-2"
-                      >
-                        🗑️ Delete Edge
-                      </button>
-                      <div className="text-xs text-text-muted text-center">
-                        Or press Delete key
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Instructions Panel */}
-                {isManualMode && (
-                  <div className="absolute top-4 left-4 z-10 bg-secondary/90 border border-border-primary rounded-lg shadow-lg p-3 max-w-xs">
-                    <div className="text-sm font-semibold text-text-primary mb-2">
-                      Manual Connection Mode
-                    </div>
-                    <div className="text-xs text-text-muted space-y-1">
-                      <div>
-                        • Drag from one node's handle to another to create
-                        connections
-                      </div>
-                      <div>• Click on edges to select and delete them</div>
-                      <div>• Press Delete key to remove selected edges</div>
-                      <div>• Use "Clear Edges" to remove all connections</div>
-                    </div>
-                  </div>
-                )}
                 <ReactFlow
                   className="h-full w-full"
                   nodes={nodes}
