@@ -338,8 +338,45 @@ const DiagramPage = () => {
 
         tanks.forEach((device: DeviceResult, tankIndex: number) => {
           const deviceId = `${groupId}-tank${tankIndex + 1}`;
-          const deviceX = 280 + tankIndex * 100;
-          const deviceY = 125;
+
+          const tankWidth = 80;
+          const tankHeight = 96;
+          const tankSpacing = 20;
+          const groupWidth = 625;
+          const groupHeight = 350;
+          const sideMargin = 50;
+
+          const availableWidth = groupWidth - 2 * sideMargin;
+          const maxTanksPerRow = Math.max(
+            1,
+            Math.floor(availableWidth / (tankWidth + tankSpacing))
+          );
+          const totalRows = Math.ceil(tanks.length / maxTanksPerRow);
+
+          const row = Math.floor(tankIndex / maxTanksPerRow);
+          const col = tankIndex % maxTanksPerRow;
+
+          const totalTanksInRow = Math.min(
+            maxTanksPerRow,
+            tanks.length - row * maxTanksPerRow
+          );
+          const rowWidth =
+            totalTanksInRow * tankWidth + (totalTanksInRow - 1) * tankSpacing;
+          const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+          const deviceX = startX + col * (tankWidth + tankSpacing);
+
+          let deviceY;
+          if (totalRows === 1) {
+            deviceY = (groupHeight - tankHeight) / 2;
+          } else {
+            const availableHeight = groupHeight - 100;
+            const rowSpacing = Math.max(
+              20,
+              (availableHeight - totalRows * tankHeight) / (totalRows + 1)
+            );
+            deviceY = 60 + rowSpacing + row * (tankHeight + rowSpacing);
+          }
 
           const tankNodeData: NodeData = {
             label: device.device_name,
@@ -360,24 +397,49 @@ const DiagramPage = () => {
             sourcePosition: "right",
             targetPosition: "left",
             type: "tank",
-            width: 80,
-            height: 96,
+            width: tankWidth,
+            height: tankHeight,
           });
         });
 
         fms.forEach((device: DeviceResult, fmIndex: number) => {
           const deviceId = `${groupId}-fm${fmIndex + 1}`;
           const totalFMs = fms.length;
+          const fmWidth = 96;
+          const fmHeight = 64;
+          const groupWidth = 625;
+          const groupHeight = 350;
+          const sideMargin = 20;
+
+          // Calculate tank area to avoid overlap
+          const availableWidth = groupWidth - 2 * 50; // Same as tank calculation
+          const maxTanksPerRow = Math.max(
+            1,
+            Math.floor(availableWidth / (80 + 20))
+          );
+          const totalTankRows = Math.ceil(tanks.length / maxTanksPerRow);
+          const tankAreaHeight =
+            totalTankRows > 0
+              ? totalTankRows * 96 + (totalTankRows - 1) * 20 + 120
+              : 0;
+
           const fmPerSide = Math.ceil(totalFMs / 2);
+          const availableHeight = groupHeight - tankAreaHeight - 40;
+          const fmVerticalSpacing =
+            totalFMs > 1
+              ? Math.min(80, Math.max(60, availableHeight / totalFMs))
+              : 80;
 
           let deviceX, deviceY;
           if (fmIndex < fmPerSide) {
-            deviceX = 20;
-            deviceY = 70 + fmIndex * 80;
+            deviceX = sideMargin;
+            deviceY = 20 + fmIndex * fmVerticalSpacing;
           } else {
-            deviceX = 490;
-            deviceY = 70 + (fmIndex - fmPerSide) * 80;
+            deviceX = groupWidth - fmWidth - sideMargin;
+            deviceY = 20 + (fmIndex - fmPerSide) * fmVerticalSpacing;
           }
+
+          deviceY = Math.min(deviceY, groupHeight - fmHeight - 20);
 
           const fmNodeData: NodeData = {
             label: device.device_name,
@@ -397,8 +459,8 @@ const DiagramPage = () => {
             sourcePosition: fmIndex < fmPerSide ? "right" : "left",
             targetPosition: fmIndex < fmPerSide ? "right" : "left",
             type: "fm",
-            width: 96,
-            height: 64,
+            width: fmWidth,
+            height: fmHeight,
           });
         });
       }
@@ -430,12 +492,13 @@ const DiagramPage = () => {
 
   const fetchDeviceData = useCallback(async () => {
     try {
-      const res = await dispatch(
-        getDeviceByProjectId(parseInt(projectId as string))
-      ).unwrap();
-      if (res.success) {
-        setDeviceData(res.data);
-      }
+      await dispatch(getDeviceByProjectId(parseInt(projectId as string)))
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            setDeviceData(res.data);
+          }
+        });
     } catch (err) {
       console.error("Error fetching device data:", err);
     }
