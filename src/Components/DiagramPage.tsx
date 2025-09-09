@@ -316,7 +316,6 @@ const DiagramPage = () => {
           const groupX = groupIndex * 675 + 50;
           const groupY = 50;
 
-          // Get dynamic dimensions for this department
           const currentDimensions = departmentDimensions[groupId] || {
             width: 625,
             height: 350,
@@ -426,7 +425,6 @@ const DiagramPage = () => {
             const sideMargin = 50;
             const fmSpacing = 20;
 
-            // Calculate tank area to avoid overlap
             const availableWidth = groupWidth - 2 * sideMargin;
             const maxTanksPerRow = Math.max(
               1,
@@ -438,14 +436,12 @@ const DiagramPage = () => {
                 ? totalTankRows * 96 + (totalTankRows - 1) * 20 + 120
                 : 0;
 
-            // Calculate FM grid layout
             const maxFMsPerRow = Math.max(
               1,
               Math.floor(availableWidth / (fmWidth + fmSpacing))
             );
             const totalFMRows = Math.ceil(totalFMs / maxFMsPerRow);
 
-            // Position FMs in a grid below tanks
             const fmStartY = tankAreaHeight + 20;
             const availableHeight = groupHeight - fmStartY - 20;
             const fmVerticalSpacing =
@@ -463,7 +459,6 @@ const DiagramPage = () => {
             const row = Math.floor(fmIndex / maxFMsPerRow);
             const col = fmIndex % maxFMsPerRow;
 
-            // Center FMs horizontally
             const totalFMsInRow = Math.min(
               maxFMsPerRow,
               totalFMs - row * maxFMsPerRow
@@ -720,7 +715,7 @@ const DiagramPage = () => {
     try {
       const cleanNodes = nodes.map((node) => {
         if (node.type === "tank") {
-          const { _currentLevel, ...cleanData } = node.data;
+          const { currentLevel, ...cleanData } = node.data;
           return {
             ...node,
             data: cleanData,
@@ -825,13 +820,20 @@ const DiagramPage = () => {
     setSelectedEdge(null);
   }, []);
 
-  const onNodeClick = useCallback((event: React.MouseEvent, node: any) => {
+  const onNodeClick = useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
-    if (node.type === "group") {
-      setSelectedDepartment(node.id);
-      setShowDepartmentPopup(true);
-    }
   }, []);
+
+  const onNodeDoubleClick = useCallback(
+    (event: React.MouseEvent, node: any) => {
+      event.stopPropagation();
+      if (node.type === "group") {
+        setSelectedDepartment(node.id);
+        setShowDepartmentPopup(true);
+      }
+    },
+    []
+  );
 
   const handleDepartmentDimensionsChange = useCallback(
     (width: number, height: number) => {
@@ -1174,6 +1176,7 @@ const DiagramPage = () => {
                   onNodeDragStop={handleNodeDragStop}
                   onConnect={onConnect}
                   onNodeClick={onNodeClick}
+                  onNodeDoubleClick={onNodeDoubleClick}
                   onEdgeClick={onEdgeClick}
                   onPaneClick={onPaneClick}
                   connectionMode={ConnectionMode.Loose}
