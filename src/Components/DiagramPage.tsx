@@ -77,7 +77,6 @@ const TankNode = ({ data }: { data: NodeData }) => {
 const FMNode = ({ data }: { data: NodeData }) => {
   const unit = data.unit || "Ltr";
   const isActive = data.isActive !== false;
-  const totalVolume = Number(data.totalVolume) || 0;
   const totalizerReading = Number(data.totalizerReading) || 0;
   const flowRate = Number(data.flowRate) || 0;
 
@@ -102,10 +101,7 @@ const FMNode = ({ data }: { data: NodeData }) => {
         </div>
       </div>
 
-      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-text-muted whitespace-nowrap font-roboto">
-        <div>
-          Total: {totalVolume} {unit}
-        </div>
+      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-text-muted whitespace-nowrap font-roboto">
         <div>
           Totalizer: {totalizerReading} {unit}
         </div>
@@ -252,7 +248,7 @@ const DiagramPage = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoadingDiagram, setIsLoadingDiagram] = useState(true);
+  const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
   const projectId = useParams().project_id;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -319,15 +315,17 @@ const DiagramPage = () => {
 
       const tanks = group.devices.filter(
         (device: DeviceResult) =>
-          device.type === "tank" || device.name === "Tank Level"
+          device.type === "tank" ||
+          device.device_family?.toLowerCase().includes("tank")
       );
       const fms = group.devices.filter(
         (device: DeviceResult) =>
-          device.type === "fm" || device.name === "Flow Meter"
+          device.type === "fm" ||
+          device.device_family?.toLowerCase().includes("flow")
       );
 
       tanks.forEach((device: DeviceResult, tankIndex: number) => {
-        const deviceId = `tank${tankIndex + 1}`;
+        const deviceId = `${groupId}-tank${tankIndex + 1}`;
         const deviceX = 280 + tankIndex * 100;
         const deviceY = 125;
 
@@ -356,7 +354,7 @@ const DiagramPage = () => {
       });
 
       fms.forEach((device: DeviceResult, fmIndex: number) => {
-        const deviceId = `fm${fmIndex + 1}`;
+        const deviceId = `${groupId}-fm${fmIndex + 1}`;
         const totalFMs = fms.length;
         const fmPerSide = Math.ceil(totalFMs / 2);
 
@@ -393,59 +391,167 @@ const DiagramPage = () => {
       });
 
       if (tanks.length > 0 && fms.length > 0) {
-        const leftFMs = fms.filter(
-          (_: DeviceResult, index: number) => index < Math.ceil(fms.length / 2)
-        );
-        const rightFMs = fms.filter(
-          (_: DeviceResult, index: number) => index >= Math.ceil(fms.length / 2)
-        );
-
-        leftFMs.forEach((_: DeviceResult, index: number) => {
+        if (fms.length === 1) {
           tanks.forEach((_: DeviceResult, tankIndex: number) => {
             edges.push({
-              id: `fm${index + 1}-tank${tankIndex + 1}`,
-              source: `fm${index + 1}`,
-              target: `tank${tankIndex + 1}`,
+              id: `${groupId}-fm1-tank${tankIndex + 1}`,
+              source: `${groupId}-fm1`,
+              target: `${groupId}-tank${tankIndex + 1}`,
               animated: true,
               style: { stroke: "#3b82f6", strokeWidth: 2 },
             });
           });
-        });
-
-        rightFMs.forEach((_: DeviceResult, index: number) => {
-          const rightFMIndex = leftFMs.length + index + 1;
+        } else if (fms.length === 2) {
+          // Two FMs: First to tanks, tanks to second
           tanks.forEach((_: DeviceResult, tankIndex: number) => {
             edges.push({
-              id: `tank${tankIndex + 1}-fm${rightFMIndex}`,
-              source: `tank${tankIndex + 1}`,
-              target: `fm${rightFMIndex}`,
+              id: `${groupId}-fm1-tank${tankIndex + 1}`,
+              source: `${groupId}-fm1`,
+              target: `${groupId}-tank${tankIndex + 1}`,
+              animated: true,
+              style: { stroke: "#3b82f6", strokeWidth: 2 },
+            });
+            edges.push({
+              id: `${groupId}-tank${tankIndex + 1}-fm2`,
+              source: `${groupId}-tank${tankIndex + 1}`,
+              target: `${groupId}-fm2`,
               animated: true,
               style: { stroke: "#10b981", strokeWidth: 2 },
             });
           });
-        });
+        } else {
+          // Multiple FMs: Split into input and output
+          const inputFMs = fms.filter(
+            (_: DeviceResult, index: number) =>
+              index < Math.ceil(fms.length / 2)
+          );
+          const outputFMs = fms.filter(
+            (_: DeviceResult, index: number) =>
+              index >= Math.ceil(fms.length / 2)
+          );
+
+          inputFMs.forEach((_: DeviceResult, index: number) => {
+            tanks.forEach((_: DeviceResult, tankIndex: number) => {
+              edges.push({
+                id: `${groupId}-fm${index + 1}-tank${tankIndex + 1}`,
+                source: `${groupId}-fm${index + 1}`,
+                target: `${groupId}-tank${tankIndex + 1}`,
+                animated: true,
+                style: { stroke: "#3b82f6", strokeWidth: 2 },
+              });
+            });
+          });
+
+          outputFMs.forEach((_: DeviceResult, index: number) => {
+            const outputFMIndex = inputFMs.length + index + 1;
+            tanks.forEach((_: DeviceResult, tankIndex: number) => {
+              edges.push({
+                id: `${groupId}-tank${tankIndex + 1}-fm${outputFMIndex}`,
+                source: `${groupId}-tank${tankIndex + 1}`,
+                target: `${groupId}-fm${outputFMIndex}`,
+                animated: true,
+                style: { stroke: "#10b981", strokeWidth: 2 },
+              });
+            });
+          });
+        }
 
         for (let i = 0; i < tanks.length - 1; i++) {
           edges.push({
-            id: `tank${i + 1}-tank${i + 2}`,
-            source: `tank${i + 1}`,
-            target: `tank${i + 2}`,
+            id: `${groupId}-tank${i + 1}-tank${i + 2}`,
+            source: `${groupId}-tank${i + 1}`,
+            target: `${groupId}-tank${i + 2}`,
             animated: true,
             style: { stroke: "#8b5cf6", strokeWidth: 2 },
           });
         }
-      } else {
+      } else if (fms.length > 0) {
         for (let i = 0; i < fms.length - 1; i++) {
           edges.push({
-            id: `fm${i + 1}-fm${i + 2}`,
-            source: `fm${i + 1}`,
-            target: `fm${i + 2}`,
+            id: `${groupId}-fm${i + 1}-fm${i + 2}`,
+            source: `${groupId}-fm${i + 1}`,
+            target: `${groupId}-fm${i + 2}`,
             animated: true,
             style: { stroke: "#f59e0b", strokeWidth: 2 },
           });
         }
       }
     });
+
+    const allDepartments = Object.values(departmentGroups);
+    for (let i = 0; i < allDepartments.length - 1; i++) {
+      const currentDept = allDepartments[i] as any;
+      const nextDept = allDepartments[i + 1] as any;
+
+      const currentDeptId = currentDept.department_id.toString();
+      const nextDeptId = nextDept.department_id.toString();
+
+      const currentOutputFMs = currentDept.devices.filter(
+        (device: DeviceResult, index: number) => {
+          const fms = currentDept.devices.filter(
+            (d: DeviceResult) =>
+              d.type === "fm" || d.device_family?.toLowerCase().includes("flow")
+          );
+          const fmIndex = fms.findIndex(
+            (fm) => fm.device_id === device.device_id
+          );
+          return fmIndex >= Math.ceil(fms.length / 2);
+        }
+      );
+
+      // Find input FMs from next department
+      const nextInputFMs = nextDept.devices.filter(
+        (device: DeviceResult, index: number) => {
+          const fms = nextDept.devices.filter(
+            (d: DeviceResult) =>
+              d.type === "fm" || d.device_family?.toLowerCase().includes("flow")
+          );
+          const fmIndex = fms.findIndex(
+            (fm) => fm.device_id === device.device_id
+          );
+          return fmIndex < Math.ceil(fms.length / 2);
+        }
+      );
+
+      // Connect output FMs from current department to input FMs of next department
+      currentOutputFMs.forEach(
+        (outputFM: DeviceResult, outputIndex: number) => {
+          const outputFMNodeId = `${currentDeptId}-fm${
+            currentDept.devices
+              .filter(
+                (d: DeviceResult) =>
+                  d.type === "fm" ||
+                  d.device_family?.toLowerCase().includes("flow")
+              )
+              .findIndex((fm) => fm.device_id === outputFM.device_id) + 1
+          }`;
+
+          nextInputFMs.forEach((inputFM: DeviceResult, inputIndex: number) => {
+            const inputFMNodeId = `${nextDeptId}-fm${
+              nextDept.devices
+                .filter(
+                  (d: DeviceResult) =>
+                    d.type === "fm" ||
+                    d.device_family?.toLowerCase().includes("flow")
+                )
+                .findIndex((fm) => fm.device_id === inputFM.device_id) + 1
+            }`;
+
+            edges.push({
+              id: `inter-${currentDeptId}-${outputFMNodeId}-to-${nextDeptId}-${inputFMNodeId}`,
+              source: outputFMNodeId,
+              target: inputFMNodeId,
+              animated: true,
+              style: {
+                stroke: "#e11d48",
+                strokeWidth: 3,
+                strokeDasharray: "5,5",
+              },
+            });
+          });
+        }
+      );
+    }
 
     return { nodes, edges };
   }, []);
@@ -642,18 +748,43 @@ const DiagramPage = () => {
               </div>
 
               <div className="text-xs text-text-muted">
-                {hasChanges && (
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
-                    Unsaved changes detected
+                <div className="flex items-center gap-6">
+                  {hasChanges && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
+                      Unsaved changes detected
+                    </div>
+                  )}
+                  {!hasChanges && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-status-success rounded-full"></span>
+                      All changes saved
+                    </div>
+                  )}
+
+                  {/* Connection Legend */}
+                  <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-0.5 bg-blue-500"></div>
+                      <span>Input Flow</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-0.5 bg-green-500"></div>
+                      <span>Output Flow</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-0.5 bg-purple-500"></div>
+                      <span>Tank Connection</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div
+                        className="w-3 h-0.5 bg-red-500"
+                        style={{ borderStyle: "dashed" }}
+                      ></div>
+                      <span>Inter-Department</span>
+                    </div>
                   </div>
-                )}
-                {!hasChanges && (
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-status-success rounded-full"></span>
-                    All changes saved
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
