@@ -402,170 +402,8 @@ const DiagramPage = () => {
             height: 64,
           });
         });
-
-        if (tanks.length > 0 && fms.length > 0) {
-          if (fms.length === 1) {
-            tanks.forEach((_: DeviceResult, tankIndex: number) => {
-              edges.push({
-                id: `${groupId}-fm1-tank${tankIndex + 1}`,
-                source: `${groupId}-fm1`,
-                target: `${groupId}-tank${tankIndex + 1}`,
-                animated: true,
-                style: { stroke: "#3b82f6", strokeWidth: 2 },
-              });
-            });
-          } else if (fms.length === 2) {
-            // Two FMs: First to tanks, tanks to second
-            tanks.forEach((_: DeviceResult, tankIndex: number) => {
-              edges.push({
-                id: `${groupId}-fm1-tank${tankIndex + 1}`,
-                source: `${groupId}-fm1`,
-                target: `${groupId}-tank${tankIndex + 1}`,
-                animated: true,
-                style: { stroke: "#3b82f6", strokeWidth: 2 },
-              });
-              edges.push({
-                id: `${groupId}-tank${tankIndex + 1}-fm2`,
-                source: `${groupId}-tank${tankIndex + 1}`,
-                target: `${groupId}-fm2`,
-                animated: true,
-                style: { stroke: "#10b981", strokeWidth: 2 },
-              });
-            });
-          } else {
-            // Multiple FMs: Split into input and output
-            const inputFMs = fms.filter(
-              (_: DeviceResult, index: number) =>
-                index < Math.ceil(fms.length / 2)
-            );
-            const outputFMs = fms.filter(
-              (_: DeviceResult, index: number) =>
-                index >= Math.ceil(fms.length / 2)
-            );
-
-            inputFMs.forEach((_: DeviceResult, index: number) => {
-              tanks.forEach((_: DeviceResult, tankIndex: number) => {
-                edges.push({
-                  id: `${groupId}-fm${index + 1}-tank${tankIndex + 1}`,
-                  source: `${groupId}-fm${index + 1}`,
-                  target: `${groupId}-tank${tankIndex + 1}`,
-                  animated: true,
-                  style: { stroke: "#3b82f6", strokeWidth: 2 },
-                });
-              });
-            });
-
-            outputFMs.forEach((_: DeviceResult, index: number) => {
-              const outputFMIndex = inputFMs.length + index + 1;
-              tanks.forEach((_: DeviceResult, tankIndex: number) => {
-                edges.push({
-                  id: `${groupId}-tank${tankIndex + 1}-fm${outputFMIndex}`,
-                  source: `${groupId}-tank${tankIndex + 1}`,
-                  target: `${groupId}-fm${outputFMIndex}`,
-                  animated: true,
-                  style: { stroke: "#10b981", strokeWidth: 2 },
-                });
-              });
-            });
-          }
-
-          for (let i = 0; i < tanks.length - 1; i++) {
-            edges.push({
-              id: `${groupId}-tank${i + 1}-tank${i + 2}`,
-              source: `${groupId}-tank${i + 1}`,
-              target: `${groupId}-tank${i + 2}`,
-              animated: true,
-              style: { stroke: "#8b5cf6", strokeWidth: 2 },
-            });
-          }
-        } else if (fms.length > 0) {
-          for (let i = 0; i < fms.length - 1; i++) {
-            edges.push({
-              id: `${groupId}-fm${i + 1}-fm${i + 2}`,
-              source: `${groupId}-fm${i + 1}`,
-              target: `${groupId}-fm${i + 2}`,
-              animated: true,
-              style: { stroke: "#f59e0b", strokeWidth: 2 },
-            });
-          }
-        }
       }
     );
-
-    const allDepartments = Object.values(departmentGroups);
-    for (let i = 0; i < allDepartments.length - 1; i++) {
-      const currentDept = allDepartments[i];
-      const nextDept = allDepartments[i + 1];
-
-      const currentDeptId = currentDept.department_id.toString();
-      const nextDeptId = nextDept.department_id.toString();
-
-      const currentOutputFMs = currentDept.devices.filter(
-        (device: DeviceResult) => {
-          const fms = currentDept.devices.filter(
-            (d: DeviceResult) =>
-              d.type === "fm" || d.device_family?.toLowerCase().includes("flow")
-          );
-          const fmIndex = fms.findIndex(
-            (fm: DeviceResult) => fm.device_id === device.device_id
-          );
-          return fmIndex >= Math.ceil(fms.length / 2);
-        }
-      );
-
-      // Find input FMs from next department
-      const nextInputFMs = nextDept.devices.filter((device: DeviceResult) => {
-        const fms = nextDept.devices.filter(
-          (d: DeviceResult) =>
-            d.type === "fm" || d.device_family?.toLowerCase().includes("flow")
-        );
-        const fmIndex = fms.findIndex(
-          (fm: DeviceResult) => fm.device_id === device.device_id
-        );
-        return fmIndex < Math.ceil(fms.length / 2);
-      });
-
-      // Connect output FMs from current department to input FMs of next department
-      currentOutputFMs.forEach((outputFM: DeviceResult) => {
-        const outputFMNodeId = `${currentDeptId}-fm${
-          currentDept.devices
-            .filter(
-              (d: DeviceResult) =>
-                d.type === "fm" ||
-                d.device_family?.toLowerCase().includes("flow")
-            )
-            .findIndex(
-              (fm: DeviceResult) => fm.device_id === outputFM.device_id
-            ) + 1
-        }`;
-
-        nextInputFMs.forEach((inputFM: DeviceResult) => {
-          const inputFMNodeId = `${nextDeptId}-fm${
-            nextDept.devices
-              .filter(
-                (d: DeviceResult) =>
-                  d.type === "fm" ||
-                  d.device_family?.toLowerCase().includes("flow")
-              )
-              .findIndex(
-                (fm: DeviceResult) => fm.device_id === inputFM.device_id
-              ) + 1
-          }`;
-
-          edges.push({
-            id: `inter-${currentDeptId}-${outputFMNodeId}-to-${nextDeptId}-${inputFMNodeId}`,
-            source: outputFMNodeId,
-            target: inputFMNodeId,
-            animated: true,
-            style: {
-              stroke: "#e11d48",
-              strokeWidth: 3,
-              strokeDasharray: "5,5",
-            },
-          });
-        });
-      });
-    }
 
     return { nodes, edges };
   }, []);
@@ -580,7 +418,9 @@ const DiagramPage = () => {
           setEdges(res.data.edges as any);
           setIsLoadingDiagram(false);
         } else {
-          console.log("No existing diagram data found in project");
+          console.log(
+            "No existing diagram data found in project - will show nodes only"
+          );
         }
       }
     } catch (err) {
