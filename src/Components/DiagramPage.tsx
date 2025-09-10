@@ -199,41 +199,46 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
         </span>
       </div>
 
-      <div className="">
-        <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
-          <div className="text-center flex items-start flex-col">
-            <div className="flex items-center gap-2">
-              <div className="text-text-primary">Total Stock :</div>
-              <div className="font-semibold text-text-primary">
-                {stockData.current.toFixed(1)} {unit}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-text-primary">Total Capacity :</div>
-              <div className="font-semibold text-text-primary">
-                {stockData.capacity.toFixed(0)} {unit}
-              </div>
+      <div
+        className="absolute top-9 left-1/2 transform -translate-x-1/2 text-xs text-status-warning font-roboto text-center"
+        style={{ pointerEvents: "none" }}
+      >
+        💡 Double-click department name to change width & height of department
+      </div>
+
+      <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
+        <div className="text-center flex items-start flex-col">
+          <div className="flex items-center gap-2">
+            <div className="text-text-primary">Total Stock :</div>
+            <div className="font-semibold text-text-primary">
+              {stockData.current.toFixed(1)} {unit}
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex flex-col">
-              <div className="flex items-center justify-end gap-2">
-                <div className="text-text-primary">Total In :</div>
-                <div className="font-semibold text-text-primary">
-                  {inOutData.totalIn.toFixed(1)} {unit}
-                </div>
+            <div className="text-text-primary">Total Capacity :</div>
+            <div className="font-semibold text-text-primary">
+              {stockData.capacity.toFixed(0)} {unit}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col">
+            <div className="flex items-center justify-end gap-2">
+              <div className="text-text-primary">Total In :</div>
+              <div className="font-semibold text-text-primary">
+                {inOutData.totalIn.toFixed(1)} {unit}
               </div>
-              <div className="flex items-center justify-end gap-2">
-                <div className="text-text-primary">Total Out :</div>
-                <div className="font-semibold text-text-primary">
-                  {inOutData.totalOut.toFixed(1)} {unit}
-                </div>
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <div className="text-text-primary">Total Out :</div>
+              <div className="font-semibold text-text-primary">
+                {inOutData.totalOut.toFixed(1)} {unit}
               </div>
-              <div className="flex items-center justify-end gap-2">
-                <div className="text-text-primary">Total Balance :</div>
-                <div className="font-semibold text-text-primary">
-                  {totalBalance.toFixed(1)} {unit}
-                </div>
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <div className="text-text-primary">Total Balance :</div>
+              <div className="font-semibold text-text-primary">
+                {totalBalance.toFixed(1)} {unit}
               </div>
             </div>
           </div>
@@ -261,17 +266,10 @@ const DiagramPage = () => {
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
 
-  // Debug selectedEdge changes
-  useEffect(() => {
-    console.log("selectedEdge changed to:", selectedEdge);
-  }, [selectedEdge]);
-
-  // Add event listeners for edge selection inside groups
   useEffect(() => {
     const handleEdgeClick = (event: Event) => {
       const target = event.target as HTMLElement;
 
-      // Check if clicking on an edge path or any edge element
       if (
         (target.tagName === "path" &&
           target.classList.contains("react-flow__edge-path")) ||
@@ -281,7 +279,6 @@ const DiagramPage = () => {
         if (edgeElement) {
           const edgeId = edgeElement.getAttribute("data-id");
           if (edgeId) {
-            console.log("Edge clicked via useEffect listener:", edgeId);
             setSelectedEdge(edgeId);
             event.preventDefault();
             event.stopPropagation();
@@ -291,11 +288,9 @@ const DiagramPage = () => {
       }
     };
 
-    // Add event listener to document to catch all edge clicks
     document.addEventListener("click", handleEdgeClick, true);
     document.addEventListener("mousedown", handleEdgeClick, true);
 
-    // Also add a MutationObserver to watch for new edge elements
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === "childList") {
@@ -306,7 +301,6 @@ const DiagramPage = () => {
                 element.addEventListener("click", (e) => {
                   const edgeId = element.getAttribute("data-id");
                   if (edgeId) {
-                    console.log("Edge clicked via MutationObserver:", edgeId);
                     setSelectedEdge(edgeId);
                     e.preventDefault();
                     e.stopPropagation();
@@ -319,7 +313,6 @@ const DiagramPage = () => {
       });
     });
 
-    // Start observing
     observer.observe(document.body, {
       childList: true,
       subtree: true,
@@ -633,6 +626,9 @@ const DiagramPage = () => {
           if (res.success) {
             setDeviceData(res.data);
           }
+        })
+        .catch((err) => {
+          console.error("Error fetching device data:", err);
         });
     } catch (err) {
       console.error("Error fetching device data:", err);
@@ -1145,14 +1141,11 @@ const DiagramPage = () => {
   }, []);
 
   const handleDeleteSelectedEdge = useCallback(() => {
-    console.log("Delete selected edge called, selectedEdge:", selectedEdge);
     if (selectedEdge) {
       setEdges((currentEdges) => {
-        console.log("Current edges before deletion:", currentEdges.length);
         const filteredEdges = currentEdges.filter(
           (edge) => edge.id !== selectedEdge
         );
-        console.log("Edges after deletion:", filteredEdges.length);
         return filteredEdges;
       });
       setSelectedEdge(null);
@@ -1386,7 +1379,7 @@ const DiagramPage = () => {
               </h3>
               <button
                 onClick={handleCloseDepartmentPopup}
-                className="text-text-muted hover:text-text-primary text-xl"
+                className="text-text-secondary hover:text-text-primary text-xl cursor-pointer"
               >
                 ×
               </button>
@@ -1394,16 +1387,16 @@ const DiagramPage = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
+                <label className="block text-sm font-medium text-text-primary font-roboto">
                   Department:{" "}
                   {nodes.find((n) => n.id === selectedDepartment)?.data.label}
                 </label>
-                <div className="text-xs text-text-muted mb-2">
+                <div className="text-xs text-text-secondary mb-2 font-roboto">
                   Current size:{" "}
                   {departmentDimensions[selectedDepartment]?.width || 625}px ×{" "}
                   {departmentDimensions[selectedDepartment]?.height || 350}px
                 </div>
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-2 text-xs text-blue-800">
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-2 text-xs text-blue-800 font-roboto">
                   <strong>💡 Tip:</strong> The department group (highlighted in
                   blue) will resize immediately as you change the values below.
                 </div>
@@ -1411,20 +1404,18 @@ const DiagramPage = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
                     Width (px)
                   </label>
                   <input
                     type="number"
                     min="300"
                     max="1200"
-                    value={
-                      departmentDimensions[selectedDepartment]?.width || 625
-                    }
+                    value={departmentDimensions[selectedDepartment]?.width}
                     onChange={(e) => {
-                      const width = parseInt(e.target.value) || 625;
+                      const width = parseInt(e.target.value);
                       const height =
-                        departmentDimensions[selectedDepartment]?.height || 350;
+                        departmentDimensions[selectedDepartment]?.height;
                       handleDepartmentDimensionsChange(width, height);
                     }}
                     className="w-full px-3 py-2 border border-border-primary rounded-md bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1432,20 +1423,18 @@ const DiagramPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
+                  <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
                     Height (px)
                   </label>
                   <input
                     type="number"
                     min="200"
                     max="800"
-                    value={
-                      departmentDimensions[selectedDepartment]?.height || 350
-                    }
+                    value={departmentDimensions[selectedDepartment]?.height}
                     onChange={(e) => {
                       const width =
-                        departmentDimensions[selectedDepartment]?.width || 625;
-                      const height = parseInt(e.target.value) || 350;
+                        departmentDimensions[selectedDepartment]?.width;
+                      const height = parseInt(e.target.value);
                       handleDepartmentDimensionsChange(width, height);
                     }}
                     className="w-full px-3 py-2 border border-border-primary rounded-md bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1453,11 +1442,11 @@ const DiagramPage = () => {
                 </div>
               </div>
 
-              <div className="text-xs text-text-muted">
+              <div className="text-xs text-text-secondary font-roboto">
                 <p>• Minimum width: 300px, Maximum width: 1200px</p>
                 <p>• Minimum height: 200px, Maximum height: 800px</p>
                 <p>• Changes will reposition devices automatically</p>
-                <p className="text-status-info font-semibold">
+                <p className="text-status-info font-roboto font-medium">
                   • Group will resize immediately as you type
                 </p>
               </div>
@@ -1465,7 +1454,7 @@ const DiagramPage = () => {
               <div className="flex justify-end gap-2 pt-4">
                 <button
                   onClick={handleCloseDepartmentPopup}
-                  className="px-4 py-2 bg-secondary border border-border-primary rounded-md text-text-primary hover:bg-secondary/80 transition-colors"
+                  className="px-4 py-2 bg-primary border border-border-primary rounded-md text-text-primary hover:bg-primary/80 font-roboto cursor-pointer transition-colors"
                 >
                   Close
                 </button>
@@ -1475,7 +1464,7 @@ const DiagramPage = () => {
                       handleDepartmentDimensionsChange(625, 350);
                     }
                   }}
-                  className="px-4 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md transition-colors"
+                  className="px-4 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md transition-colors font-roboto cursor-pointer"
                 >
                   Reset to Default
                 </button>
