@@ -5,6 +5,7 @@ import ReactFlow, {
   BackgroundVariant,
   useEdgesState,
   useNodesState,
+  useReactFlow,
   type NodeDragHandler,
   Handle,
   Position as HandlePosition,
@@ -78,7 +79,6 @@ const TankNode = ({ data }: { data: NodeData }) => {
 };
 
 const FMNode = ({ data }: { data: NodeData }) => {
-  console.log("data", data);
   const unit = data.unit || "Ltr";
   const isActive = data.isActive !== false;
   const totalizerReading = Number(data.totalizerReading) || 0;
@@ -127,6 +127,8 @@ const FMNode = ({ data }: { data: NodeData }) => {
 
 const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
   const unit = data.unit || "Ltr";
+  const { getNodes } = useReactFlow();
+  const allNodes = getNodes();
 
   const handleEditClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -141,6 +143,58 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
       document.dispatchEvent(customEvent);
     }
   };
+
+  const calculateTotalStock = () => {
+    const departmentTanks = allNodes.filter(
+      (node) => node.type === "tank" && node.parentId === id
+    );
+
+    const totals = departmentTanks.reduce(
+      (acc, tank) => {
+        const tankData = tank.data as NodeData;
+        return {
+          current: acc.current + (Number(tankData.currentLevel) || 0),
+          capacity: acc.capacity + (Number(tankData.capacity) || 0),
+        };
+      },
+      { current: 0, capacity: 0 }
+    );
+
+    return totals;
+  };
+
+  const calculateTotalInOut = () => {
+    const departmentFMs = allNodes.filter(
+      (node) => node.type === "fm" && node.parentId === id
+    );
+
+    const totals = departmentFMs.reduce(
+      (acc, fm) => {
+        const fmData = fm.data as NodeData;
+        const totalVolume = fmData?.totalizerReading || 0;
+
+        const fmIndex = departmentFMs.indexOf(fm);
+        const totalFMs = departmentFMs.length;
+
+        if (totalFMs > 0) {
+          if (fmIndex < Math.ceil(totalFMs / 2)) {
+            acc.totalIn += totalVolume;
+          } else {
+            acc.totalOut += totalVolume;
+          }
+        }
+
+        return acc;
+      },
+      { totalIn: 0, totalOut: 0 }
+    );
+
+    return totals;
+  };
+
+  const stockData = calculateTotalStock();
+  const inOutData = calculateTotalInOut();
+  const totalBalance = inOutData.totalOut - inOutData.totalIn;
 
   return (
     <div
@@ -169,13 +223,13 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Stock :</div>
             <div className="font-semibold text-text-primary">
-              {0} {unit}
+              {stockData.current.toFixed(1)} {unit}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Capacity :</div>
             <div className="font-semibold text-text-primary">
-              {0} {unit}
+              {stockData.capacity.toFixed(0)} {unit}
             </div>
           </div>
         </div>
@@ -184,19 +238,19 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
             <div className="flex items-center justify-end gap-2">
               <div className="text-text-primary">Total In :</div>
               <div className="font-semibold text-text-primary">
-                {0} {unit}
+                {inOutData.totalIn.toFixed(1)} {unit}
               </div>
             </div>
             <div className="flex items-center justify-end gap-2">
               <div className="text-text-primary">Total Out :</div>
               <div className="font-semibold text-text-primary">
-                {0} {unit}
+                {inOutData.totalOut.toFixed(1)} {unit}
               </div>
             </div>
             <div className="flex items-center justify-end gap-2">
               <div className="text-text-primary">Total Balance :</div>
               <div className="font-semibold text-text-primary">
-                {0} {unit}
+                {totalBalance.toFixed(1)} {unit}
               </div>
             </div>
           </div>
