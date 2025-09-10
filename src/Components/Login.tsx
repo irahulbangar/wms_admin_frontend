@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import backgroundImage from "/background.jpg";
 import { Error, Success } from "../utils/toast";
 import { Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { loginAdmin } from "../../store/adminSlice";
 import Loader from "./Loader";
+import BackgroundImage from "../assets/images/background.jpg";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -76,7 +76,7 @@ const Login: React.FC = () => {
     <div
       className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden animate-pan-background"
       style={{
-        backgroundImage: `url(${backgroundImage})`,
+        backgroundImage: `url(${BackgroundImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
