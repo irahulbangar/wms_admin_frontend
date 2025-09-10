@@ -56,12 +56,12 @@ const menuItems = [
         icon: <User className="w-5 h-5" />,
         href: "/organization/users",
       },
-      {
-        id: "organization-setting",
-        label: "Setting",
-        icon: <Settings className="w-5 h-5" />,
-        href: "/organization/setting",
-      },
+      // {
+      //   id: "organization-setting",
+      //   label: "Setting",
+      //   icon: <Settings className="w-5 h-5" />,
+      //   href: "/organization/setting",
+      // },
     ],
   },
   {
