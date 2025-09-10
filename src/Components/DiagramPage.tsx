@@ -210,22 +210,20 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
       className="relative w-full h-full bg-transparent rounded-lg"
       style={{ pointerEvents: "none" }}
     >
-      <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto relative">
-        <div
-          className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm group-header flex items-center gap-2"
-          style={{ pointerEvents: "auto" }}
-        >
-          <span className="text-sm font-semibold text-text-primary font-roboto">
-            {data.label}
-          </span>
-        </div>
+      <div
+        className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm group-header flex items-center gap-2"
+        style={{ pointerEvents: "auto" }}
+      >
+        <span className="text-sm font-semibold text-text-primary font-roboto">
+          {data.label}
+        </span>
         <button
           onClick={handleEditClick}
-          className="text-status-info hover:text-status-info/80 transition-colors cursor-pointer absolute top-2 right-48 transform -translate-x-1/2"
+          className="text-status-info hover:text-status-info/80 transition-colors cursor-pointer"
           title="Edit department dimensions"
           style={{ pointerEvents: "auto" }}
         >
-          <Edit className="w-5 h-5" />
+          <Edit className="w-4 h-4" />
         </button>
       </div>
 
