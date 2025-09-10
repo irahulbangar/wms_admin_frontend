@@ -25,7 +25,7 @@ import type {
 } from "../../model/single-project.interface";
 import type { DeviceResult } from "../../model/devices.interface";
 import { getDeviceByProjectId } from "../../store/deviceSlice";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 
 const TankNode = ({ data }: { data: NodeData }) => {
   const currentLevel = Number(data.currentLevel) || 0;
@@ -284,7 +284,6 @@ const DiagramPage = () => {
   // Create global function for opening department popup
   useEffect(() => {
     (window as any).openDepartmentPopup = (nodeId: string) => {
-      console.log("Global function called with nodeId:", nodeId);
       setSelectedDepartment(nodeId);
       setShowDepartmentPopup(true);
     };
@@ -1227,6 +1226,42 @@ const DiagramPage = () => {
     navigate("/organization/plants");
   };
 
+  const deleteKeyCode = useMemo(() => ["Backspace", "Delete"], []);
+  const multiSelectionKeyCode = useMemo(() => ["Meta", "Ctrl"], []);
+
+  const transformedNodes = useMemo(() => {
+    return nodes.map((node) => {
+      if (node.id === selectedDepartment && node.type === "group") {
+        return {
+          ...node,
+          style: {
+            ...node.style,
+            border: "3px solid #3b82f6",
+            boxShadow: "0 0 15px rgba(59, 130, 246, 0.3)",
+          },
+        };
+      }
+      return node;
+    });
+  }, [nodes, selectedDepartment]);
+
+  const transformedEdges = useMemo(() => {
+    return edges.map((edge) => ({
+      ...edge,
+      style: {
+        ...edge.style,
+        strokeWidth:
+          selectedEdge === edge.id ? 2 : edge.style?.strokeWidth || 3,
+        stroke:
+          selectedEdge === edge.id
+            ? "#ff0000"
+            : edge.style?.stroke || "#6366f1",
+        zIndex: 10,
+      },
+      className: "react-flow__edge-clickable",
+    }));
+  }, [edges, selectedEdge]);
+
   return (
     <div className="bg-primary text-text-primary h-screen w-full">
       <div className="h-full w-full flex">
@@ -1335,38 +1370,8 @@ const DiagramPage = () => {
                 <ReactFlow
                   className="h-full w-full"
                   style={{ width: "100%", height: "100%" }}
-                  nodes={nodes.map((node) => {
-                    if (
-                      node.id === selectedDepartment &&
-                      node.type === "group"
-                    ) {
-                      return {
-                        ...node,
-                        style: {
-                          ...node.style,
-                          border: "3px solid #3b82f6",
-                          boxShadow: "0 0 15px rgba(59, 130, 246, 0.3)",
-                        },
-                      };
-                    }
-                    return node;
-                  })}
-                  edges={edges.map((edge) => ({
-                    ...edge,
-                    style: {
-                      ...edge.style,
-                      strokeWidth:
-                        selectedEdge === edge.id
-                          ? 2
-                          : edge.style?.strokeWidth || 3,
-                      stroke:
-                        selectedEdge === edge.id
-                          ? "#ff0000"
-                          : edge.style?.stroke || "#6366f1",
-                      zIndex: 10,
-                    },
-                    className: "react-flow__edge-clickable",
-                  }))}
+                  nodes={transformedNodes}
+                  edges={transformedEdges}
                   onNodesChange={handleNodesChange}
                   onEdgesChange={handleEdgesChange}
                   onNodeDragStop={handleNodeDragStop}
@@ -1382,8 +1387,8 @@ const DiagramPage = () => {
                   selectNodesOnDrag={false}
                   fitView
                   attributionPosition="bottom-left"
-                  deleteKeyCode={["Backspace", "Delete"]}
-                  multiSelectionKeyCode={["Meta", "Ctrl"]}
+                  deleteKeyCode={deleteKeyCode}
+                  multiSelectionKeyCode={multiSelectionKeyCode}
                 >
                   <Background variant={BackgroundVariant.Dots} />
                   <Controls />
