@@ -2,7 +2,6 @@ import {
   Bell,
   ChevronDown,
   Menu,
-  Search,
   Sun,
   Moon,
   User,
