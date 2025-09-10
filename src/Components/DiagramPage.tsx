@@ -1,4 +1,4 @@
-import { ChevronsLeft, Trash2, Edit3, Edit } from "lucide-react";
+import { ChevronsLeft, Trash2, Edit } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -1424,11 +1424,11 @@ const DiagramPage = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-text-primary font-roboto">
-                  Department:{" "}
+                  Department Name :
                   {nodes.find((n) => n.id === selectedDepartment)?.data.label}
                 </label>
                 <div className="text-xs text-text-secondary mb-2 font-roboto">
-                  Current size:{" "}
+                  Current size :
                   {departmentDimensions[selectedDepartment]?.width || 625}px ×{" "}
                   {departmentDimensions[selectedDepartment]?.height || 350}px
                 </div>
@@ -1447,13 +1447,16 @@ const DiagramPage = () => {
                     type="number"
                     min="300"
                     max="1200"
-                    value={departmentDimensions[selectedDepartment]?.width}
+                    value={
+                      departmentDimensions[selectedDepartment]?.width || 625
+                    }
                     onChange={(e) => {
-                      const width = parseInt(e.target.value);
+                      const width = parseInt(e.target.value) || 625;
                       const height =
-                        departmentDimensions[selectedDepartment]?.height;
+                        departmentDimensions[selectedDepartment]?.height || 350;
                       handleDepartmentDimensionsChange(width, height);
                     }}
+                    placeholder="Enter width"
                     className="w-full px-3 py-2 border border-border-primary rounded-md bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -1466,13 +1469,16 @@ const DiagramPage = () => {
                     type="number"
                     min="200"
                     max="800"
-                    value={departmentDimensions[selectedDepartment]?.height}
+                    value={
+                      departmentDimensions[selectedDepartment]?.height || 350
+                    }
                     onChange={(e) => {
                       const width =
-                        departmentDimensions[selectedDepartment]?.width;
-                      const height = parseInt(e.target.value);
+                        departmentDimensions[selectedDepartment]?.width || 625;
+                      const height = parseInt(e.target.value) || 350;
                       handleDepartmentDimensionsChange(width, height);
                     }}
+                    placeholder="Enter height"
                     className="w-full px-3 py-2 border border-border-primary rounded-md bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
