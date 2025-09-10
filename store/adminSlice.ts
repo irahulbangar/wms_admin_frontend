@@ -79,6 +79,7 @@ export const adminSlice = createSlice({
             state.token = null;
             state.isAuthenticated = false;
             localStorage.clear();
+            window.location.reload();
           } else {
             state.admin = JSON.parse(admin);
             state.token = token;
