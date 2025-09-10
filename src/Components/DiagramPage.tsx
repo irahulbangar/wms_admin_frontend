@@ -5,7 +5,6 @@ import ReactFlow, {
   BackgroundVariant,
   useEdgesState,
   useNodesState,
-  useReactFlow,
   type NodeDragHandler,
   Handle,
   Position as HandlePosition,
@@ -56,7 +55,7 @@ const TankNode = ({ data }: { data: NodeData }) => {
 
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-xs font-bold text-text-primary bg-secondary/80 px-1 rounded">
-            {percentage}%
+            {percentage.toFixed(2)}%
           </span>
         </div>
 
@@ -79,6 +78,7 @@ const TankNode = ({ data }: { data: NodeData }) => {
 };
 
 const FMNode = ({ data }: { data: NodeData }) => {
+  console.log("data", data);
   const unit = data.unit || "Ltr";
   const isActive = data.isActive !== false;
   const totalizerReading = Number(data.totalizerReading) || 0;
@@ -127,8 +127,6 @@ const FMNode = ({ data }: { data: NodeData }) => {
 
 const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
   const unit = data.unit || "Ltr";
-  const { getNodes } = useReactFlow();
-  const allNodes = getNodes();
 
   const handleEditClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -143,61 +141,6 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
       document.dispatchEvent(customEvent);
     }
   };
-
-  const calculateTotalStock = () => {
-    const departmentTanks = allNodes.filter(
-      (node) => node.type === "tank" && node.parentId === id
-    );
-
-    const totals = departmentTanks.reduce(
-      (acc, tank) => {
-        const tankData = tank.data as NodeData;
-        return {
-          current: acc.current + (Number(tankData.currentLevel) || 0),
-          capacity: acc.capacity + (Number(tankData.capacity) || 0),
-        };
-      },
-      { current: 0, capacity: 0 }
-    );
-
-    return totals;
-  };
-
-  const calculateTotalInOut = () => {
-    const departmentFMs = allNodes.filter(
-      (node) => node.type === "fm" && node.parentId === id
-    );
-
-    const totals = departmentFMs.reduce(
-      (acc, fm) => {
-        const fmData = fm.data as NodeData;
-        const totalVolume = fmData.totalVolume || 0;
-
-        if (data.label === "ENTC Department") {
-          if (fm.id === "fm1" || fm.id === "fm2") {
-            acc.totalIn += totalVolume;
-          } else if (fm.id === "fm3" || fm.id === "fm4") {
-            acc.totalOut += totalVolume;
-          }
-        } else if (data.label === "IT Department") {
-          if (fm.id === "fm5") {
-            acc.totalIn += totalVolume;
-          } else if (fm.id === "fm6") {
-            acc.totalOut += totalVolume;
-          }
-        }
-
-        return acc;
-      },
-      { totalIn: 0, totalOut: 0 }
-    );
-
-    return totals;
-  };
-
-  const stockData = calculateTotalStock();
-  const inOutData = calculateTotalInOut();
-  const totalBalance = inOutData.totalOut - inOutData.totalIn;
 
   return (
     <div
@@ -226,13 +169,13 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Stock :</div>
             <div className="font-semibold text-text-primary">
-              {stockData.current.toFixed(1)} {unit}
+              {0} {unit}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Capacity :</div>
             <div className="font-semibold text-text-primary">
-              {stockData.capacity.toFixed(0)} {unit}
+              {0} {unit}
             </div>
           </div>
         </div>
@@ -241,19 +184,19 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
             <div className="flex items-center justify-end gap-2">
               <div className="text-text-primary">Total In :</div>
               <div className="font-semibold text-text-primary">
-                {inOutData.totalIn.toFixed(1)} {unit}
+                {0} {unit}
               </div>
             </div>
             <div className="flex items-center justify-end gap-2">
               <div className="text-text-primary">Total Out :</div>
               <div className="font-semibold text-text-primary">
-                {inOutData.totalOut.toFixed(1)} {unit}
+                {0} {unit}
               </div>
             </div>
             <div className="flex items-center justify-end gap-2">
               <div className="text-text-primary">Total Balance :</div>
               <div className="font-semibold text-text-primary">
-                {totalBalance.toFixed(1)} {unit}
+                {0} {unit}
               </div>
             </div>
           </div>
@@ -505,7 +448,7 @@ const DiagramPage = () => {
             }
 
             const tankNodeData: NodeData = {
-              label: device.device_name,
+              label: device?.device_name,
               type: "bidirectional",
               direction: "bidirectional",
               unit: "Ltr",
