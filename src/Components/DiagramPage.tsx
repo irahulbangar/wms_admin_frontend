@@ -199,13 +199,6 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
         </span>
       </div>
 
-      <div
-        className="absolute top-9 left-1/2 transform -translate-x-1/2 text-xs text-status-warning font-roboto text-center"
-        style={{ pointerEvents: "none" }}
-      >
-        💡 Double-click department name to change width & height of department
-      </div>
-
       <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
         <div className="text-center flex items-start flex-col">
           <div className="flex items-center gap-2">
@@ -1268,19 +1261,19 @@ const DiagramPage = () => {
 
               <div className="flex items-center gap-6">
                 {selectedEdge && (
-                  <div className="flex items-center gap-2 text-text-muted text-xs">
+                  <div className="flex items-center gap-2 text-text-secondary text-xs">
                     <span className="w-2 h-2 bg-status-info rounded-full animate-pulse"></span>
                     Edge selected - Press Delete or use button to remove
                   </div>
                 )}
                 {hasChanges && (
-                  <div className="flex items-center gap-2 text-text-muted text-xs">
+                  <div className="flex items-center gap-2 text-text-secondary text-xs">
                     <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
                     Unsaved changes detected
                   </div>
                 )}
                 {!hasChanges && !selectedEdge && (
-                  <div className="flex items-center gap-2 text-text-muted text-xs">
+                  <div className="flex items-center gap-2 text-text-secondary text-xs">
                     <span className="w-2 h-2 bg-status-success rounded-full"></span>
                     All changes saved
                   </div>
@@ -1297,7 +1290,7 @@ const DiagramPage = () => {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                  <p className="text-text-muted">Loading diagram...</p>
+                  <p className="text-text-secondary">Loading diagram...</p>
                 </div>
               </div>
             ) : (
