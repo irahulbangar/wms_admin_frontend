@@ -138,6 +138,37 @@ const GroupNode = ({
   const { getNodes } = useReactFlow();
   const allNodes = getNodes();
 
+  const deviceDataKey = deviceData
+    ? JSON.stringify(
+        deviceData.map((d) => ({
+          id: d.device_id,
+          totalizerReading: d.last_record?.min_max,
+          currentLevel: d.last_record?.min_last_level,
+          capacity: d.params?.storageCapacity,
+        }))
+      )
+    : "";
+
+  const [, forceUpdate] = useState({});
+  useEffect(() => {
+    forceUpdate({});
+  }, [deviceDataKey]);
+
+  useEffect(() => {
+    forceUpdate({});
+  }, [allNodes.length]);
+
+  useEffect(() => {
+    const handleDeviceDataUpdate = () => {
+      forceUpdate({});
+    };
+
+    document.addEventListener("deviceDataUpdated", handleDeviceDataUpdate);
+    return () => {
+      document.removeEventListener("deviceDataUpdated", handleDeviceDataUpdate);
+    };
+  }, []);
+
   const handleEditClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
@@ -806,6 +837,11 @@ const DiagramPage = () => {
         return node;
       });
     });
+
+    const event = new CustomEvent("deviceDataUpdated", {
+      detail: { deviceData, timestamp: Date.now() },
+    });
+    document.dispatchEvent(event);
   }, [deviceData, nodes.length]);
 
   useEffect(() => {
@@ -827,6 +863,14 @@ const DiagramPage = () => {
 
   useEffect(() => {
     (window as any).deviceData = deviceData;
+
+    if (deviceData.length > 0) {
+      const event = new CustomEvent("deviceDataUpdated", {
+        detail: { deviceData, timestamp: Date.now() },
+      });
+      document.dispatchEvent(event);
+    }
+
     return () => {
       delete (window as any).deviceData;
     };
