@@ -1,4 +1,4 @@
-import { ChevronsLeft } from "lucide-react";
+import { ChevronsLeft, Trash2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -99,13 +99,13 @@ const FMNode = ({ data }: { data: NodeData }) => {
       />
 
       <div className="text-xs text-center mb-1">
-        <div className="text-text-muted font-roboto">Flow:</div>
+        <div className="text-text-primary font-roboto">Flow:</div>
         <div className="font-semibold text-status-info font-roboto">
           {flowRate} {unit}
         </div>
       </div>
 
-      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-text-muted whitespace-nowrap font-roboto">
+      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-text-primary whitespace-nowrap font-roboto">
         <div>
           Totalizer: {totalizerReading} {unit}
         </div>
@@ -203,13 +203,13 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
         <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
           <div className="text-center flex items-start flex-col">
             <div className="flex items-center gap-2">
-              <div className="text-text-muted">Total Stock :</div>
+              <div className="text-text-primary">Total Stock :</div>
               <div className="font-semibold text-text-primary">
                 {stockData.current.toFixed(1)} {unit}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-text-muted">Total Capacity :</div>
+              <div className="text-text-primary">Total Capacity :</div>
               <div className="font-semibold text-text-primary">
                 {stockData.capacity.toFixed(0)} {unit}
               </div>
@@ -218,19 +218,19 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
-                <div className="text-text-muted">Total In :</div>
+                <div className="text-text-primary">Total In :</div>
                 <div className="font-semibold text-text-primary">
                   {inOutData.totalIn.toFixed(1)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
-                <div className="text-text-muted">Total Out :</div>
+                <div className="text-text-primary">Total Out :</div>
                 <div className="font-semibold text-text-primary">
                   {inOutData.totalOut.toFixed(1)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
-                <div className="text-text-muted">Total Balance :</div>
+                <div className="text-text-primary">Total Balance :</div>
                 <div className="font-semibold text-text-primary">
                   {totalBalance.toFixed(1)} {unit}
                 </div>
@@ -1229,19 +1229,19 @@ const DiagramPage = () => {
                   {selectedEdge && (
                     <button
                       onClick={handleDeleteSelectedEdge}
-                      className="px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-md text-sm transition-colors font-roboto"
+                      className="px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
                       title="Delete selected edge"
                     >
-                      🗑️ Delete Selected Edge
+                      <Trash2 className="w-4 h-4" /> Delete Selected Edge
                     </button>
                   )}
 
                   <button
                     onClick={handleClearAllEdges}
-                    className="px-3 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md text-sm transition-colors font-roboto"
+                    className="px-3 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
                     title="Clear all connections"
                   >
-                    🗑️ Clear All Edges
+                    <Trash2 className="w-4 h-4" /> Clear All Edges
                   </button>
 
                   <button
@@ -1339,11 +1339,11 @@ const DiagramPage = () => {
                       ...edge.style,
                       strokeWidth:
                         selectedEdge === edge.id
-                          ? 6
+                          ? 2
                           : edge.style?.strokeWidth || 3,
                       stroke:
                         selectedEdge === edge.id
-                          ? "#f59e0b"
+                          ? "#ff0000"
                           : edge.style?.stroke || "#6366f1",
                       zIndex: 10,
                     },
