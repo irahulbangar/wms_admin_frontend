@@ -1,4 +1,4 @@
-import { ChevronsLeft, Trash2 } from "lucide-react";
+import { ChevronsLeft, Trash2, Edit3, Edit } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -130,6 +130,26 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
   const { getNodes } = useReactFlow();
   const allNodes = getNodes();
 
+  const handleEditClick = (event: React.MouseEvent) => {
+    console.log("Edit icon clicked for group:", id);
+    event.stopPropagation();
+    event.preventDefault();
+
+    // Try to access the global function if it exists
+    if ((window as any).openDepartmentPopup) {
+      console.log("Calling global function");
+      (window as any).openDepartmentPopup(id);
+    } else {
+      console.log("Global function not found, using custom event");
+      // Fallback to custom event
+      const customEvent = new CustomEvent("groupEditClick", {
+        detail: { nodeId: id, nodeData: data },
+      });
+      console.log("Dispatching custom event:", customEvent);
+      document.dispatchEvent(customEvent);
+    }
+  };
+
   const calculateTotalStock = () => {
     const departmentTanks = allNodes.filter(
       (node) => node.type === "tank" && node.parentId === id
@@ -190,13 +210,23 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
       className="relative w-full h-full bg-transparent rounded-lg"
       style={{ pointerEvents: "none" }}
     >
-      <div
-        className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm group-header"
-        style={{ pointerEvents: "auto" }}
-      >
-        <span className="text-sm font-semibold text-text-primary font-roboto">
-          {data.label}
-        </span>
+      <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto relative">
+        <div
+          className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm group-header flex items-center gap-2"
+          style={{ pointerEvents: "auto" }}
+        >
+          <span className="text-sm font-semibold text-text-primary font-roboto">
+            {data.label}
+          </span>
+        </div>
+        <button
+          onClick={handleEditClick}
+          className="text-status-info hover:text-status-info/80 transition-colors cursor-pointer absolute top-2 right-48 transform -translate-x-1/2"
+          title="Edit department dimensions"
+          style={{ pointerEvents: "auto" }}
+        >
+          <Edit className="w-5 h-5" />
+        </button>
       </div>
 
       <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
@@ -258,6 +288,39 @@ const DiagramPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
+
+  // Create global function for opening department popup
+  useEffect(() => {
+    (window as any).openDepartmentPopup = (nodeId: string) => {
+      console.log("Global function called with nodeId:", nodeId);
+      setSelectedDepartment(nodeId);
+      setShowDepartmentPopup(true);
+    };
+
+    return () => {
+      delete (window as any).openDepartmentPopup;
+    };
+  }, []);
+
+  // Listen for edit icon clicks
+  useEffect(() => {
+    const handleGroupEditClick = (event: any) => {
+      console.log("Custom event received:", event);
+      console.log("Event detail:", event.detail);
+      const { nodeId } = event.detail;
+      console.log("Edit icon clicked for group:", nodeId);
+      setSelectedDepartment(nodeId);
+      setShowDepartmentPopup(true);
+    };
+
+    console.log("Adding event listener for groupEditClick");
+    document.addEventListener("groupEditClick", handleGroupEditClick);
+
+    return () => {
+      console.log("Removing event listener for groupEditClick");
+      document.removeEventListener("groupEditClick", handleGroupEditClick);
+    };
+  }, []);
 
   useEffect(() => {
     const handleEdgeClick = (event: Event) => {
@@ -877,18 +940,12 @@ const DiagramPage = () => {
     [setEdges]
   );
 
-  const onEdgeClick = useCallback(
-    (event: React.MouseEvent, edge: Edge) => {
-      event.preventDefault();
-      event.stopPropagation();
+  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-      const sourceNode = nodes.find((n) => n.id === edge.source);
-      const targetNode = nodes.find((n) => n.id === edge.target);
-      const isInsideGroup = sourceNode?.parentId || targetNode?.parentId;
-      setSelectedEdge(edge.id);
-    },
-    [nodes]
-  );
+    setSelectedEdge(edge.id);
+  }, []);
 
   const onPaneClick = useCallback((event: React.MouseEvent) => {
     if (event.target === event.currentTarget) {
@@ -944,17 +1001,6 @@ const DiagramPage = () => {
       event.stopPropagation();
     }
   }, []);
-
-  const onNodeDoubleClick = useCallback(
-    (event: React.MouseEvent, node: any) => {
-      event.stopPropagation();
-      if (node.type === "group") {
-        setSelectedDepartment(node.id);
-        setShowDepartmentPopup(true);
-      }
-    },
-    []
-  );
 
   const handleDepartmentDimensionsChange = useCallback(
     (width: number, height: number) => {
@@ -1340,7 +1386,6 @@ const DiagramPage = () => {
                   onNodeDragStop={handleNodeDragStop}
                   onConnect={onConnect}
                   onNodeClick={onNodeClick}
-                  onNodeDoubleClick={onNodeDoubleClick}
                   onEdgeClick={onEdgeClick}
                   onPaneClick={onPaneClick}
                   onSelectionChange={onSelectionChange}
