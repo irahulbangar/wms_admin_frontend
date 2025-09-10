@@ -73,17 +73,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </div>
       </div>
 
-      <div className="flex-1 max-w-md md:mx-8 mx-2">
-        <div className="relative">
-          <Search className="w-5 h-5 absolute top-1/2 transform -translate-y-1/2 left-2 text-text-muted" />
-          <input
-            type="text"
-            placeholder="Search Anything"
-            className="w-full pl-10 pr-4 py-2.5 bg-primary border border-border-secondary font-roboto text-text-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all"
-          />
-        </div>
-      </div>
-
       <div className="flex items-center space-x-3">
         <button
           className="p-2.5 rounded-xl text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer"
