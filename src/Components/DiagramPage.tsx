@@ -16,7 +16,6 @@ import ReactFlow, {
   ConnectionMode,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { useState, useEffect, useCallback, useRef } from "react";
 import { Success } from "../utils/toast";
 import { useAppDispatch } from "../../store/store";
 import { getProjectById, updateDiagramData } from "../../store/projectSlice";
@@ -26,6 +25,7 @@ import type {
 } from "../../model/single-project.interface";
 import type { DeviceResult } from "../../model/devices.interface";
 import { getDeviceByProjectId } from "../../store/deviceSlice";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const TankNode = ({ data }: { data: NodeData }) => {
   const currentLevel = Number(data.currentLevel) || 0;
@@ -131,21 +131,15 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
   const allNodes = getNodes();
 
   const handleEditClick = (event: React.MouseEvent) => {
-    console.log("Edit icon clicked for group:", id);
     event.stopPropagation();
     event.preventDefault();
 
-    // Try to access the global function if it exists
     if ((window as any).openDepartmentPopup) {
-      console.log("Calling global function");
       (window as any).openDepartmentPopup(id);
     } else {
-      console.log("Global function not found, using custom event");
-      // Fallback to custom event
       const customEvent = new CustomEvent("groupEditClick", {
         detail: { nodeId: id, nodeData: data },
       });
-      console.log("Dispatching custom event:", customEvent);
       document.dispatchEvent(customEvent);
     }
   };
@@ -300,22 +294,16 @@ const DiagramPage = () => {
     };
   }, []);
 
-  // Listen for edit icon clicks
   useEffect(() => {
     const handleGroupEditClick = (event: any) => {
-      console.log("Custom event received:", event);
-      console.log("Event detail:", event.detail);
       const { nodeId } = event.detail;
-      console.log("Edit icon clicked for group:", nodeId);
       setSelectedDepartment(nodeId);
       setShowDepartmentPopup(true);
     };
 
-    console.log("Adding event listener for groupEditClick");
     document.addEventListener("groupEditClick", handleGroupEditClick);
 
     return () => {
-      console.log("Removing event listener for groupEditClick");
       document.removeEventListener("groupEditClick", handleGroupEditClick);
     };
   }, []);
@@ -1444,7 +1432,7 @@ const DiagramPage = () => {
                     Width (px)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     min="300"
                     max="1200"
                     value={
@@ -1466,7 +1454,7 @@ const DiagramPage = () => {
                     Height (px)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     min="200"
                     max="800"
                     value={
