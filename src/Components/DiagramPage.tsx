@@ -125,7 +125,15 @@ const FMNode = ({ data }: { data: NodeData }) => {
   );
 };
 
-const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
+const GroupNode = ({
+  data,
+  id,
+  deviceData,
+}: {
+  data: NodeData;
+  id: string;
+  deviceData?: DeviceResult[];
+}) => {
   const unit = data.unit || "Ltr";
   const { getNodes } = useReactFlow();
   const allNodes = getNodes();
@@ -145,49 +153,123 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
   };
 
   const calculateTotalStock = () => {
-    const departmentTanks = allNodes.filter(
-      (node) => node.type === "tank" && node.parentId === id
-    );
+    let totals = { current: 0, capacity: 0 };
 
-    const totals = departmentTanks.reduce(
-      (acc, tank) => {
-        const tankData = tank.data as NodeData;
-        return {
-          current: acc.current + (Number(tankData.currentLevel) || 0),
-          capacity: acc.capacity + (Number(tankData.capacity) || 0),
-        };
-      },
-      { current: 0, capacity: 0 }
-    );
+    if (allNodes && allNodes.length > 0) {
+      const departmentTanks = allNodes.filter(
+        (node) => node.type === "tank" && node.parentId === id
+      );
+
+      totals = departmentTanks.reduce(
+        (acc, tank) => {
+          const tankData = tank.data as NodeData;
+          return {
+            current: acc.current + (Number(tankData.currentLevel) || 0),
+            capacity: acc.capacity + (Number(tankData.capacity) || 0),
+          };
+        },
+        { current: 0, capacity: 0 }
+      );
+    }
+
+    if (
+      totals.current === 0 &&
+      totals.capacity === 0 &&
+      deviceData &&
+      deviceData.length > 0
+    ) {
+      const departmentId = parseInt(id);
+      const departmentDevices = deviceData.filter(
+        (device) => device.department_id === departmentId
+      );
+
+      const departmentTanks = departmentDevices.filter(
+        (device) =>
+          device.type === "tank" ||
+          device.device_family?.toLowerCase().includes("tank")
+      );
+
+      totals = departmentTanks.reduce(
+        (acc, device) => {
+          return {
+            current:
+              acc.current + (Number(device.last_record?.min_last_level) || 0),
+            capacity:
+              acc.capacity + (Number(device?.params?.storageCapacity) || 0),
+          };
+        },
+        { current: 0, capacity: 0 }
+      );
+    }
 
     return totals;
   };
 
   const calculateTotalInOut = () => {
-    const departmentFMs = allNodes.filter(
-      (node) => node.type === "fm" && node.parentId === id
-    );
+    let totals = { totalIn: 0, totalOut: 0 };
 
-    const totals = departmentFMs.reduce(
-      (acc, fm) => {
-        const fmData = fm.data as NodeData;
-        const totalVolume = fmData?.totalizerReading || 0;
+    if (allNodes && allNodes.length > 0) {
+      const departmentFMs = allNodes.filter(
+        (node) => node.type === "fm" && node.parentId === id
+      );
 
-        const fmIndex = departmentFMs.indexOf(fm);
-        const totalFMs = departmentFMs.length;
+      totals = departmentFMs.reduce(
+        (acc, fm) => {
+          const fmData = fm.data as NodeData;
+          const totalVolume = fmData?.totalizerReading || 0;
 
-        if (totalFMs > 0) {
-          if (fmIndex < Math.ceil(totalFMs / 2)) {
-            acc.totalIn += totalVolume;
-          } else {
-            acc.totalOut += totalVolume;
+          const fmIndex = departmentFMs.indexOf(fm);
+          const totalFMs = departmentFMs.length;
+
+          if (totalFMs > 0) {
+            if (fmIndex < Math.ceil(totalFMs / 2)) {
+              acc.totalIn += totalVolume;
+            } else {
+              acc.totalOut += totalVolume;
+            }
           }
-        }
 
-        return acc;
-      },
-      { totalIn: 0, totalOut: 0 }
-    );
+          return acc;
+        },
+        { totalIn: 0, totalOut: 0 }
+      );
+    }
+
+    if (
+      totals.totalIn === 0 &&
+      totals.totalOut === 0 &&
+      deviceData &&
+      deviceData.length > 0
+    ) {
+      const departmentId = parseInt(id);
+      const departmentDevices = deviceData.filter(
+        (device) => device.department_id === departmentId
+      );
+
+      const departmentFMs = departmentDevices.filter(
+        (device) =>
+          device.type === "fm" ||
+          device.device_family?.toLowerCase().includes("flow")
+      );
+
+      totals = departmentFMs.reduce(
+        (acc, device, index) => {
+          const totalVolume = Number(device.last_record?.min_max) || 0;
+          const totalFMs = departmentFMs.length;
+
+          if (totalFMs > 0) {
+            if (index < Math.ceil(totalFMs / 2)) {
+              acc.totalIn += totalVolume;
+            } else {
+              acc.totalOut += totalVolume;
+            }
+          }
+
+          return acc;
+        },
+        { totalIn: 0, totalOut: 0 }
+      );
+    }
 
     return totals;
   };
@@ -261,7 +343,8 @@ const GroupNode = ({ data, id }: { data: NodeData; id: string }) => {
 };
 
 const GroupNodeWrapper = ({ data, id }: { data: NodeData; id: string }) => {
-  return <GroupNode data={data} id={id} />;
+  const deviceData = (window as any).deviceData || [];
+  return <GroupNode data={data} id={id} deviceData={deviceData} />;
 };
 
 const nodeTypes = {
@@ -741,6 +824,13 @@ const DiagramPage = () => {
     updateNodesWithDynamicData,
     fetchDeviceData,
   ]);
+
+  useEffect(() => {
+    (window as any).deviceData = deviceData;
+    return () => {
+      delete (window as any).deviceData;
+    };
+  }, [deviceData]);
 
   useEffect(() => {
     if (projectId) {
