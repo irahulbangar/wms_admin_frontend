@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Fragment } from "react";
 import {
   Search,
   PlusCircle,
@@ -614,7 +614,7 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center md:justify-between justify-center lg:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap lg:flex-nowrap">
+      <div className="flex items-start md:items-center lg:justify-between justify-center md:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap lg:flex-nowrap">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
@@ -822,7 +822,7 @@ const Devices = () => {
                 department?.department_name.trim() || `Department ${deptId}`;
 
               return (
-                <div key={deptId} className="mb-2">
+                <Fragment key={deptId}>
                   <div className="bg-primary px-4 py-3 border-b border-border-primary flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button
@@ -970,7 +970,7 @@ const Devices = () => {
                       </table>
                     </div>
                   )}
-                </div>
+                </Fragment>
               );
             })
           ) : (

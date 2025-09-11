@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppSelector } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   User,
   Mail,
@@ -16,13 +16,13 @@ const Profile: React.FC = () => {
   const { admin } = useAppSelector((state) => state.admin);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: "Jhon Doe",
+    name: admin?.name || "",
     email: admin?.email || "",
-    phone: "+1 (555) 123-4567",
+    phone: admin?.contact_number || "",
     location: "New York, NY",
-    role: "Administrator",
+    role: admin?.role || "",
     department: "IT Department",
-    joinDate: "January 2024",
+    joinDate: admin?.created_at || "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -42,13 +42,13 @@ const Profile: React.FC = () => {
   const handleCancel = () => {
     // Reset form data to original values
     setFormData({
-      name: "Jhon Doe",
+      name: admin?.name || "",
       email: admin?.email || "",
-      phone: "+1 (555) 123-4567",
-      location: "New York, NY",
-      role: "Administrator",
+      phone: admin?.contact_number || "",
+      location: admin?.location || "",
+      role: admin?.role || "",
       department: "IT Department",
-      joinDate: "January 2024",
+      joinDate: admin?.created_at || "",
     });
     setIsEditing(false);
     Info("Changes cancelled. Profile data restored.");
@@ -109,7 +109,7 @@ const Profile: React.FC = () => {
               </h3>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="flex items-center text-text-secondary hover:text-text-primary transition-colors"
+                className="flex items-center text-text-secondary hover:text-text-primary transition-colors p-2 rounded-md border border-border-primary bg-input-bg"
               >
                 {isEditing ? (
                   <X className="w-4 h-4 mr-2" />
@@ -132,7 +132,7 @@ const Profile: React.FC = () => {
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full bg-input-bg border-input-border rounded-lg"
+                    className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                   />
                 ) : (
                   <p className="text-text-primary">{formData.name}</p>
@@ -148,7 +148,7 @@ const Profile: React.FC = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
-                    className="w-full bg-input-bg border-input-border rounded-lg"
+                    className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                   />
                 ) : (
                   <p className="text-text-primary">{formData.email}</p>
@@ -164,7 +164,7 @@ const Profile: React.FC = () => {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
-                    className="w-full bg-input-bg border-input-border rounded-lg"
+                    className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                   />
                 ) : (
                   <p className="text-text-primary">{formData.phone}</p>
@@ -182,7 +182,7 @@ const Profile: React.FC = () => {
                     onChange={(e) =>
                       handleInputChange("location", e.target.value)
                     }
-                    className="w-full bg-input-bg border-input-border rounded-lg"
+                    className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                   />
                 ) : (
                   <p className="text-text-primary">{formData.location}</p>
@@ -200,7 +200,7 @@ const Profile: React.FC = () => {
                     onChange={(e) =>
                       handleInputChange("department", e.target.value)
                     }
-                    className="w-full bg-input-bg border-input-border rounded-lg"
+                    className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                   />
                 ) : (
                   <p className="text-text-primary">{formData.department}</p>
@@ -211,7 +211,16 @@ const Profile: React.FC = () => {
                 <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
                   Role
                 </label>
-                <p className="text-text-primary">{formData.role}</p>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={formData.role}
+                    onChange={(e) => handleInputChange("role", e.target.value)}
+                    className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
+                  />
+                ) : (
+                  <p className="text-text-primary">{formData.role}</p>
+                )}
               </div>
             </div>
 
@@ -219,13 +228,13 @@ const Profile: React.FC = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={handleCancel}
-                  className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors font-roboto"
+                  className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors font-roboto cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center font-roboto"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg cursor-pointer transition-colors flex items-center font-roboto"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes

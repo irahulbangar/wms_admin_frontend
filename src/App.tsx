@@ -4,7 +4,7 @@ import HomePage from "./Components/HomePage";
 import AuthInitializer from "./Components/AuthInitializer";
 import { ThemeProvider } from "./context/ThemeContext";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,

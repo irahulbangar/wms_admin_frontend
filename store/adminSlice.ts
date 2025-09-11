@@ -11,6 +11,8 @@ interface CustomJwtPayload {
   role?: string;
   contact_number?: string;
   status?: string;
+  created_at?: string;
+  location?: string;
 }
 
 interface Admin {
@@ -18,6 +20,10 @@ interface Admin {
   email: string;
   name?: string;
   role?: string;
+  contact_number?: string;
+  status?: string;
+  created_at?: string;
+  location?: string;
 }
 
 interface LoginResponse {
