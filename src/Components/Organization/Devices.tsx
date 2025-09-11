@@ -857,7 +857,7 @@ const Devices = () => {
                   </div>
 
                   {!collapsedDepartments?.has(deptId) && (
-                    <div className="overflow-auto">
+                    <div className="overflow-x-auto">
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                           <tr>
