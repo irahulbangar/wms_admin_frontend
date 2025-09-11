@@ -173,7 +173,7 @@ const Organization = () => {
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto">
       <div className="flex items-start md:items-center md:justify-end justify-center w-full md:gap-4 gap-2 md:flex-row flex-col sticky top-0">
-        <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
+        <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto mt-1">
           <div className="relative md:w-92 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
             <input
@@ -228,10 +228,10 @@ const Organization = () => {
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                   Organization Name
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto whitespace-nowrap">
                   Contact Person
                 </th>
-                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
+                <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto whitespace-nowrap">
                   Contact Number
                 </th>
                 <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
@@ -302,7 +302,7 @@ const Organization = () => {
                               organization?.organization_id.toString()
                             )
                           }
-                          className="w-5 h-5 text-teal-500 cursor-pointer"
+                          className="w-5 h-5 text-fuchsia-500 cursor-pointer"
                         />
 
                         <SquarePen
