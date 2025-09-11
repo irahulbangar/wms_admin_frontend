@@ -74,6 +74,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   >(null);
   const [editingDeviceFamilyName, setEditingDeviceFamilyName] =
     useState<string>("");
+  const [editingDeviceFamilyType, setEditingDeviceFamilyType] =
+    useState<string>("");
   const [editingDeviceTypeId, setEditingDeviceTypeId] = useState<number | null>(
     null
   );
@@ -105,6 +107,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     outputFor: 0,
     multiplier: 0,
     shifter: 0,
+    maxLpmLimit: 0,
   });
 
   const [tankInputValues, setTankInputValues] = useState({
@@ -120,6 +123,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     outputFor: "0",
     multiplier: "0",
     shifter: "0",
+    maxLpmLimit: "0",
   });
 
   const resetForm = () => {
@@ -146,6 +150,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       outputFor: 0,
       multiplier: 0,
       shifter: 0,
+      maxLpmLimit: 0,
     });
     setTankInputValues({
       height: "0",
@@ -159,6 +164,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       outputFor: "0",
       multiplier: "0",
       shifter: "0",
+      maxLpmLimit: "0",
     });
     setErrors({});
   };
@@ -283,6 +289,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 outputFor: 0,
                 multiplier: 0,
                 shifter: 0,
+                maxLpmLimit: 0,
               };
               setFmParams(fmData);
               setFmInputValues({
@@ -290,6 +297,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 outputFor: fmData.outputFor.toString(),
                 multiplier: fmData.multiplier.toString(),
                 shifter: fmData.shifter.toString(),
+                maxLpmLimit: fmData.maxLpmLimit.toString(),
               });
             } else {
               const tankData = deviceData.params || {
@@ -338,6 +346,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     if (!showAddDeviceFamilyPopup) {
       setEditingDeviceFamilyId(null);
       setEditingDeviceFamilyName("");
+      setEditingDeviceFamilyType("");
     }
   }, [showAddDeviceFamilyPopup]);
 
@@ -483,6 +492,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                             selectedFamily.device_family_id
                           );
                           setEditingDeviceFamilyName(selectedFamily.name);
+                          setEditingDeviceFamilyType(selectedFamily.type);
                           setShowAddDeviceFamilyPopup(true);
                         }
                       }}
@@ -987,6 +997,36 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     }`}
                   />
                 </div>
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Max LPM Limit
+                  </label>
+                  <input
+                    type="text"
+                    name="maxLpmLimit"
+                    value={fmInputValues.maxLpmLimit}
+                    onChange={(e) => {
+                      const inputValue = e.target.value;
+                      setFmInputValues((prev) => ({
+                        ...prev,
+                        maxLpmLimit: inputValue,
+                      }));
+
+                      const numericValue =
+                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                      setFmParams((prev) => ({
+                        ...prev,
+                        maxLpmLimit: numericValue,
+                      }));
+                    }}
+                    placeholder="Enter max LPM limit"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.maxLpmLimit
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
+                  />
+                </div>
               </>
             )}
           </div>
@@ -1033,10 +1073,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           type={editingDeviceFamilyId ? "update" : "add"}
           deviceFamilyId={editingDeviceFamilyId || undefined}
           deviceFamilyName={editingDeviceFamilyName || undefined}
+          deviceFamilyType={editingDeviceFamilyType || undefined}
           onUpdateSuccess={() => {
             refreshDeviceFamilyData();
             setEditingDeviceFamilyId(null);
             setEditingDeviceFamilyName("");
+            setEditingDeviceFamilyType("");
           }}
         />
       )}

@@ -75,7 +75,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
         }
       })
       .catch((error) => {
-        Error(`Failed to load project data: ${error}`);
+        Error(`Failed to load plant data: ${error}`);
       });
   };
 
@@ -83,7 +83,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
     const newErrors: Partial<ProjectFormData> = {};
 
     if (!formData.project_name.trim()) {
-      newErrors.project_name = "Project name is required";
+      newErrors.project_name = "Plant name is required";
     }
 
     if (!formData.latitude.trim()) {
@@ -129,7 +129,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
     }
 
     if (type === "add" && !organizationId) {
-      Error("Organization ID is required to add a project");
+      Error("Organization ID is required to add a plant");
       return;
     }
 
@@ -159,11 +159,11 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           }
         })
         .catch((error) => {
-          Error(`Failed to add project: ${error}`);
+          Error(`Failed to add plant: ${error}`);
         });
     } else {
       if (!projectId) {
-        Error("Project ID is required for update");
+        Error("Plant ID is required for update");
         return;
       }
 
@@ -193,7 +193,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           }
         })
         .catch((error) => {
-          Error(`Failed to update project: ${error}`);
+          Error(`Failed to update plant: ${error}`);
         });
     }
   };
@@ -223,7 +223,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           </label>
           <input
             type="text"
-            name="plant_name"
+            name="project_name"
             value={formData.project_name}
             onChange={handleInputChange}
             className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
@@ -231,7 +231,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
                 ? "border-status-danger"
                 : "border-border-primary"
             }`}
-            placeholder="Enter project name"
+            placeholder="Enter plant name"
           />
           {errors.project_name && (
             <p className="text-status-danger text-sm">{errors.project_name}</p>
