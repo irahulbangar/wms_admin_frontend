@@ -172,15 +172,7 @@ const Organization = () => {
 
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto">
-      <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col sticky top-0">
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-text-primary">
-            Organizations
-          </h1>
-          <p className="text-text-secondary">
-            Manage your organization's information and settings
-          </p>
-        </div>
+      <div className="flex items-start md:items-center md:justify-end justify-center w-full md:gap-4 gap-2 md:flex-row flex-col sticky top-0">
         <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
           <div className="relative md:w-92 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />

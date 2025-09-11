@@ -132,19 +132,7 @@ const AdminSetting = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary font-roboto">
-            Admin Settings
-          </h1>
-          <p className="text-text-secondary mt-1 font-roboto">
-            Manage your account settings and preferences
-          </p>
-        </div>
-      </div>
-
+    <div className="space-y-4">
       {/* Tabs */}
       <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (
@@ -166,7 +154,7 @@ const AdminSetting = () => {
       {/* Content */}
       <div className="bg-primary border border-border-primary rounded-xl p-4 sm:p-6 shadow-sm">
         {activeTab === "theme" && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Settings className="w-6 h-6 text-text-primary" />
               <h2 className="text-xl font-semibold text-text-primary font-roboto">
@@ -211,7 +199,7 @@ const AdminSetting = () => {
         )}
 
         {activeTab === "password" && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Shield className="w-6 h-6 text-text-primary" />
               <h2 className="text-xl font-semibold text-text-primary font-roboto">
@@ -221,97 +209,91 @@ const AdminSetting = () => {
 
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
               {/* Current Password */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
-                  Current Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showCurrentPassword ? "text" : "password"}
-                    value={passwordForm.currentPassword}
-                    onChange={(e) =>
-                      handlePasswordChange("currentPassword", e.target.value)
-                    }
-                    className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    placeholder="Enter your current password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
-                  >
-                    {showCurrentPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
+              <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+                Current Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={passwordForm.currentPassword}
+                  onChange={(e) =>
+                    handlePasswordChange("currentPassword", e.target.value)
+                  }
+                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="Enter your current password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
 
               {/* New Password */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
-                  New Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={passwordForm.newPassword}
-                    onChange={(e) =>
-                      handlePasswordChange("newPassword", e.target.value)
-                    }
-                    className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    placeholder="Enter your new password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
-                  >
-                    {showNewPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
+              <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+                New Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  value={passwordForm.newPassword}
+                  onChange={(e) =>
+                    handlePasswordChange("newPassword", e.target.value)
+                  }
+                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="Enter your new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
 
               {/* Confirm Password */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Confirm New Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={passwordForm.confirmPassword}
-                    onChange={(e) =>
-                      handlePasswordChange("confirmPassword", e.target.value)
-                    }
-                    className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    placeholder="Confirm your new password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-                {passwordForm.confirmPassword &&
-                  passwordForm.newPassword !== passwordForm.confirmPassword && (
-                    <p className="mt-1 text-sm text-status-danger font-roboto">
-                      Passwords do not match
-                    </p>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                Confirm New Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) =>
+                    handlePasswordChange("confirmPassword", e.target.value)
+                  }
+                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  placeholder="Confirm your new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
                   )}
+                </button>
               </div>
+              {passwordForm.confirmPassword &&
+                passwordForm.newPassword !== passwordForm.confirmPassword && (
+                  <p className="text-sm text-status-danger font-roboto">
+                    Passwords do not match
+                  </p>
+                )}
 
               {/* Submit Button */}
               <button
@@ -336,7 +318,7 @@ const AdminSetting = () => {
         )}
 
         {activeTab === "profile" && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
               <User className="w-6 h-6 text-text-primary" />
               <h2 className="text-xl font-semibold text-text-primary font-roboto">

@@ -272,10 +272,6 @@ const OrganizationUsers = () => {
 
       <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
         <div className="flex items-start flex-col md:items-center md:flex-row gap-4 w-full md:w-auto">
-          <h1 className="text-2xl font-bold text-text-primary font-roboto">
-            Organization Users
-          </h1>
-
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
             ref={organizationDropdownRef}

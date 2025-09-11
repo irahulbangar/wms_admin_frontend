@@ -48,25 +48,19 @@ const Users = () => {
         <Loader />
       ) : (
         <>
-          <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
-            <h1 className="text-2xl font-bold text-text-primary font-roboto">
-              Admin Users
-            </h1>
-
-            <div className="flex items-center gap-4 w-full md:w-auto">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
-                <PlusCircle className="w-4 h-4" />
-                Add User
-              </button>
+          <div className="flex items-center md:justify-end justify-center gap-4 w-full md:w-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
+              <input
+                type="text"
+                placeholder="Search users..."
+                className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
             </div>
+            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
+              <PlusCircle className="w-4 h-4" />
+              Add User
+            </button>
           </div>
 
           <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">

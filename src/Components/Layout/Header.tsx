@@ -12,7 +12,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { logout } from "../../../store/adminSlice";
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Success } from "../../utils/toast";
 
 interface HeaderProps {
@@ -26,6 +26,41 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { admin } = useAppSelector((state) => state.admin);
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Function to get dynamic title based on current route
+  const getPageTitle = () => {
+    const path = location.pathname;
+
+    // Route to title mapping
+    const routeTitles: { [key: string]: string } = {
+      "/": "Dashboard",
+      "/dashboard": "Dashboard",
+      "/profile": "Profile",
+      "/organization": "Organizations",
+      "/organization/plants": "Plants",
+      "/organization/devices": "Devices",
+      "/organization/users": "Organization Users",
+      "/admin-users": "Admin Users",
+      "/diagram": "Diagram",
+      "/admin-setting": "Admin Settings",
+      "/organization/setting": "Organization Settings",
+    };
+
+    // Check for dynamic routes with parameters
+    if (path.includes("/organization/") && path.includes("/devices")) {
+      return "Devices";
+    }
+    if (path.includes("/organization/") && path.includes("/users")) {
+      return "Organization Users";
+    }
+    if (path.includes("/organization/") && path.includes("/plants")) {
+      return "Plants";
+    }
+
+    // Return mapped title or default to 'Dashboard'
+    return routeTitles[path] || "Dashboard";
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -65,9 +100,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="hidden md:block">
+        <div className="block">
           <h1 className="text-2xl font-black text-text-primary font-roboto">
-            Dashboard
+            {getPageTitle()}
           </h1>
         </div>
       </div>

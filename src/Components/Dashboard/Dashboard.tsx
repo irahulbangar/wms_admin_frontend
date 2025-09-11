@@ -163,33 +163,23 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="h-full w-full">
+    <>
       {isLoading ? (
         <div className="flex items-center justify-center h-full bg-primary rounded-lg">
           <Loader2 className="w-12 h-12 text-text-primary animate-spin" />
         </div>
       ) : (
         <div className="flex flex-col gap-4 w-full">
-          <div className="flex items-start md:items-center md:justify-between justify-center w-full md:gap-4 gap-2 md:flex-row flex-col">
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary font-roboto">
-                Dashboard
-              </h1>
-              <p className="text-text-secondary font-roboto">
-                Welcome back! Here's what's happening with your WMS today.
-              </p>
+          <div className="flex items-center md:justify-end justify-center space-x-3">
+            <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
+              <Calendar className="w-5 h-5 text-text-secondary" />
+              <span>{currentTime.toLocaleDateString()}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
-                <Calendar className="w-5 h-5 text-text-secondary" />
-                <span>{currentTime.toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
-                <Clock className="w-5 h-5 text-text-secondary" />
-                <span className="font-roboto font-semibold text-base">
-                  {currentTime.toLocaleTimeString()}
-                </span>
-              </div>
+            <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
+              <Clock className="w-5 h-5 text-text-secondary" />
+              <span className="font-roboto font-semibold text-base">
+                {currentTime.toLocaleTimeString()}
+              </span>
             </div>
           </div>
 
@@ -218,7 +208,7 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
