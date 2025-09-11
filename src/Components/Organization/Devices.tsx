@@ -857,7 +857,7 @@ const Devices = () => {
                   </div>
 
                   {!collapsedDepartments?.has(deptId) && (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-auto">
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                           <tr>
@@ -924,13 +924,7 @@ const Devices = () => {
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                                {
-                                  deviceType?.find(
-                                    (dt) =>
-                                      dt?.device_type_id ===
-                                      device?.device_type_id
-                                  )?.topic
-                                }
+                                {device?.device_type}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 <span

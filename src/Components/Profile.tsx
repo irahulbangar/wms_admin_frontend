@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import { useAppSelector } from "../../store/store";
 import {
   User,
   Mail,
