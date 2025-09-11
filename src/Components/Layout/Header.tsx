@@ -138,7 +138,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 {admin?.name}
               </p>
               <p className="text-sm text-text-secondary font-roboto">
-                {admin?.role}
+                {admin?.role === "admin" ? "Admin" : "Super Admin"}
               </p>
             </div>
             <ChevronDown
