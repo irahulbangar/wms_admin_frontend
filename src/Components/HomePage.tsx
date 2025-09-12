@@ -135,7 +135,7 @@ const HomePage = () => {
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-input-bg p-4 space-y-4">
             {renderContent()}
           </main>
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </div>
     </div>
