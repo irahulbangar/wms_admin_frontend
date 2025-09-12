@@ -151,15 +151,17 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           status: "active",
         };
 
-        const result = await dispatch(updateAdminProfile(updateData)).unwrap();
-
-        if (result.success) {
-          Success("Admin updated successfully!");
-          onSuccess();
-          onClose();
-        } else {
-          Error(result.message || "Failed to update admin");
-        }
+        dispatch(updateAdminProfile(updateData))
+          .unwrap()
+          .then((result) => {
+            if (result.success) {
+              Success("Admin updated successfully!");
+              onSuccess();
+              onClose();
+            } else {
+              Error(result.message || "Failed to update admin");
+            }
+          });
       } else {
         const createData = {
           id: "",
@@ -173,15 +175,17 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           status: "active",
         };
 
-        const result = await dispatch(addAdminUser(createData)).unwrap();
-
-        if (result.success) {
-          Success("Admin created successfully!");
-          onSuccess();
-          onClose();
-        } else {
-          Error(result.message || "Failed to create admin");
-        }
+        dispatch(addAdminUser(createData))
+          .unwrap()
+          .then((result) => {
+            if (result.success) {
+              Success("Admin created successfully!");
+              onSuccess();
+              onClose();
+            } else {
+              Error(result.message || "Failed to create admin");
+            }
+          });
       }
     } catch (error) {
       console.error("Admin operation error:", error);
@@ -320,8 +324,6 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
                 <option value="">Select role</option>
                 <option value="admin">Admin</option>
                 <option value="super_admin">Super Admin</option>
-                <option value="manager">Manager</option>
-                <option value="user">User</option>
               </select>
             </div>
             <div className="flex justify-end space-x-3 pt-4">
