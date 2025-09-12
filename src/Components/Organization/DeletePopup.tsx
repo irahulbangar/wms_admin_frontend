@@ -50,19 +50,17 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
         <div className="flex items-center justify-end gap-3 p-6 border-t border-border-primary">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-text-primary bg-primary border border-border-primary rounded-lg hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-roboto"
+            className="px-4 py-2 text-text-primary bg-primary border border-border-primary rounded-lg hover:bg-primary/80 transition-colors cursor-pointer font-roboto"
           >
             Cancel
           </button>
 
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-roboto"
+            className="px-4 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-lg transition-colors flex items-center gap-2 font-roboto cursor-pointer"
           >
-            <>
-              <Trash2 className="w-4 h-4" />
-              Delete
-            </>
+            <Trash2 className="w-4 h-4" />
+            Delete
           </button>
         </div>
       </div>
