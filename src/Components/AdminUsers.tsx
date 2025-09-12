@@ -1,5 +1,6 @@
 import { Search, PlusCircle, User, SquarePen, Trash2 } from "lucide-react";
 import NoDataFound from "./NoDataFound";
+import AddUpdateAdmin from "./AddUpdateAdmin";
 import { useAppDispatch } from "../../store/store";
 import type {
   AdminUsers,
@@ -15,6 +16,9 @@ const Users = () => {
   const dispatch = useAppDispatch();
   const [users, setUsers] = useState<AdminUsers[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
+  const [type, setType] = useState<string>("add");
 
   useEffect(() => {
     setLoading(true);
@@ -35,11 +39,43 @@ const Users = () => {
   }, []);
 
   const handleEditUser = (id: string) => {
-    console.log(id);
+    setSelectedAdminId(id);
+    setType("update");
+    setIsModalOpen(true);
   };
 
   const handleDeleteUser = (id: string) => {
     console.log(id);
+  };
+
+  const handleAddUser = () => {
+    setSelectedAdminId(null);
+    setType("add");
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setType("add");
+    setIsModalOpen(false);
+    setSelectedAdminId(null);
+  };
+
+  const handleModalSuccess = () => {
+    setLoading(true);
+    dispatch(getAllUsers())
+      .unwrap()
+      .then((res: AdminUsersResponse) => {
+        if (res.success) {
+          setUsers(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
@@ -57,7 +93,10 @@ const Users = () => {
                 className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto">
+            <button
+              onClick={handleAddUser}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+            >
               <PlusCircle className="w-4 h-4" />
               Add User
             </button>
@@ -160,7 +199,7 @@ const Users = () => {
                         title="No users found"
                         description="Add your first user to get started"
                         buttonText="Add User"
-                        buttonOnClick={() => {}}
+                        buttonOnClick={handleAddUser}
                       />
                     </td>
                   </tr>
@@ -170,6 +209,15 @@ const Users = () => {
           </div>
         </>
       )}
+
+      {/* Add/Update Admin Modal */}
+      <AddUpdateAdmin
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        adminId={selectedAdminId}
+        onSuccess={handleModalSuccess}
+        type={type}
+      />
     </div>
   );
 };
