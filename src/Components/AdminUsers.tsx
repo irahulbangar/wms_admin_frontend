@@ -17,7 +17,6 @@ import type {
 import { useEffect, useState } from "react";
 import { getAllUsers, deleteAdminUser } from "../../store/adminSlice";
 import { Error, Success } from "../utils/toast";
-import Loader from "./Loader";
 import { fromatDateWithTime, handleStatus } from "../utils/utils";
 import Pagination from "./Pagination";
 

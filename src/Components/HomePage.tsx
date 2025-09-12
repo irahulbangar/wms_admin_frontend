@@ -1,6 +1,5 @@
 import Sidebar from "./Layout/Sidebar";
 import Header from "./Layout/Header";
-import Footer from "./Layout/Footer";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/store";
