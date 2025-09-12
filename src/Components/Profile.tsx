@@ -1,19 +1,9 @@
-import { useState } from "react";
 import { useAppSelector } from "../../store/store";
 import { User, Mail, Phone, MapPin, Calendar } from "lucide-react";
 import { fromatDateWithTime } from "../utils/utils";
 
 const Profile: React.FC = () => {
   const { admin } = useAppSelector((state) => state.admin);
-  const [formData, setFormData] = useState({
-    name: admin?.name || "",
-    email: admin?.email || "",
-    phone: admin?.contact_number || "",
-    location: admin?.location || "",
-    role: admin?.role || "",
-    department: admin?.department || "",
-    joinDate: admin?.created_at || "",
-  });
 
   return (
     <div className="max-w-full">
@@ -34,28 +24,30 @@ const Profile: React.FC = () => {
                 <User className="w-12 h-12 text-white" />
               </div>
               <h2 className="text-xl font-semibold text-text-primary font-roboto">
-                {formData.name}
+                {admin?.name}
               </h2>
-              <p className="text-text-secondary font-roboto">{formData.role}</p>
+              <p className="text-text-secondary font-roboto">{admin?.role}</p>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center text-text-secondary font-roboto">
                 <Mail className="w-4 h-4 mr-3" />
-                <span className="text-sm font-roboto">{formData.email}</span>
+                <span className="text-sm font-roboto">{admin?.email}</span>
               </div>
               <div className="flex items-center text-text-secondary font-roboto">
                 <Phone className="w-4 h-4 mr-3" />
-                <span className="text-sm font-roboto">{formData.phone}</span>
+                <span className="text-sm font-roboto">
+                  {admin?.contact_number}
+                </span>
               </div>
               <div className="flex items-center text-text-secondary font-roboto">
                 <MapPin className="w-4 h-4 mr-3" />
-                <span className="text-sm font-roboto">{formData.location}</span>
+                <span className="text-sm font-roboto">{admin?.location}</span>
               </div>
               <div className="flex items-center text-text-secondary font-roboto">
                 <Calendar className="w-4 h-4 mr-3" />
                 <span className="text-sm font-roboto">
-                  Joined {fromatDateWithTime(formData.joinDate)}
+                  Joined {fromatDateWithTime(admin?.created_at || "")}
                 </span>
               </div>
             </div>
@@ -77,10 +69,7 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  value={admin?.name}
                   className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                 />
               </div>
@@ -91,10 +80,7 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  value={admin?.email}
                   className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                 />
               </div>
@@ -105,10 +91,7 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="tel"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
+                  value={admin?.contact_number}
                   className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                 />
               </div>
@@ -119,10 +102,7 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
+                  value={admin?.location}
                   className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                 />
               </div>
@@ -133,10 +113,7 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.department}
-                  onChange={(e) =>
-                    setFormData({ ...formData, department: e.target.value })
-                  }
+                  value={admin?.department}
                   className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
                 />
               </div>
@@ -147,10 +124,7 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
-                  }
+                  value={admin?.role}
                   className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary capitalize"
                 />
               </div>

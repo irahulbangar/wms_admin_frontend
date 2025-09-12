@@ -6,7 +6,6 @@ import type { AdminUsersResponse } from "../model/admin-users.interface";
 // Extend JwtPayload to include custom properties
 interface CustomJwtPayload {
   exp?: number;
-  admin_id?: string;
   email?: string;
   name?: string;
   role?: string;
@@ -18,7 +17,7 @@ interface CustomJwtPayload {
 }
 
 interface Admin {
-  admin_id: string;
+  id: string;
   email: string;
   name?: string;
   role?: string;
@@ -132,7 +131,6 @@ export const loginAdmin = createAsyncThunk(
         localStorage.setItem("accessToken", response.data.token);
         const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
         const admin = {
-          admin_id: decodedToken.admin_id,
           email: decodedToken.email,
           name: decodedToken.name,
           role: decodedToken.role,
@@ -176,13 +174,13 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// update admin profile
-export const updateAdminProfile = createAsyncThunk(
-  "admin/update-profile",
+// Add admin user
+export const addAdminUser = createAsyncThunk(
+  "admin/addAdminUser",
   async (data: Admin, thunkAPI) => {
     try {
-      const response = await api().put<AdminResponse>(
-        `/admin/update-profile`,
+      const response = await api().post<AdminResponse>(
+        "/admin/register",
         data,
         {
           headers: {
@@ -190,15 +188,59 @@ export const updateAdminProfile = createAsyncThunk(
           },
         }
       );
-      if (response.data.success) {
-        localStorage.setItem("admin", JSON.stringify(response.data.admin));
-        thunkAPI.dispatch(setAdmin(response.data.admin));
-        thunkAPI.dispatch(setToken(localStorage.getItem("accessToken") || ""));
-      }
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add admin user";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+interface UpdateAdminProfilePayload extends Admin {
+  id: string;
+}
+
+// update admin profile
+export const updateAdminProfile = createAsyncThunk(
+  "admin/update-profile",
+  async (data: UpdateAdminProfilePayload, thunkAPI) => {
+    try {
+      const response = await api().put<AdminResponse>(
+        `/admin/update-profile/${data.id}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to update profile";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// get admin by id
+export const getAdminById = createAsyncThunk(
+  "admin/getAdminById",
+  async (id: string, thunkAPI) => {
+    try {
+      const response = await api().get<AdminResponse>(
+        `/admin/get-admin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to get admin";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
