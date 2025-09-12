@@ -45,25 +45,28 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
     password: "",
   });
 
+  console.log("adminId", adminId);
+
   useEffect(() => {
     if (adminId && isOpen) {
       setIsLoading(true);
       dispatch(getAdminById(adminId))
         .unwrap()
-        .then((response) => {
-          if (response.success && response.admin) {
-            const adminData = response.admin;
+        .then((res) => {
+          console.log("res", res);
+          if (res.success) {
+            const adminData = res.data;
             setFormData({
-              name: adminData.name || "",
-              email: adminData.email || "",
-              contact_number: adminData.contact_number || "",
-              location: adminData.location || "",
-              department: adminData.department || "",
-              role: adminData.role || "",
+              name: adminData[0].name || "",
+              email: adminData[0].email || "",
+              contact_number: adminData[0].contact_number || "",
+              location: adminData[0].location || "",
+              department: adminData[0].department || "",
+              role: adminData[0].role || "",
               password: "",
             });
           } else {
-            console.error("Invalid response structure:", response);
+            console.error("Invalid response structure:", res);
             Error("Invalid admin data received");
           }
         })
@@ -204,7 +207,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card border border-border-primary rounded-xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-card border border-border-primary rounded-xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto h-full">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
             {type === "update" ? "Update Admin" : "Add Admin"}
@@ -217,139 +220,126 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </button>
         </div>
 
-        {isLoading && type === "update" ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-            <span className="ml-2 text-text-secondary">
-              Loading admin data...
-            </span>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Full Name
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+              placeholder="Enter full name"
+            />
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Email
+            </label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+              placeholder="Enter email address"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              value={formData.contact_number}
+              onChange={(e) =>
+                handleInputChange("contact_number", e.target.value)
+              }
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+              placeholder="Enter phone number"
+            />
+          </div>
+
+          {type === "add" && (
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                Full Name
+                Password
               </label>
               <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleInputChange("password", e.target.value)}
                 className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-                placeholder="Enter full name"
+                placeholder="Enter password"
               />
             </div>
+          )}
 
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-                placeholder="Enter email address"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Location
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => handleInputChange("location", e.target.value)}
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+              placeholder="Enter location"
+            />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={formData.contact_number}
-                onChange={(e) =>
-                  handleInputChange("contact_number", e.target.value)
-                }
-                className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-                placeholder="Enter phone number"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Department
+            </label>
+            <input
+              type="text"
+              value={formData.department}
+              onChange={(e) => handleInputChange("department", e.target.value)}
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+              placeholder="Enter department"
+            />
+          </div>
 
-            {type === "add" && (
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    handleInputChange("password", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-                  placeholder="Enter password"
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                Location
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => handleInputChange("location", e.target.value)}
-                className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-                placeholder="Enter location"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                Department
-              </label>
-              <input
-                type="text"
-                value={formData.department}
-                onChange={(e) =>
-                  handleInputChange("department", e.target.value)
-                }
-                className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-                placeholder="Enter department"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                Role
-              </label>
-              <select
-                value={formData.role}
-                onChange={(e) => handleInputChange("role", e.target.value)}
-                className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-              >
-                <option value="">Select role</option>
-                <option value="admin">Admin</option>
-                <option value="super_admin">Super Admin</option>
-              </select>
-            </div>
-            <div className="flex justify-end space-x-3 pt-4">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors font-roboto cursor-pointer"
-                disabled={isLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg cursor-pointer transition-colors flex items-center font-roboto disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4 mr-2" />
-                )}
-                {type === "update" ? "Update Admin" : "Add Admin"}
-              </button>
-            </div>
-          </form>
-        )}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Role
+            </label>
+            <select
+              value={formData.role}
+              onChange={(e) => handleInputChange("role", e.target.value)}
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+            >
+              <option value="">Select role</option>
+              <option value="admin">Admin</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors font-roboto cursor-pointer"
+              disabled={isLoading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg cursor-pointer transition-colors flex items-center font-roboto disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              {type === "update" ? "Update Admin" : "Add Admin"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

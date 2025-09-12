@@ -229,8 +229,8 @@ export const getAdminById = createAsyncThunk(
   "admin/getAdminById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get<AdminResponse>(
-        `/admin/get-admin/${id}`,
+      const response = await api().get<AdminUsersResponse>(
+        `/admin/get-profile/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

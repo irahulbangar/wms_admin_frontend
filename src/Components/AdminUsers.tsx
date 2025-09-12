@@ -19,6 +19,7 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
   const [type, setType] = useState<string>("add");
+  console.log("selectedAdminId", users);
 
   useEffect(() => {
     setLoading(true);
@@ -139,7 +140,7 @@ const Users = () => {
                 {users?.length > 0 ? (
                   users?.map((user, index) => (
                     <tr
-                      key={user?.id}
+                      key={user?.admin_id}
                       className="border-b border-border-primary bg-primary hover:bg-secondary"
                     >
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
@@ -175,11 +176,11 @@ const Users = () => {
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center gap-3 justify-center">
                           <SquarePen
-                            onClick={() => handleEditUser(user?.id)}
+                            onClick={() => handleEditUser(user?.admin_id)}
                             className="w-5 h-5 text-status-info cursor-pointer"
                           />
                           <Trash2
-                            onClick={() => handleDeleteUser(user?.id)}
+                            onClick={() => handleDeleteUser(user?.admin_id)}
                             className="w-5 h-5 text-status-danger cursor-pointer"
                           />
                         </div>
@@ -210,7 +211,6 @@ const Users = () => {
         </>
       )}
 
-      {/* Add/Update Admin Modal */}
       <AddUpdateAdmin
         isOpen={isModalOpen}
         onClose={handleModalClose}
