@@ -822,7 +822,7 @@ const Devices = () => {
                 department?.department_name.trim() || `Department ${deptId}`;
 
               return (
-                <Fragment key={deptId}>
+                <div className="mb-2" key={deptId}>
                   <div className="bg-primary px-4 py-3 border-b border-border-primary flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button
@@ -964,7 +964,7 @@ const Devices = () => {
                       </table>
                     </div>
                   )}
-                </Fragment>
+                </div>
               );
             })
           ) : (
