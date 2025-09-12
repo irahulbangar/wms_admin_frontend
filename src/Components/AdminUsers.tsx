@@ -12,6 +12,7 @@ import { getAllUsers, deleteAdminUser } from "../../store/adminSlice";
 import { Error, Success } from "../utils/toast";
 import Loader from "./Loader";
 import { fromatDateWithTime, handleStatus } from "../utils/utils";
+import Pagination from "./Pagination";
 
 const Users = () => {
   const dispatch = useAppDispatch();
@@ -25,6 +26,19 @@ const Users = () => {
   const [selectedUserForDelete, setSelectedUserForDelete] =
     useState<AdminUsers | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const totalItems = users.length;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (rowsPerPage: number) => {
+    setRowsPerPage(rowsPerPage);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -42,7 +56,7 @@ const Users = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [rowsPerPage]);
 
   const handleEditUser = (id: string) => {
     setSelectedAdminId(id);
@@ -253,6 +267,15 @@ const Users = () => {
                 )}
               </tbody>
             </table>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              rowsPerPage={rowsPerPage}
+              totalItems={totalItems}
+              selectedRows={totalItems}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
           </div>
         </>
       )}
