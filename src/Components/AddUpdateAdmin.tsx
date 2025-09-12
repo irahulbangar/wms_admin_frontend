@@ -269,6 +269,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
             </label>
             <input
               type="text"
+              name="location"
               value={formData.location}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"

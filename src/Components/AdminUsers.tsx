@@ -1,4 +1,11 @@
-import { Search, PlusCircle, User, SquarePen, Trash2 } from "lucide-react";
+import {
+  Search,
+  PlusCircle,
+  User,
+  SquarePen,
+  Trash2,
+  Loader2,
+} from "lucide-react";
 import NoDataFound from "./NoDataFound";
 import AddUpdateAdmin from "./AddUpdateAdmin";
 import DeleteAdminPopup from "./DeleteAdminPopup";
@@ -28,16 +35,21 @@ const Users = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
 
   const totalItems = users.length;
+  const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedUsers = users.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleRowsPerPageChange = (rowsPerPage: number) => {
-    setRowsPerPage(rowsPerPage);
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -56,7 +68,7 @@ const Users = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [rowsPerPage]);
+  }, []);
 
   const handleEditUser = (id: string) => {
     setSelectedAdminId(id);
@@ -139,31 +151,32 @@ const Users = () => {
 
   return (
     <div className="flex flex-col gap-4 h-full relative">
+      <div className="flex items-center md:justify-end justify-center gap-4 w-full md:w-auto">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
+          <input
+            type="text"
+            placeholder="Search users..."
+            className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+        <button
+          onClick={handleAddUser}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <PlusCircle className="w-4 h-4" />
+          Add User
+        </button>
+      </div>
       {loading ? (
-        <Loader />
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+          <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+        </div>
       ) : (
-        <>
-          <div className="flex items-center md:justify-end justify-center gap-4 w-full md:w-auto">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              onClick={handleAddUser}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
-            >
-              <PlusCircle className="w-4 h-4" />
-              Add User
-            </button>
-          </div>
-
-          <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
+        <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
+          <div className="overflow-auto h-[calc(100vh-245px)]">
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
-              <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+              <thead className="text-xs text-text-primary uppercase border-b border-border-primary sticky top-0 z-20 shadow-sm">
                 <tr>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                     Sr No
@@ -195,14 +208,14 @@ const Users = () => {
                 </tr>
               </thead>
               <tbody>
-                {users?.length > 0 ? (
-                  users?.map((user, index) => (
+                {paginatedUsers?.length > 0 ? (
+                  paginatedUsers?.map((user, index) => (
                     <tr
                       key={user?.admin_id}
-                      className="border-b border-border-primary bg-primary hover:bg-secondary"
+                      className="border-b border-border-primary hover:bg-secondary transition-colors"
                     >
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
-                        {index + 1}
+                        {startIndex + index + 1}
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap capitalize">
                         {user?.name}
@@ -250,7 +263,7 @@ const Users = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="text-center font-roboto text-text-secondary text-sm"
                     >
                       <NoDataFound
@@ -267,17 +280,17 @@ const Users = () => {
                 )}
               </tbody>
             </table>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              rowsPerPage={rowsPerPage}
-              totalItems={totalItems}
-              selectedRows={totalItems}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
           </div>
-        </>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            rowsPerPage={rowsPerPage}
+            totalItems={totalItems}
+            selectedRows={totalItems}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
+        </div>
       )}
 
       <AddUpdateAdmin
