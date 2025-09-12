@@ -6,6 +6,7 @@ import type { AdminUsersResponse } from "../model/admin-users.interface";
 // Extend JwtPayload to include custom properties
 interface CustomJwtPayload {
   exp?: number;
+  admin_id?: string;
   email?: string;
   name?: string;
   role?: string;
@@ -13,10 +14,11 @@ interface CustomJwtPayload {
   status?: string;
   created_at?: string;
   location?: string;
+  department?: string;
 }
 
 interface Admin {
-  id: string;
+  admin_id: string;
   email: string;
   name?: string;
   role?: string;
@@ -24,6 +26,13 @@ interface Admin {
   status?: string;
   created_at?: string;
   location?: string;
+  department?: string;
+}
+
+interface AdminResponse {
+  success: boolean;
+  admin: Admin;
+  message: string;
 }
 
 interface LoginResponse {
@@ -123,11 +132,15 @@ export const loginAdmin = createAsyncThunk(
         localStorage.setItem("accessToken", response.data.token);
         const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
         const admin = {
+          admin_id: decodedToken.admin_id,
           email: decodedToken.email,
           name: decodedToken.name,
           role: decodedToken.role,
           contact_number: decodedToken.contact_number,
           status: decodedToken.status,
+          created_at: decodedToken.created_at,
+          location: decodedToken.location,
+          department: decodedToken.department,
         };
         localStorage.setItem("admin", JSON.stringify(admin));
         thunkAPI.dispatch(setAdmin(admin));
@@ -158,6 +171,34 @@ export const getAllUsers = createAsyncThunk(
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to fetch users";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// update admin profile
+export const updateAdminProfile = createAsyncThunk(
+  "admin/update-profile",
+  async (data: Admin, thunkAPI) => {
+    try {
+      const response = await api().put<AdminResponse>(
+        `/admin/update-profile`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        localStorage.setItem("admin", JSON.stringify(response.data.admin));
+        thunkAPI.dispatch(setAdmin(response.data.admin));
+        thunkAPI.dispatch(setToken(localStorage.getItem("accessToken") || ""));
+      }
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update profile";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
