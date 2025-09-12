@@ -5,7 +5,7 @@ import {
   getAdminById,
   updateAdminProfile,
 } from "../../store/adminSlice";
-import { X, Save, Loader2 } from "lucide-react";
+import { X, Save } from "lucide-react";
 import { Success, Error } from "../utils/toast";
 import type { CreateAdminPayload } from "../../store/adminSlice";
 
@@ -25,7 +25,6 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
   type,
 }) => {
   const dispatch = useAppDispatch();
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<CreateAdminPayload>({
     name: "",
     email: "",
@@ -39,7 +38,6 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
 
   useEffect(() => {
     if (adminId && isOpen) {
-      setIsLoading(true);
       dispatch(getAdminById(adminId))
         .unwrap()
         .then((res) => {
@@ -63,9 +61,6 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
         .catch((error) => {
           console.error("Error fetching admin:", error.message);
           Error("Failed to load admin data");
-        })
-        .finally(() => {
-          setIsLoading(false);
         });
     } else {
       resetForm();
@@ -134,7 +129,6 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
     try {
       if (type === "update" && adminId) {
         const updateData = {
@@ -187,8 +181,6 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
     } catch (error) {
       console.error("Admin operation error:", error);
       Error("Operation failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 

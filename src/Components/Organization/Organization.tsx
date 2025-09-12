@@ -8,6 +8,7 @@ import {
   X,
   Loader2,
   Eye,
+  Trash2,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -39,6 +40,8 @@ const Organization = () => {
   const [filteredOrganizations, setFilteredOrganizations] = useState<
     OrganizationResult[]
   >([]);
+  const { admin } = useAppSelector((state) => state.admin);
+  const [organizationTitle, setOrganizationTitle] = useState("");
 
   const refreshOrganizations = () => {
     if (isLoading) return;
@@ -168,6 +171,20 @@ const Organization = () => {
 
   const handleViewPlants = (organizationId: string) => {
     navigate(`/organization/plants/${organizationId}`);
+  };
+
+  const handleDeleteOrganization = (organizationId: string) => {
+    setShowDeletePopup(true);
+    setOrganizationToDelete(
+      organizations.find(
+        (org) => org.organization_id.toString() === organizationId
+      ) || null
+    );
+    setOrganizationTitle(
+      organizations.find(
+        (org) => org.organization_id.toString() === organizationId
+      )?.organization_name || ""
+    );
   };
 
   return (
@@ -313,6 +330,17 @@ const Organization = () => {
                           }
                           className="w-5 h-5 text-status-info cursor-pointer"
                         />
+
+                        {admin?.role === "super_admin" && (
+                          <Trash2
+                            className="w-5 h-5 text-status-danger cursor-pointer"
+                            onClick={() =>
+                              handleDeleteOrganization(
+                                organization?.organization_id.toString()
+                              )
+                            }
+                          />
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -363,8 +391,7 @@ const Organization = () => {
           onClose={handleDeletePopupClose}
           onConfirm={handleConfirmDelete}
           organization={organizationToDelete}
-          isLoading={isLoading}
-          title="Organization"
+          title={organizationTitle}
         />
       )}
 
