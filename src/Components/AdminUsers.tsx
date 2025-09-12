@@ -19,7 +19,6 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
   const [type, setType] = useState<string>("add");
-  console.log("selectedAdminId", users);
 
   useEffect(() => {
     setLoading(true);

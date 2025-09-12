@@ -7,6 +7,7 @@ import {
 } from "../../store/adminSlice";
 import { X, Save, Loader2 } from "lucide-react";
 import { Success, Error } from "../utils/toast";
+import type { CreateAdminPayload } from "../../store/adminSlice";
 
 interface AddUpdateAdminProps {
   isOpen: boolean;
@@ -14,16 +15,6 @@ interface AddUpdateAdminProps {
   adminId?: string | null;
   onSuccess: () => void;
   type: string;
-}
-
-interface FormData {
-  name: string;
-  email: string;
-  contact_number: string;
-  location: string;
-  department: string;
-  role: string;
-  password: string;
 }
 
 const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
@@ -35,7 +26,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CreateAdminPayload>({
     name: "",
     email: "",
     contact_number: "",
@@ -43,9 +34,8 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
     department: "",
     role: "",
     password: "",
+    status: "active",
   });
-
-  console.log("adminId", adminId);
 
   useEffect(() => {
     if (adminId && isOpen) {
@@ -53,25 +43,25 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
       dispatch(getAdminById(adminId))
         .unwrap()
         .then((res) => {
-          console.log("res", res);
           if (res.success) {
             const adminData = res.data;
             setFormData({
-              name: adminData[0].name || "",
-              email: adminData[0].email || "",
-              contact_number: adminData[0].contact_number || "",
-              location: adminData[0].location || "",
-              department: adminData[0].department || "",
-              role: adminData[0].role || "",
+              name: adminData.name || "",
+              email: adminData.email || "",
+              contact_number: adminData.contact_number || "",
+              location: adminData.location || "",
+              department: adminData.department || "",
+              role: adminData.role || "",
               password: "",
+              status: adminData.status || "active",
             });
           } else {
-            console.error("Invalid response structure:", res);
+            console.error("Invalid response structure:", res.message);
             Error("Invalid admin data received");
           }
         })
         .catch((error) => {
-          console.error("Error fetching admin:", error);
+          console.error("Error fetching admin:", error.message);
           Error("Failed to load admin data");
         })
         .finally(() => {
@@ -91,13 +81,17 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
       department: "",
       role: "",
       password: "",
+      status: "",
     });
   };
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev: CreateAdminPayload) => ({
       ...prev,
-      [field]: value,
+      [name]: value,
     }));
   };
 
@@ -151,14 +145,15 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           location: formData.location,
           department: formData.department,
           role: formData.role,
-          status: "active",
+          status: formData.status,
+          password: formData.password || "",
         };
 
         dispatch(updateAdminProfile(updateData))
           .unwrap()
           .then((result) => {
             if (result.success) {
-              Success("Admin updated successfully!");
+              Success(result.message || "Admin updated successfully!");
               onSuccess();
               onClose();
             } else {
@@ -167,7 +162,6 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           });
       } else {
         const createData = {
-          id: "",
           name: formData.name,
           email: formData.email,
           contact_number: formData.contact_number,
@@ -182,7 +176,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           .unwrap()
           .then((result) => {
             if (result.success) {
-              Success("Admin created successfully!");
+              Success(result.message || "Admin created successfully!");
               onSuccess();
               onClose();
             } else {
@@ -227,8 +221,9 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
             </label>
             <input
               type="text"
+              name="name"
               value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
               placeholder="Enter full name"
             />
@@ -240,8 +235,9 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
             </label>
             <input
               type="email"
+              name="email"
               value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
               placeholder="Enter email address"
             />
@@ -253,40 +249,38 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
             </label>
             <input
               type="tel"
+              name="contact_number"
               value={formData.contact_number}
-              onChange={(e) =>
-                handleInputChange("contact_number", e.target.value)
-              }
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
               placeholder="Enter phone number"
             />
           </div>
 
-          {type === "add" && (
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-                Password
-              </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-                placeholder="Enter password"
-              />
-            </div>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+              placeholder="Enter password"
+            />
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
-              Location
+              Address
             </label>
             <input
               type="text"
               value={formData.location}
-              onChange={(e) => handleInputChange("location", e.target.value)}
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
-              placeholder="Enter location"
+              placeholder="Enter address"
             />
           </div>
 
@@ -296,8 +290,9 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
             </label>
             <input
               type="text"
+              name="department"
               value={formData.department}
-              onChange={(e) => handleInputChange("department", e.target.value)}
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
               placeholder="Enter department"
             />
@@ -308,8 +303,9 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               Role
             </label>
             <select
+              name="role"
               value={formData.role}
-              onChange={(e) => handleInputChange("role", e.target.value)}
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
             >
               <option value="">Select role</option>
@@ -317,6 +313,22 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               <option value="super_admin">Super Admin</option>
             </select>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"

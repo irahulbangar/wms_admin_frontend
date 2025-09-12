@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import { jwtDecode } from "jwt-decode";
 import type { AdminUsersResponse } from "../model/admin-users.interface";
+import type { SingleAdminResponse } from "../model/single-admin.interface";
 
 // Extend JwtPayload to include custom properties
 interface CustomJwtPayload {
@@ -26,12 +27,6 @@ interface Admin {
   created_at?: string;
   location?: string;
   department?: string;
-}
-
-interface AdminResponse {
-  success: boolean;
-  admin: Admin;
-  message: string;
 }
 
 interface LoginResponse {
@@ -174,10 +169,28 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
+// Interface for creating admin user
+export interface CreateAdminPayload {
+  name: string;
+  email: string;
+  contact_number: string;
+  location: string;
+  department: string;
+  role: string;
+  password: string;
+  status: string;
+}
+
+export interface AdminResponse {
+  success: boolean;
+  admin: CreateAdminPayload;
+  message: string;
+}
+
 // Add admin user
 export const addAdminUser = createAsyncThunk(
   "admin/addAdminUser",
-  async (data: Admin, thunkAPI) => {
+  async (data: CreateAdminPayload, thunkAPI) => {
     try {
       const response = await api().post<AdminResponse>(
         "/admin/register",
@@ -197,7 +210,7 @@ export const addAdminUser = createAsyncThunk(
   }
 );
 
-interface UpdateAdminProfilePayload extends Admin {
+export interface UpdateAdminProfilePayload extends CreateAdminPayload {
   id: string;
 }
 
@@ -229,7 +242,7 @@ export const getAdminById = createAsyncThunk(
   "admin/getAdminById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get<AdminUsersResponse>(
+      const response = await api().get<SingleAdminResponse>(
         `/admin/get-profile/${id}`,
         {
           headers: {
