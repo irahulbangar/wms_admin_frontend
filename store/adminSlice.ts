@@ -259,6 +259,28 @@ export const getAdminById = createAsyncThunk(
   }
 );
 
+// delete admin user
+export const deleteAdminUser = createAsyncThunk(
+  "admin/deleteAdminUser",
+  async (admin_id: string, thunkAPI) => {
+    try {
+      const response = await api().delete<SingleAdminResponse>(
+        `/admin/delete-admin/${admin_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete admin user";
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setAdmin, setToken, logout, setLoading, checkAuthStatus } =
   adminSlice.actions;
 

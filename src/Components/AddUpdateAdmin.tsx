@@ -333,21 +333,15 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors font-roboto cursor-pointer"
-              disabled={isLoading}
+              className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors font-roboto cursor-pointer bg-primary border border-border-primary rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={isLoading}
               className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg cursor-pointer transition-colors flex items-center font-roboto disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Save className="w-4 h-4 mr-2" />
-              )}
+              <Save className="w-4 h-4 mr-2" />
               {type === "update" ? "Update Admin" : "Add Admin"}
             </button>
           </div>

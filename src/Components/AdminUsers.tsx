@@ -1,14 +1,15 @@
 import { Search, PlusCircle, User, SquarePen, Trash2 } from "lucide-react";
 import NoDataFound from "./NoDataFound";
 import AddUpdateAdmin from "./AddUpdateAdmin";
-import { useAppDispatch } from "../../store/store";
+import DeleteAdminPopup from "./DeleteAdminPopup";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import type {
   AdminUsers,
   AdminUsersResponse,
 } from "../../model/admin-users.interface";
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../../store/adminSlice";
-import { Error } from "../utils/toast";
+import { getAllUsers, deleteAdminUser } from "../../store/adminSlice";
+import { Error, Success } from "../utils/toast";
 import Loader from "./Loader";
 import { fromatDateWithTime, handleStatus } from "../utils/utils";
 
@@ -19,6 +20,11 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAdminId, setSelectedAdminId] = useState<string | null>(null);
   const [type, setType] = useState<string>("add");
+  const { admin } = useAppSelector((state) => state.admin);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [selectedUserForDelete, setSelectedUserForDelete] =
+    useState<AdminUsers | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -45,7 +51,46 @@ const Users = () => {
   };
 
   const handleDeleteUser = (id: string) => {
-    console.log(id);
+    const userToDelete = users.find((user) => user.admin_id === id);
+    if (userToDelete) {
+      setSelectedUserForDelete(userToDelete);
+      setShowDeletePopup(true);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedUserForDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const result = await dispatch(
+        deleteAdminUser(selectedUserForDelete.admin_id)
+      ).unwrap();
+      if (result.success) {
+        Success("Admin user deleted successfully");
+        setLoading(true);
+        await dispatch(getAllUsers())
+          .unwrap()
+          .then((res: AdminUsersResponse) => {
+            if (res.success) {
+              setUsers(res.data);
+            }
+          });
+      }
+    } catch (err: any) {
+      console.log(err);
+      Error(err.message || "Failed to delete admin user");
+    } finally {
+      setIsDeleting(false);
+      setShowDeletePopup(false);
+      setSelectedUserForDelete(null);
+      setLoading(false);
+    }
+  };
+
+  const handleCloseDeletePopup = () => {
+    setShowDeletePopup(false);
+    setSelectedUserForDelete(null);
   };
 
   const handleAddUser = () => {
@@ -155,7 +200,7 @@ const Users = () => {
                         {user?.contact_number}
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap capitalize">
-                        {user?.role}
+                        {user?.role === "admin" ? "Admin" : "Super Admin"}
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         <span
@@ -178,10 +223,12 @@ const Users = () => {
                             onClick={() => handleEditUser(user?.admin_id)}
                             className="w-5 h-5 text-status-info cursor-pointer"
                           />
-                          <Trash2
-                            onClick={() => handleDeleteUser(user?.admin_id)}
-                            className="w-5 h-5 text-status-danger cursor-pointer"
-                          />
+                          {admin?.role === "super_admin" && (
+                            <Trash2
+                              onClick={() => handleDeleteUser(user?.admin_id)}
+                              className="w-5 h-5 text-status-danger cursor-pointer"
+                            />
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -216,6 +263,14 @@ const Users = () => {
         adminId={selectedAdminId}
         onSuccess={handleModalSuccess}
         type={type}
+      />
+
+      <DeleteAdminPopup
+        isOpen={showDeletePopup}
+        onClose={handleCloseDeletePopup}
+        onConfirm={handleConfirmDelete}
+        adminUser={selectedUserForDelete}
+        isLoading={isDeleting}
       />
     </div>
   );
