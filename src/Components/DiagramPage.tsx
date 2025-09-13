@@ -31,6 +31,7 @@ const DiagramPage = () => {
     isSaving,
     isLoadingDiagram,
     departmentDimensions,
+    setDepartmentDimensions,
     saveDiagramToAPI,
     resetDiagram,
   } = useDiagramData(projectId);
@@ -46,7 +47,6 @@ const DiagramPage = () => {
     handleMouseDown,
     handleClick,
     onNodeClick,
-    deleteKeyCode,
     multiSelectionKeyCode,
   } = useDiagramControls(setEdges, setHasChanges);
 
@@ -55,7 +55,7 @@ const DiagramPage = () => {
     showDepartmentPopup,
     handleDepartmentDimensionsChange,
     handleCloseDepartmentPopup,
-  } = useDepartmentPopup(setNodes, setHasChanges);
+  } = useDepartmentPopup(setNodes, setHasChanges, setDepartmentDimensions);
 
   // Node drag handler
   const handleNodeDragStop: NodeDragHandler = () => {
@@ -93,13 +93,21 @@ const DiagramPage = () => {
   // Edge change handler
   const handleEdgesChange = useCallback(
     (changes: any[]) => {
+      console.log("handleEdgesChange called with changes:", changes); // Debug log
       setEdges((eds) => {
         // Apply ReactFlow changes manually
-        return eds
+        const updatedEdges = eds
           .map((edge) => {
             const change = changes.find((c) => c.id === edge.id);
             if (change) {
+              console.log(
+                "Processing change for edge:",
+                edge.id,
+                "type:",
+                change.type
+              ); // Debug log
               if (change.type === "remove") {
+                console.log("Removing edge:", edge.id); // Debug log
                 return null;
               }
               if (change.type === "select") {
@@ -109,6 +117,9 @@ const DiagramPage = () => {
             return edge;
           })
           .filter((edge): edge is NonNullable<typeof edge> => edge !== null);
+
+        console.log("Edges after handleEdgesChange:", updatedEdges.length); // Debug log
+        return updatedEdges;
       });
       setHasChanges(true);
     },
@@ -145,6 +156,7 @@ const DiagramPage = () => {
             ...node.style,
             border: "3px solid #3b82f6",
             boxShadow: "0 0 15px rgba(59, 130, 246, 0.3)",
+            zIndex: 5, // Lower z-index to allow edges to be selectable inside
           },
         };
       }
@@ -163,7 +175,7 @@ const DiagramPage = () => {
           selectedEdge === edge.id
             ? "#ff0000"
             : edge.style?.stroke || "#6366f1",
-        zIndex: 10,
+        zIndex: selectedEdge === edge.id ? 50 : 25, // Very high z-index to ensure edges are above department groups
       },
       className: "react-flow__edge-clickable",
     }));
@@ -186,7 +198,7 @@ const DiagramPage = () => {
 
           <div
             className="h-full w-full p-4 relative"
-            style={{ width: "100%", height: "calc(100vh - 120px)" }}
+            style={{ width: "100%", height: "calc(100vh - 70px)" }}
           >
             {isLoadingDiagram ? (
               <div className="flex items-center justify-center h-full">
@@ -217,12 +229,19 @@ const DiagramPage = () => {
                   onSelectionChange={onSelectionChange}
                   connectionMode={ConnectionMode.Loose}
                   nodeTypes={nodeTypes}
+                  nodesDraggable={true}
+                  nodesConnectable={true}
+                  nodesFocusable={true}
                   edgesUpdatable={true}
                   edgesFocusable={true}
                   selectNodesOnDrag={false}
+                  elevateNodesOnSelect={false}
+                  elevateEdgesOnSelect={false}
+                  panOnDrag={true}
+                  panOnScroll={true}
                   fitView
                   attributionPosition="bottom-left"
-                  deleteKeyCode={deleteKeyCode}
+                  deleteKeyCode={["Backspace", "Delete"]}
                   multiSelectionKeyCode={multiSelectionKeyCode}
                 >
                   <Background variant={BackgroundVariant.Dots} />

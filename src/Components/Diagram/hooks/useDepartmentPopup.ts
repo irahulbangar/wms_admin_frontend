@@ -5,7 +5,14 @@ export const useDepartmentPopup = (
   setNodes: (
     nodes: DiagramNode[] | ((nodes: DiagramNode[]) => DiagramNode[])
   ) => void,
-  setHasChanges: (hasChanges: boolean) => void
+  setHasChanges: (hasChanges: boolean) => void,
+  setDepartmentDimensions: (
+    dimensions:
+      | Record<string, { width: number; height: number }>
+      | ((
+          dimensions: Record<string, { width: number; height: number }>
+        ) => Record<string, { width: number; height: number }>)
+  ) => void
 ) => {
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
     null
@@ -39,7 +46,6 @@ export const useDepartmentPopup = (
     };
   }, []);
 
-  // Handle department dimensions change
   const handleDepartmentDimensionsChange = useCallback(
     (width: number, height: number) => {
       if (selectedDepartment) {
@@ -50,6 +56,10 @@ export const useDepartmentPopup = (
                 ...node,
                 width: width,
                 height: height,
+                draggable: true,
+                selectable: true,
+                deletable: false,
+                dragHandle: ".group-drag-handle",
                 style: {
                   ...node.style,
                   width: `${width}px`,
@@ -58,6 +68,7 @@ export const useDepartmentPopup = (
                   minHeight: `${height}px`,
                   maxWidth: `${width}px`,
                   maxHeight: `${height}px`,
+                  zIndex: 10,
                 },
               };
             }
@@ -201,17 +212,38 @@ export const useDepartmentPopup = (
           });
         });
 
+        setDepartmentDimensions((prevDimensions) => ({
+          ...prevDimensions,
+          [selectedDepartment]: { width, height },
+        }));
+
         setHasChanges(true);
       }
     },
-    [selectedDepartment, setNodes, setHasChanges]
+    [selectedDepartment, setNodes, setHasChanges, setDepartmentDimensions]
   );
 
-  // Close department popup
   const handleCloseDepartmentPopup = useCallback(() => {
+    if (selectedDepartment) {
+      setNodes((currentNodes) => {
+        return currentNodes.map((node) => {
+          if (node.id === selectedDepartment && node.type === "group") {
+            return {
+              ...node,
+              style: {
+                ...node.style,
+                zIndex: 1,
+              },
+            };
+          }
+          return node;
+        });
+      });
+    }
+
     setShowDepartmentPopup(false);
     setSelectedDepartment(null);
-  }, []);
+  }, [selectedDepartment, setNodes]);
 
   return {
     selectedDepartment,

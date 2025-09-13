@@ -13,6 +13,10 @@ export interface DiagramNode {
   width?: number;
   height?: number;
   style?: any;
+  draggable?: boolean;
+  selectable?: boolean;
+  deletable?: boolean;
+  dragHandle?: string;
 }
 
 export interface DiagramEdge {
@@ -92,10 +96,16 @@ export const convertDevicesToDiagram = (
         height: groupHeight,
         borderRadius: 10,
         border: "2px dashed #ccc",
+        zIndex: 1,
+        pointerEvents: "auto",
       },
       type: "group",
       width: groupWidth,
       height: groupHeight,
+      draggable: true,
+      selectable: true,
+      deletable: false,
+      dragHandle: ".group-drag-handle",
     });
 
     // Create tank nodes
@@ -321,10 +331,15 @@ export const cleanNodesForAPI = (
           width: currentDimensions.width,
           height: currentDimensions.height,
           position: node.position,
+          draggable: true,
+          selectable: true,
+          deletable: false,
+          dragHandle: ".group-drag-handle",
           style: {
             ...node.style,
             width: `${currentDimensions.width}px`,
             height: `${currentDimensions.height}px`,
+            zIndex: 1,
           },
         };
       }

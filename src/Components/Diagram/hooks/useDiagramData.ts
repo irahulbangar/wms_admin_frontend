@@ -54,7 +54,22 @@ export const useDiagramData = (projectId: string | undefined) => {
         setProjectData(res.data);
 
         if (res.data.nodes && res.data.edges && res.data.nodes.length > 0) {
-          setNodes(res.data.nodes as DiagramNode[]);
+          const nodesWithDraggable = (res.data.nodes as DiagramNode[]).map(
+            (node) => {
+              if (node.type === "group") {
+                return {
+                  ...node,
+                  draggable: true,
+                  selectable: true,
+                  deletable: false,
+                  dragHandle: ".group-drag-handle",
+                };
+              }
+              return node;
+            }
+          );
+
+          setNodes(nodesWithDraggable);
           setEdges(res.data.edges as DiagramEdge[]);
 
           if ((res.data as any).department_dimensions) {
@@ -209,10 +224,15 @@ export const useDiagramData = (projectId: string | undefined) => {
             ...node,
             width: dimensions.width,
             height: dimensions.height,
+            draggable: true,
+            selectable: true,
+            deletable: false,
+            dragHandle: ".group-drag-handle",
             style: {
               ...node.style,
               width: `${dimensions.width}px`,
               height: `${dimensions.height}px`,
+              zIndex: 1,
             },
           };
         }
@@ -310,10 +330,15 @@ export const useDiagramData = (projectId: string | undefined) => {
               ...node,
               width: dimensions.width,
               height: dimensions.height,
+              draggable: true,
+              selectable: true,
+              deletable: false,
+              dragHandle: ".group-drag-handle",
               style: {
                 ...node.style,
                 width: `${dimensions.width}px`,
                 height: `${dimensions.height}px`,
+                zIndex: 1,
               },
             };
           }

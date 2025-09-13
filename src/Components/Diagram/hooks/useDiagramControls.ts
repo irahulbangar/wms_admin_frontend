@@ -35,6 +35,11 @@ export const useDiagramControls = (
     event.preventDefault();
     event.stopPropagation();
     setSelectedEdge(edge.id);
+
+    const customEvent = new CustomEvent("edgeSelected", {
+      detail: { edgeId: edge.id },
+    });
+    document.dispatchEvent(customEvent);
   }, []);
 
   // Handle pane clicks
@@ -56,14 +61,22 @@ export const useDiagramControls = (
   // Delete selected edge
   const handleDeleteSelectedEdge = useCallback(() => {
     if (selectedEdge) {
+      const edgeToDelete = selectedEdge;
+
       setEdges((currentEdges) => {
         const filteredEdges = currentEdges.filter(
-          (edge) => edge.id !== selectedEdge
+          (edge) => edge.id !== edgeToDelete
         );
         return filteredEdges;
       });
+
       setSelectedEdge(null);
       setHasChanges(true);
+
+      const customEvent = new CustomEvent("edgeDeleted", {
+        detail: { edgeId: edgeToDelete },
+      });
+      document.dispatchEvent(customEvent);
     }
   }, [selectedEdge, setEdges, setHasChanges]);
 
@@ -77,16 +90,32 @@ export const useDiagramControls = (
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Delete" || event.key === "Backspace") {
-        event.preventDefault();
         if (selectedEdge) {
+          event.preventDefault();
+          event.stopPropagation();
           handleDeleteSelectedEdge();
         }
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
+    window.addEventListener("keydown", handleKeyDown, true);
+
+    const globalKeyHandler = (event: KeyboardEvent) => {
+      if (
+        (event.key === "Delete" || event.key === "Backspace") &&
+        selectedEdge
+      ) {
+        handleDeleteSelectedEdge();
+      }
+    };
+
+    document.addEventListener("keyup", globalKeyHandler, true);
+
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, true);
+      window.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("keyup", globalKeyHandler, true);
     };
   }, [selectedEdge, handleDeleteSelectedEdge]);
 
@@ -98,7 +127,8 @@ export const useDiagramControls = (
       if (
         (target.tagName === "path" &&
           target.classList.contains("react-flow__edge-path")) ||
-        target.closest(".react-flow__edge")
+        target.closest(".react-flow__edge") ||
+        target.classList.contains("react-flow__edge-clickable")
       ) {
         const edgeElement = target.closest(".react-flow__edge");
         if (edgeElement) {
@@ -115,6 +145,7 @@ export const useDiagramControls = (
 
     document.addEventListener("click", handleEdgeClick, true);
     document.addEventListener("mousedown", handleEdgeClick, true);
+    document.addEventListener("mouseup", handleEdgeClick, true);
 
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -146,6 +177,7 @@ export const useDiagramControls = (
     return () => {
       document.removeEventListener("click", handleEdgeClick, true);
       document.removeEventListener("mousedown", handleEdgeClick, true);
+      document.removeEventListener("mouseup", handleEdgeClick, true);
       observer.disconnect();
     };
   }, []);
@@ -193,8 +225,6 @@ export const useDiagramControls = (
     }
   }, []);
 
-  // Keyboard codes
-  const deleteKeyCode = useMemo(() => ["Backspace", "Delete"], []);
   const multiSelectionKeyCode = useMemo(() => ["Meta", "Ctrl"], []);
 
   return {
@@ -209,7 +239,6 @@ export const useDiagramControls = (
     handleMouseDown,
     handleClick,
     onNodeClick,
-    deleteKeyCode,
     multiSelectionKeyCode,
   };
 };

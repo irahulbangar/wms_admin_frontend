@@ -190,26 +190,85 @@ const GroupNode: React.FC<GroupNodeProps> = ({ data, id, deviceData }) => {
   return (
     <div
       className="relative w-full h-full bg-transparent rounded-lg"
-      style={{ pointerEvents: "none" }}
+      style={{
+        pointerEvents: "auto",
+        zIndex: 1,
+        isolation: "isolate",
+        cursor: "grab",
+      }}
+      data-node-id={id}
     >
       <div
+        className="absolute inset-0 w-full h-full group-drag-handle"
+        style={{
+          pointerEvents: "auto",
+          cursor: "grab",
+          zIndex: 0,
+          backgroundColor: "transparent",
+        }}
+        onMouseDown={(e) => {
+          const target = e.target as HTMLElement;
+          const isEdge =
+            target.closest(".react-flow__edge") ||
+            target.closest(".react-flow__edge-path") ||
+            target.tagName === "path" ||
+            target.classList.contains("react-flow__edge-clickable");
+
+          if (isEdge) {
+            return;
+          }
+
+          e.stopPropagation();
+        }}
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          const isEdge =
+            target.closest(".react-flow__edge") ||
+            target.closest(".react-flow__edge-path") ||
+            target.tagName === "path" ||
+            target.classList.contains("react-flow__edge-clickable");
+
+          if (isEdge) {
+            return;
+          }
+
+          e.stopPropagation();
+        }}
+      />
+
+      <div
         className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm group-header flex items-center gap-2"
-        style={{ pointerEvents: "auto" }}
+        style={{
+          pointerEvents: "auto",
+          zIndex: 2,
+        }}
       >
         <span className="text-sm font-semibold text-text-primary font-roboto">
           {data.label}
         </span>
         <button
-          onClick={handleEditClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleEditClick(e);
+          }}
           className="text-status-info hover:text-status-info/80 transition-colors cursor-pointer"
           title="Edit department dimensions"
-          style={{ pointerEvents: "auto" }}
+          style={{
+            pointerEvents: "auto",
+            zIndex: 15,
+          }}
         >
           <Edit className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="flex items-center justify-between w-full gap-6 text-xs font-roboto">
+      <div
+        className="flex items-center justify-between w-full gap-6 text-xs font-roboto"
+        style={{
+          pointerEvents: "auto",
+          zIndex: 2,
+        }}
+      >
         <div className="text-center flex items-start flex-col">
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Stock :</div>

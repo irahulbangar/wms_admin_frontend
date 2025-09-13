@@ -280,58 +280,10 @@ body {
   font-family: "Inter", sans-serif;
 }
 
-/* ReactFlow Edge Clickability Styles */
-.react-flow__edge-clickable {
-  cursor: pointer !important;
-  pointer-events: all !important;
+.react-flow .react-flow__edges {
+  z-index: 2 !important;
 }
 
-.react-flow__edge-clickable:hover {
-  stroke-width: 4px !important;
-  opacity: 0.8;
-}
-
-.react-flow__edge-clickable.selected {
-  stroke-width: 6px !important;
-  stroke: #f59e0b !important;
-}
-
-/* Ensure edges inside groups are clickable */
-.react-flow__edge {
-  pointer-events: all !important;
-  z-index: 10 !important;
-}
-
-.react-flow__edge-path {
-  pointer-events: all !important;
-  cursor: pointer !important;
-}
-
-.react-flow__edge-text {
-  pointer-events: none !important;
-}
-
-/* Make sure edges are clickable even inside groups */
-.react-flow__node-group .react-flow__edge {
-  pointer-events: all !important;
-  z-index: 20 !important;
-}
-
-.react-flow__node-group .react-flow__edge-path {
-  pointer-events: all !important;
-  cursor: pointer !important;
-}
-
-/* Ensure group nodes don't block edge clicks */
-.react-flow__node-group {
-  pointer-events: none !important;
-}
-
-.react-flow__node-group > div {
-  pointer-events: none !important;
-}
-
-/* But allow the header to be clickable */
-.react-flow__node-group .group-header {
-  pointer-events: auto !important;
+.react-flow__node {
+  z-index: 1 !important;
 }
