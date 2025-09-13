@@ -375,7 +375,7 @@ const Devices = () => {
       if (!target.closest(".organization-dropdown")) {
         setIsOrganizationDropdownOpen(false);
       }
-      if (!target.closest(".project-dropdown")) {
+      if (!target.closest(".plant-dropdown")) {
         setIsProjectDropdownOpen(false);
       }
     };
@@ -389,7 +389,7 @@ const Devices = () => {
   const handleAddDevice = () => {
     if (selectedOrganization === "all" || selectedProject === "all") {
       Warning(
-        "Please select both organization and project before adding a device"
+        "Please select both organization and plant before adding a device"
       );
       return;
     }
@@ -549,7 +549,7 @@ const Devices = () => {
   const handleEditDepartment = (deptId: string) => {
     if (selectedProject === "all") {
       Warning(
-        "Please select a project from the dropdown before updating the department"
+        "Please select a plant from the dropdown before updating the department"
       );
       return;
     }
@@ -563,7 +563,7 @@ const Devices = () => {
       setProjectId(parseInt(selectedProject));
     } else {
       Warning(
-        "No project found for this department. Please ensure devices are assigned to this department."
+        "No plant found for this department. Please ensure devices are assigned to this department."
       );
     }
   };
@@ -608,7 +608,7 @@ const Devices = () => {
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
               {projects.find(
                 (proj) => proj.project_id.toString() === selectedProject
-              )?.project_name || "Project"}
+              )?.project_name || "Plant"}
             </span>
           </>
         )}
@@ -698,7 +698,7 @@ const Devices = () => {
             )}
           </div>
           <div
-            className="flex-shrink-0 md:w-54 w-full relative project-dropdown"
+            className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
             ref={projectDropdownRef}
           >
             <div className="relative">
@@ -868,7 +868,7 @@ const Devices = () => {
                               Device Name
                             </th>
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
-                              Project Name
+                              Plant Name
                             </th>
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Device Family
@@ -990,7 +990,7 @@ const Devices = () => {
                     ? "Try adjusting your search terms or filter criteria"
                     : selectedOrganization === "all"
                     ? "Add your first device to get started"
-                    : `Add your first project for ${
+                    : `Add your first plant for ${
                         organizations.find(
                           (org) => org.organization_id === selectedOrganization
                         )?.organization_name ||

@@ -164,7 +164,7 @@ export const getDeviceByProjectId = createAsyncThunk(
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to get device by project id";
+          : "Failed to get device by plant id";
       return rejectWithValue(errorMessage);
     }
   }

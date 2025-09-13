@@ -739,12 +739,12 @@ const DiagramPage = () => {
           setIsLoadingDiagram(false);
         } else {
           console.log(
-            "No existing diagram data found in project - will show nodes only"
+            "No existing diagram data found in plant - will show nodes only"
           );
         }
       }
     } catch (err) {
-      console.error("Error fetching project data:", err);
+      console.error("Error fetching plant data:", err);
       setIsLoadingDiagram(false);
     }
   }, [dispatch, projectId, setNodes, setEdges]);

@@ -107,7 +107,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
     e.preventDefault();
 
     if (!formData.project_id) {
-      Error("Please select a project");
+      Error("Please select a plant");
       return;
     }
     if (!formData.role) {
@@ -212,7 +212,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
 
         <form className="p-6 space-y-4" onSubmit={handleSubmit}>
           <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
-            Project
+            Plant
           </label>
           <select
             value={formData.project_id}
@@ -224,7 +224,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             }
             className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
           >
-            <option value="">Select Project</option>
+            <option value="">Select Plant</option>
             {projects.map((project) => (
               <option key={project.project_id} value={project.project_id}>
                 {project.project_name}
@@ -302,7 +302,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                       Sr No
                     </th>
                     <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                      Project Name
+                      Plant Name
                     </th>
                     <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                       Client Name
@@ -372,7 +372,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                             formData.project_id !== 0 ||
                             formData.role ||
                             formData.status
-                              ? "No matching plants found"
+                              ? "No matching plants match your search/filter"
                               : "No plants found for this user"
                           }
                           description={

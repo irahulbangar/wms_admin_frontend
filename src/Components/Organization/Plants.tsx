@@ -220,7 +220,7 @@ const Plants = () => {
 
   const handleAddProject = () => {
     if (selectedOrganizationId === "all") {
-      Warning("Please select an organization first before adding a project");
+      Warning("Please select an organization first before adding a plant");
       return;
     }
     setShowAddModalType("add");
@@ -238,7 +238,7 @@ const Plants = () => {
     try {
       const result = await dispatch(deleteProjectById(id)).unwrap();
       if (result.success) {
-        Success("Project deleted successfully");
+        Success("Plant deleted successfully");
         if (selectedOrganizationId === "all") {
           fetchProjects();
         } else {
@@ -246,7 +246,7 @@ const Plants = () => {
         }
       }
     } catch (error) {
-      Error(`Failed to delete project: ${error}`);
+      Error(`Failed to delete plant: ${error}`);
     }
   };
 
@@ -541,10 +541,10 @@ const Plants = () => {
                       }
                       title={
                         searchTerm || filterBy !== "all"
-                          ? "No projects match your search/filter"
+                          ? "No plants match your search/filter"
                           : selectedOrganizationId === "all"
-                          ? "No projects found"
-                          : `No projects found for ${
+                          ? "No plants found"
+                          : `No plants found for ${
                               organizations.find(
                                 (org) =>
                                   org.organization_id.toString() ===
@@ -557,8 +557,8 @@ const Plants = () => {
                         searchTerm || filterBy !== "all"
                           ? "Try adjusting your search terms or filter criteria"
                           : selectedOrganizationId === "all"
-                          ? "Add your first project to get started"
-                          : `Add your first project for ${
+                          ? "Add your first plant to get started"
+                          : `Add your first plant for ${
                               organizations.find(
                                 (org) =>
                                   org.organization_id.toString() ===
@@ -570,7 +570,7 @@ const Plants = () => {
                       buttonText={
                         searchTerm || filterBy !== "all"
                           ? "Clear Search"
-                          : "Add Project"
+                          : "Add Plant"
                       }
                       buttonOnClick={() => {
                         if (searchTerm || filterBy !== "all") {
@@ -617,7 +617,7 @@ const Plants = () => {
           <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full transform transition-all">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
               <h3 className="text-xl font-semibold text-text-primary font-roboto">
-                Delete Project
+                Delete Plant
               </h3>
               <button
                 onClick={handleCloseDeletePopup}
@@ -628,7 +628,7 @@ const Plants = () => {
             </div>
             <div className="p-6">
               <p className="text-text-secondary mb-4 font-roboto">
-                Are you sure you want to delete{" "}
+                Are you sure you want to delete the plant{" "}
                 <span className="font-bold">{deleteProject?.project_name}</span>
                 ?
               </p>
