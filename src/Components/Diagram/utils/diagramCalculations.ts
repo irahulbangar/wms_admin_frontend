@@ -72,17 +72,18 @@ export const convertDevicesToDiagram = (
   // Create nodes for each department
   Object.values(departmentGroups).forEach((group, groupIndex) => {
     const groupId = group.department_id.toString();
-    const groupX = groupIndex * 675 + 50;
+    const groupX = groupIndex * 600 + 50;
     const groupY = 50;
 
+    const minDimensions = calculateMinimumDimensions(group.devices.length);
+
     const currentDimensions = departmentDimensions[groupId] || {
-      width: 625,
-      height: 350,
+      width: Math.max(575, minDimensions.width),
+      height: Math.max(350, minDimensions.height),
     };
     const groupWidth = currentDimensions.width;
     const groupHeight = currentDimensions.height;
 
-    // Create group node
     nodes.push({
       id: groupId,
       data: {
@@ -165,10 +166,10 @@ const createTankNode = (
   tankIndex: number,
   totalTanks: number
 ): DiagramNode => {
-  const tankWidth = 80;
-  const tankHeight = 96;
-  const tankSpacing = 20;
-  const sideMargin = 50;
+  const tankWidth = 120;
+  const tankHeight = 80;
+  const tankSpacing = 10;
+  const sideMargin = 30;
 
   const availableWidth = groupWidth - 2 * sideMargin;
   const maxTanksPerRow = Math.max(
@@ -191,16 +192,33 @@ const createTankNode = (
   const deviceX = startX + col * (tankWidth + tankSpacing);
 
   let deviceY;
+  const headerHeight = 40;
+  const footerHeight = 20;
+  const availableHeight = groupHeight - headerHeight - footerHeight;
+
+  const tankSectionHeight = Math.min(
+    availableHeight * 0.6,
+    totalRows * (tankHeight + 10) + 30
+  );
+  const tankStartY = headerHeight + 10;
+
   if (totalRows === 1) {
-    deviceY = (groupHeight - tankHeight) / 2;
+    deviceY = tankStartY + (tankSectionHeight - tankHeight) / 2;
   } else {
-    const availableHeight = groupHeight - 100;
     const rowSpacing = Math.max(
-      20,
-      (availableHeight - totalRows * tankHeight) / (totalRows + 1)
+      30,
+      Math.min(
+        50,
+        (tankSectionHeight - totalRows * tankHeight) / (totalRows - 1)
+      )
     );
-    deviceY = 60 + rowSpacing + row * (tankHeight + rowSpacing);
+    deviceY = tankStartY + row * (tankHeight + rowSpacing);
   }
+
+  const maxX = groupWidth - tankWidth - sideMargin;
+  const maxY = groupHeight - tankHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
 
   const tankNodeData: NodeData = {
     label: device?.device_name,
@@ -216,7 +234,7 @@ const createTankNode = (
   return {
     id: deviceId,
     data: tankNodeData,
-    position: { x: deviceX, y: deviceY },
+    position: { x: finalX, y: finalY },
     parentId: groupId,
     sourcePosition: "right",
     targetPosition: "left",
@@ -237,16 +255,25 @@ const createFMNode = (
   totalFMs: number,
   totalTanks: number
 ): DiagramNode => {
-  const fmWidth = 96;
-  const fmHeight = 64;
-  const sideMargin = 50;
-  const fmSpacing = 20;
+  const fmWidth = 140;
+  const fmHeight = 60;
+  const sideMargin = 10;
+  const fmSpacing = 10;
 
   const availableWidth = groupWidth - 2 * sideMargin;
-  const maxTanksPerRow = Math.max(1, Math.floor(availableWidth / (80 + 20)));
+  const maxTanksPerRow = Math.max(1, Math.floor(availableWidth / (50 + 30)));
   const totalTankRows = Math.ceil(totalTanks / maxTanksPerRow);
+
+  const headerHeight = 20;
+  const footerHeight = 10;
   const tankAreaHeight =
-    totalTankRows > 0 ? totalTankRows * 96 + (totalTankRows - 1) * 20 + 120 : 0;
+    totalTanks > 0
+      ? headerHeight +
+        20 +
+        totalTankRows * 60 +
+        Math.max(0, totalTankRows - 1) * 30 +
+        40
+      : headerHeight + 20;
 
   const maxFMsPerRow = Math.max(
     1,
@@ -254,15 +281,21 @@ const createFMNode = (
   );
   const totalFMRows = Math.ceil(totalFMs / maxFMsPerRow);
 
-  const fmStartY = tankAreaHeight + 20;
-  const availableHeight = groupHeight - fmStartY - 20;
+  const fmStartY = tankAreaHeight + 40;
+  const availableHeight = groupHeight - fmStartY - footerHeight;
+
+  const fmSectionHeight = Math.min(
+    availableHeight * 0.4,
+    totalFMRows * (fmHeight + 30) + 40
+  );
+
   const fmVerticalSpacing =
     totalFMRows > 1
-      ? Math.min(
-          80,
-          Math.max(
-            60,
-            (availableHeight - totalFMRows * fmHeight) / (totalFMRows - 1)
+      ? Math.max(
+          30,
+          Math.min(
+            50,
+            (fmSectionHeight - totalFMRows * fmHeight) / (totalFMRows - 1)
           )
         )
       : 0;
@@ -275,7 +308,12 @@ const createFMNode = (
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (fmWidth + fmSpacing);
-  const deviceY = fmStartY + row * (fmHeight + fmVerticalSpacing);
+  const deviceY = fmStartY + 20 + row * (fmHeight + fmVerticalSpacing);
+
+  const maxX = groupWidth - fmWidth - sideMargin;
+  const maxY = groupHeight - fmHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
 
   const fmNodeData: NodeData = {
     label: device.device_name,
@@ -290,7 +328,7 @@ const createFMNode = (
   return {
     id: deviceId,
     data: fmNodeData,
-    position: { x: deviceX, y: deviceY },
+    position: { x: finalX, y: finalY },
     parentId: groupId,
     sourcePosition: "right",
     targetPosition: "left",
@@ -346,4 +384,34 @@ export const cleanNodesForAPI = (
     }
     return node;
   });
+};
+
+const calculateMinimumDimensions = (
+  deviceCount: number
+): { width: number; height: number } => {
+  const headerHeight = 20;
+  const footerHeight = 10;
+  const sideMargin = 30;
+  const deviceSpacing = 30;
+
+  const minWidth = Math.max(500, sideMargin * 2 + deviceCount * 50);
+
+  const tankHeight = 80;
+  const fmHeight = 70;
+  const maxDevicesPerRow = Math.max(
+    1,
+    Math.floor((minWidth - sideMargin * 2) / 150)
+  );
+  const totalRows = Math.ceil(deviceCount / maxDevicesPerRow);
+  const minHeight =
+    headerHeight +
+    footerHeight +
+    totalRows * Math.max(tankHeight, fmHeight) +
+    (totalRows - 1) * deviceSpacing +
+    100;
+
+  return {
+    width: minWidth,
+    height: Math.max(500, minHeight),
+  };
 };
