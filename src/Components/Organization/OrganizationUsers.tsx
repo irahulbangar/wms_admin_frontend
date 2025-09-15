@@ -455,7 +455,13 @@ const OrganizationUsers = () => {
                   handlePaginatedUsers.map((user, index) => (
                     <tr
                       key={user.client_id}
-                      className="bg-primary border-b border-border-primary hover:bg-secondary"
+                      className="bg-primary border-b border-border-primary hover:bg-secondary cursor-pointer"
+                      onDoubleClick={() =>
+                        handleViewPlants(
+                          user.client_id.toString(),
+                          user.organization_id.toString()
+                        )
+                      }
                     >
                       <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base capitalize">
                         {(currentPage - 1) * rowsPerPage + index + 1}

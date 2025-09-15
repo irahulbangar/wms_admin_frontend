@@ -305,7 +305,12 @@ const Organization = () => {
                   handlePaginatedOrganizations?.map((organization, index) => (
                     <tr
                       key={organization?.organization_id}
-                      className="bg-primary border-b border-border-primary hover:bg-secondary"
+                      className="bg-primary border-b border-border-primary hover:bg-secondary cursor-pointer"
+                      onDoubleClick={() =>
+                        handleViewPlants(
+                          organization?.organization_id.toString()
+                        )
+                      }
                     >
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                         {(currentPage - 1) * rowsPerPage + index + 1}

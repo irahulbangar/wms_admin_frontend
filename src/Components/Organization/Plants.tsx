@@ -484,7 +484,13 @@ const Plants = () => {
                   handlePaginatedProjects.map((project, index) => (
                     <tr
                       key={index}
-                      className="border-b border-border-primary bg-primary hover:bg-secondary"
+                      className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer"
+                      onDoubleClick={() =>
+                        handleViewDevices(
+                          project?.project_id,
+                          project?.organization_id
+                        )
+                      }
                     >
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                         {(currentPage - 1) * rowsPerPage + index + 1}
