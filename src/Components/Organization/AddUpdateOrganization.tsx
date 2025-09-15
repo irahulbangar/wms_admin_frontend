@@ -298,11 +298,11 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Address
           </label>
-          <textarea
+          <input
+            type="text"
             name="address"
             value={formData.address}
             onChange={handleInputChange}
-            rows={3}
             className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.address ? "border-status-danger" : "border-border-primary"
             }`}
@@ -341,17 +341,17 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             placeholder="Enter notes"
           />
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex items-center justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={() => setShowAddModal(false)}
-              className="flex-1 px-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg hover:bg-secondary transition-colors cursor-pointer font-roboto"
+              className="px-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg hover:bg-secondary transition-colors cursor-pointer font-roboto"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-roboto"
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-roboto"
             >
               {type === "add" ? "Add Organization" : "Update Organization"}
             </button>

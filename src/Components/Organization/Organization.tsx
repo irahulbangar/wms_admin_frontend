@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -47,15 +47,17 @@ const Organization = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const totalItems = filteredOrganizations.length;
-  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const totalItems = useMemo(() => {
+    return filteredOrganizations.length;
+  }, [filteredOrganizations]);
 
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedOrganizations = filteredOrganizations.slice(
-    startIndex,
-    endIndex
-  );
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / rowsPerPage);
+  }, [totalItems, rowsPerPage]);
+
+  const selectedRows = useMemo(() => {
+    return filteredOrganizations.length;
+  }, [filteredOrganizations]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -65,6 +67,13 @@ const Organization = () => {
     setRowsPerPage(newRowsPerPage);
     setCurrentPage(1);
   };
+
+  const handlePaginatedOrganizations = useMemo(() => {
+    return filteredOrganizations.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [filteredOrganizations, currentPage, rowsPerPage]);
 
   const refreshOrganizations = () => {
     if (isLoading) return;
@@ -296,14 +305,14 @@ const Organization = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedOrganizations?.length > 0 ? (
-                  paginatedOrganizations?.map((organization, index) => (
+                {handlePaginatedOrganizations?.length > 0 ? (
+                  handlePaginatedOrganizations?.map((organization, index) => (
                     <tr
                       key={organization?.organization_id}
                       className="bg-primary border-b border-border-primary hover:bg-secondary"
                     >
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                        {index + 1}
+                        {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                         {organization?.organization_name || "-"}
@@ -412,7 +421,7 @@ const Organization = () => {
             totalPages={totalPages}
             rowsPerPage={rowsPerPage}
             totalItems={totalItems}
-            selectedRows={totalItems}
+            selectedRows={selectedRows}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
           />
