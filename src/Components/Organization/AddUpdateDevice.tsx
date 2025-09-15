@@ -276,13 +276,17 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_status: deviceData.device_status,
               hwid: deviceData.hwid,
               department_id: deviceData.department_id,
-              params: deviceData.params || {},
+              params: deviceData.params,
             });
             setDeviceFamilyId(deviceData.device_family_id);
 
-            const familyName = familyData
-              .find((f) => f.device_family_id === deviceData.device_family_id)
-              ?.name?.toLowerCase();
+            const selectedFamily = familyData.find(
+              (f) => f.device_family_id === deviceData.device_family_id
+            );
+            const familyName =
+              selectedFamily?.type?.toLowerCase() ||
+              selectedFamily?.name?.toLowerCase() ||
+              "";
             if (familyName === "fm") {
               const fmData = deviceData.params || {
                 inputFor: 0,
