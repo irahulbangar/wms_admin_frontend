@@ -55,10 +55,6 @@ const Organization = () => {
     return Math.ceil(totalItems / rowsPerPage);
   }, [totalItems, rowsPerPage]);
 
-  const selectedRows = useMemo(() => {
-    return filteredOrganizations.length;
-  }, [filteredOrganizations]);
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -421,7 +417,6 @@ const Organization = () => {
             totalPages={totalPages}
             rowsPerPage={rowsPerPage}
             totalItems={totalItems}
-            selectedRows={selectedRows}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
           />

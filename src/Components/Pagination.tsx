@@ -11,7 +11,6 @@ interface PaginationProps {
   totalPages: number;
   rowsPerPage: number;
   totalItems: number;
-  selectedRows: number;
   rowsPerPageOptions?: number[];
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rowsPerPage: number) => void;
@@ -23,7 +22,6 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   rowsPerPage,
   totalItems,
-  selectedRows,
   rowsPerPageOptions = [10, 25, 50, 100],
   onPageChange,
   onRowsPerPageChange,

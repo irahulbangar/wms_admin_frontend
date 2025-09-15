@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   ClientUsersResponse,
@@ -56,13 +56,14 @@ const OrganizationUsers = () => {
   const [showUserPlants, setShowUserPlants] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const totalItems = filteredUsers.length;
 
-  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const totalItems = useMemo(() => {
+    return filteredUsers.length;
+  }, [filteredUsers]);
 
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / rowsPerPage);
+  }, [totalItems, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -72,6 +73,13 @@ const OrganizationUsers = () => {
     setRowsPerPage(newRowsPerPage);
     setCurrentPage(1);
   };
+
+  const handlePaginatedUsers = useMemo(() => {
+    return filteredUsers.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [filteredUsers, currentPage, rowsPerPage]);
 
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -443,14 +451,14 @@ const OrganizationUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedUsers.length > 0 ? (
-                  paginatedUsers.map((user, index) => (
+                {handlePaginatedUsers.length > 0 ? (
+                  handlePaginatedUsers.map((user, index) => (
                     <tr
                       key={user.client_id}
                       className="bg-primary border-b border-border-primary hover:bg-secondary"
                     >
                       <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base capitalize">
-                        {index + 1}
+                        {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
                         {user.client_name}
@@ -546,7 +554,6 @@ const OrganizationUsers = () => {
             totalPages={totalPages}
             rowsPerPage={rowsPerPage}
             totalItems={totalItems}
-            selectedRows={totalItems}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
           />

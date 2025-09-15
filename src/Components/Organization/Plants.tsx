@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   Search,
   PlusCircle,
@@ -59,12 +59,13 @@ const Plants = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const totalItems = filteredProjects.length;
-  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const totalItems = useMemo(() => {
+    return filteredProjects.length;
+  }, [filteredProjects]);
 
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedProjects = filteredProjects.slice(startIndex, endIndex);
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / rowsPerPage);
+  }, [totalItems, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -74,6 +75,13 @@ const Plants = () => {
     setRowsPerPage(newRowsPerPage);
     setCurrentPage(1);
   };
+
+  const handlePaginatedProjects = useMemo(() => {
+    return filteredProjects.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [filteredProjects, currentPage, rowsPerPage]);
 
   const handleConfirmDelete = async () => {
     if (deleteProject) {
@@ -472,14 +480,14 @@ const Plants = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedProjects.length > 0 ? (
-                  paginatedProjects.map((project, index) => (
+                {handlePaginatedProjects.length > 0 ? (
+                  handlePaginatedProjects.map((project, index) => (
                     <tr
                       key={index}
                       className="border-b border-border-primary bg-primary hover:bg-secondary"
                     >
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                        {index + 1}
+                        {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                         {project?.project_name || "N/A"}
@@ -612,7 +620,6 @@ const Plants = () => {
             totalPages={totalPages}
             rowsPerPage={rowsPerPage}
             totalItems={totalItems}
-            selectedRows={totalItems}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
           />

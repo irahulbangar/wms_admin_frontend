@@ -14,7 +14,7 @@ import type {
   AdminUsers,
   AdminUsersResponse,
 } from "../../model/admin-users.interface";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getAllUsers, deleteAdminUser } from "../../store/adminSlice";
 import { Error, Success } from "../utils/toast";
 import { fromatDateWithTime, handleStatus } from "../utils/utils";
@@ -35,12 +35,13 @@ const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const totalItems = users.length;
-  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const totalItems = useMemo(() => {
+    return users.length;
+  }, [users]);
 
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedUsers = users.slice(startIndex, endIndex);
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / rowsPerPage);
+  }, [totalItems, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -50,6 +51,13 @@ const Users = () => {
     setRowsPerPage(newRowsPerPage);
     setCurrentPage(1);
   };
+
+  const handlePaginatedUsers = useMemo(() => {
+    return users.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [users, currentPage, rowsPerPage]);
 
   useEffect(() => {
     setLoading(true);
@@ -207,14 +215,14 @@ const Users = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedUsers?.length > 0 ? (
-                  paginatedUsers?.map((user, index) => (
+                {handlePaginatedUsers?.length > 0 ? (
+                  handlePaginatedUsers?.map((user, index) => (
                     <tr
                       key={user?.admin_id}
                       className="border-b border-border-primary hover:bg-secondary transition-colors"
                     >
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
-                        {startIndex + index + 1}
+                        {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap capitalize">
                         {user?.name}
@@ -285,7 +293,6 @@ const Users = () => {
             totalPages={totalPages}
             rowsPerPage={rowsPerPage}
             totalItems={totalItems}
-            selectedRows={totalItems}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
           />
