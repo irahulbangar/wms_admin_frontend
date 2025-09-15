@@ -33,6 +33,7 @@ import {
   setOrganizations,
 } from "../../../store/organizationSlice";
 import UserPlants from "./UserPlants";
+import Pagination from "../Pagination";
 
 const OrganizationUsers = () => {
   const navigate = useNavigate();
@@ -53,11 +54,27 @@ const OrganizationUsers = () => {
     ClientUsersResult[]
   >([]);
   const [showUserPlants, setShowUserPlants] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const totalItems = filteredUsers.length;
 
-  // Ref for dropdown container
+  const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
+  };
+
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Click outside functionality for dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -391,134 +408,148 @@ const OrganizationUsers = () => {
           <Loader2 className="w-12 h-12 text-text-primary animate-spin" />
         </div>
       ) : (
-        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-          <table className="w-full text-sm text-left rtl:text-right text-text-primary">
-            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-              <tr>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Sr No
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Phone
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Organization
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Created At
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Updated At
-                </th>
-                <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user, index) => (
-                  <tr
-                    key={user.client_id}
-                    className="bg-primary border-b border-border-primary hover:bg-secondary"
-                  >
-                    <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base capitalize">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
-                      {user.client_name}
-                    </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
-                      {user.client_email}
-                    </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
-                      {user.client_phone}
-                    </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
-                      {
-                        organizations.find(
-                          (org) =>
-                            org.organization_id.toString() ===
-                            user.organization_id.toString()
-                        )?.organization_name
-                      }
-                    </td>
-                    <td className="px-6 py-4 font-roboto text-center text-text-primary text-base capitalize">
-                      <span
-                        className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
-                          user?.status
-                        )}`}
-                      >
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
-                      {fromatDateWithTime(user.created_at)}
-                    </td>
-                    <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
-                      {fromatDateWithTime(user.updated_at)}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      <div className="flex items-center gap-3 justify-center">
-                        <SquarePen
-                          onClick={() =>
-                            handleEditUser(user.client_id, user.organization_id)
-                          }
-                          className="w-5 h-5 text-status-info cursor-pointer"
-                        />
-                        <span title="View Plants">
-                          <User2
-                            className="w-5 h-5 text-text-primary cursor-pointer"
+        <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
+          <div className="overflow-auto h-[calc(100vh-245px)]">
+            <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+              <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                <tr>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Sr No
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Phone
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Organization
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Created At
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Updated At
+                  </th>
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedUsers.length > 0 ? (
+                  paginatedUsers.map((user, index) => (
+                    <tr
+                      key={user.client_id}
+                      className="bg-primary border-b border-border-primary hover:bg-secondary"
+                    >
+                      <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base capitalize">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
+                        {user.client_name}
+                      </td>
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                        {user.client_email}
+                      </td>
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
+                        {user.client_phone}
+                      </td>
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
+                        {
+                          organizations.find(
+                            (org) =>
+                              org.organization_id.toString() ===
+                              user.organization_id.toString()
+                          )?.organization_name
+                        }
+                      </td>
+                      <td className="px-6 py-4 font-roboto text-center text-text-primary text-base capitalize">
+                        <span
+                          className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                            user?.status
+                          )}`}
+                        >
+                          {user.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                        {fromatDateWithTime(user.created_at)}
+                      </td>
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                        {fromatDateWithTime(user.updated_at)}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                        <div className="flex items-center gap-3 justify-center">
+                          <SquarePen
                             onClick={() =>
-                              handleViewPlants(
-                                user.client_id.toString(),
-                                user.organization_id.toString()
+                              handleEditUser(
+                                user.client_id,
+                                user.organization_id
                               )
                             }
+                            className="w-5 h-5 text-status-info cursor-pointer"
                           />
-                        </span>
-                        {/* <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" /> */}
-                      </div>
+                          <span title="View Plants">
+                            <User2
+                              className="w-5 h-5 text-text-primary cursor-pointer"
+                              onClick={() =>
+                                handleViewPlants(
+                                  user.client_id.toString(),
+                                  user.organization_id.toString()
+                                )
+                              }
+                            />
+                          </span>
+                          {/* <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" /> */}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={10}
+                      className="text-center font-roboto text-text-secondary text-sm"
+                    >
+                      <NoDataFound
+                        icon={
+                          <User className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                        }
+                        title={
+                          searchTerm.trim()
+                            ? "No search results found"
+                            : "No users found"
+                        }
+                        description={
+                          searchTerm.trim()
+                            ? "Try adjusting your search terms"
+                            : "Add your first user to get started"
+                        }
+                        buttonText="Add User"
+                        buttonOnClick={handleAddUser}
+                      />
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={10}
-                    className="text-center font-roboto text-text-secondary text-sm"
-                  >
-                    <NoDataFound
-                      icon={
-                        <User className="w-16 h-16 text-text-muted mx-auto mb-4" />
-                      }
-                      title={
-                        searchTerm.trim()
-                          ? "No search results found"
-                          : "No users found"
-                      }
-                      description={
-                        searchTerm.trim()
-                          ? "Try adjusting your search terms"
-                          : "Add your first user to get started"
-                      }
-                      buttonText="Add User"
-                      buttonOnClick={handleAddUser}
-                    />
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            rowsPerPage={rowsPerPage}
+            totalItems={totalItems}
+            selectedRows={totalItems}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
         </div>
       )}
 
