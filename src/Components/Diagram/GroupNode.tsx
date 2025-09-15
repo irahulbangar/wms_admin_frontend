@@ -3,17 +3,85 @@ import { useReactFlow } from "reactflow";
 import { Edit } from "lucide-react";
 import type { NodeData } from "../../../model/single-project.interface";
 import type { DeviceResult } from "../../../model/devices.interface";
+import type { DiagramEdge } from "./utils/diagramCalculations";
 
 interface GroupNodeProps {
   data: NodeData;
   id: string;
   deviceData?: DeviceResult[];
+  edges?: DiagramEdge[];
 }
 
-const GroupNode: React.FC<GroupNodeProps> = ({ data, id, deviceData }) => {
+const determineFMFlowDirection = (
+  fmId: string,
+  departmentTanks: any[],
+  edges: DiagramEdge[]
+): boolean => {
+  const fmEdges = edges.filter(
+    (edge) => edge.source === fmId || edge.target === fmId
+  );
+
+  const tankConnections = fmEdges.filter((edge) => {
+    const otherNodeId = edge.source === fmId ? edge.target : edge.source;
+    return departmentTanks.some((tank) => tank.id === otherNodeId);
+  });
+
+  if (tankConnections.length === 0) {
+    return true;
+  }
+
+  let inputConnections = 0;
+  let outputConnections = 0;
+
+  tankConnections.forEach((edge) => {
+    if (edge.source === fmId) {
+      inputConnections++;
+    } else {
+      outputConnections++;
+    }
+  });
+
+  return inputConnections >= outputConnections;
+};
+
+const determineFMFlowDirectionFromDevices = (
+  fmDevice: DeviceResult,
+  _departmentTanks: DeviceResult[],
+  departmentFMs: DeviceResult[],
+  fmIndex: number
+): boolean => {
+  const deviceName = fmDevice.device_name?.toLowerCase() || "";
+
+  if (
+    deviceName.includes("in") ||
+    deviceName.includes("input") ||
+    deviceName.includes("supply")
+  ) {
+    return true;
+  }
+  if (
+    deviceName.includes("out") ||
+    deviceName.includes("output") ||
+    deviceName.includes("discharge")
+  ) {
+    return false;
+  }
+
+  const totalFMs = departmentFMs.length;
+
+  return fmIndex < Math.ceil(totalFMs / 2);
+};
+
+const GroupNode: React.FC<GroupNodeProps> = ({
+  data,
+  id,
+  deviceData,
+  edges = [],
+}) => {
   const unit = data.unit || "Ltr";
-  const { getNodes } = useReactFlow();
+  const { getNodes, getEdges } = useReactFlow();
   const allNodes = getNodes();
+  const allEdges = getEdges ? getEdges() : edges;
 
   const deviceDataKey = deviceData
     ? JSON.stringify(
@@ -122,20 +190,25 @@ const GroupNode: React.FC<GroupNodeProps> = ({ data, id, deviceData }) => {
         (node) => node.type === "fm" && node.parentId === id
       );
 
+      const departmentTanks = allNodes.filter(
+        (node) => node.type === "tank" && node.parentId === id
+      );
+
       totals = departmentFMs.reduce(
         (acc, fm) => {
           const fmData = fm.data as NodeData;
           const totalVolume = fmData?.totalizerReading || 0;
 
-          const fmIndex = departmentFMs.indexOf(fm);
-          const totalFMs = departmentFMs.length;
+          const isInput = determineFMFlowDirection(
+            fm.id,
+            departmentTanks,
+            allEdges
+          );
 
-          if (totalFMs > 0) {
-            if (fmIndex < Math.ceil(totalFMs / 2)) {
-              acc.totalIn += totalVolume;
-            } else {
-              acc.totalOut += totalVolume;
-            }
+          if (isInput) {
+            acc.totalIn += totalVolume;
+          } else {
+            acc.totalOut += totalVolume;
           }
 
           return acc;
@@ -161,17 +234,27 @@ const GroupNode: React.FC<GroupNodeProps> = ({ data, id, deviceData }) => {
           device.device_family?.toLowerCase().includes("flow")
       );
 
+      const departmentTanks = departmentDevices.filter(
+        (device) =>
+          device.type === "tank" ||
+          device.device_family?.toLowerCase().includes("tank")
+      );
+
       totals = departmentFMs.reduce(
         (acc, device, index) => {
           const totalVolume = Number(device.last_record?.min_max) || 0;
-          const totalFMs = departmentFMs.length;
 
-          if (totalFMs > 0) {
-            if (index < Math.ceil(totalFMs / 2)) {
-              acc.totalIn += totalVolume;
-            } else {
-              acc.totalOut += totalVolume;
-            }
+          const isInput = determineFMFlowDirectionFromDevices(
+            device,
+            departmentTanks,
+            departmentFMs,
+            index
+          );
+
+          if (isInput) {
+            acc.totalIn += totalVolume;
+          } else {
+            acc.totalOut += totalVolume;
           }
 
           return acc;
