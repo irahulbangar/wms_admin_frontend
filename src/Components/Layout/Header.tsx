@@ -28,11 +28,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Function to get dynamic title based on current route
   const getPageTitle = () => {
     const path = location.pathname;
 
-    // Route to title mapping
     const routeTitles: { [key: string]: string } = {
       "/": "Dashboard",
       "/dashboard": "Dashboard",
@@ -47,7 +45,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       "/organization/setting": "Organization Settings",
     };
 
-    // Check for dynamic routes with parameters
     if (path.includes("/organization/") && path.includes("/devices")) {
       return "Devices";
     }
@@ -58,7 +55,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       return "Plants";
     }
 
-    // Return mapped title or default to 'Dashboard'
     return routeTitles[path] || "Dashboard";
   };
 

@@ -9,7 +9,6 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.admin);
 
-  // Show loading while authentication state is being determined
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-primary">

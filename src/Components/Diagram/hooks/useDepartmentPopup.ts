@@ -19,7 +19,6 @@ export const useDepartmentPopup = (
   );
   const [showDepartmentPopup, setShowDepartmentPopup] = useState(false);
 
-  // Create global function for opening department popup
   useEffect(() => {
     (window as any).openDepartmentPopup = (nodeId: string) => {
       setSelectedDepartment(nodeId);
@@ -31,7 +30,6 @@ export const useDepartmentPopup = (
     };
   }, []);
 
-  // Handle group edit click events
   useEffect(() => {
     const handleGroupEditClick = (event: any) => {
       const { nodeId } = event.detail;

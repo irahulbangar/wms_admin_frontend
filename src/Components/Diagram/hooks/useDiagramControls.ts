@@ -10,7 +10,6 @@ export const useDiagramControls = (
 ) => {
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
 
-  // Handle edge connections
   const onConnect = useCallback(
     (params: Connection) => {
       const newEdge: Edge = {
@@ -30,7 +29,6 @@ export const useDiagramControls = (
     [setEdges, setHasChanges]
   );
 
-  // Handle edge clicks
   const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
     event.preventDefault();
     event.stopPropagation();
@@ -42,14 +40,12 @@ export const useDiagramControls = (
     document.dispatchEvent(customEvent);
   }, []);
 
-  // Handle pane clicks
   const onPaneClick = useCallback((event: React.MouseEvent) => {
     if (event.target === event.currentTarget) {
       setSelectedEdge(null);
     }
   }, []);
 
-  // Handle selection changes
   const onSelectionChange = useCallback(({ edges }: { edges: Edge[] }) => {
     if (edges.length > 0) {
       setSelectedEdge(edges[0].id);
@@ -58,7 +54,6 @@ export const useDiagramControls = (
     }
   }, []);
 
-  // Delete selected edge
   const handleDeleteSelectedEdge = useCallback(() => {
     if (selectedEdge) {
       const edgeToDelete = selectedEdge;
@@ -80,13 +75,11 @@ export const useDiagramControls = (
     }
   }, [selectedEdge, setEdges, setHasChanges]);
 
-  // Clear all edges
   const handleClearAllEdges = useCallback(() => {
     setEdges([]);
     setHasChanges(true);
   }, [setEdges, setHasChanges]);
 
-  // Keyboard event handling
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Delete" || event.key === "Backspace") {
@@ -119,7 +112,6 @@ export const useDiagramControls = (
     };
   }, [selectedEdge, handleDeleteSelectedEdge]);
 
-  // Edge click handling with DOM events
   useEffect(() => {
     const handleEdgeClick = (event: Event) => {
       const target = event.target as HTMLElement;
@@ -182,7 +174,6 @@ export const useDiagramControls = (
     };
   }, []);
 
-  // Mouse event handlers
   const handleMouseDown = useCallback((event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
 
@@ -218,7 +209,6 @@ export const useDiagramControls = (
     }
   }, []);
 
-  // Node click handler
   const onNodeClick = useCallback((event: React.MouseEvent, node: any) => {
     if (node.type !== "group") {
       event.stopPropagation();

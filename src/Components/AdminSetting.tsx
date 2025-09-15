@@ -36,14 +36,12 @@ const AdminSetting = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Password form state
   const [passwordForm, setPasswordForm] = useState<PasswordForm>({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  // Password validation state
   const [passwordValidation, setPasswordValidation] =
     useState<PasswordValidation>({
       length: false,
@@ -53,11 +51,9 @@ const AdminSetting = () => {
       special: false,
     });
 
-  // Handle password input change
   const handlePasswordChange = (field: keyof PasswordForm, value: string) => {
     setPasswordForm((prev) => ({ ...prev, [field]: value }));
 
-    // Validate new password
     if (field === "newPassword") {
       setPasswordValidation({
         length: value.length >= 8,
@@ -69,7 +65,6 @@ const AdminSetting = () => {
     }
   };
 
-  // Validate password form
   const isPasswordFormValid = () => {
     const { currentPassword, newPassword, confirmPassword } = passwordForm;
     const isNewPasswordValid = Object.values(passwordValidation).every(Boolean);
@@ -83,7 +78,6 @@ const AdminSetting = () => {
     );
   };
 
-  // Handle password change submission
   const handlePasswordChangeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -95,7 +89,6 @@ const AdminSetting = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       Success("Password changed successfully!");
@@ -133,7 +126,6 @@ const AdminSetting = () => {
 
   return (
     <div className="space-y-4">
-      {/* Tabs */}
       <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (
           <button
@@ -151,7 +143,6 @@ const AdminSetting = () => {
         ))}
       </div>
 
-      {/* Content */}
       <div className="bg-primary border border-border-primary rounded-xl p-4 sm:p-6 shadow-sm">
         {activeTab === "theme" && (
           <div className="space-y-4">
@@ -162,7 +153,6 @@ const AdminSetting = () => {
               </h2>
             </div>
 
-            {/* Current Theme Display */}
             <div className="rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -208,7 +198,6 @@ const AdminSetting = () => {
             </div>
 
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
-              {/* Current Password */}
               <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
                 Current Password
               </label>
@@ -235,7 +224,6 @@ const AdminSetting = () => {
                 </button>
               </div>
 
-              {/* New Password */}
               <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
                 New Password
               </label>
@@ -262,7 +250,6 @@ const AdminSetting = () => {
                 </button>
               </div>
 
-              {/* Confirm Password */}
               <label className="block text-sm font-medium text-text-primary mb-2">
                 Confirm New Password
               </label>
@@ -295,7 +282,6 @@ const AdminSetting = () => {
                   </p>
                 )}
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}

@@ -3,7 +3,6 @@ import {
   Search,
   PlusCircle,
   Edit,
-  // Trash2,
   X,
   Loader2,
   Monitor,

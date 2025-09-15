@@ -1,7 +1,6 @@
 import type { DeviceResult } from "../../../../model/devices.interface";
 import type { NodeData } from "../../../../model/single-project.interface";
 
-// Type definitions
 export interface DiagramNode {
   id: string;
   data: NodeData;
@@ -34,7 +33,6 @@ export interface DepartmentGroup {
   devices: DeviceResult[];
 }
 
-// Device conversion functions
 export const convertDevicesToDiagram = (
   devices: DeviceResult[],
   departmentDimensions: Record<string, { width: number; height: number }>
@@ -56,7 +54,6 @@ export const convertDevicesToDiagram = (
     return acc;
   }, {} as Record<string, DepartmentGroup>);
 
-  // Sort devices within each department
   Object.values(departmentGroups).forEach((group) => {
     group.devices.sort((a: DeviceResult, b: DeviceResult) => {
       const aIsTank =
@@ -69,7 +66,6 @@ export const convertDevicesToDiagram = (
     });
   });
 
-  // Create nodes for each department
   Object.values(departmentGroups).forEach((group, groupIndex) => {
     const groupId = group.department_id.toString();
     const groupX = groupIndex * 600 + 50;
@@ -109,7 +105,6 @@ export const convertDevicesToDiagram = (
       dragHandle: ".group-drag-handle",
     });
 
-    // Create tank nodes
     const tanks = group.devices.filter(
       (device: DeviceResult) =>
         device.type === "tank" ||
@@ -130,7 +125,6 @@ export const convertDevicesToDiagram = (
       nodes.push(tankNode);
     });
 
-    // Create flow meter nodes
     const fms = group.devices.filter(
       (device: DeviceResult) =>
         device.type === "fm" ||
@@ -156,7 +150,6 @@ export const convertDevicesToDiagram = (
   return { nodes, edges };
 };
 
-// Helper function to create tank node
 const createTankNode = (
   device: DeviceResult,
   deviceId: string,
@@ -244,7 +237,6 @@ const createTankNode = (
   };
 };
 
-// Helper function to create FM node
 const createFMNode = (
   device: DeviceResult,
   deviceId: string,
@@ -338,7 +330,6 @@ const createFMNode = (
   };
 };
 
-// Clean nodes for API submission
 export const cleanNodesForAPI = (
   nodes: DiagramNode[],
   departmentDimensions: Record<string, { width: number; height: number }>

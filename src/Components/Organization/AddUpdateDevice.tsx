@@ -447,7 +447,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       setFormData((prev) => ({
                         ...prev,
                         device_family_id: parseInt(value) || 0,
-                        device_type_id: 0, // Reset device type when family changes
+                        device_type_id: 0,
                       }));
                       setDeviceFamilyId(parseInt(value) || 0);
                     }
