@@ -613,7 +613,7 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center lg:justify-between justify-center md:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap lg:flex-nowrap">
+      <div className="flex items-start md:items-center justify-center md:justify-end w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
