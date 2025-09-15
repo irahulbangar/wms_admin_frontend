@@ -20,7 +20,6 @@ const DiagramPage = () => {
   const projectId = useParams().project_id;
   const navigate = useNavigate();
 
-  // Custom hooks for diagram functionality
   const {
     nodes,
     setNodes,
@@ -57,16 +56,13 @@ const DiagramPage = () => {
     handleCloseDepartmentPopup,
   } = useDepartmentPopup(setNodes, setHasChanges, setDepartmentDimensions);
 
-  // Node drag handler
   const handleNodeDragStop: NodeDragHandler = () => {
     setHasChanges(true);
   };
 
-  // Node change handler
   const handleNodesChange = useCallback(
     (changes: any[]) => {
       setNodes((nds) => {
-        // Apply ReactFlow changes manually
         return nds
           .map((node) => {
             const change = changes.find((c) => c.id === node.id);
@@ -90,24 +86,14 @@ const DiagramPage = () => {
     [setNodes, setHasChanges]
   );
 
-  // Edge change handler
   const handleEdgesChange = useCallback(
     (changes: any[]) => {
-      console.log("handleEdgesChange called with changes:", changes); // Debug log
       setEdges((eds) => {
-        // Apply ReactFlow changes manually
         const updatedEdges = eds
           .map((edge) => {
             const change = changes.find((c) => c.id === edge.id);
             if (change) {
-              console.log(
-                "Processing change for edge:",
-                edge.id,
-                "type:",
-                change.type
-              ); // Debug log
               if (change.type === "remove") {
-                console.log("Removing edge:", edge.id); // Debug log
                 return null;
               }
               if (change.type === "select") {
@@ -118,7 +104,6 @@ const DiagramPage = () => {
           })
           .filter((edge): edge is NonNullable<typeof edge> => edge !== null);
 
-        console.log("Edges after handleEdgesChange:", updatedEdges.length); // Debug log
         return updatedEdges;
       });
       setHasChanges(true);
@@ -126,7 +111,6 @@ const DiagramPage = () => {
     [setEdges, setHasChanges]
   );
 
-  // Event handlers
   const handleSaveDiagram = async () => {
     await saveDiagramToAPI();
   };
@@ -146,7 +130,6 @@ const DiagramPage = () => {
     navigate("/organization/plants");
   };
 
-  // Transform nodes and edges for display
   const transformedNodes = useMemo(() => {
     return nodes.map((node) => {
       if (node.id === selectedDepartment && node.type === "group") {
@@ -156,7 +139,7 @@ const DiagramPage = () => {
             ...node.style,
             border: "3px solid #3b82f6",
             boxShadow: "0 0 15px rgba(59, 130, 246, 0.3)",
-            zIndex: 5, // Lower z-index to allow edges to be selectable inside
+            zIndex: 5,
           },
         };
       }
@@ -175,7 +158,7 @@ const DiagramPage = () => {
           selectedEdge === edge.id
             ? "#ff0000"
             : edge.style?.stroke || "#6366f1",
-        zIndex: selectedEdge === edge.id ? 50 : 25, // Very high z-index to ensure edges are above department groups
+        zIndex: selectedEdge === edge.id ? 50 : 25,
       },
       className: "react-flow__edge-clickable",
     }));

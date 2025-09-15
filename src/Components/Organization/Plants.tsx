@@ -30,6 +30,7 @@ import {
   setOrganizations,
 } from "../../../store/organizationSlice";
 import AddUpdatePlant from "./AddUpdatePlant";
+import Pagination from "../Pagination";
 
 const Plants = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
@@ -55,6 +56,24 @@ const Plants = () => {
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const totalItems = filteredProjects.length;
+  const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedProjects = filteredProjects.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
+  };
 
   const handleConfirmDelete = async () => {
     if (deleteProject) {
@@ -415,177 +434,188 @@ const Plants = () => {
           <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
       ) : (
-        <div className="relative overflow-auto shadow-sm rounded-lg pb-0 bg-primary flex-1">
-          <table className="w-full text-sm text-left rtl:text-right text-text-primary">
-            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-              <tr>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Sr No
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Plant Name
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Organization
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Latitude
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Longitude
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Address
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Status
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Created At
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Updated At
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProjects.length > 0 ? (
-                filteredProjects.map((project, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-border-primary bg-primary hover:bg-secondary"
-                  >
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {project?.project_name || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {
-                        organizations.find(
-                          (org) =>
-                            org.organization_id.toString() ===
-                            project.organization_id.toString()
-                        )?.organization_name
-                      }
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {project?.latitude || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      {project?.longitude || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {project?.address || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      <span
-                        className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
-                          project?.status
-                        )}`}
-                      >
-                        {project?.status || "N/A"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {fromatDateWithTime(project?.created_at) || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
-                      {fromatDateWithTime(project?.updated_at) || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                      <div className="flex items-center justify-center gap-2">
-                        <Eye
-                          onClick={() =>
-                            handleViewDevices(
-                              project?.project_id,
-                              project?.organization_id
-                            )
-                          }
-                          className="w-5 h-5 text-fuchsia-500 cursor-pointer"
-                        />
-
-                        <Edit
-                          onClick={() =>
-                            handleEditProject(project?.project_id.toString())
-                          }
-                          className="w-5 h-5 text-status-info cursor-pointer"
-                        />
+        <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
+          <div className="overflow-auto h-[calc(100vh-245px)]">
+            <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+              <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                <tr>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Sr No
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Plant Name
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Organization
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Latitude
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Longitude
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Address
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Status
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Created At
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Updated At
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedProjects.length > 0 ? (
+                  paginatedProjects.map((project, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-border-primary bg-primary hover:bg-secondary"
+                    >
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                        {project?.project_name || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                        {
+                          organizations.find(
+                            (org) =>
+                              org.organization_id.toString() ===
+                              project.organization_id.toString()
+                          )?.organization_name
+                        }
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                        {project?.latitude || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                        {project?.longitude || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                        {project?.address || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                         <span
-                          title="Edit diagram"
-                          aria-label="Edit diagram"
-                          className="inline-flex cursor-pointer"
-                          onClick={() =>
-                            navigate(`/diagram/${project?.project_id}`)
-                          }
+                          className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                            project?.status
+                          )}`}
                         >
-                          <ChartNetwork className="w-5 h-5 text-text-primary" />
+                          {project?.status || "N/A"}
                         </span>
-                      </div>
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                        {fromatDateWithTime(project?.created_at) || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                        {fromatDateWithTime(project?.updated_at) || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-2">
+                          <Eye
+                            onClick={() =>
+                              handleViewDevices(
+                                project?.project_id,
+                                project?.organization_id
+                              )
+                            }
+                            className="w-5 h-5 text-fuchsia-500 cursor-pointer"
+                          />
+
+                          <Edit
+                            onClick={() =>
+                              handleEditProject(project?.project_id.toString())
+                            }
+                            className="w-5 h-5 text-status-info cursor-pointer"
+                          />
+                          <span
+                            title="Edit diagram"
+                            aria-label="Edit diagram"
+                            className="inline-flex cursor-pointer"
+                            onClick={() =>
+                              navigate(`/diagram/${project?.project_id}`)
+                            }
+                          >
+                            <ChartNetwork className="w-5 h-5 text-text-primary" />
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={10}
+                      className="text-text-primary text-center font-roboto text-sm h-full"
+                    >
+                      <NoDataFound
+                        icon={
+                          <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                        }
+                        title={
+                          searchTerm || filterBy !== "all"
+                            ? "No plants match your search/filter"
+                            : selectedOrganizationId === "all"
+                            ? "No plants found"
+                            : `No plants found for ${
+                                organizations.find(
+                                  (org) =>
+                                    org.organization_id.toString() ===
+                                    selectedOrganizationId
+                                )?.organization_name ||
+                                `Organization ${selectedOrganizationId}`
+                              }`
+                        }
+                        description={
+                          searchTerm || filterBy !== "all"
+                            ? "Try adjusting your search terms or filter criteria"
+                            : selectedOrganizationId === "all"
+                            ? "Add your first plant to get started"
+                            : `Add your first plant for ${
+                                organizations.find(
+                                  (org) =>
+                                    org.organization_id.toString() ===
+                                    selectedOrganizationId
+                                )?.organization_name ||
+                                `Organization ${selectedOrganizationId}`
+                              } to get started`
+                        }
+                        buttonText={
+                          searchTerm || filterBy !== "all"
+                            ? "Clear Search"
+                            : "Add Plant"
+                        }
+                        buttonOnClick={() => {
+                          if (searchTerm || filterBy !== "all") {
+                            setSearchTerm("");
+                            setFilterBy("all");
+                          } else {
+                            handleAddProject();
+                          }
+                        }}
+                      />
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={10}
-                    className="text-text-primary text-center font-roboto text-sm h-full"
-                  >
-                    <NoDataFound
-                      icon={
-                        <Columns3Cog className="w-16 h-16 text-text-muted mx-auto mb-4" />
-                      }
-                      title={
-                        searchTerm || filterBy !== "all"
-                          ? "No plants match your search/filter"
-                          : selectedOrganizationId === "all"
-                          ? "No plants found"
-                          : `No plants found for ${
-                              organizations.find(
-                                (org) =>
-                                  org.organization_id.toString() ===
-                                  selectedOrganizationId
-                              )?.organization_name ||
-                              `Organization ${selectedOrganizationId}`
-                            }`
-                      }
-                      description={
-                        searchTerm || filterBy !== "all"
-                          ? "Try adjusting your search terms or filter criteria"
-                          : selectedOrganizationId === "all"
-                          ? "Add your first plant to get started"
-                          : `Add your first plant for ${
-                              organizations.find(
-                                (org) =>
-                                  org.organization_id.toString() ===
-                                  selectedOrganizationId
-                              )?.organization_name ||
-                              `Organization ${selectedOrganizationId}`
-                            } to get started`
-                      }
-                      buttonText={
-                        searchTerm || filterBy !== "all"
-                          ? "Clear Search"
-                          : "Add Plant"
-                      }
-                      buttonOnClick={() => {
-                        if (searchTerm || filterBy !== "all") {
-                          setSearchTerm("");
-                          setFilterBy("all");
-                        } else {
-                          handleAddProject();
-                        }
-                      }}
-                    />
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            rowsPerPage={rowsPerPage}
+            totalItems={totalItems}
+            selectedRows={totalItems}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
         </div>
       )}
 

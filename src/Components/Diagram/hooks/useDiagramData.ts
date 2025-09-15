@@ -18,7 +18,6 @@ import { Success } from "../../../utils/toast";
 export const useDiagramData = (projectId: string | undefined) => {
   const dispatch = useAppDispatch();
 
-  // State management
   const [nodes, setNodes] = useState<DiagramNode[]>([]);
   const [edges, setEdges] = useState<DiagramEdge[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
@@ -32,11 +31,9 @@ export const useDiagramData = (projectId: string | undefined) => {
     Record<string, { width: number; height: number }>
   >({});
 
-  // Refs for generation control
   const diagramGeneratedRef = useRef(false);
   const generationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Convert devices to diagram nodes
   const convertDevicesToDiagramCallback = useCallback(
     (devices: DeviceResult[]) => {
       return convertDevicesToDiagram(devices, departmentDimensions);
@@ -44,7 +41,6 @@ export const useDiagramData = (projectId: string | undefined) => {
     [departmentDimensions]
   );
 
-  // Fetch diagram data from API
   const fetchDiagram = useCallback(async () => {
     if (!projectId) return;
 
@@ -77,10 +73,6 @@ export const useDiagramData = (projectId: string | undefined) => {
           }
 
           setIsLoadingDiagram(false);
-        } else {
-          console.log(
-            "No existing diagram data found in plant - will show nodes only"
-          );
         }
       }
     } catch (err) {
@@ -89,7 +81,6 @@ export const useDiagramData = (projectId: string | undefined) => {
     }
   }, [dispatch, projectId]);
 
-  // Fetch device data
   const fetchDeviceData = useCallback(async () => {
     if (!projectId) return;
 
@@ -109,7 +100,6 @@ export const useDiagramData = (projectId: string | undefined) => {
     }
   }, [dispatch, projectId]);
 
-  // Update nodes with dynamic device data
   const updateNodesWithDynamicData = useCallback(() => {
     if (deviceData.length === 0 || nodes.length === 0) return;
 
@@ -161,14 +151,12 @@ export const useDiagramData = (projectId: string | undefined) => {
       });
     });
 
-    // Dispatch device data update event
     const event = new CustomEvent("deviceDataUpdated", {
       detail: { deviceData, timestamp: Date.now() },
     });
     document.dispatchEvent(event);
   }, [deviceData, nodes.length]);
 
-  // Save diagram to API
   const saveDiagramToAPI = useCallback(async () => {
     if (!projectId) return;
 
@@ -203,7 +191,6 @@ export const useDiagramData = (projectId: string | undefined) => {
     }
   }, [dispatch, projectId, nodes, edges, departmentDimensions]);
 
-  // Reset diagram
   const resetDiagram = useCallback(() => {
     setDepartmentDimensions({});
     fetchDiagram();
@@ -214,7 +201,6 @@ export const useDiagramData = (projectId: string | undefined) => {
     setHasChanges(false);
   }, [fetchDiagram, fetchDeviceData]);
 
-  // Sync department dimensions with nodes
   const syncDepartmentDimensionsWithNodes = useCallback(() => {
     setNodes((currentNodes) => {
       return currentNodes.map((node) => {
@@ -241,7 +227,6 @@ export const useDiagramData = (projectId: string | undefined) => {
     });
   }, [departmentDimensions]);
 
-  // Effects
   useEffect(() => {
     if (projectId) {
       diagramGeneratedRef.current = false;
