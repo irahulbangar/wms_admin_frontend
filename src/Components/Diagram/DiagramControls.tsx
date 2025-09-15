@@ -7,7 +7,6 @@ interface DiagramControlsProps {
   selectedEdge: string | null;
   onBack: () => void;
   onSaveDiagram: () => void;
-  onResetDiagram: () => void;
   onDeleteSelectedEdge: () => void;
   onClearAllEdges: () => void;
 }
@@ -18,23 +17,12 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
   selectedEdge,
   onBack,
   onSaveDiagram,
-  onResetDiagram,
   onDeleteSelectedEdge,
   onClearAllEdges,
 }) => {
   const handleClearAllEdgesWithConfirm = () => {
     if (confirm("Are you sure you want to delete all connections?")) {
       onClearAllEdges();
-    }
-  };
-
-  const handleResetDiagramWithConfirm = () => {
-    if (
-      confirm(
-        "Are you sure you want to reset the diagram to its initial state? This will clear all current positions, data, and department dimensions."
-      )
-    ) {
-      onResetDiagram();
     }
   };
 
@@ -87,14 +75,6 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
               }
             >
               {isSaving ? "⏳ Saving..." : "💾 Save"}
-            </button>
-
-            <button
-              onClick={handleResetDiagramWithConfirm}
-              className="px-3 py-1 bg-status-danger hover:bg-status-danger/80 text-white rounded-md text-sm transition-colors font-roboto"
-              title="Reset diagram to initial state"
-            >
-              🔄 Reset
             </button>
           </div>
         </div>

@@ -18,7 +18,12 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
         isActive ? "border-status-success" : "border-border-primary"
       }`}
     >
-      <div className="text-xs font-bold text-center mb-1">{data.label}</div>
+      <div
+        className="text-xs font-bold text-center mb-1 truncate px-1"
+        title={data.label}
+      >
+        {data.label}
+      </div>
 
       <div
         className={`absolute top-1 right-1 w-2 h-2 rounded-full ${
@@ -26,15 +31,23 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
         }`}
       />
 
-      <div className="text-xs text-center mb-1">
-        <div className="text-text-primary font-roboto">Flow:</div>
-        <div className="font-semibold text-status-info font-roboto">
+      <div className="text-center mb-1">
+        <div className="text-text-primary font-roboto text-xs font-semibold">
+          Flow:
+        </div>
+        <div
+          className="font-semibold text-status-info font-roboto text-[10px] truncate px-1"
+          title={`${flowRate} LPM`}
+        >
           {flowRate} LPM
         </div>
       </div>
 
-      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-text-primary whitespace-nowrap font-roboto">
-        <div>
+      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
+        <div
+          className="truncate text-center"
+          title={`Totalizer: ${totalizerReading} ${unit}`}
+        >
           Totalizer: {totalizerReading} {unit}
         </div>
       </div>

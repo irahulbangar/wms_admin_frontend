@@ -32,7 +32,6 @@ const DiagramPage = () => {
     departmentDimensions,
     setDepartmentDimensions,
     saveDiagramToAPI,
-    resetDiagram,
   } = useDiagramData(projectId);
 
   const {
@@ -115,10 +114,6 @@ const DiagramPage = () => {
     await saveDiagramToAPI();
   };
 
-  const handleResetDiagram = () => {
-    resetDiagram();
-  };
-
   const handleClearAllEdgesWithConfirm = () => {
     if (confirm("Are you sure you want to delete all connections?")) {
       handleClearAllEdges();
@@ -174,7 +169,6 @@ const DiagramPage = () => {
             selectedEdge={selectedEdge}
             onBack={handleBack}
             onSaveDiagram={handleSaveDiagram}
-            onResetDiagram={handleResetDiagram}
             onDeleteSelectedEdge={handleDeleteSelectedEdge}
             onClearAllEdges={handleClearAllEdgesWithConfirm}
           />

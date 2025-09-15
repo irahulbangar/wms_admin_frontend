@@ -28,8 +28,10 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
           />
         </div>
 
-        <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs whitespace-nowrap font-roboto text-text-primary">
-          {data.label}
+        <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-16">
+          <div className="truncate text-center" title={data.label}>
+            {data.label}
+          </div>
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
@@ -49,8 +51,13 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
           className="w-3 h-3 bg-status-info"
         />
       </div>
-      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs whitespace-nowrap font-roboto text-text-primary">
-        {currentLevel}/{capacity} {unit}
+      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-20">
+        <div
+          className="truncate text-center"
+          title={`${currentLevel}/${capacity} ${unit}`}
+        >
+          {currentLevel}/{capacity} {unit}
+        </div>
       </div>
     </>
   );
