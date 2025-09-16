@@ -5,7 +5,6 @@ import type {
   ProjectResult,
 } from "../model/project.interface";
 import type { SingleProjectResponse } from "../model/single-project.interface";
-import type { DeviceResult } from "../model/devices.interface";
 import type { NodesResult } from "../model/nodes.interface";
 import type { EdgesResult } from "../model/edges.interface";
 
@@ -188,28 +187,6 @@ export const deleteProjectById = createAsyncThunk(
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to delete project";
-      return thunkAPI.rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Get devices by project ID
-export const getDevicesByProjectId = createAsyncThunk(
-  "project/admin/getDevicesByProjectId",
-  async (project_id: number, thunkAPI) => {
-    try {
-      const response = await api().get<{
-        success: boolean;
-        data: DeviceResult[];
-      }>(`/device/admin/device-project/${project_id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
-      return response.data;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch devices";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
