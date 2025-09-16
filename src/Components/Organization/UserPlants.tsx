@@ -222,7 +222,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                 project_id: parseInt(e.target.value),
               }))
             }
-            className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
+            className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
           >
             <option value="">Select Plant</option>
             {projects.map((project) => (
@@ -241,7 +241,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, role: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
+            className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
           >
             <option value="">Select Role</option>
             {roleOptions.map((option) => (
@@ -259,7 +259,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, status: e.target.value }))
             }
-            className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary"
+            className="w-full px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
           >
             <option value="">Select Status</option>
             {statusOptions.map((option) => (

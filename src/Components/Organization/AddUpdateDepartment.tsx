@@ -130,7 +130,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               placeholder="Enter department name"
               value={newDepartmentName || departmentData?.department_name}
               onChange={(e) => setNewDepartmentName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-primary text-text-primary ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.department_name
                   ? "border-status-danger"
                   : "border-border-primary"

@@ -230,7 +230,7 @@ const Organization = () => {
                 setSearchTerm(value);
                 filterOrganizations(value);
               }}
-              className="md:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="md:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
             />
             {searchTerm && (
               <button

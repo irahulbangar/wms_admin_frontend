@@ -70,7 +70,7 @@ const Profile: React.FC = () => {
                 <input
                   type="text"
                   value={admin?.name}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -81,7 +81,7 @@ const Profile: React.FC = () => {
                 <input
                   type="email"
                   value={admin?.email}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -92,7 +92,7 @@ const Profile: React.FC = () => {
                 <input
                   type="tel"
                   value={admin?.contact_number}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -103,7 +103,7 @@ const Profile: React.FC = () => {
                 <input
                   type="text"
                   value={admin?.location}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -114,7 +114,7 @@ const Profile: React.FC = () => {
                 <input
                   type="text"
                   value={admin?.department}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -125,7 +125,7 @@ const Profile: React.FC = () => {
                 <input
                   type="text"
                   value={admin?.role}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors font-roboto border-border-secondary capitalize"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary capitalize"
                 />
               </div>
             </div>

@@ -165,7 +165,7 @@ const AdminSetting = () => {
                 </div>
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-2 px-4 py-2 bg-input-bg border-input-border text-text-primary rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 bg-input-bg border-input-border text-text-primary rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-1 focus:ring-status-info cursor-pointer"
                 >
                   {theme === "light" ? (
                     <>
@@ -208,7 +208,7 @@ const AdminSetting = () => {
                   onChange={(e) =>
                     handlePasswordChange("currentPassword", e.target.value)
                   }
-                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info transition-all"
                   placeholder="Enter your current password"
                 />
                 <button
@@ -234,7 +234,7 @@ const AdminSetting = () => {
                   onChange={(e) =>
                     handlePasswordChange("newPassword", e.target.value)
                   }
-                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info transition-all"
                   placeholder="Enter your new password"
                 />
                 <button
@@ -260,7 +260,7 @@ const AdminSetting = () => {
                   onChange={(e) =>
                     handlePasswordChange("confirmPassword", e.target.value)
                   }
-                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                  className="w-full pl-4 pr-12 py-3 bg-input-bg font-roboto text-text-secondary border-input-border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info transition-all"
                   placeholder="Confirm your new password"
                 />
                 <button
