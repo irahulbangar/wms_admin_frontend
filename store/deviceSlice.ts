@@ -51,6 +51,10 @@ export interface CreateDevicePayload {
   device_type_id: number;
   device_family_id: number;
   department_id: number;
+  device_visibility: string;
+  department_connection: string;
+  plant_connection: string;
+  organization_connection: string;
   params: object;
 }
 

@@ -56,13 +56,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_status: "active",
     hwid: "",
     department_id: departmentId,
-    params: {
-      height: 0,
-      storageCapacity: 0,
-      sensorPostion: 0,
-      multiplier: 0,
-      shifter: 0,
-    },
+    device_visibility: "",
+    department_connection: "",
+    plant_connection: "",
+    organization_connection: "",
+    params: {},
   });
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
   const [showAddDeviceFamilyPopup, setShowAddDeviceFamilyPopup] =
@@ -103,8 +101,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     shifter: 0,
   });
   const [fmParams, setFmParams] = useState<object>({
-    inputFor: 0,
-    outputFor: 0,
     multiplier: 0,
     shifter: 0,
     maxLpmLimit: 0,
@@ -119,8 +115,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
 
   const [fmInputValues, setFmInputValues] = useState({
-    inputFor: "0",
-    outputFor: "0",
     multiplier: "0",
     shifter: "0",
     maxLpmLimit: "0",
@@ -136,6 +130,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hwid: "",
       department_id: departmentId,
       params: tankParams,
+      device_visibility: "",
+      department_connection: "",
+      plant_connection: "",
+      organization_connection: "",
     });
     setDeviceFamilyId(0);
     setTankParams({
@@ -146,8 +144,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       shifter: 0,
     });
     setFmParams({
-      inputFor: 0,
-      outputFor: 0,
       multiplier: 0,
       shifter: 0,
       maxLpmLimit: 0,
@@ -160,8 +156,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       shifter: "0",
     });
     setFmInputValues({
-      inputFor: "0",
-      outputFor: "0",
       multiplier: "0",
       shifter: "0",
       maxLpmLimit: "0",
@@ -229,33 +223,47 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_status: formData.device_status,
         hwid: formData.hwid,
         department_id: formData.department_id,
+        device_visibility: formData.device_visibility,
+        department_connection: formData.department_connection,
+        plant_connection: formData.plant_connection,
+        organization_connection: formData.organization_connection,
         params: getSelectedDeviceFamilyName() === "fm" ? fmParams : tankParams,
       };
 
       if (type === "add") {
-        const result = await dispatch(createDevice(deviceData)).unwrap();
-        if (result.success) {
-          Success("Device added successfully");
-          setShowAddModal(false);
-          onUpdateSuccess?.(result);
-        } else {
-          Error(result.message || "Failed to add device");
-        }
+        await dispatch(createDevice(deviceData))
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message || "Device added successfully");
+              setShowAddModal(false);
+              onUpdateSuccess?.(res);
+            } else {
+              Error(res.message || "Failed to add device");
+            }
+          })
+          .catch((err) => {
+            Error(err.message || "Failed to add device");
+          });
       } else {
-        const result = await dispatch(
-          updateDevice({ device_id: deviceId, ...deviceData })
-        ).unwrap();
-        if (result.success) {
-          Success("Device updated successfully");
-          setShowAddModal(false);
-          onUpdateSuccess?.(result);
-        } else {
-          Error(result.message || "Failed to update device");
-        }
+        await dispatch(updateDevice({ device_id: deviceId, ...deviceData }))
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              Success(res.message || "Device updated successfully");
+              setShowAddModal(false);
+              onUpdateSuccess?.(res);
+            } else {
+              Error(res.message || "Failed to update device");
+            }
+          })
+          .catch((err) => {
+            Error(err.message || "Failed to update device");
+          });
       }
     } catch (error) {
       console.error("Error submitting device:", error);
-      Error("Failed to submit device");
+      Error((error as string) || "Failed to submit device");
     } finally {
       setIsLoading(false);
     }
@@ -277,6 +285,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               hwid: deviceData.hwid,
               department_id: deviceData.department_id,
               params: deviceData.params,
+              device_visibility: deviceData.device_visibility,
+              department_connection: deviceData.department_connection,
+              plant_connection: deviceData.plant_connection,
+              organization_connection: deviceData.organization_connection,
             });
             setDeviceFamilyId(deviceData.device_family_id);
 
@@ -297,8 +309,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               };
               setFmParams(fmData);
               setFmInputValues({
-                inputFor: fmData.inputFor.toString(),
-                outputFor: fmData.outputFor.toString(),
                 multiplier: fmData.multiplier.toString(),
                 shifter: fmData.shifter.toString(),
                 maxLpmLimit: fmData.maxLpmLimit.toString(),
@@ -335,6 +345,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         hwid: "",
         department_id: departmentId,
         params: tankParams,
+        device_visibility: "",
+        department_connection: "",
+        plant_connection: "",
+        organization_connection: "",
       });
       setDeviceFamilyId(0);
     }
@@ -415,7 +429,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-primary rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-primary rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
           <h2 className="text-xl font-semibold text-text-primary font-roboto">
             {type === "update" ? "Update Device" : "Add New Device"}
@@ -432,149 +446,55 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                Device Family
+              <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2">
+                Device Details
               </label>
-              <div className="relative">
-                <select
-                  name="device_family_id"
-                  value={formData.device_family_id}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === "add_new") {
-                      setShowAddDeviceFamilyPopup(true);
-                      setFormData((prev) => ({ ...prev, device_family_id: 0 }));
-                    } else {
-                      setShowAddDeviceFamilyPopup(false);
-                      setFormData((prev) => ({
-                        ...prev,
-                        device_family_id: parseInt(value) || 0,
-                        device_type_id: 0,
-                      }));
-                      setDeviceFamilyId(parseInt(value) || 0);
-                    }
-                  }}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.device_family_id
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                >
-                  <option value="0">Select Device Family</option>
-                  {familyData.map((family) => (
-                    <option
-                      key={family.device_family_id}
-                      value={family.device_family_id}
-                    >
-                      {family.name}
-                    </option>
-                  ))}
-                  {admin?.role === "super_admin" && (
-                    <option
-                      value="add_new"
-                      className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
-                    >
-                      + Add New
-                    </option>
-                  )}
-                </select>
-
-                {formData.device_family_id !== 0 && (
-                  <div className="absolute right-5 top-1/2 transform -translate-y-1/2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const selectedFamily = familyData.find(
-                          (family) =>
-                            family.device_family_id ===
-                            formData.device_family_id
-                        );
-                        if (selectedFamily) {
-                          setEditingDeviceFamilyId(
-                            selectedFamily.device_family_id
-                          );
-                          setEditingDeviceFamilyName(selectedFamily.name);
-                          setEditingDeviceFamilyType(selectedFamily.type);
-                          setShowAddDeviceFamilyPopup(true);
-                        }
-                      }}
-                      className="p-1 hover:bg-secondary/50 rounded transition-colors flex items-center gap-2"
-                      title={`Edit ${
-                        familyData.find(
-                          (f) =>
-                            f.device_family_id === formData.device_family_id
-                        )?.name || "Device Family"
-                      }`}
-                    >
-                      {admin?.role === "super_admin" && (
-                        <Edit className="w-4 h-4 text-status-info" />
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-              {errors.device_family_id && (
-                <p className="text-status-danger text-sm mt-1 font-roboto">
-                  {errors.device_family_id}
-                </p>
-              )}
             </div>
-
-            <div>
-              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                Device Type
-              </label>
-              <div className="relative">
-                <select
-                  name="device_type_id"
-                  value={formData.device_type_id}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === "add_new") {
-                      setShowAddDeviceTypePopup(true);
-                      setFormData((prev) => ({ ...prev, device_type_id: 0 }));
-                    } else {
-                      setShowAddDeviceTypePopup(false);
-                      setFormData((prev) => ({
-                        ...prev,
-                        device_type_id: parseInt(value) || 0,
-                      }));
-                    }
-                  }}
-                  disabled={!formData.device_family_id}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.device_type_id
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  } ${
-                    !formData.device_family_id
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }`}
-                >
-                  <option value="0">
-                    {formData.device_family_id
-                      ? "Select Device Type"
-                      : "Select Device Family First"}
-                  </option>
-                  {formData.device_family_id &&
-                    typeData
-                      .filter(
-                        (type) =>
-                          type.device_family_id === formData.device_family_id
-                      )
-                      .map((type) => (
-                        <option
-                          key={type.device_type_id}
-                          value={type.device_type_id}
-                        >
-                          {type.device_type_name}
-                        </option>
-                      ))}
-                  {formData.device_family_id &&
-                    admin?.role === "super_admin" && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Device Family
+                </label>
+                <div className="relative">
+                  <select
+                    name="device_family_id"
+                    value={formData.device_family_id}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "add_new") {
+                        setShowAddDeviceFamilyPopup(true);
+                        setFormData((prev) => ({
+                          ...prev,
+                          device_family_id: 0,
+                        }));
+                      } else {
+                        setShowAddDeviceFamilyPopup(false);
+                        setFormData((prev) => ({
+                          ...prev,
+                          device_family_id: parseInt(value) || 0,
+                          device_type_id: 0,
+                        }));
+                        setDeviceFamilyId(parseInt(value) || 0);
+                      }
+                    }}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.device_family_id
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
+                  >
+                    <option value="0">Select Device Family</option>
+                    {familyData.map((family) => (
+                      <option
+                        key={family.device_family_id}
+                        value={family.device_family_id}
+                      >
+                        {family.name}
+                      </option>
+                    ))}
+                    {admin?.role === "super_admin" && (
                       <option
                         value="add_new"
                         className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
@@ -582,298 +502,491 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                         + Add New
                       </option>
                     )}
-                </select>
+                  </select>
 
-                {formData.device_type_id !== 0 && (
-                  <div className="absolute right-5 cursor-pointer top-1/2 transform -translate-y-1/2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const selectedType = typeData.find(
-                          (type) =>
-                            type.device_type_id === formData.device_type_id
-                        );
-                        if (selectedType) {
-                          setEditingDeviceTypeId(selectedType.device_type_id);
-                          setEditingDeviceTypeName(
-                            selectedType.device_type_name
+                  {formData.device_family_id !== 0 && (
+                    <div className="absolute right-5 top-1/2 transform -translate-y-1/2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const selectedFamily = familyData.find(
+                            (family) =>
+                              family.device_family_id ===
+                              formData.device_family_id
                           );
-                          setEditingDeviceTypeTopic(selectedType.topic);
-                          setShowAddDeviceTypePopup(true);
-                        }
-                      }}
-                      className="p-1 hover:bg-secondary/50 rounded transition-colors flex items-center gap-2"
-                      title={`Edit ${
-                        typeData.find(
-                          (t) => t.device_type_id === formData.device_type_id
-                        )?.device_type_name || "Device Type"
-                      }`}
-                    >
-                      {admin?.role === "super_admin" && (
-                        <Edit className="w-4 h-4 text-status-info" />
-                      )}
-                    </button>
-                  </div>
+                          if (selectedFamily) {
+                            setEditingDeviceFamilyId(
+                              selectedFamily.device_family_id
+                            );
+                            setEditingDeviceFamilyName(selectedFamily.name);
+                            setEditingDeviceFamilyType(selectedFamily.type);
+                            setShowAddDeviceFamilyPopup(true);
+                          }
+                        }}
+                        className="p-1 hover:bg-secondary/50 rounded transition-colors flex items-center gap-2"
+                        title={`Edit ${
+                          familyData.find(
+                            (f) =>
+                              f.device_family_id === formData.device_family_id
+                          )?.name || "Device Family"
+                        }`}
+                      >
+                        {admin?.role === "super_admin" && (
+                          <Edit className="w-4 h-4 text-status-info" />
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {errors.device_family_id && (
+                  <p className="text-status-danger text-sm mt-1 font-roboto">
+                    {errors.device_family_id}
+                  </p>
                 )}
               </div>
-              {errors.device_type_id && (
-                <p className="text-status-danger text-sm mt-1 font-roboto">
-                  {errors.device_type_id}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                Device Name
-              </label>
-              <input
-                type="text"
-                name="device_name"
-                value={formData.device_name}
-                onChange={handleInputChange}
-                placeholder="Enter device name"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.device_name
-                    ? "border-status-danger"
-                    : "border-border-primary"
-                }`}
-              />
-              {errors.device_name && (
-                <p className="text-status-danger text-sm mt-1 font-roboto">
-                  {errors.device_name}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                Device Status
-              </label>
-              <select
-                name="device_status"
-                value={formData.device_status}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-
-            {/* IMEI Number */}
-            <div>
-              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                HWID Number
-              </label>
-              <input
-                type="text"
-                name="hwid"
-                value={formData.hwid}
-                onChange={handleInputChange}
-                placeholder="Enter HWID number"
-                maxLength={15}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                  errors.hwid ? "border-status-danger" : "border-border-primary"
-                }`}
-              />
-              {errors.hwid && (
-                <p className="text-status-danger text-sm mt-1 font-roboto">
-                  {errors.hwid}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                Department
-              </label>
-              <select
-                name="department_id"
-                value={formData.department_id}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === "add_new") {
-                    setShowAddDepartmentPopup(true);
-                    setFormData((prev) => ({ ...prev, department_id: 0 }));
-                  } else {
-                    setShowAddDepartmentPopup(false);
-                    setFormData((prev) => ({
-                      ...prev,
-                      department_id: parseInt(value) || 0,
-                    }));
-                  }
-                }}
-                className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
-              >
-                <option value="0">Select Department</option>
-                {departmentData.map((department) => (
-                  <option
-                    key={department.department_id}
-                    value={department.department_id}
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Device Type
+                </label>
+                <div className="relative">
+                  <select
+                    name="device_type_id"
+                    value={formData.device_type_id}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "add_new") {
+                        setShowAddDeviceTypePopup(true);
+                        setFormData((prev) => ({ ...prev, device_type_id: 0 }));
+                      } else {
+                        setShowAddDeviceTypePopup(false);
+                        setFormData((prev) => ({
+                          ...prev,
+                          device_type_id: parseInt(value) || 0,
+                        }));
+                      }
+                    }}
+                    disabled={!formData.device_family_id}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors.device_type_id
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    } ${
+                      !formData.device_family_id
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
                   >
-                    {department.department_name}
-                  </option>
-                ))}
-                <option
-                  value="add_new"
-                  className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                    <option value="0">
+                      {formData.device_family_id
+                        ? "Select Device Type"
+                        : "Select Device Family First"}
+                    </option>
+                    {formData.device_family_id &&
+                      typeData
+                        .filter(
+                          (type) =>
+                            type.device_family_id === formData.device_family_id
+                        )
+                        .map((type) => (
+                          <option
+                            key={type.device_type_id}
+                            value={type.device_type_id}
+                          >
+                            {type.device_type_name}
+                          </option>
+                        ))}
+                    {formData.device_family_id &&
+                      admin?.role === "super_admin" && (
+                        <option
+                          value="add_new"
+                          className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                        >
+                          + Add New
+                        </option>
+                      )}
+                  </select>
+
+                  {formData.device_type_id !== 0 && (
+                    <div className="absolute right-5 cursor-pointer top-1/2 transform -translate-y-1/2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const selectedType = typeData.find(
+                            (type) =>
+                              type.device_type_id === formData.device_type_id
+                          );
+                          if (selectedType) {
+                            setEditingDeviceTypeId(selectedType.device_type_id);
+                            setEditingDeviceTypeName(
+                              selectedType.device_type_name
+                            );
+                            setEditingDeviceTypeTopic(selectedType.topic);
+                            setShowAddDeviceTypePopup(true);
+                          }
+                        }}
+                        className="p-1 hover:bg-secondary/50 rounded transition-colors flex items-center gap-2"
+                        title={`Edit ${
+                          typeData.find(
+                            (t) => t.device_type_id === formData.device_type_id
+                          )?.device_type_name || "Device Type"
+                        }`}
+                      >
+                        {admin?.role === "super_admin" && (
+                          <Edit className="w-4 h-4 text-status-info" />
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {errors.device_type_id && (
+                  <p className="text-status-danger text-sm mt-1 font-roboto">
+                    {errors.device_type_id}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Device Name
+                </label>
+                <input
+                  type="text"
+                  name="device_name"
+                  value={formData.device_name}
+                  onChange={handleInputChange}
+                  placeholder="Enter device name"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.device_name
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+                {errors.device_name && (
+                  <p className="text-status-danger text-sm mt-1 font-roboto">
+                    {errors.device_name}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Device Status
+                </label>
+                <select
+                  name="device_status"
+                  value={formData.device_status}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
-                  + Add New
-                </option>
-              </select>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              {/* IMEI Number */}
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  HWID Number
+                </label>
+                <input
+                  type="text"
+                  name="hwid"
+                  value={formData.hwid}
+                  onChange={handleInputChange}
+                  placeholder="Enter HWID number"
+                  maxLength={15}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.hwid
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+                {errors.hwid && (
+                  <p className="text-status-danger text-sm mt-1 font-roboto">
+                    {errors.hwid}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Department
+                </label>
+                <select
+                  name="department_id"
+                  value={formData.department_id}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "add_new") {
+                      setShowAddDepartmentPopup(true);
+                      setFormData((prev) => ({ ...prev, department_id: 0 }));
+                    } else {
+                      setShowAddDepartmentPopup(false);
+                      setFormData((prev) => ({
+                        ...prev,
+                        department_id: parseInt(value) || 0,
+                      }));
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">None</option>
+                  {departmentData.map((department) => (
+                    <option
+                      key={department.department_id}
+                      value={department.department_id}
+                    >
+                      {department.department_name}
+                    </option>
+                  ))}
+                  <option
+                    value="add_new"
+                    className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                  >
+                    + Add New
+                  </option>
+                </select>
+              </div>
             </div>
+
+            <div>
+              <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                Device Connection
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Device Visibility
+                </label>
+                <select
+                  name="device_visibility"
+                  value={formData.device_visibility}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Visibility</option>
+                  <option value="visible">Visible</option>
+                  <option value="hidden">Hidden</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Department Connection
+                </label>
+                <select
+                  name="department_connection"
+                  value={formData.department_connection}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Department Connection</option>
+                  <option value="none">None</option>
+                  <option value="in">In</option>
+                  <option value="out">Out</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Plant Connection
+                </label>
+                <select
+                  name="plant_connection"
+                  value={formData.plant_connection}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Plant Connection</option>
+                  <option value="none">None</option>
+                  <option value="in">In</option>
+                  <option value="out">Out</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Organization Connection
+                </label>
+                <select
+                  name="organization_connection"
+                  value={formData.organization_connection}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Organization Connection</option>
+                  <option value="none">None</option>
+                  <option value="in">In</option>
+                  <option value="out">Out</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+            </div>
+
             {/* Tank Parameters */}
             {getSelectedDeviceFamilyName() === "tank" && (
               <>
                 <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Height
+                  <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                    Tank Parameters
                   </label>
-                  <input
-                    type="text"
-                    name="height"
-                    value={tankInputValues.height}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setTankInputValues((prev) => ({
-                        ...prev,
-                        height: inputValue,
-                      }));
-
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setTankParams((prev) => ({
-                        ...prev,
-                        height: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter height"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.height
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
                 </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Storage Capacity
-                  </label>
-                  <input
-                    type="text"
-                    name="storageCapacity"
-                    value={tankInputValues.storageCapacity}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setTankInputValues((prev) => ({
-                        ...prev,
-                        storageCapacity: inputValue,
-                      }));
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Height
+                    </label>
+                    <input
+                      type="text"
+                      name="height"
+                      value={tankInputValues.height}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setTankInputValues((prev) => ({
+                          ...prev,
+                          height: inputValue,
+                        }));
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setTankParams((prev) => ({
-                        ...prev,
-                        storageCapacity: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter storage capacity"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.storageCapacity
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Sensor Position
-                  </label>
-                  <input
-                    type="text"
-                    name="sensorPostion"
-                    value={tankInputValues.sensorPostion}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setTankInputValues((prev) => ({
-                        ...prev,
-                        sensorPostion: inputValue,
-                      }));
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setTankParams((prev) => ({
+                          ...prev,
+                          height: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter height"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.height
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setTankParams((prev) => ({
-                        ...prev,
-                        sensorPostion: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter sensor position"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.sensorPostion
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Multiplier
-                  </label>
-                  <input
-                    type="text"
-                    name="multiplier"
-                    value={tankInputValues.multiplier}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setTankInputValues((prev) => ({
-                        ...prev,
-                        multiplier: inputValue,
-                      }));
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Storage Capacity
+                    </label>
+                    <input
+                      type="text"
+                      name="storageCapacity"
+                      value={tankInputValues.storageCapacity}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setTankInputValues((prev) => ({
+                          ...prev,
+                          storageCapacity: inputValue,
+                        }));
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setTankParams((prev) => ({
-                        ...prev,
-                        multiplier: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter multiplier"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.multiplier
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Shifter
-                  </label>
-                  <input
-                    type="text"
-                    name="shifter"
-                    value={tankInputValues.shifter}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setTankInputValues((prev) => ({
-                        ...prev,
-                        shifter: inputValue,
-                      }));
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setTankParams((prev) => ({
+                          ...prev,
+                          storageCapacity: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter storage capacity"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.storageCapacity
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setTankParams((prev) => ({
-                        ...prev,
-                        shifter: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter shifter"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.shifter
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Sensor Position
+                    </label>
+                    <input
+                      type="text"
+                      name="sensorPostion"
+                      value={tankInputValues.sensorPostion}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setTankInputValues((prev) => ({
+                          ...prev,
+                          sensorPostion: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setTankParams((prev) => ({
+                          ...prev,
+                          sensorPostion: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter sensor position"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.sensorPostion
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Multiplier
+                    </label>
+                    <input
+                      type="text"
+                      name="multiplier"
+                      value={tankInputValues.multiplier}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setTankInputValues((prev) => ({
+                          ...prev,
+                          multiplier: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setTankParams((prev) => ({
+                          ...prev,
+                          multiplier: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter multiplier"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.multiplier
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Shifter
+                    </label>
+                    <input
+                      type="text"
+                      name="shifter"
+                      value={tankInputValues.shifter}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setTankInputValues((prev) => ({
+                          ...prev,
+                          shifter: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setTankParams((prev) => ({
+                          ...prev,
+                          shifter: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter shifter"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.shifter
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -882,154 +995,103 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             {getSelectedDeviceFamilyName() === "fm" && (
               <>
                 <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Input For
+                  <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                    FM Parameters
                   </label>
-                  <input
-                    type="text"
-                    name="inputFor"
-                    value={fmInputValues.inputFor}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setFmInputValues((prev) => ({
-                        ...prev,
-                        inputFor: inputValue,
-                      }));
-
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setFmParams((prev) => ({
-                        ...prev,
-                        inputFor: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter input for"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.inputFor
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
                 </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Output For
-                  </label>
-                  <input
-                    type="text"
-                    name="outputFor"
-                    value={fmInputValues.outputFor}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setFmInputValues((prev) => ({
-                        ...prev,
-                        outputFor: inputValue,
-                      }));
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Multiplier
+                    </label>
+                    <input
+                      type="text"
+                      name="multiplier"
+                      value={fmInputValues.multiplier}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setFmInputValues((prev) => ({
+                          ...prev,
+                          multiplier: inputValue,
+                        }));
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setFmParams((prev) => ({
-                        ...prev,
-                        outputFor: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter output for"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.outputFor
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Multiplier
-                  </label>
-                  <input
-                    type="text"
-                    name="multiplier"
-                    value={fmInputValues.multiplier}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setFmInputValues((prev) => ({
-                        ...prev,
-                        multiplier: inputValue,
-                      }));
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setFmParams((prev) => ({
+                          ...prev,
+                          multiplier: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter multiplier"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.multiplier
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setFmParams((prev) => ({
-                        ...prev,
-                        multiplier: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter multiplier"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.multiplier
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Shifter
-                  </label>
-                  <input
-                    type="text"
-                    name="shifter"
-                    value={fmInputValues.shifter}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setFmInputValues((prev) => ({
-                        ...prev,
-                        shifter: inputValue,
-                      }));
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Shifter
+                    </label>
+                    <input
+                      type="text"
+                      name="shifter"
+                      value={fmInputValues.shifter}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setFmInputValues((prev) => ({
+                          ...prev,
+                          shifter: inputValue,
+                        }));
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setFmParams((prev) => ({
-                        ...prev,
-                        shifter: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter shifter"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.shifter
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                    Max LPM Limit
-                  </label>
-                  <input
-                    type="text"
-                    name="maxLpmLimit"
-                    value={fmInputValues.maxLpmLimit}
-                    onChange={(e) => {
-                      const inputValue = e.target.value;
-                      setFmInputValues((prev) => ({
-                        ...prev,
-                        maxLpmLimit: inputValue,
-                      }));
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setFmParams((prev) => ({
+                          ...prev,
+                          shifter: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter shifter"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.shifter
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
 
-                      const numericValue =
-                        inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                      setFmParams((prev) => ({
-                        ...prev,
-                        maxLpmLimit: numericValue,
-                      }));
-                    }}
-                    placeholder="Enter max LPM limit"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                      errors.maxLpmLimit
-                        ? "border-status-danger"
-                        : "border-border-primary"
-                    }`}
-                  />
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Max LPM Limit
+                    </label>
+                    <input
+                      type="text"
+                      name="maxLpmLimit"
+                      value={fmInputValues.maxLpmLimit}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setFmInputValues((prev) => ({
+                          ...prev,
+                          maxLpmLimit: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setFmParams((prev) => ({
+                          ...prev,
+                          maxLpmLimit: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter max LPM limit"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.maxLpmLimit
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
                 </div>
               </>
             )}
