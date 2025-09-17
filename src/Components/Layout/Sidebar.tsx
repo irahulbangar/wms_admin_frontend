@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAppSelector } from "../../../store/store";
 import Logo from "../../assets/images/logo.png";
+import { useNavigate } from "react-router-dom";
 
 interface SubmenuItem {
   id: string;
@@ -104,6 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   setIsOpen,
 }) => {
   const { admin } = useAppSelector((state) => state.admin);
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(() => {
     const saved = localStorage.getItem("sidebar-expanded");
     return saved ? new Set(JSON.parse(saved)) : new Set(["dashboard"]);
@@ -174,7 +176,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <div className="flex items-center justify-center">
-            <img src={Logo} alt="logo" className="h-16 w-32 object-contain" />
+            <img
+              onClick={() => navigate("/")}
+              src={Logo}
+              alt="logo"
+              className="h-16 w-32 object-contain cursor-pointer"
+            />
           </div>
           <button
             onClick={() => setIsOpen(false)}
