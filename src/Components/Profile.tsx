@@ -69,8 +69,9 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  disabled
                   value={admin?.name}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -80,8 +81,9 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="email"
+                  disabled
                   value={admin?.email}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -91,8 +93,9 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="tel"
+                  disabled
                   value={admin?.contact_number}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -102,8 +105,9 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  disabled
                   value={admin?.location}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -113,8 +117,9 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  disabled
                   value={admin?.department}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
                 />
               </div>
 
@@ -124,8 +129,9 @@ const Profile: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  disabled
                   value={admin?.role}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto border-border-secondary capitalize"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary capitalize"
                 />
               </div>
             </div>
