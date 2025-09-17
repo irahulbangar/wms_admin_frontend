@@ -7,8 +7,6 @@ import {
   User,
   LogOut,
   User as UserIcon,
-  Calendar,
-  Clock,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -29,15 +27,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -99,7 +88,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   return (
     <div className="bg-primary border-b border-border-primary md:px-6 px-2 py-4 flex items-center justify-between shadow-lg">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center">
         <button
           onClick={onMenuClick}
           className="lg:hidden p-2 rounded-md text-text-primary hover:text-foreground hover:bg-accent"
@@ -107,36 +96,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="hidden md:block">
-          <h1 className="text-2xl text-text-primary font-roboto font-medium">
+        <div className="block">
+          <h1 className="text-2xl font-black text-text-primary font-roboto">
             {getPageTitle()}
           </h1>
         </div>
-        {getPageTitle() === "Dashboard" && (
-          <div className="flex md:items-center items-start flex-col md:flex-row gap-2">
-            <div className="flex items-center space-x-2 text-text-primary">
-              <Calendar className="w-5 h-5 text-text-secondary" />
-              <span className="font-roboto font-semibold text-lg">
-                {currentTime.toLocaleDateString("en-IN", {
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2 text-text-primary">
-              <Clock className="w-5 h-5 text-text-secondary" />
-              <span className="font-roboto font-semibold text-lg">
-                {currentTime.toLocaleTimeString("en-IN", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                })}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="flex items-center space-x-3">

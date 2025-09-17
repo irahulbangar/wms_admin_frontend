@@ -23,6 +23,7 @@ import { getAllDevices } from "../../../store/deviceSlice";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const dispatch = useDispatch<AppDispatch>();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
@@ -111,6 +112,11 @@ const Dashboard = () => {
     fetchProjects();
     fetchUsers();
     fetchDevices();
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [fetchOrganizations, fetchProjects, fetchUsers, fetchDevices]);
 
   const stats = [
@@ -164,6 +170,30 @@ const Dashboard = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-4 w-full">
+          <div className="flex items-center md:justify-end justify-center space-x-3">
+            <div className="flex items-center space-x-2 text-text-primary">
+              <Calendar className="w-5 h-5 text-text-secondary" />
+              <span className="font-roboto font-semibold text-base">
+                {currentTime.toLocaleDateString("en-IN", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2 text-text-primary">
+              <Clock className="w-5 h-5 text-text-secondary" />
+              <span className="font-roboto font-semibold text-base">
+                {currentTime.toLocaleTimeString("en-IN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {stats.map((stat, index) => (
               <div
