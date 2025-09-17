@@ -23,7 +23,6 @@ import { getAllDevices } from "../../../store/deviceSlice";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const dispatch = useDispatch<AppDispatch>();
   const [projects, setProjects] = useState<ProjectResult[]>([]);
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
@@ -112,11 +111,6 @@ const Dashboard = () => {
     fetchProjects();
     fetchUsers();
     fetchDevices();
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, [fetchOrganizations, fetchProjects, fetchUsers, fetchDevices]);
 
   const stats = [
@@ -170,19 +164,6 @@ const Dashboard = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-4 w-full">
-          <div className="flex items-center md:justify-end justify-center space-x-3">
-            <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
-              <Calendar className="w-5 h-5 text-text-secondary" />
-              <span>{currentTime.toLocaleDateString()}</span>
-            </div>
-            <div className="flex items-center space-x-2 text-base text-text-primary font-roboto font-semibold">
-              <Clock className="w-5 h-5 text-text-secondary" />
-              <span className="font-roboto font-semibold text-base">
-                {currentTime.toLocaleTimeString()}
-              </span>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {stats.map((stat, index) => (
               <div
