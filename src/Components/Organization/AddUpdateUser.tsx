@@ -76,17 +76,13 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
       !/^[0-9]{10}$/.test(formData.client_phone.toString().trim()) ||
       formData.client_phone.toString().trim().length !== 10
     ) {
-      newErrors.client_phone = "Please enter exactly 10 digits";
+      Error("Please enter the 10 digit phone number");
     }
 
     if (type === "add" && !formData.client_password.trim()) {
       newErrors.client_password = "Client Password is required";
     } else if (type === "add" && formData.client_password.length < 6) {
-      newErrors.client_password = "Password must be at least 6 characters";
-    }
-
-    if (!formData.status) {
-      newErrors.status = "Client Status is required";
+      Error("Password must be at least 6 characters");
     }
 
     setErrors(newErrors as Record<string, string>);
@@ -130,7 +126,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
             } as CreateClientPayload);
           })
           .catch((err) => {
-            Error(err);
+            Error(err.message || "Something went wrong");
           })
           .finally(() => {
             setIsLoading(false);
@@ -156,7 +152,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
             }
           })
           .catch((err) => {
-            Error(err.message);
+            Error(err.message || "Something went wrong");
           })
           .finally(() => {
             setIsLoading(false);
@@ -194,7 +190,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           }
         })
         .catch((err) => {
-          Error(err.message);
+          Error(err.message || "Something went wrong");
         })
         .finally(() => {
           setIsFetching(false);
@@ -353,7 +349,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
             </label>
             <select
               name="organization_id"
-              value={formData.organization_id}
+              value={formData.organization_id || ""}
               disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.organization_id
@@ -362,6 +358,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               } ${isFetching ? "opacity-50 cursor-not-allowed" : ""}`}
               onChange={handleInputChange}
             >
+              <option value="">Select Organization</option>
               {organizationData.map((organization) => (
                 <option
                   key={organization.organization_id}
