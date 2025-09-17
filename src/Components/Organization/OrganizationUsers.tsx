@@ -501,16 +501,21 @@ const OrganizationUsers = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center gap-3 justify-center">
-                          <SquarePen
-                            onClick={() =>
-                              handleEditUser(
-                                user.client_id,
-                                user.organization_id
-                              )
-                            }
-                            className="w-5 h-5 text-status-info cursor-pointer"
-                          />
-                          <span title="View Plants">
+                          <span title="Edit user" aria-label="Edit user">
+                            <SquarePen
+                              onClick={() =>
+                                handleEditUser(
+                                  user.client_id,
+                                  user.organization_id
+                                )
+                              }
+                              className="w-5 h-5 text-status-info cursor-pointer"
+                            />
+                          </span>
+                          <span
+                            title="View user plants"
+                            aria-label="View user plants"
+                          >
                             <User2
                               className="w-5 h-5 text-text-primary cursor-pointer"
                               onClick={() =>

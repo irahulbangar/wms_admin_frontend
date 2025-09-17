@@ -347,33 +347,45 @@ const Organization = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                         <div className="flex items-center gap-3 justify-center">
-                          <Eye
-                            onClick={() =>
-                              handleViewPlants(
-                                organization?.organization_id.toString()
-                              )
-                            }
-                            className="w-5 h-5 text-fuchsia-500 cursor-pointer"
-                          />
-
-                          <SquarePen
-                            onClick={() =>
-                              handleEditOrganization(
-                                organization?.organization_id.toString()
-                              )
-                            }
-                            className="w-5 h-5 text-status-info cursor-pointer"
-                          />
-
-                          {admin?.role === "super_admin" && (
-                            <Trash2
-                              className="w-5 h-5 text-status-danger cursor-pointer"
+                          <span title="View plants" aria-label="View plants">
+                            <Eye
                               onClick={() =>
-                                handleDeleteOrganization(
+                                handleViewPlants(
                                   organization?.organization_id.toString()
                                 )
                               }
+                              className="w-5 h-5 text-fuchsia-500 cursor-pointer"
                             />
+                          </span>
+
+                          <span
+                            title="Edit organization"
+                            aria-label="Edit organization"
+                          >
+                            <SquarePen
+                              onClick={() =>
+                                handleEditOrganization(
+                                  organization?.organization_id.toString()
+                                )
+                              }
+                              className="w-5 h-5 text-status-info cursor-pointer"
+                            />
+                          </span>
+
+                          {admin?.role === "super_admin" && (
+                            <span
+                              title="Delete organization"
+                              aria-label="Delete organization"
+                            >
+                              <Trash2
+                                className="w-5 h-5 text-status-danger cursor-pointer"
+                                onClick={() =>
+                                  handleDeleteOrganization(
+                                    organization?.organization_id.toString()
+                                  )
+                                }
+                              />
+                            </span>
                           )}
                         </div>
                       </td>

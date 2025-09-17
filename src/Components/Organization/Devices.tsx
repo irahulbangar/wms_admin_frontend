@@ -945,16 +945,21 @@ const Devices = () => {
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 <div className="flex items-center justify-center gap-2">
-                                  <Edit
-                                    onClick={() =>
-                                      handleEditDevice(
-                                        device?.device_id,
-                                        device?.project_id,
-                                        device?.department_id
-                                      )
-                                    }
-                                    className="w-5 h-5 text-status-info cursor-pointer"
-                                  />
+                                  <span
+                                    title="Edit device"
+                                    aria-label="Edit device"
+                                  >
+                                    <Edit
+                                      onClick={() =>
+                                        handleEditDevice(
+                                          device?.device_id,
+                                          device?.project_id,
+                                          device?.department_id
+                                        )
+                                      }
+                                      className="w-5 h-5 text-status-info cursor-pointer"
+                                    />
+                                  </span>
                                 </div>
                               </td>
                             </tr>

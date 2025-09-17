@@ -253,15 +253,19 @@ const Users = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center gap-3 justify-center">
-                          <SquarePen
-                            onClick={() => handleEditUser(user?.admin_id)}
-                            className="w-5 h-5 text-status-info cursor-pointer"
-                          />
-                          {admin?.role === "super_admin" && (
-                            <Trash2
-                              onClick={() => handleDeleteUser(user?.admin_id)}
-                              className="w-5 h-5 text-status-danger cursor-pointer"
+                          <span title="Edit user" aria-label="Edit user">
+                            <SquarePen
+                              onClick={() => handleEditUser(user?.admin_id)}
+                              className="w-5 h-5 text-status-info cursor-pointer"
                             />
+                          </span>
+                          {admin?.role === "super_admin" && (
+                            <span title="Delete user" aria-label="Delete user">
+                              <Trash2
+                                onClick={() => handleDeleteUser(user?.admin_id)}
+                                className="w-5 h-5 text-status-danger cursor-pointer"
+                              />
+                            </span>
                           )}
                         </div>
                       </td>

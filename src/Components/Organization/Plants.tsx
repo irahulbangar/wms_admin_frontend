@@ -533,22 +533,29 @@ const Plants = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">
-                          <Eye
-                            onClick={() =>
-                              handleViewDevices(
-                                project?.project_id,
-                                project?.organization_id
-                              )
-                            }
-                            className="w-5 h-5 text-fuchsia-500 cursor-pointer"
-                          />
+                          <span title="View devices" aria-label="View devices">
+                            <Eye
+                              onClick={() =>
+                                handleViewDevices(
+                                  project?.project_id,
+                                  project?.organization_id
+                                )
+                              }
+                              className="w-5 h-5 text-fuchsia-500 cursor-pointer"
+                            />
+                          </span>
 
-                          <Edit
-                            onClick={() =>
-                              handleEditProject(project?.project_id.toString())
-                            }
-                            className="w-5 h-5 text-status-info cursor-pointer"
-                          />
+                          <span title="Edit plant" aria-label="Edit plant">
+                            <Edit
+                              onClick={() =>
+                                handleEditProject(
+                                  project?.project_id.toString()
+                                )
+                              }
+                              className="w-5 h-5 text-status-info cursor-pointer"
+                            />
+                          </span>
+
                           <span
                             title="Edit diagram"
                             aria-label="Edit diagram"
