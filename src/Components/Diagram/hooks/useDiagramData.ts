@@ -45,36 +45,45 @@ export const useDiagramData = (projectId: string | undefined) => {
     if (!projectId) return;
 
     try {
-      const res = await dispatch(getProjectById(projectId)).unwrap();
-      if (res.success) {
-        setProjectData(res.data);
+      await dispatch(getProjectById(projectId))
+        .unwrap()
+        .then((res: any) => {
+          if (res.success) {
+            setProjectData(res.data);
 
-        if (res.data.nodes && res.data.edges && res.data.nodes.length > 0) {
-          const nodesWithDraggable = (res.data.nodes as DiagramNode[]).map(
-            (node) => {
-              if (node.type === "group") {
-                return {
-                  ...node,
-                  draggable: true,
-                  selectable: true,
-                  deletable: false,
-                  dragHandle: ".group-drag-handle",
-                };
+            if (res.data.nodes && res.data.edges && res.data.nodes.length > 0) {
+              const nodesWithDraggable = (res.data.nodes as DiagramNode[]).map(
+                (node) => {
+                  if (node.type === "group") {
+                    return {
+                      ...node,
+                      draggable: true,
+                      selectable: true,
+                      deletable: false,
+                      dragHandle: ".group-drag-handle",
+                    };
+                  }
+                  return node;
+                }
+              );
+
+              setNodes(nodesWithDraggable);
+              setEdges(res.data.edges as DiagramEdge[]);
+
+              if ((res.data as any).department_dimensions) {
+                setDepartmentDimensions(
+                  (res.data as any).department_dimensions
+                );
               }
-              return node;
+
+              setIsLoadingDiagram(false);
             }
-          );
-
-          setNodes(nodesWithDraggable);
-          setEdges(res.data.edges as DiagramEdge[]);
-
-          if ((res.data as any).department_dimensions) {
-            setDepartmentDimensions((res.data as any).department_dimensions);
           }
-
+        })
+        .catch((err: any) => {
+          console.error("Error fetching plant data:", err);
           setIsLoadingDiagram(false);
-        }
-      }
+        });
     } catch (err) {
       console.error("Error fetching plant data:", err);
       setIsLoadingDiagram(false);
