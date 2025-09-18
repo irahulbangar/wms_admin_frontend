@@ -53,6 +53,7 @@ const Devices = () => {
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
   const { organizations } = useAppSelector((state) => state.organization);
   const { projects } = useAppSelector((state) => state.project);
+  const { devices } = useAppSelector((state) => state.device);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -279,7 +280,7 @@ const Devices = () => {
       return;
     }
 
-    let filtered = filteredDevices;
+    let filtered = devices;
 
     if (searchTerm) {
       filtered = filtered.filter(
@@ -318,6 +319,7 @@ const Devices = () => {
 
     setFilteredDevices(filtered);
   }, [
+    devices,
     searchTerm,
     selectedOrganization,
     selectedProject,
@@ -754,7 +756,7 @@ const Devices = () => {
               <button
                 onClick={() => {
                   setSearchTerm("");
-                  setFilteredDevices(filteredDevices);
+                  setFilteredDevices(devices);
                 }}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 title="Clear search"
