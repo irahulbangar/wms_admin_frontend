@@ -14,7 +14,6 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
 import {
-  getAllDevices,
   getDeviceByOrganizationIdAndProjectId,
   setDevices,
 } from "../../../store/deviceSlice";
@@ -54,7 +53,6 @@ const Devices = () => {
   const [selectedProject, setSelectedProject] = useState(project_id || "all");
   const { organizations } = useAppSelector((state) => state.organization);
   const { projects } = useAppSelector((state) => state.project);
-  const { devices } = useAppSelector((state) => state.device);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -227,25 +225,6 @@ const Devices = () => {
     } else {
       setSelectedOrganization("all");
       setSelectedProject("all");
-
-      if (devices.length === 0) {
-        setIsLoading(true);
-        dispatch(getAllDevices())
-          .unwrap()
-          .then((res) => {
-            if (res.success) {
-              dispatch(setDevices(res?.data));
-              setFilteredDevices(res?.data);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            Error("Failed to get devices");
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
-      }
     }
   }, [
     organization_id,
@@ -263,22 +242,7 @@ const Devices = () => {
       return;
     }
 
-    if (selectedOrganization === "all" && selectedProject === "all") {
-      if (devices.length === 0) {
-        dispatch(getAllDevices())
-          .unwrap()
-          .then((res) => {
-            if (res.success) {
-              dispatch(setDevices(res?.data));
-              setFilteredDevices(res?.data);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            Error("Failed to get devices");
-          });
-      }
-    } else if (selectedOrganization !== "all" && selectedProject !== "all") {
+    if (selectedOrganization !== "all" && selectedProject !== "all") {
       setIsLoading(true);
       dispatch(
         getDeviceByOrganizationIdAndProjectId({
@@ -305,13 +269,17 @@ const Devices = () => {
     selectedOrganization,
     selectedProject,
     dispatch,
-    devices.length,
     organization_id,
     project_id,
   ]);
 
   useEffect(() => {
-    let filtered = devices;
+    if (selectedOrganization === "all" && selectedProject === "all") {
+      setFilteredDevices([]);
+      return;
+    }
+
+    let filtered = filteredDevices;
 
     if (searchTerm) {
       filtered = filtered.filter(
@@ -350,7 +318,6 @@ const Devices = () => {
 
     setFilteredDevices(filtered);
   }, [
-    devices,
     searchTerm,
     selectedOrganization,
     selectedProject,
@@ -492,21 +459,7 @@ const Devices = () => {
           setIsLoading(false);
         });
     } else {
-      dispatch(getAllDevices())
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            dispatch(setDevices(res?.data));
-            setFilteredDevices(res?.data);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error("Failed to update device");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      setIsLoading(false);
     }
   };
 
@@ -801,7 +754,7 @@ const Devices = () => {
               <button
                 onClick={() => {
                   setSearchTerm("");
-                  setFilteredDevices(devices);
+                  setFilteredDevices(filteredDevices);
                 }}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 title="Clear search"
@@ -999,38 +952,30 @@ const Devices = () => {
                   <Monitor className="w-16 h-16 text-text-muted mx-auto mb-4" />
                 }
                 title={
-                  searchTerm || selectedOrganization !== "all"
+                  selectedOrganization === "all" || selectedProject === "all"
+                    ? "Please select an organization and plant"
+                    : searchTerm
                     ? "No devices match your search/filter"
-                    : selectedOrganization === "all"
-                    ? "No devices found"
-                    : `No devices found for ${
-                        organizations.find(
-                          (org) => org.organization_id === selectedOrganization
-                        )?.organization_name ||
-                        `Organization ${selectedOrganization}`
-                      }`
+                    : "No devices found"
                 }
                 description={
-                  searchTerm || selectedOrganization !== "all"
+                  selectedOrganization === "all" || selectedProject === "all"
+                    ? "Use the dropdowns above to choose an organization and plant."
+                    : searchTerm
                     ? "Try adjusting your search terms or filter criteria"
-                    : selectedOrganization === "all"
-                    ? "Add your first device to get started"
-                    : `Add your first plant for ${
-                        organizations.find(
-                          (org) => org.organization_id === selectedOrganization
-                        )?.organization_name ||
-                        `Organization ${selectedOrganization}`
-                      } to get started`
+                    : "Add your first device to get started"
                 }
                 buttonText={
-                  searchTerm || selectedOrganization !== "all"
+                  searchTerm
                     ? "Clear Search"
+                    : selectedOrganization === "all" ||
+                      selectedProject === "all"
+                    ? "Select organization and plant"
                     : "Add Device"
                 }
                 buttonOnClick={() => {
-                  if (searchTerm || selectedOrganization !== "all") {
+                  if (searchTerm) {
                     setSearchTerm("");
-                    setSelectedOrganization("all");
                   } else {
                     handleAddDevice();
                   }
