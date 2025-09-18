@@ -14,6 +14,7 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
 import {
+  getAllDevices,
   getDeviceByOrganizationIdAndProjectId,
   setDevices,
 } from "../../../store/deviceSlice";
@@ -243,7 +244,24 @@ const Devices = () => {
       return;
     }
 
-    if (selectedOrganization !== "all" && selectedProject !== "all") {
+    if (
+      selectedOrganization === "all" &&
+      selectedProject === "all" &&
+      devices.length === 0
+    ) {
+      dispatch(getAllDevices())
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDevices(res?.data));
+            setFilteredDevices(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to get devices");
+        });
+    } else if (selectedOrganization !== "all" && selectedProject !== "all") {
       setIsLoading(true);
       dispatch(
         getDeviceByOrganizationIdAndProjectId({
@@ -270,16 +288,12 @@ const Devices = () => {
     selectedOrganization,
     selectedProject,
     dispatch,
+    devices.length,
     organization_id,
     project_id,
   ]);
 
   useEffect(() => {
-    if (selectedOrganization === "all" && selectedProject === "all") {
-      setFilteredDevices([]);
-      return;
-    }
-
     let filtered = devices;
 
     if (searchTerm) {
@@ -380,90 +394,113 @@ const Devices = () => {
     setOrganizationId(organizationId);
   };
 
-  const handleDeviceUpdate = (result?: {
-    data?: {
-      refreshDepartments?: boolean;
-      refreshDeviceFamilies?: boolean;
-      refreshDeviceTypes?: boolean;
-      refreshOrganizations?: boolean;
-      refreshProjects?: boolean;
-    };
-  }) => {
-    if (isLoading) return;
+  const handleDeviceUpdate = useCallback(
+    (result?: {
+      data?: {
+        refreshDepartments?: boolean;
+        refreshDeviceFamilies?: boolean;
+        refreshDeviceTypes?: boolean;
+        refreshOrganizations?: boolean;
+        refreshProjects?: boolean;
+      };
+    }) => {
+      if (isLoading) return;
 
-    if (result?.data?.refreshDepartments) {
-      getDepartment();
-      return;
-    }
+      if (result?.data?.refreshDepartments) {
+        getDepartment();
+        return;
+      }
 
-    if (result?.data?.refreshDeviceFamilies) {
-      getDeviceFamily();
-      return;
-    }
+      if (result?.data?.refreshDeviceFamilies) {
+        getDeviceFamily();
+        return;
+      }
 
-    if (result?.data?.refreshDeviceTypes) {
-      getDeviceType();
-      return;
-    }
+      if (result?.data?.refreshDeviceTypes) {
+        getDeviceType();
+        return;
+      }
 
-    if (result?.data?.refreshOrganizations) {
-      getOrganization();
-      return;
-    }
+      if (result?.data?.refreshOrganizations) {
+        getOrganization();
+        return;
+      }
 
-    if (result?.data?.refreshProjects) {
-      fetchProjects();
-      return;
-    }
+      if (result?.data?.refreshProjects) {
+        fetchProjects();
+        return;
+      }
 
-    setIsLoading(true);
+      setIsLoading(true);
 
-    if (organization_id && project_id) {
-      dispatch(
-        getDeviceByOrganizationIdAndProjectId({
-          projectId: parseInt(project_id),
-          organizationId: parseInt(organization_id),
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            dispatch(setDevices(res?.data));
-            setFilteredDevices(res?.data);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error("Failed to update device");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else if (selectedOrganization !== "all" && selectedProject !== "all") {
-      dispatch(
-        getDeviceByOrganizationIdAndProjectId({
-          projectId: parseInt(selectedProject),
-          organizationId: parseInt(selectedOrganization),
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            dispatch(setDevices(res?.data));
-            setFilteredDevices(res?.data);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error("Failed to update device");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  };
+      if (organization_id && project_id) {
+        dispatch(
+          getDeviceByOrganizationIdAndProjectId({
+            projectId: parseInt(project_id),
+            organizationId: parseInt(organization_id),
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              dispatch(setDevices(res?.data));
+              setFilteredDevices(res?.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error("Failed to update device");
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      } else if (selectedOrganization !== "all" && selectedProject !== "all") {
+        dispatch(
+          getDeviceByOrganizationIdAndProjectId({
+            projectId: parseInt(selectedProject),
+            organizationId: parseInt(selectedOrganization),
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              dispatch(setDevices(res?.data));
+              setFilteredDevices(res?.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error("Failed to update device");
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      } else {
+        dispatch(getAllDevices())
+          .unwrap()
+          .then((res) => {
+            if (res.success) {
+              dispatch(setDevices(res?.data));
+              setFilteredDevices(res?.data);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error("Failed to update device");
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }
+    },
+    [
+      dispatch,
+      selectedOrganization,
+      selectedProject,
+      organization_id,
+      project_id,
+    ]
+  );
 
   const deviceStatus = (status: string) => {
     if (status === "active" || status === "Active") {
@@ -959,30 +996,38 @@ const Devices = () => {
                   <Monitor className="w-16 h-16 text-text-muted mx-auto mb-4" />
                 }
                 title={
-                  selectedOrganization === "all" || selectedProject === "all"
-                    ? "Please select an organization and plant"
-                    : searchTerm
+                  searchTerm || selectedOrganization !== "all"
                     ? "No devices match your search/filter"
-                    : "No devices found"
+                    : selectedOrganization === "all"
+                    ? "No devices found"
+                    : `No devices found for ${
+                        organizations.find(
+                          (org) => org.organization_id === selectedOrganization
+                        )?.organization_name ||
+                        `Organization ${selectedOrganization}`
+                      }`
                 }
                 description={
-                  selectedOrganization === "all" || selectedProject === "all"
-                    ? "Use the dropdowns above to choose an organization and plant."
-                    : searchTerm
+                  searchTerm || selectedOrganization !== "all"
                     ? "Try adjusting your search terms or filter criteria"
-                    : "Add your first device to get started"
+                    : selectedOrganization === "all"
+                    ? "Add your first device to get started"
+                    : `Add your first plant for ${
+                        organizations.find(
+                          (org) => org.organization_id === selectedOrganization
+                        )?.organization_name ||
+                        `Organization ${selectedOrganization}`
+                      } to get started`
                 }
                 buttonText={
-                  searchTerm
+                  searchTerm || selectedOrganization !== "all"
                     ? "Clear Search"
-                    : selectedOrganization === "all" ||
-                      selectedProject === "all"
-                    ? "Select organization and plant"
                     : "Add Device"
                 }
                 buttonOnClick={() => {
-                  if (searchTerm) {
+                  if (searchTerm || selectedOrganization !== "all") {
                     setSearchTerm("");
+                    setSelectedOrganization("all");
                   } else {
                     handleAddDevice();
                   }
