@@ -788,7 +788,10 @@ const Devices = () => {
                 (dept) => dept.department_id.toString() === deptId
               );
               const departmentName =
-                department?.department_name.trim() || `Department ${deptId}`;
+                department?.department_name.trim() ||
+                `${
+                  deptId === "0" ? "Extra Department" : `Department ${deptId}`
+                }`;
 
               return (
                 <div
@@ -820,10 +823,12 @@ const Devices = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Edit
-                        onClick={() => handleEditDepartment(deptId)}
-                        className="w-5 h-5 text-status-info cursor-pointer"
-                      />
+                      {deptId !== "0" && (
+                        <Edit
+                          onClick={() => handleEditDepartment(deptId)}
+                          className="w-5 h-5 text-status-info cursor-pointer"
+                        />
+                      )}
                       {deptDevices?.length < 1 && (
                         <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
                       )}
