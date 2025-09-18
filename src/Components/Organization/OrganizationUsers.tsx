@@ -417,7 +417,7 @@ const OrganizationUsers = () => {
         </div>
       ) : (
         <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
-          <div className="overflow-auto h-[calc(100vh-245px)]">
+          <div className="overflow-auto h-[calc(100vh-280px)]">
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
