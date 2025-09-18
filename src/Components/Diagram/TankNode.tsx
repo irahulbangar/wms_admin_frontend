@@ -20,7 +20,7 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
       <div className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden">
         <div className="absolute inset-0 flex flex-col">
           <div
-            className="w-full bg-status-info transition-all duration-500 ease-in-out"
+            className="w-full bg-status-info/80 transition-all duration-500 ease-in-out"
             style={{
               height: `${fillHeight}%`,
               marginTop: "auto",

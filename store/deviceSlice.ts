@@ -51,11 +51,12 @@ export interface CreateDevicePayload {
   device_type_id: number;
   device_family_id: number;
   department_id: number;
-  device_visibility: string;
+  visibility: string;
   department_connection: string;
-  plant_connection: string;
+  project_connection: string;
   organization_connection: string;
   params: object;
+  organization_id: number;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {

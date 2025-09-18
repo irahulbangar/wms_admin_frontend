@@ -32,6 +32,7 @@ interface AddUpdateDeviceProps {
   typeData: DeviceTypeResult[];
   departmentData: DepartmentResult[];
   departmentId: number;
+  organizationId: number;
 }
 
 const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
@@ -44,6 +45,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   typeData,
   departmentData,
   departmentId,
+  organizationId,
 }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -56,9 +58,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_status: "active",
     hwid: "",
     department_id: departmentId,
-    device_visibility: "",
+    organization_id: organizationId,
+    visibility: "",
     department_connection: "",
-    plant_connection: "",
+    project_connection: "",
     organization_connection: "",
     params: {},
   });
@@ -130,9 +133,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hwid: "",
       department_id: departmentId,
       params: tankParams,
-      device_visibility: "",
+      organization_id: organizationId,
+      visibility: "",
       department_connection: "",
-      plant_connection: "",
+      project_connection: "",
       organization_connection: "",
     });
     setDeviceFamilyId(0);
@@ -223,9 +227,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_status: formData.device_status,
         hwid: formData.hwid,
         department_id: formData.department_id,
-        device_visibility: formData.device_visibility,
+        organization_id: formData.organization_id,
+        visibility: formData.visibility,
         department_connection: formData.department_connection,
-        plant_connection: formData.plant_connection,
+        project_connection: formData.project_connection,
         organization_connection: formData.organization_connection,
         params: getSelectedDeviceFamilyName() === "fm" ? fmParams : tankParams,
       };
@@ -284,10 +289,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_status: deviceData.device_status,
               hwid: deviceData.hwid,
               department_id: deviceData.department_id,
+              organization_id: deviceData.organization_id,
               params: deviceData.params,
-              device_visibility: deviceData.device_visibility,
+              visibility: deviceData.visibility,
               department_connection: deviceData.department_connection,
-              plant_connection: deviceData.plant_connection,
+              project_connection: deviceData.project_connection,
               organization_connection: deviceData.organization_connection,
             });
             setDeviceFamilyId(deviceData.device_family_id);
@@ -344,15 +350,24 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_status: "active",
         hwid: "",
         department_id: departmentId,
+        organization_id: organizationId,
         params: tankParams,
-        device_visibility: "",
+        visibility: "",
         department_connection: "",
-        plant_connection: "",
+        project_connection: "",
         organization_connection: "",
       });
       setDeviceFamilyId(0);
     }
-  }, [type, deviceId, dispatch, project_id, departmentId, familyData]);
+  }, [
+    type,
+    deviceId,
+    dispatch,
+    project_id,
+    departmentId,
+    familyData,
+    organizationId,
+  ]);
 
   useEffect(() => {
     if (type === "update" && deviceId) {
@@ -762,8 +777,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   Device Visibility
                 </label>
                 <select
-                  name="device_visibility"
-                  value={formData.device_visibility}
+                  name="visibility"
+                  value={formData.visibility}
+                  onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Visibility</option>
@@ -779,6 +795,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 <select
                   name="department_connection"
                   value={formData.department_connection}
+                  onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Department Connection</option>
@@ -794,8 +811,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   Plant Connection
                 </label>
                 <select
-                  name="plant_connection"
-                  value={formData.plant_connection}
+                  name="project_connection"
+                  value={formData.project_connection}
+                  onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Plant Connection</option>
@@ -813,6 +831,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 <select
                   name="organization_connection"
                   value={formData.organization_connection}
+                  onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Organization Connection</option>

@@ -71,7 +71,7 @@ const Devices = () => {
   const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [projectSearchTerm, setProjectSearchTerm] = useState("");
-
+  const [organizationId, setOrganizationId] = useState<number>(0);
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
   const projectDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -395,17 +395,20 @@ const Devices = () => {
 
     setIsAddDeviceOpen(true);
     setProjectId(parseInt(selectedProject));
+    setOrganizationId(parseInt(selectedOrganization));
   };
 
   const handleEditDevice = (
     deviceId: number,
     projectId: number,
-    departmentId: number
+    departmentId: number,
+    organizationId: number
   ) => {
     setEditingDeviceId(deviceId);
     setIsEditDeviceOpen(true);
     setProjectId(projectId);
     setDepartmentId(departmentId);
+    setOrganizationId(organizationId);
   };
 
   const handleDeviceUpdate = (result?: {
@@ -413,6 +416,8 @@ const Devices = () => {
       refreshDepartments?: boolean;
       refreshDeviceFamilies?: boolean;
       refreshDeviceTypes?: boolean;
+      refreshOrganizations?: boolean;
+      refreshProjects?: boolean;
     };
   }) => {
     if (isLoading) return;
@@ -429,6 +434,16 @@ const Devices = () => {
 
     if (result?.data?.refreshDeviceTypes) {
       getDeviceType();
+      return;
+    }
+
+    if (result?.data?.refreshOrganizations) {
+      getOrganization();
+      return;
+    }
+
+    if (result?.data?.refreshProjects) {
+      fetchProjects();
       return;
     }
 
@@ -959,7 +974,8 @@ const Devices = () => {
                                         handleEditDevice(
                                           device?.device_id,
                                           device?.project_id,
-                                          device?.department_id
+                                          device?.department_id,
+                                          organizationId
                                         )
                                       }
                                       className="w-5 h-5 text-status-info cursor-pointer"
@@ -1036,6 +1052,7 @@ const Devices = () => {
           typeData={deviceType}
           departmentData={departmentData}
           departmentId={departmentId}
+          organizationId={organizationId}
         />
       )}
 
@@ -1050,6 +1067,7 @@ const Devices = () => {
           typeData={deviceType}
           departmentData={departmentData}
           departmentId={departmentId}
+          organizationId={organizationId}
         />
       )}
 
