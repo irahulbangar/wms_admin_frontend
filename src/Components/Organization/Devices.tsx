@@ -385,13 +385,23 @@ const Devices = () => {
     deviceId: number,
     projectId: number,
     departmentId: number,
-    organizationId: number
+    organizationId?: number
   ) => {
+    const derivedOrganizationId: number =
+      organizationId ||
+      projects.find((p) => p.project_id === projectId)?.organization_id ||
+      (selectedOrganization !== "all" ? parseInt(selectedOrganization) : 0);
+
     setEditingDeviceId(deviceId);
     setIsEditDeviceOpen(true);
     setProjectId(projectId);
     setDepartmentId(departmentId);
-    setOrganizationId(organizationId);
+    if (!derivedOrganizationId) {
+      Warning(
+        "Organization not found for this device. Please select an organization first."
+      );
+    }
+    setOrganizationId(derivedOrganizationId);
   };
 
   const handleDeviceUpdate = useCallback(
@@ -1006,7 +1016,7 @@ const Devices = () => {
                                           device?.device_id,
                                           device?.project_id,
                                           device?.department_id,
-                                          organizationId
+                                          device?.organization_id
                                         )
                                       }
                                       className="w-5 h-5 text-status-info cursor-pointer"

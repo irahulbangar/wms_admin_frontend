@@ -50,13 +50,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  console.log("organization_id", organizationId);
   const [formData, setFormData] = useState<CreateDevicePayload>({
     project_id: project_id || 0,
     device_family_id: 0,
     device_type_id: 0,
     device_name: "",
-    device_status: "active",
+    device_status: "",
     hwid: "",
     department_id: departmentId,
     organization_id: organizationId,
@@ -130,7 +129,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       device_family_id: 0,
       device_type_id: 0,
       device_name: "",
-      device_status: "active",
+      device_status: "",
       hwid: "",
       department_id: departmentId,
       params: tankParams,
@@ -228,7 +227,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_status: formData.device_status,
         hwid: formData.hwid,
         department_id: formData.department_id,
-        organization_id: formData.organization_id,
+        organization_id: formData.organization_id || organizationId,
         visibility: formData.visibility,
         department_connection: formData.department_connection,
         project_connection: formData.project_connection,
