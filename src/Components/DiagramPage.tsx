@@ -15,6 +15,7 @@ import { useDiagramControls } from "./Diagram/hooks/useDiagramControls";
 import { useDepartmentPopup } from "./Diagram/hooks/useDepartmentPopup";
 import DepartmentPopup from "./Diagram/DepartmentPopup";
 import DiagramControls from "./Diagram/DiagramControls";
+import { ChartArea } from "lucide-react";
 
 const DiagramPage = () => {
   const projectId = useParams().project_id;
@@ -159,6 +160,10 @@ const DiagramPage = () => {
     }));
   }, [edges, selectedEdge]);
 
+  const isDiagramEmpty = useMemo(() => {
+    return !isLoadingDiagram && nodes?.length === 0 && edges?.length === 0;
+  }, [isLoadingDiagram, nodes, edges]);
+
   return (
     <div className="bg-primary text-text-primary h-screen w-full">
       <div className="h-full w-full flex">
@@ -182,6 +187,18 @@ const DiagramPage = () => {
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
                   <p className="text-text-secondary">Loading diagram...</p>
+                </div>
+              </div>
+            ) : isDiagramEmpty ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="flex items-center justify-center flex-col">
+                  <ChartArea className="w-18 h-18 text-text-secondary gap-2" />
+                  <p className="text-lg text-text-primary font-roboto">
+                    Diagram data is not available
+                  </p>
+                  <p className="text-sm text-text-secondary font-roboto">
+                    No departments or connections to display for this plant.
+                  </p>
                 </div>
               </div>
             ) : (

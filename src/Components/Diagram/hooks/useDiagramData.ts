@@ -99,13 +99,18 @@ export const useDiagramData = (projectId: string | undefined) => {
         .then((res: any) => {
           if (res.success) {
             setDeviceData(res.data);
+            if (!res.data || res.data.length === 0) {
+              setIsLoadingDiagram(false);
+            }
           }
         })
         .catch((err: any) => {
           console.error("Error fetching device data:", err);
+          setIsLoadingDiagram(false);
         });
     } catch (err) {
       console.error("Error fetching device data:", err);
+      setIsLoadingDiagram(false);
     }
   }, [dispatch, projectId]);
 
@@ -246,6 +251,10 @@ export const useDiagramData = (projectId: string | undefined) => {
   }, [fetchDiagram, fetchDeviceData, projectId]);
 
   useEffect(() => {
+    if (projectData && deviceData.length === 0 && isLoadingDiagram) {
+      setIsLoadingDiagram(false);
+    }
+
     if (
       projectData &&
       deviceData.length > 0 &&
