@@ -50,6 +50,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  console.log("organization_id", organizationId);
   const [formData, setFormData] = useState<CreateDevicePayload>({
     project_id: project_id || 0,
     device_family_id: 0,

@@ -859,16 +859,50 @@ const Devices = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {deptId !== "0" && (
-                        <Edit
-                          onClick={() => handleEditDepartment(deptId)}
-                          className="w-5 h-5 text-status-info cursor-pointer"
-                        />
-                      )}
-                      {deptDevices?.length < 1 && (
-                        <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
-                      )}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-status-success rounded-full"></div>
+                          <span className="text-xs text-text-secondary font-roboto">
+                            {deptDevices?.filter(
+                              (d) => d.device_status?.toLowerCase() === "active"
+                            ).length || 0}{" "}
+                            Active
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-status-danger rounded-full"></div>
+                          <span className="text-xs text-text-secondary font-roboto">
+                            {deptDevices?.filter(
+                              (d) =>
+                                d.device_status?.toLowerCase() === "inactive"
+                            ).length || 0}{" "}
+                            Inactive
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-status-warning rounded-full"></div>
+                          <span className="text-xs text-text-secondary font-roboto">
+                            {deptDevices?.filter(
+                              (d) =>
+                                d.device_status?.toLowerCase() !== "active" &&
+                                d.device_status?.toLowerCase() !== "inactive"
+                            ).length || 0}{" "}
+                            Other
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {deptId !== "0" && (
+                          <Edit
+                            onClick={() => handleEditDepartment(deptId)}
+                            className="w-5 h-5 text-status-info cursor-pointer"
+                          />
+                        )}
+                        {deptDevices?.length < 1 && (
+                          <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
+                        )}
+                      </div>
                     </div>
                   </div>
 
