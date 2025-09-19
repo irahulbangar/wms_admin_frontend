@@ -188,6 +188,11 @@
     color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.theme-changing *,
+.theme-changing {
+  transition: none !important;
+}
+
 html {
   transition: background-color 0.3s ease;
 }

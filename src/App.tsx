@@ -2,7 +2,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import Login from "./Components/Login";
 import HomePage from "./Components/HomePage";
 import AuthInitializer from "./Components/AuthInitializer";
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import {
   HashRouter as Router,
   Routes,
@@ -14,6 +14,24 @@ import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import store from "../store/store";
 import DiagramPage from "./Components/DiagramPage";
+
+function ThemedToast() {
+  const { theme } = useTheme();
+  return (
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme={theme === "dark" ? "dark" : "light"}
+    />
+  );
+}
 
 function App() {
   return (
@@ -123,19 +141,8 @@ function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
 
-              {/* Toast Container */}
-              <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-              />
+              {/* Toast Container (theme-aware) */}
+              <ThemedToast />
             </div>
           </Router>
         </AuthInitializer>
