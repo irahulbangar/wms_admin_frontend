@@ -71,7 +71,7 @@ const Profile: React.FC = () => {
                   type="text"
                   disabled
                   value={admin?.name}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-primary"
                 />
               </div>
 
@@ -83,7 +83,7 @@ const Profile: React.FC = () => {
                   type="email"
                   disabled
                   value={admin?.email}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-primary"
                 />
               </div>
 
@@ -95,7 +95,7 @@ const Profile: React.FC = () => {
                   type="tel"
                   disabled
                   value={admin?.contact_number}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-primary"
                 />
               </div>
 
@@ -107,7 +107,7 @@ const Profile: React.FC = () => {
                   type="text"
                   disabled
                   value={admin?.location}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-primary"
                 />
               </div>
 
@@ -119,7 +119,7 @@ const Profile: React.FC = () => {
                   type="text"
                   disabled
                   value={admin?.department}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-primary"
                 />
               </div>
 
@@ -131,7 +131,7 @@ const Profile: React.FC = () => {
                   type="text"
                   disabled
                   value={admin?.role}
-                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-secondary capitalize"
+                  className="w-full px-3 py-2 border text-text-primary rounded-md placeholder-text-text-secondary focus:outline-none transition-colors font-roboto border-border-primary capitalize"
                 />
               </div>
             </div>

@@ -345,7 +345,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <button
               type="button"
               onClick={() => setShowAddModal(false)}
-              className="px-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg hover:bg-secondary transition-colors cursor-pointer font-roboto"
+              className="px-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors cursor-pointer font-roboto"
             >
               Cancel
             </button>

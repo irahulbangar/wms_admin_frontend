@@ -72,7 +72,7 @@ const Pagination: React.FC<PaginationProps> = ({
             value={rowsPerPage}
             onChange={handleRowsPerPageChange}
             disabled={disabled || hasNoData}
-            className="p-2 text-sm bg-primary border border-border-secondary rounded text-text-primary focus:outline-none focus:ring-1 focus:ring-status-info disabled:opacity-50 disabled:cursor-not-allowed font-roboto"
+            className="p-2 text-sm bg-primary border border-border-primary rounded text-text-primary focus:outline-none focus:ring-1 focus:ring-status-info disabled:opacity-50 disabled:cursor-not-allowed font-roboto"
           >
             {rowsPerPageOptions.map((option) => (
               <option key={option} value={option}>

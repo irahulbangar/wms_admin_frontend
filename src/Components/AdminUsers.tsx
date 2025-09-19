@@ -164,7 +164,7 @@ const Users = () => {
           <input
             type="text"
             placeholder="Search users..."
-            className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+            className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
           />
         </div>
         <button

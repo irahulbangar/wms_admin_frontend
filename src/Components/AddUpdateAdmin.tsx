@@ -216,7 +216,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
               placeholder="Enter full name"
             />
           </div>
@@ -230,7 +230,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
               placeholder="Enter email address"
             />
           </div>
@@ -244,7 +244,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="contact_number"
               value={formData.contact_number}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
               placeholder="Enter phone number"
             />
           </div>
@@ -258,7 +258,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
               placeholder="Enter password"
             />
           </div>
@@ -272,7 +272,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="location"
               value={formData.location}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
               placeholder="Enter address"
             />
           </div>
@@ -286,7 +286,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="department"
               value={formData.department}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
               placeholder="Enter department"
             />
           </div>
@@ -299,7 +299,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="role"
               value={formData.role}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
             >
               <option value="">Select role</option>
               <option value="admin">Admin</option>
@@ -315,7 +315,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="status"
               value={formData.status}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-secondary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>

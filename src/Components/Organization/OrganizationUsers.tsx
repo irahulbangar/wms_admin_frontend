@@ -313,7 +313,7 @@ const OrganizationUsers = () => {
                       )?.organization_name || "Select organization..."
                 }
                 readOnly
-                className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
                 onClick={() =>
                   setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
                 }
@@ -388,7 +388,7 @@ const OrganizationUsers = () => {
             <input
               type="text"
               placeholder="Search users..."
-              className="md:w-80 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+              className="md:w-80 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

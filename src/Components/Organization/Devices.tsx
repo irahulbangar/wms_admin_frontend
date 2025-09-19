@@ -650,7 +650,7 @@ const Devices = () => {
                       )?.organization_name || "Select organization..."
                 }
                 readOnly
-                className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
                 onClick={() =>
                   setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
                 }
@@ -663,8 +663,8 @@ const Devices = () => {
             </div>
 
             {isOrganizationDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-secondary rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
-                <div className="sticky top-0 bg-primary p-3 border-b border-border-secondary">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
                     <input
@@ -674,14 +674,14 @@ const Devices = () => {
                       onChange={(e) =>
                         setOrganizationSearchTerm(e.target.value)
                       }
-                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                 </div>
 
                 <div
-                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-secondary"
+                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                   onClick={() => {
                     setSelectedOrganization("all");
                     setIsOrganizationDropdownOpen(false);
@@ -695,7 +695,7 @@ const Devices = () => {
                   filteredOrganizations.map((org) => (
                     <div
                       key={org.organization_id}
-                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-secondary"
+                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                       onClick={() => {
                         setSelectedOrganization(org.organization_id.toString());
                         setIsOrganizationDropdownOpen(false);
@@ -729,7 +729,7 @@ const Devices = () => {
                       )?.project_name || "Select plant..."
                 }
                 readOnly
-                className="px-3 py-2 border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
                 onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
               />
               <ChevronDown
@@ -797,7 +797,7 @@ const Devices = () => {
               placeholder="Search devices by name, HWID, status, type, family name, or family ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-secondary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+              className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
             />
             {searchTerm && (
               <button
