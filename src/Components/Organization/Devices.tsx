@@ -81,6 +81,7 @@ const Devices = () => {
   const [deviceToDelete, setDeviceToDelete] = useState<DeviceResult | null>(
     null
   );
+  const { admin } = useAppSelector((state) => state.admin);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1057,17 +1058,20 @@ const Devices = () => {
                                       className="w-5 h-5 text-status-info cursor-pointer"
                                     />
                                   </span>
-                                  <span
-                                    title="Delete device"
-                                    aria-label="Delete device"
-                                  >
-                                    <Trash2
-                                      onClick={() =>
-                                        handleDeleteDevice(device?.device_id)
-                                      }
-                                      className="w-5 h-5 text-status-danger cursor-pointer"
-                                    />
-                                  </span>
+
+                                  {admin?.role === "super_admin" && (
+                                    <span
+                                      title="Delete device"
+                                      aria-label="Delete device"
+                                    >
+                                      <Trash2
+                                        onClick={() =>
+                                          handleDeleteDevice(device?.device_id)
+                                        }
+                                        className="w-5 h-5 text-status-danger cursor-pointer"
+                                      />
+                                    </span>
+                                  )}
                                 </div>
                               </td>
                             </tr>
