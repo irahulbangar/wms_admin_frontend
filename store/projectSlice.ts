@@ -176,7 +176,7 @@ export const deleteProjectById = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       const response = await api().delete<ProjectResponse>(
-        `/project/delete-project/${id}`,
+        `/project/admin/delete-project/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

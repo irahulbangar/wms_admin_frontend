@@ -51,6 +51,7 @@ const Plants = () => {
   const { organizations } = useAppSelector((state) => state.organization);
   const { projects } = useAppSelector((state) => state.project);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [projectTitle, setProjectTitle] = useState<string | null>(null);
   const [deleteProject, setDeleteProject] = useState<ProjectResult | null>(
     null
   );
@@ -58,7 +59,7 @@ const Plants = () => {
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  const { admin } = useAppSelector((state) => state.admin);
   const totalItems = useMemo(() => {
     return filteredProjects.length;
   }, [filteredProjects]);
@@ -85,7 +86,25 @@ const Plants = () => {
 
   const handleConfirmDelete = async () => {
     if (deleteProject) {
-      await handleDeleteProject(deleteProject.project_id.toString());
+      setIsLoading(true);
+      await dispatch(deleteProjectById(deleteProject.project_id.toString()))
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            Success("Plant deleted successfully");
+            if (selectedOrganizationId === "all") {
+              fetchProjects();
+            } else {
+              getProjectByOrganizationId(selectedOrganizationId);
+            }
+          }
+        })
+        .catch((err) => {
+          Error(err.message || "Failed to delete plant");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
       setShowDeletePopup(false);
       setDeleteProject(null);
     }
@@ -262,19 +281,14 @@ const Plants = () => {
   };
 
   const handleDeleteProject = async (id: string) => {
-    try {
-      const result = await dispatch(deleteProjectById(id)).unwrap();
-      if (result.success) {
-        Success("Plant deleted successfully");
-        if (selectedOrganizationId === "all") {
-          fetchProjects();
-        } else {
-          getProjectByOrganizationId(selectedOrganizationId);
-        }
-      }
-    } catch (error) {
-      Error(`Failed to delete plant: ${error}`);
-    }
+    setShowDeletePopup(true);
+    setDeleteProject(
+      projects.find((project) => project.project_id.toString() === id) || null
+    );
+    setProjectTitle(
+      projects.find((project) => project.project_id.toString() === id)
+        ?.project_name || null
+    );
   };
 
   const handleModalClose = () => {
@@ -566,6 +580,22 @@ const Plants = () => {
                           >
                             <ChartNetwork className="w-5 h-5 text-text-primary" />
                           </span>
+
+                          {admin?.role === "super_admin" && (
+                            <span
+                              title="Delete plant"
+                              aria-label="Delete plant"
+                            >
+                              <Trash2
+                                onClick={() =>
+                                  handleDeleteProject(
+                                    project?.project_id.toString()
+                                  )
+                                }
+                                className="w-5 h-5 text-status-danger cursor-pointer"
+                              />
+                            </span>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -678,9 +708,8 @@ const Plants = () => {
             </div>
             <div className="p-6">
               <p className="text-text-secondary mb-4 font-roboto">
-                Are you sure you want to delete the plant{" "}
-                <span className="font-bold">{deleteProject?.project_name}</span>
-                ?
+                Are you sure you want to delete this plant{" "}
+                <span className="font-bold">{projectTitle || "N/A"}</span>?
               </p>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-border-primary">
