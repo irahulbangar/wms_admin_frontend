@@ -14,6 +14,7 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../model/devices.interface";
 import {
+  deleteDevice,
   getAllDevices,
   getDeviceByOrganizationIdAndProjectId,
   setDevices,
@@ -27,7 +28,7 @@ import { getAllProjects, setProjects } from "../../../store/projectSlice";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import { fromatDateWithTime } from "../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
-import { Error, Warning } from "../../utils/toast";
+import { Error, Success, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import type { DepartmentResult } from "../../../model/department.interface";
@@ -35,6 +36,7 @@ import { getDepartments } from "../../../store/departmentSlice";
 import AddUpdateDepartment from "./AddUpdateDepartment";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
+import DeletePopup from "./DeletePopup";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -74,6 +76,11 @@ const Devices = () => {
   const [organizationId, setOrganizationId] = useState<number>(0);
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
   const projectDropdownRef = useRef<HTMLDivElement>(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [deviceName, setDeviceName] = useState<string | null>(null);
+  const [deviceToDelete, setDeviceToDelete] = useState<DeviceResult | null>(
+    null
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -239,6 +246,27 @@ const Devices = () => {
     getDepartment,
   ]);
 
+  const refreshDevices = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    dispatch(getAllDevices())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          dispatch(setDevices(res?.data));
+          setFilteredDevices(res?.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get devices");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch, setFilteredDevices, setDevices]);
+
   useEffect(() => {
     if (organization_id && project_id) {
       return;
@@ -249,18 +277,7 @@ const Devices = () => {
       selectedProject === "all" &&
       devices.length === 0
     ) {
-      dispatch(getAllDevices())
-        .unwrap()
-        .then((res) => {
-          if (res.success) {
-            dispatch(setDevices(res?.data));
-            setFilteredDevices(res?.data);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error("Failed to get devices");
-        });
+      refreshDevices();
     } else if (selectedOrganization !== "all" && selectedProject !== "all") {
       setIsLoading(true);
       dispatch(
@@ -486,21 +503,7 @@ const Devices = () => {
             setIsLoading(false);
           });
       } else {
-        dispatch(getAllDevices())
-          .unwrap()
-          .then((res) => {
-            if (res.success) {
-              dispatch(setDevices(res?.data));
-              setFilteredDevices(res?.data);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            Error("Failed to update device");
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
+        refreshDevices();
       }
     },
     [
@@ -509,6 +512,7 @@ const Devices = () => {
       selectedProject,
       organization_id,
       project_id,
+      refreshDevices,
     ]
   );
 
@@ -586,6 +590,48 @@ const Devices = () => {
 
   const handleDepartmentUpdate = () => {
     getDepartment();
+  };
+
+  const handleDeleteDevice = (deviceId: number) => {
+    setShowDeletePopup(true);
+    setDeviceName(
+      devices.find((device) => device.device_id === deviceId)?.device_name ||
+        null
+    );
+    setDeviceToDelete(
+      devices.find((device) => device.device_id === deviceId) || null
+    );
+  };
+
+  const handleCloseDeletePopup = () => {
+    setShowDeletePopup(false);
+    setDeviceName(null);
+    setDeviceToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deviceToDelete || isLoading) return;
+    setIsLoading(true);
+
+    await dispatch(deleteDevice(deviceToDelete.device_id.toString()))
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          Success(res.message);
+          refreshDevices();
+          setShowDeletePopup(false);
+          setDeviceName(null);
+          setDeviceToDelete(null);
+        } else {
+          Error(res.message || "Failed to delete device");
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -1011,6 +1057,17 @@ const Devices = () => {
                                       className="w-5 h-5 text-status-info cursor-pointer"
                                     />
                                   </span>
+                                  <span
+                                    title="Delete device"
+                                    aria-label="Delete device"
+                                  >
+                                    <Trash2
+                                      onClick={() =>
+                                        handleDeleteDevice(device?.device_id)
+                                      }
+                                      className="w-5 h-5 text-status-danger cursor-pointer"
+                                    />
+                                  </span>
                                 </div>
                               </td>
                             </tr>
@@ -1069,6 +1126,16 @@ const Devices = () => {
             </div>
           )}
         </div>
+      )}
+
+      {showDeletePopup && deviceToDelete && (
+        <DeletePopup
+          isOpen={showDeletePopup}
+          onClose={handleCloseDeletePopup}
+          onConfirm={handleConfirmDelete}
+          title={deviceName}
+          organization={deviceToDelete}
+        />
       )}
 
       {isAddDeviceOpen && (

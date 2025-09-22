@@ -208,6 +208,26 @@ export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
   }
 );
 
+// delete device
+export const deleteDevice = createAsyncThunk(
+  "device/deleteDevice",
+  async (id: string, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().delete(`/device/admin/delete-device/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete device";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;

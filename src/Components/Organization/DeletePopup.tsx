@@ -1,13 +1,14 @@
 import React from "react";
 import { X, Trash2 } from "lucide-react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
+import type { DeviceResult } from "../../../model/devices.interface";
 
 interface DeletePopupProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  organization: OrganizationResult | null;
-  title: string;
+  organization: OrganizationResult | DeviceResult | null;
+  title: string | null;
 }
 
 const DeletePopup: React.FC<DeletePopupProps> = ({
