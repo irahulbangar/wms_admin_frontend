@@ -3,9 +3,9 @@ import {
   Calendar,
   Clock,
   Building,
-  Smartphone,
   FileText,
   Loader2,
+  Monitor,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
@@ -124,36 +124,36 @@ const Dashboard = () => {
       title: "Total Users",
       value: users.length,
       icon: Users,
-      color: "bg-status-success",
-      bgColor: "bg-status-success/20",
-      textColor: "text-status-success",
+      gradient: "from-emerald-500 to-teal-600",
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-600",
       href: "/organization/users",
     },
     {
       title: "Total Organization",
       value: organizations.length,
       icon: Building,
-      color: "bg-status-info",
-      bgColor: "bg-status-info/20",
-      textColor: "text-status-info",
+      gradient: "from-blue-500 to-indigo-600",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
       href: "/organization",
     },
     {
       title: "Total Plants",
       value: projects.length,
       icon: FileText,
-      color: "bg-status-success",
-      bgColor: "bg-status-success/20",
-      textColor: "text-status-success",
+      gradient: "from-green-500 to-emerald-600",
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600",
       href: "/organization/plants",
     },
     {
       title: "Total Devices",
       value: devices.length,
-      icon: Smartphone,
-      color: "bg-status-warning",
-      bgColor: "bg-status-warning/20",
-      textColor: "text-status-warning",
+      icon: Monitor,
+      gradient: "from-orange-500 to-amber-600",
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-600",
       href: "/organization/devices",
     },
   ];
@@ -194,24 +194,26 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {stats.map((stat, index) => (
               <div
                 onClick={() => handleNavigate(stat.href)}
                 key={index}
-                className="bg-primary rounded-lg shadow-sm border border-border-primary p-6 hover:shadow-md transition-shadow cursor-pointer"
+                className={`bg-gradient-to-br ${stat.gradient} rounded-lg shadow-sm border border-border-primary p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-base font-medium text-text-secondary font-roboto">
+                    <p className="text-base font-medium text-white font-roboto">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-bold text-text-primary mt-1 font-roboto">
+                    <p className="text-2xl font-bold text-white mt-1 font-roboto">
                       {stat.value}
                     </p>
                   </div>
-                  <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                    <stat.icon className={`w-6 h-6 text-text-primary`} />
+                  <div
+                    className={`p-3 rounded-full ${stat.iconBg} backdrop-blur-sm`}
+                  >
+                    <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
                   </div>
                 </div>
               </div>
