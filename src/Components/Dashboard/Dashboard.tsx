@@ -124,7 +124,7 @@ const Dashboard = () => {
       title: "Total Users",
       value: users.length,
       icon: Users,
-      gradient: "from-emerald-500 to-teal-600",
+      gradient: "from-[#800080] to-[#ffc0cb]",
       iconBg: "bg-emerald-100",
       iconColor: "text-emerald-600",
       href: "/organization/users",
@@ -133,7 +133,7 @@ const Dashboard = () => {
       title: "Total Organization",
       value: organizations.length,
       icon: Building,
-      gradient: "from-blue-500 to-indigo-600",
+      gradient: "from-[#fc4a1a] to-[#f7b733]",
       iconBg: "bg-blue-100",
       iconColor: "text-blue-600",
       href: "/organization",
@@ -142,7 +142,7 @@ const Dashboard = () => {
       title: "Total Plants",
       value: projects.length,
       icon: FileText,
-      gradient: "from-green-500 to-emerald-600",
+      gradient: "from-[#c0392b] to-[#8e44ad]",
       iconBg: "bg-green-100",
       iconColor: "text-green-600",
       href: "/organization/plants",
@@ -151,7 +151,7 @@ const Dashboard = () => {
       title: "Total Devices",
       value: devices.length,
       icon: Monitor,
-      gradient: "from-orange-500 to-amber-600",
+      gradient: "from-[#283c86] to-[#45a247]",
       iconBg: "bg-orange-100",
       iconColor: "text-orange-600",
       href: "/organization/devices",
@@ -194,12 +194,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
             {stats.map((stat, index) => (
               <div
                 onClick={() => handleNavigate(stat.href)}
                 key={index}
-                className={`bg-gradient-to-br ${stat.gradient} rounded-lg shadow-sm border border-border-primary p-6 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105`}
+                className={`bg-gradient-to-br ${stat.gradient} rounded-lg shadow-sm p-6 hover:shadow-sm transition-all duration-300 cursor-pointer transform hover:scale-102`}
               >
                 <div className="flex items-center justify-between">
                   <div>
