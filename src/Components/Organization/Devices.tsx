@@ -365,9 +365,19 @@ const Devices = () => {
       .includes(organizationSearchTerm.toLowerCase())
   );
 
-  const filteredProjects = projects.filter((proj) =>
-    proj.project_name.toLowerCase().includes(projectSearchTerm.toLowerCase())
-  );
+  const filteredProjects = projects.filter((proj) => {
+    const matchesSearch = proj.project_name
+      .toLowerCase()
+      .includes(projectSearchTerm.toLowerCase());
+
+    if (selectedOrganization === "all") {
+      return matchesSearch;
+    }
+
+    const matchesOrganization =
+      proj.organization_id === parseInt(selectedOrganization);
+    return matchesSearch && matchesOrganization;
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -385,6 +395,22 @@ const Devices = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (selectedOrganization !== "all") {
+      const selectedPlant = projects.find(
+        (proj) => proj.project_id.toString() === selectedProject
+      );
+
+      if (
+        selectedPlant &&
+        selectedPlant.organization_id !== parseInt(selectedOrganization)
+      ) {
+        setSelectedProject("all");
+        setProjectSearchTerm("");
+      }
+    }
+  }, [selectedOrganization, selectedProject, projects]);
 
   const handleAddDevice = () => {
     if (selectedOrganization === "all" || selectedProject === "all") {
@@ -731,8 +757,10 @@ const Devices = () => {
                   className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                   onClick={() => {
                     setSelectedOrganization("all");
+                    setSelectedProject("all");
                     setIsOrganizationDropdownOpen(false);
                     setOrganizationSearchTerm("");
+                    setProjectSearchTerm("");
                   }}
                 >
                   All Organization
@@ -745,8 +773,10 @@ const Devices = () => {
                       className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                       onClick={() => {
                         setSelectedOrganization(org.organization_id.toString());
+                        setSelectedProject("all");
                         setIsOrganizationDropdownOpen(false);
                         setOrganizationSearchTerm(org.organization_name);
+                        setProjectSearchTerm("");
                       }}
                     >
                       {org.organization_name}

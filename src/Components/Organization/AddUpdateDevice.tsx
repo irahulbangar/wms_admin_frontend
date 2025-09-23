@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { X, Loader2, Edit } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../../../store/store";
+import { X, Loader2 } from "lucide-react";
+import { useAppDispatch } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import {
@@ -85,7 +85,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     useState<string>("");
   const [editingDeviceTypeTopic, setEditingDeviceTypeTopic] =
     useState<string>("");
-  const { admin } = useAppSelector((state) => state.admin);
 
   const getSelectedDeviceFamilyName = () => {
     const selectedFamily = familyData.find(
@@ -514,14 +513,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                         {family.name}
                       </option>
                     ))}
-                    {admin?.role === "super_admin" && (
-                      <option
-                        value="add_new"
-                        className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
-                      >
-                        + Add New
-                      </option>
-                    )}
                   </select>
 
                   {formData.device_family_id !== 0 && (
@@ -550,11 +541,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                               f.device_family_id === formData.device_family_id
                           )?.name || "Device Family"
                         }`}
-                      >
-                        {admin?.role === "super_admin" && (
-                          <Edit className="w-4 h-4 text-status-info" />
-                        )}
-                      </button>
+                      ></button>
                     </div>
                   )}
                 </div>
@@ -616,15 +603,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                             {type.device_type_name}
                           </option>
                         ))}
-                    {formData.device_family_id &&
-                      admin?.role === "super_admin" && (
-                        <option
-                          value="add_new"
-                          className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
-                        >
-                          + Add New
-                        </option>
-                      )}
                   </select>
 
                   {formData.device_type_id !== 0 && (
@@ -651,11 +629,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                             (t) => t.device_type_id === formData.device_type_id
                           )?.device_type_name || "Device Type"
                         }`}
-                      >
-                        {admin?.role === "super_admin" && (
-                          <Edit className="w-4 h-4 text-status-info" />
-                        )}
-                      </button>
+                      ></button>
                     </div>
                   )}
                 </div>
@@ -859,8 +833,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 >
                   <option value="0">Select Device Flow Direction</option>
                   <option value="none">None</option>
-                  <option value="single-way">Single Way</option>
-                  <option value="multi-way">Multi Way</option>
+                  <option value="single">Single Way</option>
+                  <option value="multi">Multi Way</option>
                 </select>
               </div>
             </div>
