@@ -63,6 +63,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     department_connection: "",
     project_connection: "",
     organization_connection: "",
+    device_flow_direction: "",
     params: {},
   });
   const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
@@ -138,6 +139,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       department_connection: "",
       project_connection: "",
       organization_connection: "",
+      device_flow_direction: "",
     });
     setDeviceFamilyId(0);
     setTankParams({
@@ -233,6 +235,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         project_connection: formData.project_connection,
         organization_connection: formData.organization_connection,
         params: getSelectedDeviceFamilyName() === "fm" ? fmParams : tankParams,
+        device_flow_direction: formData.device_flow_direction,
       };
 
       if (type === "add") {
@@ -295,6 +298,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               department_connection: deviceData.department_connection,
               project_connection: deviceData.project_connection,
               organization_connection: deviceData.organization_connection,
+              device_flow_direction: deviceData.device_flow_direction,
             });
             setDeviceFamilyId(deviceData.device_family_id);
 
@@ -356,6 +360,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         department_connection: "",
         project_connection: "",
         organization_connection: "",
+        device_flow_direction: "",
       });
       setDeviceFamilyId(0);
     }
@@ -446,7 +451,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
-          <h2 className="text-xl font-semibold text-text-primary font-roboto">
+          <h2 className="text-2xl font-semibold text-text-primary font-roboto">
             {type === "update" ? "Update Device" : "Add New Device"}
           </h2>
           <button
@@ -463,7 +468,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2">
+              <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2">
                 Device Details
               </label>
             </div>
@@ -766,7 +771,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
 
             <div>
-              <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 Device Connection
               </label>
             </div>
@@ -841,13 +846,30 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="both">Both</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Device Flow Direction
+                </label>
+                <select
+                  name="device_flow_direction"
+                  value={formData.device_flow_direction}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Device Flow Direction</option>
+                  <option value="none">None</option>
+                  <option value="single-way">Single Way</option>
+                  <option value="multi-way">Multi Way</option>
+                </select>
+              </div>
             </div>
 
             {/* Tank Parameters */}
             {getSelectedDeviceFamilyName() === "tank" && (
               <>
                 <div>
-                  <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                  <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                     Tank Parameters
                   </label>
                 </div>
@@ -1014,7 +1036,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             {getSelectedDeviceFamilyName() === "fm" && (
               <>
                 <div>
-                  <label className="block text-2xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                  <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                     FM Parameters
                   </label>
                 </div>
