@@ -103,6 +103,11 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
       Error("Phone number is required");
       return false;
     }
+    if (!/^\d{10}$/.test(formData.contact_number.trim())) {
+      Error("Phone number must be exactly 10 digits");
+      return false;
+    }
+    
     if (!formData.location.trim()) {
       Error("Location is required");
       return false;

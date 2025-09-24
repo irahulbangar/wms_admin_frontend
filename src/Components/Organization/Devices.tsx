@@ -1040,7 +1040,7 @@ const Devices = () => {
                                   )?.project_name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize truncate">
                                 {
                                   deviceFamily?.find(
                                     (df) =>
@@ -1049,7 +1049,7 @@ const Devices = () => {
                                   )?.name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap uppercase">
                                 {device?.device_type}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">

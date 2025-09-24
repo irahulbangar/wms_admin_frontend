@@ -98,33 +98,48 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   };
   // Common parameters for all device types
   const [commonParams, setCommonParams] = useState<object>({
-    multiplier: 0,
-    shifter: 0,
+    multiplier: "1",
+    shifter: "0",
   });
 
   const [commonInputValues, setCommonInputValues] = useState({
-    multiplier: "0",
+    multiplier: "1",
     shifter: "0",
   });
 
   // Device-specific parameters
   const [tankParams, setTankParams] = useState<object>({
-    height: 0,
-    storageCapacity: 0,
-    sensorPostion: 0,
+    height: "",
+    storageCapacity: "",
+    sensorPostion: "",
   });
   const [fmParams, setFmParams] = useState<object>({
-    maxLpmLimit: 0,
+    maxLpmLimit: "",
+  });
+  const [brwhmsParams, setBrwhmsParams] = useState<object>({
+    sg: "",
+    hmax: "",
+    hmin: "",
+    A: "",
+    B: "",
   });
 
   const [tankInputValues, setTankInputValues] = useState({
-    height: "0",
-    storageCapacity: "0",
-    sensorPostion: "0",
+    height: "",
+    storageCapacity: "",
+    sensorPostion: "",
   });
 
   const [fmInputValues, setFmInputValues] = useState({
-    maxLpmLimit: "0",
+    maxLpmLimit: "",
+  });
+
+  const [brwhmsInputValues, setBrwhmsInputValues] = useState({
+    sg: "",
+    hmax: "",
+    hmin: "",
+    A: "",
+    B: "",
   });
 
   const resetForm = () => {
@@ -172,6 +187,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     });
     setFmInputValues({
       maxLpmLimit: "0",
+    });
+    setBrwhmsParams({
+      sg: 0,
+      hmax: 0,
+      hmin: 0,
+      A: 0,
+      B: 0,
+    });
+    setBrwhmsInputValues({
+      sg: "0",
+      hmax: "0",
+      hmin: "0",
+      A: "0",
+      B: "0",
     });
     setErrors({});
   };
@@ -247,6 +276,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             return { ...commonParams, ...fmParams };
           } else if (deviceFamilyName === "tank") {
             return { ...commonParams, ...tankParams };
+          } else if (deviceFamilyName === "brwhms") {
+            return { ...commonParams, ...brwhmsParams };
           } else {
             return { ...commonParams };
           }
@@ -1068,6 +1099,173 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       placeholder="Enter max LPM limit"
                       className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                         errors.maxLpmLimit
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* BRWHMS Parameters */}
+            {getSelectedDeviceFamilyName() === "brwhms" && (
+              <>
+                <div>
+                  <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                    BRWHMS Parameters
+                  </label>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      SG
+                    </label>
+                    <input
+                      type="text"
+                      name="sg"
+                      value={brwhmsInputValues.sg}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setBrwhmsInputValues((prev) => ({
+                          ...prev,
+                          sg: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setBrwhmsParams((prev) => ({
+                          ...prev,
+                          sg: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter Distance from Sensor to top of V- Notch"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.sg
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      HMax
+                    </label>
+                    <input
+                      type="text"
+                      name="hmax"
+                      value={brwhmsInputValues.hmax}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setBrwhmsInputValues((prev) => ({
+                          ...prev,
+                          hmax: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setBrwhmsParams((prev) => ({
+                          ...prev,
+                          hmax: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter Distance from sensor to V-cone"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.hmax
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      HMin
+                    </label>
+                    <input
+                      type="text"
+                      name="hmin"
+                      value={brwhmsInputValues.hmin}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setBrwhmsInputValues((prev) => ({
+                          ...prev,
+                          hmin: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setBrwhmsParams((prev) => ({
+                          ...prev,
+                          hmin: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter Distance from V-Cone to top of V-Notch"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.hmin
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      A
+                    </label>
+                    <input
+                      type="text"
+                      name="A"
+                      value={brwhmsInputValues.A}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setBrwhmsInputValues((prev) => ({
+                          ...prev,
+                          A: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setBrwhmsParams((prev) => ({
+                          ...prev,
+                          A: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter A"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.A
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      B
+                    </label>
+                    <input
+                      type="text"
+                      name="B"
+                      value={brwhmsInputValues.B}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setBrwhmsInputValues((prev) => ({
+                          ...prev,
+                          B: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setBrwhmsParams((prev) => ({
+                          ...prev,
+                          B: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter B"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.B
                           ? "border-status-danger"
                           : "border-border-primary"
                       }`}
