@@ -1049,7 +1049,7 @@ const Devices = () => {
                                   )?.name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap uppercase">
+                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                                 {device?.device_type}
                               </td>
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">

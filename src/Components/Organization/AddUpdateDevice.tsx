@@ -96,26 +96,25 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       ""
     );
   };
-  // Common parameters for all device types
+
   const [commonParams, setCommonParams] = useState<object>({
     multiplier: "1",
     shifter: "0",
+    maxThreshold: "",
   });
 
   const [commonInputValues, setCommonInputValues] = useState({
     multiplier: "1",
     shifter: "0",
+    maxThreshold: "",
   });
 
-  // Device-specific parameters
   const [tankParams, setTankParams] = useState<object>({
     height: "",
     storageCapacity: "",
     sensorPostion: "",
   });
-  const [fmParams, setFmParams] = useState<object>({
-    maxLpmLimit: "",
-  });
+
   const [brwhmsParams, setBrwhmsParams] = useState<object>({
     sg: "",
     hmax: "",
@@ -130,9 +129,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     sensorPostion: "",
   });
 
-  const [fmInputValues, setFmInputValues] = useState({
-    maxLpmLimit: "",
-  });
 
   const [brwhmsInputValues, setBrwhmsInputValues] = useState({
     sg: "",
@@ -161,46 +157,40 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     });
     setDeviceFamilyId(0);
     
-    // Reset common parameters
     setCommonParams({
-      multiplier: 0,
-      shifter: 0,
+      multiplier: "1",
+      shifter: "0",
+      maxThreshold: "",
     });
     setCommonInputValues({
-      multiplier: "0",
+      multiplier: "1",
       shifter: "0",
+      maxThreshold: "",
     });
     
-    // Reset device-specific parameters
     setTankParams({
-      height: 0,
-      storageCapacity: 0,
-      sensorPostion: 0,
-    });
-    setFmParams({
-      maxLpmLimit: 0,
+      height: "",
+      storageCapacity: "",
+      sensorPostion: "",
     });
     setTankInputValues({
-      height: "0",
-      storageCapacity: "0",
-      sensorPostion: "0",
-    });
-    setFmInputValues({
-      maxLpmLimit: "0",
+      height: "",
+      storageCapacity: "",
+      sensorPostion: "",
     });
     setBrwhmsParams({
-      sg: 0,
-      hmax: 0,
-      hmin: 0,
-      A: 0,
-      B: 0,
+      sg: "",
+      hmax: "",
+      hmin: "",
+      A: "",
+      B: "",
     });
     setBrwhmsInputValues({
-      sg: "0",
-      hmax: "0",
-      hmin: "0",
-      A: "0",
-      B: "0",
+      sg: "",
+      hmax: "",
+      hmin: "",
+      A: "",
+      B: "",
     });
     setErrors({});
   };
@@ -272,9 +262,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_connection: formData.organization_connection,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
-          if (deviceFamilyName === "fm") {
-            return { ...commonParams, ...fmParams };
-          } else if (deviceFamilyName === "tank") {
+          if (deviceFamilyName === "tank") {
             return { ...commonParams, ...tankParams };
           } else if (deviceFamilyName === "brwhms") {
             return { ...commonParams, ...brwhmsParams };
@@ -356,26 +344,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               selectedFamily?.type?.toLowerCase() ||
               selectedFamily?.name?.toLowerCase() ||
               "";
-            // Set common parameters
+            
             const commonData = {
               multiplier: deviceData.params?.multiplier || 0,
               shifter: deviceData.params?.shifter || 0,
+              maxThreshold: deviceData.params?.maxThreshold || "",
             };
             setCommonParams(commonData);
             setCommonInputValues({
               multiplier: commonData.multiplier.toString(),
               shifter: commonData.shifter.toString(),
+              maxThreshold: commonData.maxThreshold.toString(),
             });
 
-            if (familyName === "fm") {
-              const fmData = {
-                maxLpmLimit: deviceData.params?.maxLpmLimit || 0,
-              };
-              setFmParams(fmData);
-              setFmInputValues({
-                maxLpmLimit: fmData.maxLpmLimit.toString(),
-              });
-            } else {
+            if (familyName === "tank") {
               const tankData = {
                 height: deviceData.params?.height || 0,
                 storageCapacity: deviceData.params?.storageCapacity || 0,
@@ -386,6 +368,22 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 height: tankData.height.toString(),
                 storageCapacity: tankData.storageCapacity.toString(),
                 sensorPostion: tankData.sensorPostion.toString(),
+              });
+            } else if (familyName === "brwhms") {
+              const brwhmsData = {
+                sg: deviceData.params?.sg || 0,
+                hmax: deviceData.params?.hmax || 0,
+                hmin: deviceData.params?.hmin || 0,
+                A: deviceData.params?.A || 0,
+                B: deviceData.params?.B || 0,
+              };
+              setBrwhmsParams(brwhmsData);
+              setBrwhmsInputValues({
+                sg: brwhmsData.sg.toString(),
+                hmax: brwhmsData.hmax.toString(),
+                hmin: brwhmsData.hmin.toString(),
+                A: brwhmsData.A.toString(),
+                B: brwhmsData.B.toString(),
               });
             }
           }
@@ -956,6 +954,35 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   }`}
                 />
               </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Max Threshold
+                </label>
+                <input
+                  type="text"
+                  name="maxThreshold"
+                  value={commonInputValues.maxThreshold}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      maxThreshold: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter max threshold"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.maxThreshold
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+                {errors.maxThreshold && (
+                  <p className="text-status-danger text-sm mt-1 font-roboto">
+                    {errors.maxThreshold}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Tank Parameters */}
@@ -1064,49 +1091,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </>
             )}
 
-            {/* FM Parameters */}
-            {getSelectedDeviceFamilyName() === "fm" && (
-              <>
-                <div>
-                  <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
-                    FM Parameters
-                  </label>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-
-                  <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                      Max LPM Limit
-                    </label>
-                    <input
-                      type="text"
-                      name="maxLpmLimit"
-                      value={fmInputValues.maxLpmLimit}
-                      onChange={(e) => {
-                        const inputValue = e.target.value;
-                        setFmInputValues((prev) => ({
-                          ...prev,
-                          maxLpmLimit: inputValue,
-                        }));
-
-                        const numericValue =
-                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                        setFmParams((prev) => ({
-                          ...prev,
-                          maxLpmLimit: numericValue,
-                        }));
-                      }}
-                      placeholder="Enter max LPM limit"
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                        errors.maxLpmLimit
-                          ? "border-status-danger"
-                          : "border-border-primary"
-                      }`}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
 
             {/* BRWHMS Parameters */}
             {getSelectedDeviceFamilyName() === "brwhms" && (
