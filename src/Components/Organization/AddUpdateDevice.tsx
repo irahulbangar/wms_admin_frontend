@@ -96,16 +96,24 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       ""
     );
   };
+  // Common parameters for all device types
+  const [commonParams, setCommonParams] = useState<object>({
+    multiplier: 0,
+    shifter: 0,
+  });
+
+  const [commonInputValues, setCommonInputValues] = useState({
+    multiplier: "0",
+    shifter: "0",
+  });
+
+  // Device-specific parameters
   const [tankParams, setTankParams] = useState<object>({
     height: 0,
     storageCapacity: 0,
     sensorPostion: 0,
-    multiplier: 0,
-    shifter: 0,
   });
   const [fmParams, setFmParams] = useState<object>({
-    multiplier: 0,
-    shifter: 0,
     maxLpmLimit: 0,
   });
 
@@ -113,13 +121,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     height: "0",
     storageCapacity: "0",
     sensorPostion: "0",
-    multiplier: "0",
-    shifter: "0",
   });
 
   const [fmInputValues, setFmInputValues] = useState({
-    multiplier: "0",
-    shifter: "0",
     maxLpmLimit: "0",
   });
 
@@ -141,28 +145,32 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       device_flow_direction: "",
     });
     setDeviceFamilyId(0);
+    
+    // Reset common parameters
+    setCommonParams({
+      multiplier: 0,
+      shifter: 0,
+    });
+    setCommonInputValues({
+      multiplier: "0",
+      shifter: "0",
+    });
+    
+    // Reset device-specific parameters
     setTankParams({
       height: 0,
       storageCapacity: 0,
       sensorPostion: 0,
-      multiplier: 0,
-      shifter: 0,
     });
     setFmParams({
-      multiplier: 0,
-      shifter: 0,
       maxLpmLimit: 0,
     });
     setTankInputValues({
       height: "0",
       storageCapacity: "0",
       sensorPostion: "0",
-      multiplier: "0",
-      shifter: "0",
     });
     setFmInputValues({
-      multiplier: "0",
-      shifter: "0",
       maxLpmLimit: "0",
     });
     setErrors({});
@@ -233,7 +241,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         department_connection: formData.department_connection,
         project_connection: formData.project_connection,
         organization_connection: formData.organization_connection,
-        params: getSelectedDeviceFamilyName() === "fm" ? fmParams : tankParams,
+        params: (() => {
+          const deviceFamilyName = getSelectedDeviceFamilyName();
+          if (deviceFamilyName === "fm") {
+            return { ...commonParams, ...fmParams };
+          } else if (deviceFamilyName === "tank") {
+            return { ...commonParams, ...tankParams };
+          } else {
+            return { ...commonParams };
+          }
+        })(),
         device_flow_direction: formData.device_flow_direction,
       };
 
@@ -308,35 +325,36 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               selectedFamily?.type?.toLowerCase() ||
               selectedFamily?.name?.toLowerCase() ||
               "";
+            // Set common parameters
+            const commonData = {
+              multiplier: deviceData.params?.multiplier || 0,
+              shifter: deviceData.params?.shifter || 0,
+            };
+            setCommonParams(commonData);
+            setCommonInputValues({
+              multiplier: commonData.multiplier.toString(),
+              shifter: commonData.shifter.toString(),
+            });
+
             if (familyName === "fm") {
-              const fmData = deviceData.params || {
-                inputFor: 0,
-                outputFor: 0,
-                multiplier: 0,
-                shifter: 0,
-                maxLpmLimit: 0,
+              const fmData = {
+                maxLpmLimit: deviceData.params?.maxLpmLimit || 0,
               };
               setFmParams(fmData);
               setFmInputValues({
-                multiplier: fmData.multiplier.toString(),
-                shifter: fmData.shifter.toString(),
                 maxLpmLimit: fmData.maxLpmLimit.toString(),
               });
             } else {
-              const tankData = deviceData.params || {
-                height: 0,
-                storageCapacity: 0,
-                sensorPostion: 0,
-                multiplier: 0,
-                shifter: 0,
+              const tankData = {
+                height: deviceData.params?.height || 0,
+                storageCapacity: deviceData.params?.storageCapacity || 0,
+                sensorPostion: deviceData.params?.sensorPostion || 0,
               };
               setTankParams(tankData);
               setTankInputValues({
                 height: tankData.height.toString(),
                 storageCapacity: tankData.storageCapacity.toString(),
                 sensorPostion: tankData.sensorPostion.toString(),
-                multiplier: tankData.multiplier.toString(),
-                shifter: tankData.shifter.toString(),
               });
             }
           }
@@ -839,6 +857,76 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
             </div>
 
+            {/* Common Parameters */}
+            <div>
+              <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                Common Parameters
+              </label>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Multiplier
+                </label>
+                <input
+                  type="text"
+                  name="multiplier"
+                  value={commonInputValues.multiplier}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      multiplier: inputValue,
+                    }));
+
+                    const numericValue =
+                      inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      multiplier: numericValue,
+                    }));
+                  }}
+                  placeholder="Enter multiplier"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.multiplier
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Shifter
+                </label>
+                <input
+                  type="text"
+                  name="shifter"
+                  value={commonInputValues.shifter}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      shifter: inputValue,
+                    }));
+
+                    const numericValue =
+                      inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      shifter: numericValue,
+                    }));
+                  }}
+                  placeholder="Enter shifter"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.shifter
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+              </div>
+            </div>
+
             {/* Tank Parameters */}
             {getSelectedDeviceFamilyName() === "tank" && (
               <>
@@ -941,67 +1029,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                      Multiplier
-                    </label>
-                    <input
-                      type="text"
-                      name="multiplier"
-                      value={tankInputValues.multiplier}
-                      onChange={(e) => {
-                        const inputValue = e.target.value;
-                        setTankInputValues((prev) => ({
-                          ...prev,
-                          multiplier: inputValue,
-                        }));
-
-                        const numericValue =
-                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                        setTankParams((prev) => ({
-                          ...prev,
-                          multiplier: numericValue,
-                        }));
-                      }}
-                      placeholder="Enter multiplier"
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                        errors.multiplier
-                          ? "border-status-danger"
-                          : "border-border-primary"
-                      }`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                      Shifter
-                    </label>
-                    <input
-                      type="text"
-                      name="shifter"
-                      value={tankInputValues.shifter}
-                      onChange={(e) => {
-                        const inputValue = e.target.value;
-                        setTankInputValues((prev) => ({
-                          ...prev,
-                          shifter: inputValue,
-                        }));
-
-                        const numericValue =
-                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                        setTankParams((prev) => ({
-                          ...prev,
-                          shifter: numericValue,
-                        }));
-                      }}
-                      placeholder="Enter shifter"
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                        errors.shifter
-                          ? "border-status-danger"
-                          : "border-border-primary"
-                      }`}
-                    />
-                  </div>
                 </div>
               </>
             )}
@@ -1015,67 +1042,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                  <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                      Multiplier
-                    </label>
-                    <input
-                      type="text"
-                      name="multiplier"
-                      value={fmInputValues.multiplier}
-                      onChange={(e) => {
-                        const inputValue = e.target.value;
-                        setFmInputValues((prev) => ({
-                          ...prev,
-                          multiplier: inputValue,
-                        }));
-
-                        const numericValue =
-                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                        setFmParams((prev) => ({
-                          ...prev,
-                          multiplier: numericValue,
-                        }));
-                      }}
-                      placeholder="Enter multiplier"
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                        errors.multiplier
-                          ? "border-status-danger"
-                          : "border-border-primary"
-                      }`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                      Shifter
-                    </label>
-                    <input
-                      type="text"
-                      name="shifter"
-                      value={fmInputValues.shifter}
-                      onChange={(e) => {
-                        const inputValue = e.target.value;
-                        setFmInputValues((prev) => ({
-                          ...prev,
-                          shifter: inputValue,
-                        }));
-
-                        const numericValue =
-                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                        setFmParams((prev) => ({
-                          ...prev,
-                          shifter: numericValue,
-                        }));
-                      }}
-                      placeholder="Enter shifter"
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                        errors.shifter
-                          ? "border-status-danger"
-                          : "border-border-primary"
-                      }`}
-                    />
-                  </div>
 
                   <div>
                     <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
