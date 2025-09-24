@@ -70,6 +70,10 @@ export interface LastRecord {
   day_max?: number;
   day_min?: number;
   day_flow?: number;
+  max_height?: number
+  min_height?: number
+  last_height?: number
+  first_height?: number
 }
 
 export interface Params {

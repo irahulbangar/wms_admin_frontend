@@ -146,6 +146,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                 status: "",
               });
               setEditingUserPlantId(null);
+              handleClose();
             }
           })
           .catch((error) => {
@@ -164,6 +165,8 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                 role: "",
                 status: "",
               });
+              setEditingUserPlantId(null);
+              handleClose();
             }
           })
           .catch((error) => {

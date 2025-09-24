@@ -76,13 +76,17 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
       !/^[0-9]{10}$/.test(formData.client_phone.toString().trim()) ||
       formData.client_phone.toString().trim().length !== 10
     ) {
-      Error("Please enter the 10 digit phone number");
+      newErrors.client_phone = "Please enter the 10 digit phone number";
     }
 
-    if (type === "add" && !formData.client_password.trim()) {
+    if (!formData.client_password.trim()) {
       newErrors.client_password = "Client Password is required";
-    } else if (type === "add" && formData.client_password.length < 6) {
-      Error("Password must be at least 6 characters");
+    } else if (formData.client_password.length < 6) {
+      newErrors.client_password = "Password must be at least 6 characters";
+    }
+
+    if (!formData.organization_id) {
+      newErrors.organization_id = "Organization is required";
     }
 
     setErrors(newErrors as Record<string, string>);
