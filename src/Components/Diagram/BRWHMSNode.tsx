@@ -8,11 +8,11 @@ interface BRWHMSNodeProps {
 
 const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
   const isActive = data.isActive !== false;
-  const flowRate = Number(data.flowRate) || 0;
   const departmentConnection = data.departmentConnection || "none";
   const projectConnection = data.projectConnection || "none";
   const organizationConnection = data.organizationConnection || "none";
   const departmentName = data.departmentName || "";
+
 
   return (
     <div
@@ -24,8 +24,8 @@ Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
 Project Connection : ${projectConnection}
 Organization Connection : ${organizationConnection}
-Totalizer Reading : ${flowRate} Ltr
-Flow Rate : ${flowRate} LPM
+Totalizer Reading : ${data?.totalizerReading} Ltr
+Flow Rate : ${data?.avg} LPM
       `}
     >
       <div
@@ -47,9 +47,8 @@ Flow Rate : ${flowRate} LPM
         </div>
         <div
           className="font-semibold text-blue-600 font-roboto text-[10px] truncate px-1"
-          title={`${flowRate} LPM`}
         >
-          {flowRate} LPM
+          {data?.avg} LPM
         </div>
       </div>
 
@@ -57,7 +56,7 @@ Flow Rate : ${flowRate} LPM
         <div
           className="truncate text-center"
         >
-          Totalizer : {flowRate} Ltr
+          Totalizer : {data?.max} Ltr
         </div>
        
       </div>
