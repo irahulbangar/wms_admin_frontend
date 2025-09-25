@@ -8,23 +8,17 @@ interface PHMCNodeProps {
 
 const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
   const isActive = data.isActive !== false;
-  const pumpStatus = data.pumpStatus || "0";
-  const voltage = data.voltage || 0;
-  const current = data.current || 0;
+  const voltageR = data.voltageR || 0;
+  const voltageY = data.voltageY || 0;
+  const voltageB = data.voltageB || 0;
+  const currentR = data.currentR || 0;
+  const currentY = data.currentY || 0;
+  const currentB = data.currentB || 0;
   const frequency = data.frequency || 0;
-  const power = data.power || 0;
   const departmentConnection = data.departmentConnection || "none";
   const projectConnection = data.projectConnection || "none";
   const organizationConnection = data.organizationConnection || "none";
   const departmentName = data.departmentName || "";
-
-  const getPumpStatusColor = (status: string) => {
-    return status === "1" ? "text-status-success" : "text-status-danger";
-  };
-
-  const getPumpStatusText = (status: string) => {
-    return status === "1" ? "ON" : "OFF";
-  };
 
   return (
     <div
@@ -36,9 +30,10 @@ Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
 Project Connection : ${projectConnection}
 Organization Connection : ${organizationConnection}
-Pump Status : ${getPumpStatusText(pumpStatus)}
-Voltage : ${voltage}V | Current : ${current}A
-Frequency : ${frequency}Hz | Power : ${power}W
+Voltage (R) : ${voltageR / 10}V | Current (R) : ${currentR}A
+Voltage (Y) : ${voltageY / 10}V | Current (Y) : ${currentY}A
+Voltage (B) : ${voltageB / 10}V | Current (B) : ${currentB}A
+Frequency : ${frequency}Hz
       `}
     >
       <div
@@ -54,65 +49,73 @@ Frequency : ${frequency}Hz | Power : ${power}W
         }`}
       />
 
-      <div className="grid grid-cols-2 gap-1 text-center">
-        <div>
-          <div className="text-text-primary font-roboto text-[9px] font-semibold">
-            Pump:
+      <div className="flex flex-col gap-1 text-center">
+        <div className="flex flex-row gap-1 text-center">
+          <div className="flex flex-col gap-1 text-center">
+            <div className="text-text-primary font-roboto text-[9px] font-semibold">
+              Volt (R):
+            </div>
+            <div
+              className="font-semibold font-roboto text-[9px] text-status-danger"
+            >
+              {voltageR / 10} V
+            </div>
           </div>
-          <div
-            className={`font-semibold font-roboto text-[9px] ${getPumpStatusColor(
-              pumpStatus
-            )}`}
-          >
-            {getPumpStatusText(pumpStatus)}
+          <div className="flex flex-col gap-1 text-center">
+            <div className="text-text-primary font-roboto text-[9px] font-semibold">
+              Volt (Y):
+            </div>
+            <div className="font-semibold text-status-warning font-roboto text-[9px]">
+              {voltageY / 10} V
+            </div>
           </div>
-        </div>
-        <div>
-          <div className="text-text-primary font-roboto text-[9px] font-semibold">
-            Voltage:
-          </div>
-          <div className="font-semibold text-green-600 font-roboto text-[9px]">
-            {voltage}V
-          </div>
-        </div>
-        <div>
-          <div className="text-text-primary font-roboto text-[9px] font-semibold">
-            Current:
-          </div>
-          <div className="font-semibold text-green-600 font-roboto text-[9px]">
-            {current}A
-          </div>
-        </div>
-        <div>
-          <div className="text-text-primary font-roboto text-[9px] font-semibold">
-            Freq:
-          </div>
-          <div className="font-semibold text-green-600 font-roboto text-[9px]">
-            {frequency}Hz
+          <div className="flex flex-col gap-1 text-center">
+            <div className="text-text-primary font-roboto text-[9px] font-semibold">
+              Volt (B):
+            </div>
+            <div className="font-semibold text-status-info font-roboto text-[9px]">
+              {voltageB / 10} V
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div
-          className="truncate text-center"
-          title={`Power: ${power}W`}
-        >
-          Power: {power}W
+        <div className="flex flex-row gap-1 text-center">
+          <div className="flex flex-col gap-1 text-center">
+            <div className="text-text-primary font-roboto text-[9px] font-semibold whitespace-nowrap">
+              Curr (R):
+            </div>
+            <div className="font-semibold text-status-danger font-roboto text-[9px]">
+              {currentR}A
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 text-center">
+            <div className="text-text-primary font-roboto text-[9px] font-semibold whitespace-nowrap">
+              Curr (Y):
+            </div>
+            <div className="font-semibold text-status-warning font-roboto text-[9px]">
+              {currentY}A
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 text-center">
+            <div className="text-text-primary font-roboto text-[9px] font-semibold whitespace-nowrap">
+              Curr (B):
+            </div>
+            <div className="font-semibold text-status-info font-roboto text-[9px]">
+              {currentB}A
+            </div>
+          </div>
         </div>
       </div>
 
       <Handle
         type="target"
         position={HandlePosition.Left}
-        className="w-3 h-3 bg-green-500"
+        className="w-3 h-3 bg-status-success"
       />
       <Handle
         type="source"
         position={HandlePosition.Right}
-        className="w-3 h-3 bg-green-500"
+        className="w-3 h-3 bg-status-success"
       />
-
     </div>
   );
 };

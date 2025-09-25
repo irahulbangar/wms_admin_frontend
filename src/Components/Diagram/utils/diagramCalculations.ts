@@ -604,10 +604,14 @@ const createPHMCNode = (
     unit: "W",
     isActive: device.device_status === "active",
     pumpStatus: device.last_record?.pumpstatus || "0",
-    voltage: Number(device.last_record?.voltage_r) || 0,
+    voltageR: Number(device.last_record?.voltage_r) || 0,
+    voltageY: Number(device.last_record?.voltage_y) || 0,
+    voltageB: Number(device.last_record?.voltage_b) || 0,
+    currentR: Number(device.last_record?.Current_r) || 0,
+    currentY: Number(device.last_record?.Current_y) || 0,
+    currentB: Number(device.last_record?.Current_b) || 0,
     current: Number(device.last_record?.Current_r) || 0,
     frequency: Number(device.last_record?.Frequency) || 0,
-    power: Number(device.last_record?.Active_Power) || 0,
   };
 
   return {
@@ -745,10 +749,14 @@ export const cleanNodesForAPI = (
     } else if (node.type === "phmc") {
       const {
         pumpStatus: _pumpStatus,
-        voltage: _voltage,
+        voltageR: _voltageR,
+        voltageY: _voltageY,
+        voltageB: _voltageB,
+        currentR: _currentR,
+        currentY: _currentY,
+        currentB: _currentB,
         current: _current,
         frequency: _frequency,
-        power: _power,
         isActive: _isActive,
         ...cleanData
       } = node.data;

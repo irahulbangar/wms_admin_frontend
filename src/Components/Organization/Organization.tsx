@@ -9,6 +9,7 @@ import {
   Loader2,
   Eye,
   Trash2,
+  ChartNetwork,
 } from "lucide-react";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -370,6 +371,17 @@ const Organization = () => {
                               }
                               className="w-5 h-5 text-status-info cursor-pointer"
                             />
+                          </span>
+
+                          <span
+                            title="Edit diagram"
+                            aria-label="Edit diagram"
+                            className="inline-flex cursor-pointer"
+                            onClick={() =>
+                              navigate(`/diagram/organization/${organization?.organization_id}`)
+                            }
+                          >
+                            <ChartNetwork className="w-5 h-5 text-text-primary" />
                           </span>
 
                           {admin?.role === "super_admin" && (

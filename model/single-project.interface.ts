@@ -54,10 +54,14 @@ export interface NodeData {
   max?: number;
   min?: number;
   pumpStatus?: string;
-  voltage?: number;
+  voltageR?: number;
+  voltageY?: number;
+  voltageB?: number;
+  currentR?: number;
+  currentY?: number;
+  currentB?: number;
   current?: number;
   frequency?: number;
-  power?: number;
   maxMm?: number;
   minMm?: number;
   lastMm?: number;

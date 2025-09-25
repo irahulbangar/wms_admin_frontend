@@ -138,6 +138,14 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/diagram/organization/:organization_id"
+                  element={
+                    <ProtectedRoute>
+                      <DiagramPage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
 
