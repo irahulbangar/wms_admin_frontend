@@ -4,6 +4,7 @@ import { Edit } from "lucide-react";
 import type { NodeData } from "../../../model/single-project.interface";
 import type { DeviceResult } from "../../../model/devices.interface";
 import type { DiagramEdge } from "./utils/diagramCalculations";
+import { calculateDepartmentFlowBalance } from "./utils/diagramCalculations";
 
 interface GroupNodeProps {
   data: NodeData;
@@ -44,33 +45,6 @@ const determineFMFlowDirection = (
   return inputConnections >= outputConnections;
 };
 
-const determineFMFlowDirectionFromDevices = (
-  fmDevice: DeviceResult,
-  _departmentTanks: DeviceResult[],
-  departmentFMs: DeviceResult[],
-  fmIndex: number
-): boolean => {
-  const deviceName = fmDevice.device_name?.toLowerCase() || "";
-
-  if (
-    deviceName.includes("in") ||
-    deviceName.includes("input") ||
-    deviceName.includes("supply")
-  ) {
-    return true;
-  }
-  if (
-    deviceName.includes("out") ||
-    deviceName.includes("output") ||
-    deviceName.includes("discharge")
-  ) {
-    return false;
-  }
-
-  const totalFMs = departmentFMs.length;
-
-  return fmIndex < Math.ceil(totalFMs / 2);
-};
 
 const GroupNode: React.FC<GroupNodeProps> = ({
   data,
@@ -82,6 +56,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   const { getNodes, getEdges } = useReactFlow();
   const allNodes = getNodes();
   const allEdges = getEdges ? getEdges() : edges;
+
 
   const deviceDataKey = deviceData
     ? JSON.stringify(
@@ -183,6 +158,20 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   };
 
   const calculateTotalInOut = () => {
+    // Use the new calculation logic based on department_connection
+    if (deviceData && deviceData.length > 0) {
+      const departmentId = parseInt(id);
+      const flowBalance = calculateDepartmentFlowBalance(deviceData, departmentId);
+      
+      if (flowBalance) {
+        return {
+          totalIn: flowBalance.totalIn,
+          totalOut: flowBalance.totalOut,
+        };
+      }
+    }
+
+    // Fallback to old logic if no device data
     let totals = { totalIn: 0, totalOut: 0 };
 
     if (allNodes && allNodes.length > 0) {
@@ -203,52 +192,6 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             fm.id,
             departmentTanks,
             allEdges
-          );
-
-          if (isInput) {
-            acc.totalIn += totalVolume;
-          } else {
-            acc.totalOut += totalVolume;
-          }
-
-          return acc;
-        },
-        { totalIn: 0, totalOut: 0 }
-      );
-    }
-
-    if (
-      totals.totalIn === 0 &&
-      totals.totalOut === 0 &&
-      deviceData &&
-      deviceData.length > 0
-    ) {
-      const departmentId = parseInt(id);
-      const departmentDevices = deviceData.filter(
-        (device) => device.department_id === departmentId
-      );
-
-      const departmentFMs = departmentDevices.filter(
-        (device) =>
-          device.type === "fm" ||
-          device.device_family?.toLowerCase().includes("flow")
-      );
-
-      const departmentTanks = departmentDevices.filter(
-        (device) =>
-          device.type === "tank" ||
-          device.device_family?.toLowerCase().includes("tank")
-      );
-
-      totals = departmentFMs.reduce(
-        (acc, device, index) => {
-          const totalVolume = Number(device.last_record?.max) || 0;
-
-          const isInput = determineFMFlowDirectionFromDevices(
-            device,
-            departmentTanks,
-            departmentFMs,
-            index
           );
 
           if (isInput) {

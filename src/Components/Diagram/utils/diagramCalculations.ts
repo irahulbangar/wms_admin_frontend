@@ -33,6 +33,14 @@ export interface DepartmentGroup {
   devices: DeviceResult[];
 }
 
+export interface DepartmentCalculations {
+  department_id: number;
+  department_name: string;
+  totalIn: number;
+  totalOut: number;
+  totalBalance: number;
+}
+
 export const convertDevicesToDiagram = (
   devices: DeviceResult[],
   departmentDimensions: Record<string, { width: number; height: number }>
@@ -760,5 +768,119 @@ const calculateMinimumDimensions = (
   return {
     width: minWidth,
     height: Math.max(500, minHeight),
+  };
+};
+
+const getDeviceFlowValue = (device: DeviceResult): number => {
+  const { type, device_type, last_record } = device;
+  
+  if (type === "fm") {
+    return Number(last_record?.max) || 0;
+  }
+  
+  if (type === "brwhms") {
+    return Number(last_record?.max) || 0;
+  }
+  
+  if (type === "phmc" && device_type === "New phmc") {
+    return Number(last_record?.flowrate) || 0;
+  }
+  
+  return 0;
+};
+
+const shouldIncludeDevice = (device: DeviceResult): boolean => {
+  const { type, device_type } = device;
+  
+  if (type === "fm") return true;
+  
+  if (type === "brwhms") return true;
+  
+  if (type === "phmc" && device_type === "New phmc") return true;
+  
+  return false;
+};
+
+export const calculateDepartmentFlowBalances = (
+  devices: DeviceResult[]
+): DepartmentCalculations[] => {
+  const departmentGroups = devices.reduce((acc, device) => {
+    const deptId = device.department_id;
+    if (!acc[deptId]) {
+      acc[deptId] = {
+        department_id: deptId,
+        department_name: device.department_name || `Department ${deptId}`,
+        devices: [],
+      };
+    }
+    acc[deptId].devices.push(device);
+    return acc;
+  }, {} as Record<number, DepartmentGroup>);
+
+  return Object.values(departmentGroups).map((group) => {
+    let totalIn = 0;
+    let totalOut = 0;
+
+    group.devices.forEach((device) => {
+      if (!shouldIncludeDevice(device)) return;
+
+      const flowValue = getDeviceFlowValue(device);
+      const { department_connection } = device;
+
+      if (department_connection === "in") {
+        totalIn += flowValue;
+      }
+
+      if (department_connection === "out") {
+        totalOut += flowValue;
+      }
+    });
+
+    const totalBalance = totalOut - totalIn;
+
+    return {
+      department_id: group.department_id,
+      department_name: group.department_name,
+      totalIn,
+      totalOut,
+      totalBalance,
+    };
+  });
+};
+
+export const calculateDepartmentFlowBalance = (
+  devices: DeviceResult[],
+  departmentId: number
+): DepartmentCalculations | null => {
+  const departmentDevices = devices.filter(device => device.department_id === departmentId);
+  
+  if (departmentDevices.length === 0) return null;
+
+  let totalIn = 0;
+  let totalOut = 0;
+
+  departmentDevices.forEach((device) => {
+    if (!shouldIncludeDevice(device)) return;
+
+    const flowValue = getDeviceFlowValue(device);
+    const { department_connection } = device;
+
+    if (department_connection === "in") {
+      totalIn += flowValue;
+    }
+
+    if (department_connection === "out") {
+      totalOut += flowValue;
+    }
+  });
+
+  const totalBalance = totalOut - totalIn;
+
+  return {
+    department_id: departmentId,
+    department_name: departmentDevices[0].department_name || `Department ${departmentId}`,
+    totalIn,
+    totalOut,
+    totalBalance,
   };
 };
