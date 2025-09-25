@@ -133,7 +133,7 @@ export const useDiagramData = (projectId: string | undefined) => {
               data: {
                 ...node.data,
                 currentLevel:
-                  Number(matchingDevice.last_record?.min_last_level) || 0,
+                  Number(matchingDevice.last_record?.last_level) || 0,
                 capacity: Number(matchingDevice?.params?.storageCapacity) || 0,
                 height: Number(matchingDevice?.params?.height) || 0,
               },
@@ -152,9 +152,73 @@ export const useDiagramData = (projectId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                flowRate: Number(matchingDevice.last_record?.min_avg) || 0,
+                flowRate: Number(matchingDevice.last_record?.avg) || 0,
                 totalizerReading:
-                  Number(matchingDevice.last_record?.min_max) || 0,
+                  Number(matchingDevice.last_record?.max) || 0,
+                isActive: matchingDevice.device_status === "active",
+              },
+            };
+          }
+        } else if (node.type === "brwhms") {
+          const matchingDevice = deviceData.find(
+            (device) =>
+              device.device_name === node.data.label &&
+              (device.type === "brwhms" ||
+                device.device_family?.toLowerCase().includes("brwhms"))
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                flowRate: Number(matchingDevice.last_record?.flow) || 0,
+                avg: Number(matchingDevice.last_record?.avg) || 0,
+                max: Number(matchingDevice.last_record?.max) || 0,
+                min: Number(matchingDevice.last_record?.min) || 0,
+                isActive: matchingDevice.device_status === "active",
+              },
+            };
+          }
+        } else if (node.type === "phmc") {
+          const matchingDevice = deviceData.find(
+            (device) =>
+              device.device_name === node.data.label &&
+              (device.type === "phmc" ||
+                device.device_family?.toLowerCase().includes("phmc"))
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                pumpStatus: matchingDevice.last_record?.pumpstatus || "0",
+                voltage: Number(matchingDevice.last_record?.voltage_r) || 0,
+                current: Number(matchingDevice.last_record?.Current_r) || 0,
+                frequency: Number(matchingDevice.last_record?.Frequency) || 0,
+                power: Number(matchingDevice.last_record?.Active_Power) || 0,
+                isActive: matchingDevice.device_status === "active",
+              },
+            };
+          }
+        } else if (node.type === "arg") {
+          const matchingDevice = deviceData.find(
+            (device) =>
+              device.device_name === node.data.label &&
+              (device.type === "arg" ||
+                device.device_family?.toLowerCase().includes("arg"))
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                maxMm: Number(matchingDevice.last_record?.max_mm) || 0,
+                minMm: Number(matchingDevice.last_record?.min_mm) || 0,
+                lastMm: Number(matchingDevice.last_record?.last_mm) || 0,
+                firstMm: Number(matchingDevice.last_record?.first_mm) || 0,
                 isActive: matchingDevice.device_status === "active",
               },
             };
@@ -243,10 +307,10 @@ export const useDiagramData = (projectId: string | undefined) => {
 
   useEffect(() => {
     if (projectId) {
+      fetchDeviceData();
       diagramGeneratedRef.current = false;
       setIsLoadingDiagram(true);
       fetchDiagram();
-      fetchDeviceData();
     }
   }, [fetchDiagram, fetchDeviceData, projectId]);
 

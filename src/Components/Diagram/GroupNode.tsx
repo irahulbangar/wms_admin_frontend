@@ -87,8 +87,8 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     ? JSON.stringify(
         deviceData.map((d) => ({
           id: d.device_id,
-          totalizerReading: d.last_record?.min_max,
-          currentLevel: d.last_record?.min_last_level,
+          totalizerReading: d.last_record?.max,
+          currentLevel: d.last_record?.last_level,
           capacity: d.params?.storageCapacity,
         }))
       )
@@ -170,7 +170,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
         (acc, device) => {
           return {
             current:
-              acc.current + (Number(device.last_record?.min_last_level) || 0),
+              acc.current + (Number(device.last_record?.last_level) || 0),
             capacity:
               acc.capacity + (Number(device?.params?.storageCapacity) || 0),
           };
@@ -242,7 +242,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
       totals = departmentFMs.reduce(
         (acc, device, index) => {
-          const totalVolume = Number(device.last_record?.min_max) || 0;
+          const totalVolume = Number(device.last_record?.max) || 0;
 
           const isInput = determineFMFlowDirectionFromDevices(
             device,

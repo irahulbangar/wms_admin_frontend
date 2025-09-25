@@ -145,6 +145,69 @@ export const convertDevicesToDiagram = (
       );
       nodes.push(fmNode);
     });
+
+    const brwhms = group.devices.filter(
+      (device: DeviceResult) =>
+        device.type === "brwhms" ||
+        device.device_family?.toLowerCase().includes("brwhms")
+    );
+
+    brwhms.forEach((device: DeviceResult, brwhmsIndex: number) => {
+      const deviceId = `${groupId}-brwhms${brwhmsIndex + 1}`;
+      const brwhmsNode = createBRWHMSNode(
+        device,
+        deviceId,
+        groupId,
+        groupWidth,
+        groupHeight,
+        brwhmsIndex,
+        brwhms.length,
+        tanks.length + fms.length
+      );
+      nodes.push(brwhmsNode);
+    });
+
+    const phmcs = group.devices.filter(
+      (device: DeviceResult) =>
+        device.type === "phmc" ||
+        device.device_family?.toLowerCase().includes("phmc")
+    );
+
+    phmcs.forEach((device: DeviceResult, phmcIndex: number) => {
+      const deviceId = `${groupId}-phmc${phmcIndex + 1}`;
+      const phmcNode = createPHMCNode(
+        device,
+        deviceId,
+        groupId,
+        groupWidth,
+        groupHeight,
+        phmcIndex,
+        phmcs.length,
+        tanks.length + fms.length + brwhms.length
+      );
+      nodes.push(phmcNode);
+    });
+
+    const args = group.devices.filter(
+      (device: DeviceResult) =>
+        device.type === "arg" ||
+        device.device_family?.toLowerCase().includes("arg")
+    );
+
+    args.forEach((device: DeviceResult, argIndex: number) => {
+      const deviceId = `${groupId}-arg${argIndex + 1}`;
+      const argNode = createARGNode(
+        device,
+        deviceId,
+        groupId,
+        groupWidth,
+        groupHeight,
+        argIndex,
+        args.length,
+        tanks.length + fms.length + brwhms.length + phmcs.length
+      );
+      nodes.push(argNode);
+    });
   });
 
   return { nodes, edges };
@@ -220,7 +283,7 @@ const createTankNode = (
     unit: "Ltr",
     isActive: device.device_status === "active",
     capacity: Number(device?.params?.storageCapacity) || 0,
-    currentLevel: Number(device.last_record?.min_last_level) || 0,
+    currentLevel: Number(device.last_record?.last_level) || 0,
     height: Number(device?.params?.height) || 0,
   };
 
@@ -313,8 +376,8 @@ const createFMNode = (
     direction: "bidirectional",
     unit: "Ltr",
     isActive: device.device_status === "active",
-    totalizerReading: Number(device.last_record?.min_max) || 0,
-    flowRate: Number(device.last_record?.min_avg) || 0,
+    totalizerReading: Number(device.last_record?.max) || 0,
+    flowRate: Number(device.last_record?.avg) || 0,
   };
 
   return {
@@ -327,6 +390,259 @@ const createFMNode = (
     type: "fm",
     width: fmWidth,
     height: fmHeight,
+  };
+};
+
+const createBRWHMSNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  brwhmsIndex: number,
+  totalBRWHMS: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const brwhmsWidth = 140;
+  const brwhmsHeight = 80;
+  const sideMargin = 10;
+  const brwhmsSpacing = 10;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxDevicesPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (brwhmsWidth + brwhmsSpacing))
+  );
+  const totalRows = Math.ceil(totalBRWHMS / maxDevicesPerRow);
+
+  const footerHeight = 10;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 200 : 0;
+
+  const brwhmsStartY = previousDevicesHeight + 40;
+  const availableHeight = groupHeight - brwhmsStartY - footerHeight;
+
+  const brwhmsSectionHeight = Math.min(
+    availableHeight * 0.4,
+    totalRows * (brwhmsHeight + 30) + 40
+  );
+
+  const brwhmsVerticalSpacing =
+    totalRows > 1
+      ? Math.max(
+          30,
+          Math.min(
+            50,
+            (brwhmsSectionHeight - totalRows * brwhmsHeight) / (totalRows - 1)
+          )
+        )
+      : 0;
+
+  const row = Math.floor(brwhmsIndex / maxDevicesPerRow);
+  const col = brwhmsIndex % maxDevicesPerRow;
+
+  const totalDevicesInRow = Math.min(maxDevicesPerRow, totalBRWHMS - row * maxDevicesPerRow);
+  const rowWidth = totalDevicesInRow * brwhmsWidth + (totalDevicesInRow - 1) * brwhmsSpacing;
+  const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+  const deviceX = startX + col * (brwhmsWidth + brwhmsSpacing);
+  const deviceY = brwhmsStartY + 20 + row * (brwhmsHeight + brwhmsVerticalSpacing);
+
+  const maxX = groupWidth - brwhmsWidth - sideMargin;
+  const maxY = groupHeight - brwhmsHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const brwhmsNodeData: NodeData = {
+    label: device.device_name,
+    type: "bidirectional",
+    direction: "bidirectional",
+    unit: "Ltr",
+    isActive: device.device_status === "active",
+    flowRate: Number(device.last_record?.flow) || 0,
+    avg: Number(device.last_record?.avg) || 0,
+    max: Number(device.last_record?.max) || 0,
+    min: Number(device.last_record?.min) || 0,
+  };
+
+  return {
+    id: deviceId,
+    data: brwhmsNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "brwhms",
+    width: brwhmsWidth,
+    height: brwhmsHeight,
+  };
+};
+
+const createPHMCNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  phmcIndex: number,
+  totalPHMCs: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const phmcWidth = 140;
+  const phmcHeight = 100;
+  const sideMargin = 10;
+  const phmcSpacing = 10;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxDevicesPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (phmcWidth + phmcSpacing))
+  );
+  const totalRows = Math.ceil(totalPHMCs / maxDevicesPerRow);
+
+  const footerHeight = 10;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 300 : 0;
+
+  const phmcStartY = previousDevicesHeight + 40;
+  const availableHeight = groupHeight - phmcStartY - footerHeight;
+
+  const phmcSectionHeight = Math.min(
+    availableHeight * 0.4,
+    totalRows * (phmcHeight + 30) + 40
+  );
+
+  const phmcVerticalSpacing =
+    totalRows > 1
+      ? Math.max(
+          30,
+          Math.min(
+            50,
+            (phmcSectionHeight - totalRows * phmcHeight) / (totalRows - 1)
+          )
+        )
+      : 0;
+
+  const row = Math.floor(phmcIndex / maxDevicesPerRow);
+  const col = phmcIndex % maxDevicesPerRow;
+
+  const totalDevicesInRow = Math.min(maxDevicesPerRow, totalPHMCs - row * maxDevicesPerRow);
+  const rowWidth = totalDevicesInRow * phmcWidth + (totalDevicesInRow - 1) * phmcSpacing;
+  const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+  const deviceX = startX + col * (phmcWidth + phmcSpacing);
+  const deviceY = phmcStartY + 20 + row * (phmcHeight + phmcVerticalSpacing);
+
+  const maxX = groupWidth - phmcWidth - sideMargin;
+  const maxY = groupHeight - phmcHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const phmcNodeData: NodeData = {
+    label: device.device_name,
+    type: "bidirectional",
+    direction: "bidirectional",
+    unit: "W",
+    isActive: device.device_status === "active",
+    pumpStatus: device.last_record?.pumpstatus || "0",
+    voltage: Number(device.last_record?.voltage_r) || 0,
+    current: Number(device.last_record?.Current_r) || 0,
+    frequency: Number(device.last_record?.Frequency) || 0,
+    power: Number(device.last_record?.Active_Power) || 0,
+  };
+
+  return {
+    id: deviceId,
+    data: phmcNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "phmc",
+    width: phmcWidth,
+    height: phmcHeight,
+  };
+};
+
+const createARGNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  argIndex: number,
+  totalARGs: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const argWidth = 120;
+  const argHeight = 80;
+  const sideMargin = 10;
+  const argSpacing = 10;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxDevicesPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (argWidth + argSpacing))
+  );
+  const totalRows = Math.ceil(totalARGs / maxDevicesPerRow);
+
+  const footerHeight = 10;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 400 : 0;
+
+  const argStartY = previousDevicesHeight + 40;
+  const availableHeight = groupHeight - argStartY - footerHeight;
+
+  const argSectionHeight = Math.min(
+    availableHeight * 0.4,
+    totalRows * (argHeight + 30) + 40
+  );
+
+  const argVerticalSpacing =
+    totalRows > 1
+      ? Math.max(
+          30,
+          Math.min(
+            50,
+            (argSectionHeight - totalRows * argHeight) / (totalRows - 1)
+          )
+        )
+      : 0;
+
+  const row = Math.floor(argIndex / maxDevicesPerRow);
+  const col = argIndex % maxDevicesPerRow;
+
+  const totalDevicesInRow = Math.min(maxDevicesPerRow, totalARGs - row * maxDevicesPerRow);
+  const rowWidth = totalDevicesInRow * argWidth + (totalDevicesInRow - 1) * argSpacing;
+  const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+  const deviceX = startX + col * (argWidth + argSpacing);
+  const deviceY = argStartY + 20 + row * (argHeight + argVerticalSpacing);
+
+  const maxX = groupWidth - argWidth - sideMargin;
+  const maxY = groupHeight - argHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const argNodeData: NodeData = {
+    label: device.device_name,
+    type: "bidirectional",
+    direction: "bidirectional",
+    unit: "mm",
+    isActive: device.device_status === "active",
+    maxMm: Number(device.last_record?.max_mm) || 0,
+    minMm: Number(device.last_record?.min_mm) || 0,
+    lastMm: Number(device.last_record?.last_mm) || 0,
+    firstMm: Number(device.last_record?.first_mm) || 0,
+  };
+
+  return {
+    id: deviceId,
+    data: argNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "arg",
+    width: argWidth,
+    height: argHeight,
   };
 };
 
@@ -345,6 +661,46 @@ export const cleanNodesForAPI = (
       const {
         flowRate: _flowRate,
         totalizerReading: _totalizerReading,
+        isActive: _isActive,
+        ...cleanData
+      } = node.data;
+      return {
+        ...node,
+        data: cleanData,
+      };
+    } else if (node.type === "brwhms") {
+      const {
+        flowRate: _flowRate,
+        avg: _avg,
+        max: _max,
+        min: _min,
+        isActive: _isActive,
+        ...cleanData
+      } = node.data;
+      return {
+        ...node,
+        data: cleanData,
+      };
+    } else if (node.type === "phmc") {
+      const {
+        pumpStatus: _pumpStatus,
+        voltage: _voltage,
+        current: _current,
+        frequency: _frequency,
+        power: _power,
+        isActive: _isActive,
+        ...cleanData
+      } = node.data;
+      return {
+        ...node,
+        data: cleanData,
+      };
+    } else if (node.type === "arg") {
+      const {
+        maxMm: _maxMm,
+        minMm: _minMm,
+        lastMm: _lastMm,
+        firstMm: _firstMm,
         isActive: _isActive,
         ...cleanData
       } = node.data;

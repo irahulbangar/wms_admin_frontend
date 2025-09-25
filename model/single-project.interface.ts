@@ -46,6 +46,21 @@ export interface NodeData {
   capacity?: number;
   currentLevel?: number | string;
   height?: number;
+  // BRWHMS specific properties
+  avg?: number;
+  max?: number;
+  min?: number;
+  // PHMC specific properties
+  pumpStatus?: string;
+  voltage?: number;
+  current?: number;
+  frequency?: number;
+  power?: number;
+  // ARG specific properties
+  maxMm?: number;
+  minMm?: number;
+  lastMm?: number;
+  firstMm?: number;
 }
 
 export interface Style {
