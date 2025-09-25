@@ -136,6 +136,10 @@ export const useDiagramData = (projectId: string | undefined) => {
                   Number(matchingDevice.last_record?.last_level) || 0,
                 capacity: Number(matchingDevice?.params?.storageCapacity) || 0,
                 height: Number(matchingDevice?.params?.height) || 0,
+                departmentConnection: matchingDevice.department_connection,
+                projectConnection: matchingDevice.project_connection,
+                organizationConnection: matchingDevice.organization_connection,
+                departmentName: matchingDevice.department_name,
               },
             };
           }
@@ -156,6 +160,10 @@ export const useDiagramData = (projectId: string | undefined) => {
                 totalizerReading:
                   Number(matchingDevice.last_record?.max) || 0,
                 isActive: matchingDevice.device_status === "active",
+                departmentConnection: matchingDevice.department_connection,
+                projectConnection: matchingDevice.project_connection,
+                organizationConnection: matchingDevice.organization_connection,
+                departmentName: matchingDevice.department_name,
               },
             };
           }
@@ -177,6 +185,10 @@ export const useDiagramData = (projectId: string | undefined) => {
                 max: Number(matchingDevice.last_record?.max) || 0,
                 min: Number(matchingDevice.last_record?.min) || 0,
                 isActive: matchingDevice.device_status === "active",
+                departmentConnection: matchingDevice.department_connection,
+                projectConnection: matchingDevice.project_connection,
+                organizationConnection: matchingDevice.organization_connection,
+                departmentName: matchingDevice.department_name,
               },
             };
           }
@@ -199,6 +211,9 @@ export const useDiagramData = (projectId: string | undefined) => {
                 frequency: Number(matchingDevice.last_record?.Frequency) || 0,
                 power: Number(matchingDevice.last_record?.Active_Power) || 0,
                 isActive: matchingDevice.device_status === "active",
+                departmentConnection: matchingDevice.department_connection,
+                projectConnection: matchingDevice.project_connection,
+                organizationConnection: matchingDevice.organization_connection,
               },
             };
           }
@@ -220,6 +235,10 @@ export const useDiagramData = (projectId: string | undefined) => {
                 lastMm: Number(matchingDevice.last_record?.last_mm) || 0,
                 firstMm: Number(matchingDevice.last_record?.first_mm) || 0,
                 isActive: matchingDevice.device_status === "active",
+                departmentConnection: matchingDevice.department_connection,
+                projectConnection: matchingDevice.project_connection,
+                organizationConnection: matchingDevice.organization_connection,
+                departmentName: matchingDevice.department_name,
               },
             };
           }

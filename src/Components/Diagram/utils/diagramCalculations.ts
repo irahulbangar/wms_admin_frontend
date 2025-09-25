@@ -293,6 +293,10 @@ const createTankNode = (
     capacity: Number(device?.params?.storageCapacity) || 0,
     currentLevel: Number(device.last_record?.last_level) || 0,
     height: Number(device?.params?.height) || 0,
+    departmentConnection: device.department_connection,
+    projectConnection: device.project_connection,
+    organizationConnection: device.organization_connection,
+    departmentName: device.department_name,
   };
 
   return {
@@ -386,6 +390,9 @@ const createFMNode = (
     isActive: device.device_status === "active",
     totalizerReading: Number(device.last_record?.max) || 0,
     flowRate: Number(device.last_record?.avg) || 0,
+    departmentConnection: device.department_connection,
+    projectConnection: device.project_connection,
+    organizationConnection: device.organization_connection,
   };
 
   return {
@@ -470,6 +477,9 @@ const createBRWHMSNode = (
     avg: Number(device.last_record?.avg) || 0,
     max: Number(device.last_record?.max) || 0,
     min: Number(device.last_record?.min) || 0,
+    departmentConnection: device.department_connection,
+    projectConnection: device.project_connection,
+    organizationConnection: device.organization_connection,
   };
 
   return {
@@ -555,6 +565,9 @@ const createPHMCNode = (
     current: Number(device.last_record?.Current_r) || 0,
     frequency: Number(device.last_record?.Frequency) || 0,
     power: Number(device.last_record?.Active_Power) || 0,
+    departmentConnection: device.department_connection,
+    projectConnection: device.project_connection,
+    organizationConnection: device.organization_connection,
   };
 
   return {
@@ -639,6 +652,9 @@ const createARGNode = (
     minMm: Number(device.last_record?.min_mm) || 0,
     lastMm: Number(device.last_record?.last_mm) || 0,
     firstMm: Number(device.last_record?.first_mm) || 0,
+    departmentConnection: device.department_connection,
+    projectConnection: device.project_connection,
+    organizationConnection: device.organization_connection,
   };
 
   return {
