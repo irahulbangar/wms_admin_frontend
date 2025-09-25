@@ -934,3 +934,66 @@ export const calculateDepartmentFlowBalance = (
     totalBalance,
   };
 };
+
+export interface ProjectCalculations {
+  project_id: number;
+  project_name: string;
+  totalIn: number;
+  totalOut: number;
+  totalBalance: number;
+  totalStock: number;
+  totalCapacity: number;
+}
+
+export const calculateProjectFlowBalance = (
+  devices: DeviceResult[],
+  projectId: number
+): ProjectCalculations | null => {
+  const projectDevices = devices.filter(device => device.project_id === projectId);
+  
+  if (projectDevices.length === 0) return null;
+
+  const relevantDevices = projectDevices.filter(shouldIncludeDevice);
+  const tankDevices = projectDevices.filter(
+    (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+  );
+
+  let totalIn = 0;
+  let totalOut = 0;
+  let totalStock = 0;
+  let totalCapacity = 0;
+
+  // Calculate flow based on project_connection
+  relevantDevices.forEach((device) => {
+    const flowValue = getDeviceFlowValue(device);
+    const { project_connection } = device;
+
+    if (project_connection === "in") {
+      totalIn += flowValue;
+    }
+
+    if (project_connection === "out") {
+      totalOut += flowValue;
+    }
+  });
+
+  tankDevices.forEach((device) => {
+    const currentLevel = Number(device.last_record?.last_level) || 0;
+    const capacity = Number(device.params?.storageCapacity) || 0;
+    
+    totalStock += currentLevel;
+    totalCapacity += capacity;
+  });
+
+  const totalBalance = totalOut - totalIn;
+
+  return {
+    project_id: projectId,
+    project_name: projectDevices[0].project_name || `Project ${projectId}`,
+    totalIn,
+    totalOut,
+    totalBalance,
+    totalStock,
+    totalCapacity,
+  };
+};

@@ -4,7 +4,7 @@ import { Edit } from "lucide-react";
 import type { NodeData } from "../../../model/single-project.interface";
 import type { DeviceResult } from "../../../model/devices.interface";
 import type { DiagramEdge } from "./utils/diagramCalculations";
-import { calculateDepartmentFlowBalance } from "./utils/diagramCalculations";
+import { calculateDepartmentFlowBalance, calculateProjectFlowBalance } from "./utils/diagramCalculations";
 
 interface GroupNodeProps {
   data: NodeData;
@@ -105,6 +105,18 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   };
 
   const calculateTotalStock = () => {
+    if (data.type === "project" && deviceData && deviceData.length > 0) {
+      const projectId = parseInt(id.replace('project-', ''));
+      const projectBalance = calculateProjectFlowBalance(deviceData, projectId);
+      
+      if (projectBalance) {
+        return {
+          current: projectBalance.totalStock,
+          capacity: projectBalance.totalCapacity,
+        };
+      }
+    }
+
     let totals = { current: 0, capacity: 0 };
 
     if (allNodes && allNodes.length > 0) {
@@ -158,7 +170,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   };
 
   const calculateTotalInOut = () => {
-    // Only calculate for department nodes, not project nodes
+    // Calculate for department nodes
     if (data.type === "department" && deviceData && deviceData.length > 0) {
       const departmentId = parseInt(id.replace('dept-', ''));
       const flowBalance = calculateDepartmentFlowBalance(deviceData, departmentId);
@@ -167,6 +179,19 @@ const GroupNode: React.FC<GroupNodeProps> = ({
         return {
           totalIn: flowBalance.totalIn,
           totalOut: flowBalance.totalOut,
+        };
+      }
+    }
+
+    // Calculate for project nodes
+    if (data.type === "project" && deviceData && deviceData.length > 0) {
+      const projectId = parseInt(id.replace('project-', ''));
+      const projectBalance = calculateProjectFlowBalance(deviceData, projectId);
+      
+      if (projectBalance) {
+        return {
+          totalIn: projectBalance.totalIn,
+          totalOut: projectBalance.totalOut,
         };
       }
     }
@@ -335,15 +360,27 @@ const GroupNode: React.FC<GroupNodeProps> = ({
           </div>
         )}
         
-        {/* Show project info for project nodes */}
+        {/* Show project calculations for project nodes */}
         {data.type === "project" && (
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
-              <div className="text-text-primary text-sm">
-                Project Overview
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total In :</div>
+                <div className="font-semibold text-text-primary">
+                  {inOutData.totalIn.toFixed(1)} {unit}
+                </div>
               </div>
-              <div className="text-xs text-text-secondary">
-                Multiple departments grouped
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total Out :</div>
+                <div className="font-semibold text-text-primary">
+                  {inOutData.totalOut.toFixed(1)} {unit}
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total Balance :</div>
+                <div className="font-semibold text-text-primary">
+                  {totalBalance.toFixed(1)} {unit}
+                </div>
               </div>
             </div>
           </div>
