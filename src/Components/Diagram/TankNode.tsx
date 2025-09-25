@@ -14,10 +14,23 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   const percentage = capacity > 0 ? (currentLevel * 100) / height : 0;
   const fillHeight = Math.min(percentage, 100);
   const unit = data.unit || "Ltr";
+  const departmentName = data.departmentName || "";
+  const departmentConnection = data.departmentConnection || "";
+  const projectConnection = data.projectConnection || "";
+  const organizationConnection = data.organizationConnection || "";
 
   return (
     <>
-      <div className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden">
+      <div className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden"
+      title={`
+Dept Name : ${departmentName}
+Dept Connection : ${departmentConnection}
+Project Connection : ${projectConnection}
+Organization Connection : ${organizationConnection}
+Current Level : ${currentLevel} ${unit}
+Capacity : ${capacity} ${unit}
+      `}
+      >
         <div className="absolute inset-0 flex flex-col">
           <div
             className="w-full bg-status-info/80 transition-all duration-500 ease-in-out"

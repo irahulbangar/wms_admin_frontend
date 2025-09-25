@@ -214,6 +214,7 @@ export const useDiagramData = (projectId: string | undefined) => {
                 departmentConnection: matchingDevice.department_connection,
                 projectConnection: matchingDevice.project_connection,
                 organizationConnection: matchingDevice.organization_connection,
+                departmentName: matchingDevice.department_name,
               },
             };
           }

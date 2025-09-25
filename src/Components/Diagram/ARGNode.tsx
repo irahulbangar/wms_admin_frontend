@@ -15,7 +15,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-24 h-20 bg-gradient-to-br from-purple-50 to-purple-100 border rounded-lg p-1 ${
+      className={`relative w-24 h-20 bg-gradient-to-br from-purple-50 to-purple-100 border rounded-lg p-1 z-0 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
     >
