@@ -48,173 +48,223 @@ export const convertDevicesToDiagram = (
   const nodes: DiagramNode[] = [];
   const edges: DiagramEdge[] = [];
 
-  const departmentGroups = devices.reduce((acc, device) => {
+  // Group devices by project first
+  const projectGroups = devices.reduce((acc, device) => {
+    const projectId = device.project_id.toString();
+    if (!acc[projectId]) {
+      acc[projectId] = {
+        project_id: device.project_id,
+        project_name: device.project_name || `Project ${device.project_id}`,
+        departments: {},
+      };
+    }
+    
+    // Group devices by department within each project
     const deptId = device.department_id.toString();
-    if (!acc[deptId]) {
-      acc[deptId] = {
+    if (!acc[projectId].departments[deptId]) {
+      acc[projectId].departments[deptId] = {
         department_id: device.department_id,
-        department_name:
-          device.department_name || `Department ${device.department_id}`,
+        department_name: device.department_name || `Department ${device.department_id}`,
         devices: [],
       };
     }
-    acc[deptId].devices.push(device);
+    acc[projectId].departments[deptId].devices.push(device);
     return acc;
-  }, {} as Record<string, DepartmentGroup>);
+  }, {} as Record<string, { project_id: number; project_name: string; departments: Record<string, DepartmentGroup> }>);
 
-  Object.values(departmentGroups).forEach((group) => {
-    group.devices.sort((a: DeviceResult, b: DeviceResult) => {
-      const aIsTank =
-        a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
-      const bIsTank =
-        b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
-      if (aIsTank && !bIsTank) return -1;
-      if (!aIsTank && bIsTank) return 1;
-      return a.device_id - b.device_id;
-    });
-  });
+  // Process each project
+  Object.values(projectGroups).forEach((project, projectIndex) => {
+    const projectId = `project-${project.project_id}`;
+    const projectX = projectIndex * 800 + 50;
+    const projectY = 20;
 
-  Object.values(departmentGroups).forEach((group, groupIndex) => {
-    const groupId = group.department_id.toString();
-    const groupX = groupIndex * 600 + 50;
-    const groupY = 50;
+    // Calculate project dimensions based on departments
+    const departmentCount = Object.keys(project.departments).length;
+    const projectWidth = Math.max(1000, departmentCount * 400 + 100);
+    const projectHeight = Math.max(650, 500);
 
-    const minDimensions = calculateMinimumDimensions(group.devices.length);
-
-    const currentDimensions = departmentDimensions[groupId] || {
-      width: Math.max(575, minDimensions.width),
-      height: Math.max(350, minDimensions.height),
-    };
-    const groupWidth = currentDimensions.width;
-    const groupHeight = currentDimensions.height;
-
+    // Create project group node
     nodes.push({
-      id: groupId,
+      id: projectId,
       data: {
-        label: group.department_name,
-        type: "output",
+        label: project.project_name,
+        type: "project",
         unit: "Ltr",
       },
-      position: { x: groupX, y: groupY },
+      position: { x: projectX, y: projectY },
       style: {
-        width: groupWidth,
-        height: groupHeight,
-        borderRadius: 10,
-        border: "2px dashed #ccc",
+        width: projectWidth,
+        height: projectHeight,
+        borderRadius: 15,
+        border: "3px solid #3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
         zIndex: 1,
         pointerEvents: "auto",
       },
       type: "group",
-      width: groupWidth,
-      height: groupHeight,
+      width: projectWidth,
+      height: projectHeight,
       draggable: true,
       selectable: true,
       deletable: false,
       dragHandle: ".group-drag-handle",
     });
 
-    const tanks = group.devices.filter(
-      (device: DeviceResult) =>
-        device.type === "tank" ||
-        device.device_family?.toLowerCase().includes("tank")
-    );
+    // Process departments within this project
+    Object.values(project.departments).forEach((department, deptIndex) => {
+      const deptId = `dept-${department.department_id}`;
+      const deptX = projectX + 20 + (deptIndex % 2) * 350;
+      const deptY = projectY + 60 + Math.floor(deptIndex / 2) * 250;
 
-    tanks.forEach((device: DeviceResult, tankIndex: number) => {
-      const deviceId = `${groupId}-tank${tankIndex + 1}`;
-      const tankNode = createTankNode(
-        device,
-        deviceId,
-        groupId,
-        groupWidth,
-        groupHeight,
-        tankIndex,
-        tanks.length
+      // Sort devices within department
+      department.devices.sort((a: DeviceResult, b: DeviceResult) => {
+        const aIsTank = a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
+        const bIsTank = b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
+        if (aIsTank && !bIsTank) return -1;
+        if (!aIsTank && bIsTank) return 1;
+        return a.device_id - b.device_id;
+      });
+
+      const minDimensions = calculateMinimumDimensions(department.devices.length);
+      const currentDimensions = departmentDimensions[deptId] || {
+        width: Math.max(300, minDimensions.width),
+        height: Math.max(200, minDimensions.height),
+      };
+      const deptWidth = currentDimensions.width;
+      const deptHeight = currentDimensions.height;
+
+      // Create department group node
+      nodes.push({
+        id: deptId,
+        data: {
+          label: department.department_name,
+          type: "department",
+          unit: "Ltr",
+        },
+        position: { x: deptX, y: deptY },
+        parentId: projectId,
+        style: {
+          width: deptWidth,
+          height: deptHeight,
+          borderRadius: 10,
+          border: "2px dashed #6b7280",
+          backgroundColor: "rgba(107, 114, 128, 0.1)",
+          zIndex: 2,
+          pointerEvents: "auto",
+        },
+        type: "group",
+        width: deptWidth,
+        height: deptHeight,
+        draggable: true,
+        selectable: true,
+        deletable: false,
+        dragHandle: ".group-drag-handle",
+      });
+
+      // Create device nodes within this department
+      const tanks = department.devices.filter(
+        (device: DeviceResult) =>
+          device.type === "tank" ||
+          device.device_family?.toLowerCase().includes("tank")
       );
-      nodes.push(tankNode);
-    });
 
-    const fms = group.devices.filter(
-      (device: DeviceResult) =>
-        device.type === "fm" ||
-        device.device_family?.toLowerCase().includes("flow")
-    );
+      tanks.forEach((device: DeviceResult, tankIndex: number) => {
+        const deviceId = `${deptId}-tank${tankIndex + 1}`;
+        const tankNode = createTankNode(
+          device,
+          deviceId,
+          deptId,
+          deptWidth,
+          deptHeight,
+          tankIndex,
+          tanks.length
+        );
+        nodes.push(tankNode);
+      });
 
-    fms.forEach((device: DeviceResult, fmIndex: number) => {
-      const deviceId = `${groupId}-fm${fmIndex + 1}`;
-      const fmNode = createFMNode(
-        device,
-        deviceId,
-        groupId,
-        groupWidth,
-        groupHeight,
-        fmIndex,
-        fms.length,
-        tanks.length
+      const fms = department.devices.filter(
+        (device: DeviceResult) =>
+          device.type === "fm" ||
+          device.device_family?.toLowerCase().includes("flow")
       );
-      nodes.push(fmNode);
-    });
 
-    const brwhms = group.devices.filter(
-      (device: DeviceResult) =>
-        device.type === "brwhms" ||
-        device.device_family?.toLowerCase().includes("brwhms")
-    );
+      fms.forEach((device: DeviceResult, fmIndex: number) => {
+        const deviceId = `${deptId}-fm${fmIndex + 1}`;
+        const fmNode = createFMNode(
+          device,
+          deviceId,
+          deptId,
+          deptWidth,
+          deptHeight,
+          fmIndex,
+          fms.length,
+          tanks.length
+        );
+        nodes.push(fmNode);
+      });
 
-    brwhms.forEach((device: DeviceResult, brwhmsIndex: number) => {
-      const deviceId = `${groupId}-brwhms${brwhmsIndex + 1}`;
-      const brwhmsNode = createBRWHMSNode(
-        device,
-        deviceId,
-        groupId,
-        groupWidth,
-        groupHeight,
-        brwhmsIndex,
-        brwhms.length,
-        tanks.length + fms.length
+      const brwhms = department.devices.filter(
+        (device: DeviceResult) =>
+          device.type === "brwhms" ||
+          device.device_family?.toLowerCase().includes("brwhms")
       );
-      nodes.push(brwhmsNode);
-    });
 
-    const phmcs = group.devices.filter(
-      (device: DeviceResult) =>
-        device.type === "phmc" ||
-        device.device_family?.toLowerCase().includes("phmc")
-    );
+      brwhms.forEach((device: DeviceResult, brwhmsIndex: number) => {
+        const deviceId = `${deptId}-brwhms${brwhmsIndex + 1}`;
+        const brwhmsNode = createBRWHMSNode(
+          device,
+          deviceId,
+          deptId,
+          deptWidth,
+          deptHeight,
+          brwhmsIndex,
+          brwhms.length,
+          tanks.length + fms.length
+        );
+        nodes.push(brwhmsNode);
+      });
 
-    phmcs.forEach((device: DeviceResult, phmcIndex: number) => {
-      const deviceId = `${groupId}-phmc${phmcIndex + 1}`;
-      const phmcNode = createPHMCNode(
-        device,
-        deviceId,
-        groupId,
-        groupWidth,
-        groupHeight,
-        phmcIndex,
-        phmcs.length,
-        tanks.length + fms.length + brwhms.length
+      const phmcs = department.devices.filter(
+        (device: DeviceResult) =>
+          device.type === "phmc" ||
+          device.device_family?.toLowerCase().includes("phmc")
       );
-      nodes.push(phmcNode);
-    });
 
-    const args = group.devices.filter(
-      (device: DeviceResult) =>
-        device.type === "arg" ||
-        device.device_family?.toLowerCase().includes("arg")
-    );
+      phmcs.forEach((device: DeviceResult, phmcIndex: number) => {
+        const deviceId = `${deptId}-phmc${phmcIndex + 1}`;
+        const phmcNode = createPHMCNode(
+          device,
+          deviceId,
+          deptId,
+          deptWidth,
+          deptHeight,
+          phmcIndex,
+          phmcs.length,
+          tanks.length + fms.length + brwhms.length
+        );
+        nodes.push(phmcNode);
+      });
 
-    args.forEach((device: DeviceResult, argIndex: number) => {
-      const deviceId = `${groupId}-arg${argIndex + 1}`;
-      const argNode = createARGNode(
-        device,
-        deviceId,
-        groupId,
-        groupWidth,
-        groupHeight,
-        argIndex,
-        args.length,
-        tanks.length + fms.length + brwhms.length + phmcs.length
+      const args = department.devices.filter(
+        (device: DeviceResult) =>
+          device.type === "arg" ||
+          device.device_family?.toLowerCase().includes("arg")
       );
-      nodes.push(argNode);
+
+      args.forEach((device: DeviceResult, argIndex: number) => {
+        const deviceId = `${deptId}-arg${argIndex + 1}`;
+        const argNode = createARGNode(
+          device,
+          deviceId,
+          deptId,
+          deptWidth,
+          deptHeight,
+          argIndex,
+          args.length,
+          tanks.length + fms.length + brwhms.length + phmcs.length
+        );
+        nodes.push(argNode);
+      });
     });
   });
 

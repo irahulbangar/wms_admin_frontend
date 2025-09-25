@@ -158,9 +158,9 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   };
 
   const calculateTotalInOut = () => {
-    // Use the new calculation logic based on department_connection
-    if (deviceData && deviceData.length > 0) {
-      const departmentId = parseInt(id);
+    // Only calculate for department nodes, not project nodes
+    if (data.type === "department" && deviceData && deviceData.length > 0) {
+      const departmentId = parseInt(id.replace('dept-', ''));
       const flowBalance = calculateDepartmentFlowBalance(deviceData, departmentId);
       
       if (flowBalance) {
@@ -309,28 +309,45 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex flex-col">
-            <div className="flex items-center justify-end gap-2">
-              <div className="text-text-primary">Total In :</div>
-              <div className="font-semibold text-text-primary">
-                {inOutData.totalIn.toFixed(1)} {unit}
+        {/* Show flow data only for department nodes */}
+        {data.type === "department" && (
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total In :</div>
+                <div className="font-semibold text-text-primary">
+                  {inOutData.totalIn.toFixed(1)} {unit}
+                </div>
               </div>
-            </div>
-            <div className="flex items-center justify-end gap-2">
-              <div className="text-text-primary">Total Out :</div>
-              <div className="font-semibold text-text-primary">
-                {inOutData.totalOut.toFixed(1)} {unit}
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total Out :</div>
+                <div className="font-semibold text-text-primary">
+                  {inOutData.totalOut.toFixed(1)} {unit}
+                </div>
               </div>
-            </div>
-            <div className="flex items-center justify-end gap-2">
-              <div className="text-text-primary">Total Balance :</div>
-              <div className="font-semibold text-text-primary">
-                {totalBalance.toFixed(1)} {unit}
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total Balance :</div>
+                <div className="font-semibold text-text-primary">
+                  {totalBalance.toFixed(1)} {unit}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+        
+        {/* Show project info for project nodes */}
+        {data.type === "project" && (
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col">
+              <div className="text-text-primary text-sm">
+                Project Overview
+              </div>
+              <div className="text-xs text-text-secondary">
+                Multiple departments grouped
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
