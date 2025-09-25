@@ -48,8 +48,11 @@ export const convertDevicesToDiagram = (
   const nodes: DiagramNode[] = [];
   const edges: DiagramEdge[] = [];
 
+  // Filter out hidden devices
+  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
+
   // Group devices by project first
-  const projectGroups = devices.reduce((acc, device) => {
+  const projectGroups = visibleDevices.reduce((acc, device) => {
     const projectId = device.project_id.toString();
     if (!acc[projectId]) {
       acc[projectId] = {
@@ -854,7 +857,10 @@ const shouldIncludeDevice = (device: DeviceResult): boolean => {
 export const calculateDepartmentFlowBalances = (
   devices: DeviceResult[]
 ): DepartmentCalculations[] => {
-  const departmentGroups = devices.reduce((acc, device) => {
+  // Filter out hidden devices
+  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
+  
+  const departmentGroups = visibleDevices.reduce((acc, device) => {
     const deptId = device.department_id;
     if (!acc[deptId]) {
       acc[deptId] = {
@@ -902,7 +908,9 @@ export const calculateDepartmentFlowBalance = (
   devices: DeviceResult[],
   departmentId: number
 ): DepartmentCalculations | null => {
-  const departmentDevices = devices.filter(device => device.department_id === departmentId);
+  // Filter out hidden devices
+  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
+  const departmentDevices = visibleDevices.filter(device => device.department_id === departmentId);
   
   if (departmentDevices.length === 0) return null;
 
@@ -949,7 +957,9 @@ export const calculateProjectFlowBalance = (
   devices: DeviceResult[],
   projectId: number
 ): ProjectCalculations | null => {
-  const projectDevices = devices.filter(device => device.project_id === projectId);
+  // Filter out hidden devices
+  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
+  const projectDevices = visibleDevices.filter(device => device.project_id === projectId);
   
   if (projectDevices.length === 0) return null;
 
