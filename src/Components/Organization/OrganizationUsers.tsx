@@ -243,6 +243,19 @@ const OrganizationUsers = () => {
     }
   };
 
+  const handleUpdateSuccess = (updatedUser: any) => {
+    if (organizationId !== 0) {
+      setOrganizationClients(prevClients => {
+        console.log("Previous organizationClients:", prevClients);
+        const updated = prevClients.map(client => 
+          client.client_id === updatedUser.client_id ? updatedUser : client
+        );
+        console.log("Updated organizationClients:", updated);
+        return updated;
+      });
+    }
+  };
+
   const handleViewPlants = (clientId: string, organizationId: string) => {
     setShowUserPlants(true);
     setClientId(parseInt(clientId));
@@ -577,6 +590,7 @@ const OrganizationUsers = () => {
           setShowAddModal={setShowAddModal}
           type={modalType}
           onClose={handleCloseAddModal}
+          onUpdateSuccess={handleUpdateSuccess}
           organizationId={organizationId as number}
           organizationData={organizations}
         />

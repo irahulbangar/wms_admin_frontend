@@ -16,6 +16,7 @@ interface AddUpdateUserProps {
   type: "add" | "update";
   clientId: number;
   onClose: () => void;
+  onUpdateSuccess?: (updatedUser: any) => void;
   organizationId: number;
   organizationData: OrganizationResult[];
 }
@@ -25,6 +26,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
   type,
   clientId,
   onClose,
+  onUpdateSuccess,
   organizationId,
   organizationData,
 }) => {
@@ -79,10 +81,12 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
       newErrors.client_phone = "Please enter the 10 digit phone number";
     }
 
-    if (!formData.client_password.trim()) {
-      newErrors.client_password = "Client Password is required";
-    } else if (formData.client_password.length < 6) {
-      newErrors.client_password = "Password must be at least 6 characters";
+    if (type === "add") {
+      if (!formData.client_password.trim()) {
+        newErrors.client_password = "Client Password is required";
+      } else if (formData.client_password.length < 6) {
+        newErrors.client_password = "Password must be at least 6 characters";
+      }
     }
 
     if (!formData.organization_id) {
@@ -108,7 +112,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           client_email: formData.client_email,
           client_phone: formData.client_phone,
           client_password: formData.client_password,
-          status: formData.status || "active",
+          status: formData.status,
           organization_id: (formData.organization_id as number) || 1,
         };
 
@@ -125,7 +129,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               client_email: "",
               client_phone: "",
               client_password: "",
-              status: "active",
+              status: "",
               organization_id: 0,
             } as CreateClientPayload);
           })
@@ -142,7 +146,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           client_email: formData.client_email,
           client_phone: formData.client_phone,
           client_password: formData.client_password,
-          status: formData.status || "active",
+          status: formData.status,
           organization_id: formData.organization_id as number,
         };
 
@@ -152,6 +156,26 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
             if (res.success) {
               setShowAddModal(false);
               Success(res.message);
+              if (onUpdateSuccess) {
+                let updatedUser;
+                if (res.data) {
+                  updatedUser = Array.isArray(res.data) ? res.data[0] : res.data;
+                } else {
+                  updatedUser = {
+                    client_id: clientId,
+                    client_name: formData.client_name,
+                    client_email: formData.client_email,
+                    client_phone: formData.client_phone,
+                    client_password: formData.client_password,
+                    status: formData.status,
+                    organization_id: formData.organization_id,
+                    created_at: "",
+                    updated_at: new Date().toISOString(),
+                    organization_name: organizationData.find(org => org.organization_id === formData.organization_id)?.organization_name || ""
+                  };
+                }
+                onUpdateSuccess(updatedUser);
+              }
               onClose();
             }
           })
@@ -187,7 +211,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 client_email: clientData.client_email || "",
                 client_phone: clientData.client_phone || "",
                 client_password: "",
-                status: clientData.status || "active",
+                status: clientData.status,
                 organization_id: clientData.organization_id || organizationId,
               } as CreateClientPayload);
             }

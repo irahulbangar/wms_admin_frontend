@@ -304,7 +304,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="role"
               value={formData.role}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto bg-primary"
             >
               <option value="">Select role</option>
               <option value="admin">Admin</option>
@@ -320,7 +320,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               name="status"
               value={formData.status}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto"
+              className="w-full px-3 py-2 border border-border-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info transition-colors font-roboto bg-primary"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
