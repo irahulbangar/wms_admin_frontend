@@ -22,7 +22,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
       title={`
 Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
-Project Connection : ${projectConnection}
+Plant Connection : ${projectConnection}
 Organization Connection : ${organizationConnection}
 Totalizer Reading : ${data?.totalizerReading} Ltr
 Flow Rate : ${data?.avg} LPM

@@ -25,7 +25,7 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
       title={`
 Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
-Project Connection : ${projectConnection}
+Plant Connection : ${projectConnection}
 Organization Connection : ${organizationConnection}
 Current Level : ${currentLevel} ${unit}
 Capacity : ${capacity} ${unit}

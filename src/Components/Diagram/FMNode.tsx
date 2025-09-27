@@ -24,9 +24,9 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
       title={`
         Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
-Project Connection : ${projectConnection}
+Plant Connection : ${projectConnection}
 Organization Connection : ${organizationConnection}
-Totalizer Reading : ${totalizerReading} {unit}
+Totalizer Reading : ${totalizerReading} ${unit}
 Flow Rate : ${flowRate} LPM
         `}
     >
