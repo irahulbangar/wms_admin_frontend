@@ -898,6 +898,11 @@ export const calculateDepartmentFlowBalances = (
       if (department_connection === "out") {
         totalOut += flowValue;
       }
+
+      if (department_connection === "both") {
+        totalIn += flowValue;
+        totalOut += flowValue;
+      }
     });
 
     const totalBalance = totalOut - totalIn;
@@ -936,6 +941,11 @@ export const calculateDepartmentFlowBalance = (
     }
 
     if (department_connection === "out") {
+      totalOut += flowValue;
+    }
+
+    if (department_connection === "both") {
+      totalIn += flowValue;
       totalOut += flowValue;
     }
   });
@@ -991,6 +1001,11 @@ export const calculateProjectFlowBalance = (
     }
 
     if (project_connection === "out") {
+      totalOut += flowValue;
+    }
+
+    if (project_connection === "both") {
+      totalIn += flowValue;
       totalOut += flowValue;
     }
   });

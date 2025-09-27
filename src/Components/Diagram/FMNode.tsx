@@ -41,10 +41,10 @@ Flow Rate : ${flowRate} LPM
       />
 
       <div className="text-center mb-1">
-        <div className="text-text-primary font-roboto text-xs font-semibold">
+        <div className="text-text-primary font-roboto text-xs font-medium">
           Flow:
         </div>
-        <div className="font-semibold text-status-info font-roboto text-[10px] truncate px-1">
+        <div className="font-medium text-status-info font-roboto text-[10px] truncate px-1">
           {flowRate} LPM
         </div>
       </div>

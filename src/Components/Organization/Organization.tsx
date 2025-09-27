@@ -373,7 +373,7 @@ const Organization = () => {
                             />
                           </span>
 
-                          <span
+                          {/* <span
                             title="Edit diagram"
                             aria-label="Edit diagram"
                             className="inline-flex cursor-pointer"
@@ -382,7 +382,7 @@ const Organization = () => {
                             }
                           >
                             <ChartNetwork className="w-5 h-5 text-text-primary" />
-                          </span>
+                          </span> */}
 
                           {admin?.role === "super_admin" && (
                             <span

@@ -16,7 +16,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-28 h-20 bg-gradient-to-br from-blue-50 to-blue-100 border rounded-lg p-1 z-10 ${
+      className={`relative w-28 h-15 bg-secondary border rounded-lg p-1 z-10 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`
@@ -29,7 +29,7 @@ Flow Rate : ${data?.avg} LPM
       `}
     >
       <div
-        className="text-xs font-bold text-center mb-1 truncate px-1 text-blue-800"
+        className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary"
         title={data.label}
       >
         {data.label}
@@ -42,11 +42,11 @@ Flow Rate : ${data?.avg} LPM
       />
 
       <div className="text-center mb-1">
-        <div className="text-text-primary font-roboto text-xs font-semibold">
+        <div className="text-text-primary font-roboto text-xs font-medium">
           Flow:
         </div>
         <div
-          className="font-semibold text-blue-600 font-roboto text-[10px] truncate px-1"
+          className="font-semibold text-status-info font-roboto text-[10px] truncate px-1"
         >
           {data?.avg} LPM
         </div>

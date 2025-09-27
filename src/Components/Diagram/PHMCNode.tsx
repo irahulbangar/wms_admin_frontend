@@ -22,7 +22,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-32 h-24 bg-gradient-to-br from-green-50 to-green-100 border rounded-lg p-1 z-10 ${
+      className={`relative w-32 h-30 bg-secondary border rounded-lg p-1 z-10 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`
@@ -37,7 +37,7 @@ Frequency : ${frequency}Hz
       `}
     >
       <div
-        className="text-xs font-bold text-center mb-1 truncate px-1 text-green-800"
+        className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary"
         title={data.label}
       >
         {data.label}
@@ -49,61 +49,69 @@ Frequency : ${frequency}Hz
         }`}
       />
 
-      <div className="flex flex-col gap-1 text-center">
-        <div className="flex flex-row gap-1 text-center">
-          <div className="flex flex-col gap-1 text-center">
-            <div className="text-text-primary font-roboto text-[9px] font-semibold">
-              Volt (R):
-            </div>
-            <div
-              className="font-semibold font-roboto text-[9px] text-status-danger"
-            >
-              {voltageR / 10} V
-            </div>
+      <div className="flex flex-col gap-0.5 text-center">
+        <div className="flex flex-col gap-0.5">
+          <div className="text-text-primary font-roboto text-[9px] font-medium text-center">
+            Voltage
           </div>
-          <div className="flex flex-col gap-1 text-center">
-            <div className="text-text-primary font-roboto text-[9px] font-semibold">
-              Volt (Y):
+          <div className="flex items-center justify-around gap-3">
+            <div className="flex flex-col gap-0.5">
+              <div className="text-text-primary font-roboto text-[9px] font-medium">
+                R
+              </div>
+              <div className="font-medium font-roboto text-[9px] text-status-danger">
+                {voltageR / 10} V
+              </div>
             </div>
-            <div className="font-semibold text-status-warning font-roboto text-[9px]">
-              {voltageY / 10} V
+            <div className="flex flex-col gap-0.5 text-center">
+              <div className="text-text-primary font-roboto text-[9px] font-medium">
+                Y
+              </div>
+              <div className="font-medium text-status-warning font-roboto text-[9px]">
+                {voltageY / 10} V
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-1 text-center">
-            <div className="text-text-primary font-roboto text-[9px] font-semibold">
-              Volt (B):
-            </div>
-            <div className="font-semibold text-status-info font-roboto text-[9px]">
-              {voltageB / 10} V
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-row gap-1 text-center">
-          <div className="flex flex-col gap-1 text-center">
-            <div className="text-text-primary font-roboto text-[9px] font-semibold whitespace-nowrap">
-              Curr (R):
-            </div>
-            <div className="font-semibold text-status-danger font-roboto text-[9px]">
-              {currentR}A
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 text-center">
-            <div className="text-text-primary font-roboto text-[9px] font-semibold whitespace-nowrap">
-              Curr (Y):
-            </div>
-            <div className="font-semibold text-status-warning font-roboto text-[9px]">
-              {currentY}A
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 text-center">
-            <div className="text-text-primary font-roboto text-[9px] font-semibold whitespace-nowrap">
-              Curr (B):
-            </div>
-            <div className="font-semibold text-status-info font-roboto text-[9px]">
-              {currentB}A
+            <div className="flex flex-col gap-0.5">
+              <div className="text-text-primary font-roboto text-[9px] font-medium">
+                B
+              </div>
+              <div className="font-medium text-status-info font-roboto text-[9px]">
+                {voltageB / 10} V
+              </div>
             </div>
           </div>
         </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="text-text-primary font-roboto text-[9px] font-medium text-center">
+              Current
+            </div>
+            <div className="flex items-center justify-around gap-3">
+              <div className="flex flex-col gap-0.5">
+                <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+                  R
+                </div>
+                <div className="font-medium text-status-danger font-roboto text-[9px]">
+                  {currentR}A
+                </div>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+                  Y
+                </div>
+                <div className="font-medium text-status-warning font-roboto text-[9px]">
+                  {currentY}A
+                </div>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+                  B
+                </div>
+                <div className="font-medium text-status-info font-roboto text-[9px]">
+                  {currentB}A
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
 
       <Handle
