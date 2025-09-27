@@ -273,11 +273,7 @@ const Devices = () => {
       return;
     }
 
-    if (
-      selectedOrganization === "all" &&
-      selectedProject === "all" &&
-      devices.length === 0
-    ) {
+    if (selectedOrganization === "all" && selectedProject === "all") {
       refreshDevices();
     } else if (selectedOrganization !== "all" && selectedProject !== "all") {
       setIsLoading(true);
@@ -306,9 +302,9 @@ const Devices = () => {
     selectedOrganization,
     selectedProject,
     dispatch,
-    devices.length,
     organization_id,
     project_id,
+    refreshDevices,
   ]);
 
   useEffect(() => {
