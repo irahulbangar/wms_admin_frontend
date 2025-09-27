@@ -36,9 +36,13 @@ export const useDiagramData = (projectId: string | undefined) => {
 
   const convertDevicesToDiagramCallback = useCallback(
     (devices: DeviceResult[]) => {
-      return convertDevicesToDiagram(devices, departmentDimensions);
+      const projectInfo = projectData ? {
+        project_name: projectData.project_name,
+        project_id: projectData.project_id
+      } : undefined;
+      return convertDevicesToDiagram(devices, departmentDimensions, projectInfo);
     },
-    [departmentDimensions]
+    [departmentDimensions, projectData]
   );
 
   const fetchDiagram = useCallback(async () => {
@@ -245,6 +249,42 @@ export const useDiagramData = (projectId: string | undefined) => {
                 departmentName: matchingDevice.department_name,
               },
             };
+          }
+        } else if (node.type === "group" && node.data.type === "department") {
+          const departmentId = node.id.replace("dept-", "");
+          const departmentDevices = deviceData.filter(
+            (device) => device.department_id.toString() === departmentId
+          );
+          
+          if (departmentDevices.length > 0) {
+            const latestDepartmentName = departmentDevices[0].department_name;
+            if (latestDepartmentName && latestDepartmentName !== node.data.label) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  label: latestDepartmentName,
+                },
+              };
+            }
+          }
+        } else if (node.type === "group" && node.data.type === "project") {
+          const projectId = node.id.replace("project-", "");
+          const projectDevices = deviceData.filter(
+            (device) => device.project_id.toString() === projectId
+          );
+          
+          if (projectDevices.length > 0) {
+            const latestProjectName = projectDevices[0].project_name;
+            if (latestProjectName && latestProjectName !== node.data.label) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  label: latestProjectName,
+                },
+              };
+            }
           }
         }
 

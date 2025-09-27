@@ -43,26 +43,28 @@ export interface DepartmentCalculations {
 
 export const convertDevicesToDiagram = (
   devices: DeviceResult[],
-  departmentDimensions: Record<string, { width: number; height: number }>
+  departmentDimensions: Record<string, { width: number; height: number }>,
+  projectData?: { project_name: string; project_id: number }
 ): { nodes: DiagramNode[]; edges: DiagramEdge[] } => {
   const nodes: DiagramNode[] = [];
   const edges: DiagramEdge[] = [];
 
-  // Filter out hidden devices
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
 
-  // Group devices by project first
   const projectGroups = visibleDevices.reduce((acc, device) => {
     const projectId = device.project_id.toString();
     if (!acc[projectId]) {
       acc[projectId] = {
         project_id: device.project_id,
-        project_name: device.project_name || `Project ${device.project_id}`,
+        project_name: projectData?.project_name || device.project_name || `Project ${device.project_id}`,
         departments: {},
       };
+    } else {
+      if (device.project_name && device.project_name !== acc[projectId].project_name && !projectData?.project_name) {
+        acc[projectId].project_name = device.project_name;
+      }
     }
     
-    // Group devices by department within each project
     const deptId = device.department_id.toString();
     if (!acc[projectId].departments[deptId]) {
       acc[projectId].departments[deptId] = {
@@ -70,23 +72,24 @@ export const convertDevicesToDiagram = (
         department_name: device.department_name || `Department ${device.department_id}`,
         devices: [],
       };
+    } else {
+      if (device.department_name && device.department_name !== acc[projectId].departments[deptId].department_name) {
+        acc[projectId].departments[deptId].department_name = device.department_name;
+      }
     }
     acc[projectId].departments[deptId].devices.push(device);
     return acc;
   }, {} as Record<string, { project_id: number; project_name: string; departments: Record<string, DepartmentGroup> }>);
 
-  // Process each project
   Object.values(projectGroups).forEach((project, projectIndex) => {
     const projectId = `project-${project.project_id}`;
     const projectX = projectIndex * 800 + 50;
     const projectY = 20;
 
-    // Calculate project dimensions based on departments
     const departmentCount = Object.keys(project.departments).length;
     const projectWidth = Math.max(1000, departmentCount * 400 + 100);
     const projectHeight = Math.max(650, 500);
 
-    // Create project group node
     nodes.push({
       id: projectId,
       data: {
@@ -113,13 +116,11 @@ export const convertDevicesToDiagram = (
       dragHandle: ".group-drag-handle",
     });
 
-    // Process departments within this project
     Object.values(project.departments).forEach((department, deptIndex) => {
       const deptId = `dept-${department.department_id}`;
       const deptX = projectX + 20 + (deptIndex % 2) * 350;
       const deptY = projectY + 60 + Math.floor(deptIndex / 2) * 250;
 
-      // Sort devices within department
       department.devices.sort((a: DeviceResult, b: DeviceResult) => {
         const aIsTank = a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
         const bIsTank = b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
@@ -136,7 +137,6 @@ export const convertDevicesToDiagram = (
       const deptWidth = currentDimensions.width;
       const deptHeight = currentDimensions.height;
 
-      // Create department group node
       nodes.push({
         id: deptId,
         data: {
@@ -164,7 +164,6 @@ export const convertDevicesToDiagram = (
         dragHandle: ".group-drag-handle",
       });
 
-      // Create device nodes within this department
       const tanks = department.devices.filter(
         (device: DeviceResult) =>
           device.type === "tank" ||
@@ -865,7 +864,6 @@ const shouldIncludeDevice = (device: DeviceResult): boolean => {
 export const calculateDepartmentFlowBalances = (
   devices: DeviceResult[]
 ): DepartmentCalculations[] => {
-  // Filter out hidden devices
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
   
   const departmentGroups = visibleDevices.reduce((acc, device) => {
@@ -921,7 +919,6 @@ export const calculateDepartmentFlowBalance = (
   devices: DeviceResult[],
   departmentId: number
 ): DepartmentCalculations | null => {
-  // Filter out hidden devices
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
   const departmentDevices = visibleDevices.filter(device => device.department_id === departmentId);
   
@@ -975,7 +972,6 @@ export const calculateProjectFlowBalance = (
   devices: DeviceResult[],
   projectId: number
 ): ProjectCalculations | null => {
-  // Filter out hidden devices
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
   const projectDevices = visibleDevices.filter(device => device.project_id === projectId);
   
@@ -991,7 +987,6 @@ export const calculateProjectFlowBalance = (
   let totalStock = 0;
   let totalCapacity = 0;
 
-  // Calculate flow based on project_connection
   relevantDevices.forEach((device) => {
     const flowValue = getDeviceFlowValue(device);
     const { project_connection } = device;
