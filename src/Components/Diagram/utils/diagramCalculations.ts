@@ -83,12 +83,30 @@ export const convertDevicesToDiagram = (
 
   Object.values(projectGroups).forEach((project, projectIndex) => {
     const projectId = `project-${project.project_id}`;
-    const projectX = projectIndex * 800 + 50;
+    
+    // Calculate dynamic project dimensions based on department count and content
+    const departmentCount = Object.values(project.departments).length;
+    
+    // Calculate optimal grid layout
+    const maxDepartmentsPerRow = departmentCount <= 2 ? 2 : departmentCount <= 6 ? 3 : 4;
+    const totalRows = Math.ceil(departmentCount / maxDepartmentsPerRow);
+    
+    // Calculate department dimensions first
+    const departmentSpacing = 20;
+    const projectPadding = 40;
+    const minDepartmentWidth = 650; // Minimum department width
+    const minDepartmentHeight = 550; // Minimum department height
+    
+    // Calculate project width based on department count (minimum 1200px)
+    const projectWidth = Math.max(1200, projectPadding * 2 + maxDepartmentsPerRow * minDepartmentWidth + (maxDepartmentsPerRow - 1) * departmentSpacing);
+    
+    // Calculate project height based on department rows and content (minimum 650px)
+    const projectHeight = Math.max(650, projectPadding * 2 + 60 + totalRows * minDepartmentHeight + (totalRows - 1) * departmentSpacing);
+    
+    // Calculate project positioning based on dynamic width
+    const projectSpacing = 100; // Base spacing between projects
+    const projectX = projectIndex * (projectWidth + projectSpacing) + 0;
     const projectY = 20;
-
-    const departmentCount = Object.keys(project.departments).length;
-    const projectWidth = Math.max(1000, departmentCount * 400 + 100);
-    const projectHeight = Math.max(650, 500);
 
     nodes.push({
       id: projectId,
@@ -116,10 +134,22 @@ export const convertDevicesToDiagram = (
       dragHandle: ".group-drag-handle",
     });
 
-    Object.values(project.departments).forEach((department, deptIndex) => {
-      const deptId = `dept-${department.department_id}`;
-      const deptX = projectX + 20 + (deptIndex % 2) * 350;
-      const deptY = projectY + 60 + Math.floor(deptIndex / 2) * 250;
+      // Calculate available space for departments within dynamic project boundaries
+      const availableWidth = projectWidth - (2 * projectPadding);
+      const availableHeight = projectHeight - (2 * projectPadding) - 40; // 40px for project header
+      
+      // Calculate department dimensions based on available space
+      const departmentWidth = Math.max(minDepartmentWidth, (availableWidth - (maxDepartmentsPerRow - 1) * departmentSpacing) / maxDepartmentsPerRow);
+      const departmentHeight = Math.max(minDepartmentHeight, (availableHeight - (totalRows - 1) * departmentSpacing) / totalRows);
+      
+      Object.values(project.departments).forEach((department, deptIndex) => {
+        const deptId = `dept-${department.department_id}`;
+        
+        // Calculate position within project boundaries
+        const row = Math.floor(deptIndex / maxDepartmentsPerRow);
+        const col = deptIndex % maxDepartmentsPerRow;
+        const deptX = projectX + projectPadding + col * (departmentWidth + departmentSpacing);
+        const deptY = projectY + 60 + row * (departmentHeight + departmentSpacing);
 
       department.devices.sort((a: DeviceResult, b: DeviceResult) => {
         const aIsTank = a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
@@ -129,10 +159,17 @@ export const convertDevicesToDiagram = (
         return a.device_id - b.device_id;
       });
 
-      const minDimensions = calculateMinimumDimensions(department.devices.length);
+      // Calculate dynamic department dimensions based on device count
+      const deviceCount = department.devices.length;
+      const minDimensions = calculateMinimumDimensions(deviceCount);
+      
+      // Use minimum department dimensions (650x550) and grow based on device content
+      const dynamicWidth = Math.max(650, Math.max(departmentWidth, minDimensions.width));
+      const dynamicHeight = Math.max(550, Math.max(departmentHeight, minDimensions.height));
+      
       const currentDimensions = departmentDimensions[deptId] || {
-        width: Math.max(300, minDimensions.width),
-        height: Math.max(200, minDimensions.height),
+        width: dynamicWidth,
+        height: dynamicHeight,
       };
       const deptWidth = currentDimensions.width;
       const deptHeight = currentDimensions.height;
@@ -804,30 +841,26 @@ export const cleanNodesForAPI = (
 const calculateMinimumDimensions = (
   deviceCount: number
 ): { width: number; height: number } => {
-  const headerHeight = 20;
-  const footerHeight = 10;
-  const sideMargin = 30;
-  const deviceSpacing = 30;
+  const headerHeight = 50; // Department header height
+  const footerHeight = 30; // Department footer height
+  const sideMargin = 30; // Side margins
+  const deviceSpacing = 20; // Spacing between devices
+  const deviceWidth = 140; // Average device width
+  const deviceHeight = 90; // Average device height
 
-  const minWidth = Math.max(500, sideMargin * 2 + deviceCount * 50);
-
-  const tankHeight = 80;
-  const fmHeight = 70;
-  const maxDevicesPerRow = Math.max(
-    1,
-    Math.floor((minWidth - sideMargin * 2) / 150)
-  );
+  // Calculate width based on device count and available space
+  const maxDevicesPerRow = Math.max(1, Math.floor(600 / (deviceWidth + deviceSpacing)));
   const totalRows = Math.ceil(deviceCount / maxDevicesPerRow);
-  const minHeight =
-    headerHeight +
-    footerHeight +
-    totalRows * Math.max(tankHeight, fmHeight) +
-    (totalRows - 1) * deviceSpacing +
-    100;
+  
+  // Calculate minimum width needed (starting from 650px minimum)
+  const minWidth = Math.max(650, sideMargin * 2 + Math.min(deviceCount, maxDevicesPerRow) * (deviceWidth + deviceSpacing));
+  
+  // Calculate minimum height needed (starting from 550px minimum)
+  const minHeight = Math.max(550, headerHeight + footerHeight + totalRows * deviceHeight + (totalRows - 1) * deviceSpacing + 30);
 
   return {
-    width: minWidth,
-    height: Math.max(500, minHeight),
+    width: Math.min(1200, minWidth), // Cap at 1200px for very large departments
+    height: Math.min(1000, minHeight), // Cap at 1000px for very large departments
   };
 };
 
