@@ -47,6 +47,7 @@ const DiagramPage = () => {
     handleClick,
     onNodeClick,
     multiSelectionKeyCode,
+    downloadDiagramAsImage,
   } = useDiagramControls(setEdges, setHasChanges);
 
   const {
@@ -126,6 +127,16 @@ const DiagramPage = () => {
     navigate("/organization/plants");
   };
 
+  const handleDownloadDiagram = async () => {
+    try {
+      await downloadDiagramAsImage();
+      Success("Diagram downloaded successfully!");
+    } catch (error) {
+      console.error("Download failed:", error);
+      // You can add error handling here if needed
+    }
+  };
+
   const transformedNodes = useMemo(() => {
     return nodes.map((node) => {
       if (node.id === selectedDepartment && node.type === "group") {
@@ -176,6 +187,7 @@ const DiagramPage = () => {
             onSaveDiagram={handleSaveDiagram}
             onDeleteSelectedEdge={handleDeleteSelectedEdge}
             onClearAllEdges={handleClearAllEdgesWithConfirm}
+            onDownloadDiagram={handleDownloadDiagram}
           />
 
           <div

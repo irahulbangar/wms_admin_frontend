@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { type Connection, type Edge, addEdge } from "reactflow";
 import type { DiagramEdge } from "../utils/diagramCalculations";
+import domtoimage from "dom-to-image";
 
 export const useDiagramControls = (
   setEdges: (
@@ -217,6 +218,166 @@ export const useDiagramControls = (
 
   const multiSelectionKeyCode = useMemo(() => ["Meta", "Ctrl"], []);
 
+  const downloadDiagramAsImage = useCallback(async () => {
+    try {
+      // Find the ReactFlow container
+      const reactFlowElement = document.querySelector('.react-flow');
+      if (!reactFlowElement) {
+        throw new Error('ReactFlow container not found');
+      }
+
+      // Create a temporary style element to hide controls and fix any color issues
+      const tempStyle = document.createElement('style');
+      tempStyle.id = 'dom-to-image-fix';
+      tempStyle.textContent = `
+        /* Hide controls and attribution */
+        .react-flow__controls {
+          display: none !important;
+        }
+        .react-flow__attribution {
+          display: none !important;
+        }
+        .react-flow__minimap {
+          display: none !important;
+        }
+        
+        /* Ensure all text is visible and readable */
+        .react-flow__node-label,
+        .react-flow__node-text,
+        text,
+        [class*="label"] {
+          color: #000000 !important;
+          fill: #000000 !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+        }
+        
+        /* Fix any oklab color issues */
+        [style*="oklab"] {
+          color: #000000 !important;
+          background-color: #ffffff !important;
+        }
+      `;
+      
+      // Add the temporary style
+      document.head.appendChild(tempStyle);
+
+      // Wait for styles to apply
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      let dataUrl: string;
+
+      try {
+        // Get the actual dimensions of the content
+        const rect = reactFlowElement.getBoundingClientRect();
+        const scrollWidth = Math.max(reactFlowElement.scrollWidth, rect.width);
+        const scrollHeight = Math.max(reactFlowElement.scrollHeight, rect.height);
+        
+        console.log('Diagram dimensions:', { scrollWidth, scrollHeight, rectWidth: rect.width, rectHeight: rect.height });
+        
+        // Try SVG first (better for large content)
+        try {
+          const svgDataUrl = await domtoimage.toSvg(reactFlowElement as HTMLElement, {
+            width: scrollWidth,
+            height: scrollHeight,
+            style: {
+              width: `${scrollWidth}px`,
+              height: `${scrollHeight}px`,
+            },
+            filter: (node: any) => {
+              // Skip controls and attribution
+              if (node.classList?.contains('react-flow__controls') ||
+                  node.classList?.contains('react-flow__attribution') ||
+                  node.classList?.contains('react-flow__minimap')) {
+                return false;
+              }
+              return true;
+            }
+          });
+          
+          // Convert SVG to PNG
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          
+          dataUrl = await new Promise((resolve, reject) => {
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = scrollWidth * 2; // 2x scale for high resolution
+              canvas.height = scrollHeight * 2;
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.scale(2, 2);
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL('image/png', 1.0));
+              } else {
+                reject(new Error('Could not get canvas context'));
+              }
+            };
+            img.onerror = reject;
+            img.src = svgDataUrl;
+          });
+        } catch (svgError) {
+          console.warn('SVG method failed, trying PNG directly:', svgError);
+          
+          // Fallback to PNG with proper dimensions
+          dataUrl = await domtoimage.toPng(reactFlowElement as HTMLElement, {
+            quality: 1.0,
+            bgcolor: '#ffffff',
+            width: scrollWidth,
+            height: scrollHeight,
+            style: {
+              width: `${scrollWidth}px`,
+              height: `${scrollHeight}px`,
+            },
+            filter: (node: any) => {
+              // Skip controls and attribution
+              if (node.classList?.contains('react-flow__controls') ||
+                  node.classList?.contains('react-flow__attribution') ||
+                  node.classList?.contains('react-flow__minimap')) {
+                return false;
+              }
+              return true;
+            }
+          });
+        }
+      } catch (domError) {
+        console.warn('All dom-to-image methods failed, trying basic method:', domError);
+        
+        // Final fallback: Basic capture without size constraints
+        dataUrl = await domtoimage.toPng(reactFlowElement as HTMLElement, {
+          quality: 0.95,
+          bgcolor: '#ffffff'
+        });
+      }
+
+      // Remove the temporary style
+      const styleElement = document.getElementById('dom-to-image-fix');
+      if (styleElement) {
+        styleElement.remove();
+      }
+
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `diagram-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading diagram:', error);
+      // Clean up temporary style if it exists
+      const styleElement = document.getElementById('dom-to-image-fix');
+      if (styleElement) {
+        styleElement.remove();
+      }
+      throw new Error('Failed to download diagram image');
+    }
+  }, []);
+
   return {
     selectedEdge,
     setSelectedEdge,
@@ -230,5 +391,6 @@ export const useDiagramControls = (
     handleClick,
     onNodeClick,
     multiSelectionKeyCode,
+    downloadDiagramAsImage,
   };
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronsLeft, Trash2 } from "lucide-react";
+import { ChevronsLeft, Trash2, Download } from "lucide-react";
 
 interface DiagramControlsProps {
   hasChanges: boolean;
@@ -9,6 +9,7 @@ interface DiagramControlsProps {
   onSaveDiagram: () => void;
   onDeleteSelectedEdge: () => void;
   onClearAllEdges: () => void;
+  onDownloadDiagram: () => void;
 }
 
 const DiagramControls: React.FC<DiagramControlsProps> = ({
@@ -19,6 +20,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
   onSaveDiagram,
   onDeleteSelectedEdge,
   onClearAllEdges,
+  onDownloadDiagram,
 }) => {
   const handleClearAllEdgesWithConfirm = () => {
     if (confirm("Are you sure you want to delete all connections?")) {
@@ -56,6 +58,15 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
               title="Clear all connections"
             >
               <Trash2 className="w-4 h-4" /> Clear All Edges
+            </button>
+
+            <button
+              onClick={onDownloadDiagram}
+              className="px-3 py-2 bg-status-success hover:bg-status-success/80 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
+              title="Download diagram as PNG image"
+            >
+              <Download className="w-4 h-4" />
+              Download Image
             </button>
 
             <button
