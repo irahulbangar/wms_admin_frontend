@@ -986,7 +986,7 @@ const Devices = () => {
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Sr No
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap -center text-base font-roboto font-medium font-roboto">
                               Device Name
                             </th>
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
@@ -1024,10 +1024,10 @@ const Devices = () => {
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
                                 {index + 1}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 {device?.device_name}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 {
                                   projects?.find(
                                     (p) =>
@@ -1036,7 +1036,7 @@ const Devices = () => {
                                   )?.project_name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize truncate">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize truncate">
                                 {
                                   deviceFamily?.find(
                                     (df) =>
@@ -1045,10 +1045,10 @@ const Devices = () => {
                                   )?.name
                                 }
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap uppercase">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap uppercase">
                                 {device?.device_type}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 <span
                                   className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${deviceStatus(
                                     device?.device_status
@@ -1057,16 +1057,16 @@ const Devices = () => {
                                   {device?.device_status}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                                 {device?.hwid || "N/A"}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 {fromatDateWithTime(device?.created_at)}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 {fromatDateWithTime(device?.updated_at)}
                               </td>
-                              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 <div className="flex items-center justify-center gap-2">
                                   <span
                                     title="Edit device"

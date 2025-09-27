@@ -509,10 +509,10 @@ const Plants = () => {
                       <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {project?.project_name || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {
                           organizations.find(
                             (org) =>
@@ -521,16 +521,16 @@ const Plants = () => {
                           )?.organization_name
                         }
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {project?.latitude || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {project?.longitude || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {project?.address || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         <span
                           className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
                             project?.status
@@ -539,13 +539,13 @@ const Plants = () => {
                           {project?.status || "N/A"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {fromatDateWithTime(project?.created_at) || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {fromatDateWithTime(project?.updated_at) || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">
                           <span title="View devices" aria-label="View devices">
                             <Eye

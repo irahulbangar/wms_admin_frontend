@@ -167,13 +167,16 @@ const Users = () => {
             className="md:w-96 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
           />
         </div>
-        <button
-          onClick={handleAddUser}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <PlusCircle className="w-4 h-4" />
-          Add User
-        </button>
+
+        {admin?.role === "super_admin" && (
+          <button
+            onClick={handleAddUser}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Add User
+          </button>
+        )}
       </div>
       {loading ? (
         <div className="flex items-center justify-center h-full bg-primary rounded-lg">
@@ -209,9 +212,11 @@ const Users = () => {
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                     Updated At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
-                    Action
-                  </th>
+                  {admin?.role === "super_admin" && (
+                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                      Action
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -251,24 +256,24 @@ const Users = () => {
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         {fromatDateWithTime(user?.updated_at)}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                        <div className="flex items-center gap-3 justify-center">
-                          <span title="Edit user" aria-label="Edit user">
-                            <SquarePen
-                              onClick={() => handleEditUser(user?.admin_id)}
-                              className="w-5 h-5 text-status-info cursor-pointer"
-                            />
-                          </span>
-                          {admin?.role === "super_admin" && (
+                      {admin?.role === "super_admin" && (
+                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                          <div className="flex items-center gap-3 justify-center">
+                            <span title="Edit user" aria-label="Edit user">
+                              <SquarePen
+                                onClick={() => handleEditUser(user?.admin_id)}
+                                className="w-5 h-5 text-status-info cursor-pointer"
+                              />
+                            </span>
                             <span title="Delete user" aria-label="Delete user">
                               <Trash2
                                 onClick={() => handleDeleteUser(user?.admin_id)}
                                 className="w-5 h-5 text-status-danger cursor-pointer"
                               />
                             </span>
-                          )}
-                        </div>
-                      </td>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 ) : (

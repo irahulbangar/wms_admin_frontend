@@ -479,16 +479,16 @@ const OrganizationUsers = () => {
                       <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base capitalize">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
-                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base capitalize">
                         {user.client_name}
                       </td>
-                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base">
                         {user.client_email}
                       </td>
-                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base capitalize">
                         {user.client_phone}
                       </td>
-                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base capitalize">
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base capitalize">
                         {
                           organizations.find(
                             (org) =>
@@ -497,7 +497,7 @@ const OrganizationUsers = () => {
                           )?.organization_name
                         }
                       </td>
-                      <td className="px-6 py-4 font-roboto text-center text-text-primary text-base capitalize">
+                      <td className="px-6 py-4 font-roboto text-text-primary text-base capitalize">
                         <span
                           className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
                             user?.status
@@ -506,13 +506,13 @@ const OrganizationUsers = () => {
                           {user.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base">
                         {fromatDateWithTime(user.created_at)}
                       </td>
-                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
+                      <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base">
                         {fromatDateWithTime(user.updated_at)}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center gap-3 justify-center">
                           <span title="Edit user" aria-label="Edit user">
                             <SquarePen
