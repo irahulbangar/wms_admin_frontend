@@ -47,6 +47,7 @@ const OrganizationDiagram = () => {
     handleClick,
     onNodeClick,
     multiSelectionKeyCode,
+    downloadDiagramAsImage,
   } = useDiagramControls(setEdges, setHasChanges);
 
   const {
@@ -164,6 +165,16 @@ const OrganizationDiagram = () => {
     return !isLoadingDiagram && nodes?.length === 0 && edges?.length === 0;
   }, [isLoadingDiagram, nodes, edges]);
 
+  const handleDownloadDiagram = async () => {
+    try {
+      await downloadDiagramAsImage();
+      Success("Diagram downloaded successfully!");
+    } catch (error) {
+      console.error("Download failed:", error);
+      // You can add error handling here if needed
+    }
+  };
+
   return (
     <div className="bg-primary text-text-primary h-screen w-full">
       <div className="h-full w-full flex">
@@ -176,6 +187,7 @@ const OrganizationDiagram = () => {
             onSaveDiagram={handleSaveDiagram}
             onDeleteSelectedEdge={handleDeleteSelectedEdge}
             onClearAllEdges={handleClearAllEdgesWithConfirm}
+            onDownloadDiagram={handleDownloadDiagram}
           />
 
           <div
