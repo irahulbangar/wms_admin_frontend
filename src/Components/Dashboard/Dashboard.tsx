@@ -13,19 +13,19 @@ import { getOrganizations } from "../../../store/organizationSlice";
 import type { AppDispatch } from "../../../store/store";
 import { Error } from "../../utils/toast";
 import { useDispatch } from "react-redux";
-import type { ProjectResult } from "../../../model/project.interface";
-import { getAllProjects } from "../../../store/projectSlice";
 import { useNavigate } from "react-router-dom";
 import type { ClientUsersResult } from "../../../model/client-users.interface";
 import { getAllClients } from "../../../store/clientSlice";
 import type { DeviceResult } from "../../../model/devices.interface";
 import { getAllDevices } from "../../../store/deviceSlice";
+import type { PlantResult } from "../../../model/plant.interface";
+import { getAllPlants } from "../../../store/plantSlice";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const dispatch = useDispatch<AppDispatch>();
-  const [projects, setProjects] = useState<ProjectResult[]>([]);
+  const [plants, setPlants] = useState<PlantResult[]>([]);
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
   const [devices, setDevices] = useState<DeviceResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,14 +51,14 @@ const Dashboard = () => {
       });
   }, [dispatch]);
 
-  const fetchProjects = useCallback(async () => {
+  const fetchPlants = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    await dispatch(getAllProjects())
+    await dispatch(getAllPlants())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setProjects(res?.data);
+          setPlants(res?.data);
         } else {
           Error(res.message || "Failed to fetch plants");
         }
@@ -109,7 +109,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchOrganizations();
-    fetchProjects();
+    fetchPlants();
     fetchUsers();
     fetchDevices();
     const timer = setInterval(() => {
@@ -117,7 +117,7 @@ const Dashboard = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [fetchOrganizations, fetchProjects, fetchUsers, fetchDevices]);
+  }, [fetchOrganizations, fetchPlants, fetchUsers, fetchDevices]);
 
   const stats = [
     {
@@ -140,7 +140,7 @@ const Dashboard = () => {
     },
     {
       title: "Total Plants",
-      value: projects.length,
+      value: plants.length,
       icon: FileText,
       gradient: "from-[#c0392b] to-[#8e44ad]",
       iconBg: "bg-green-100",

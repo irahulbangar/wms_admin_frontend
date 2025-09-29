@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAppDispatch } from "../../../../store/store";
 import {
-  getProjectById,
+  getPlantById,
   updateDiagramData,
-} from "../../../../store/projectSlice";
-import { getDeviceByProjectId } from "../../../../store/deviceSlice";
-import type { SingleProjectResult } from "../../../../model/single-project.interface";
+} from "../../../../store/plantSlice";
+import { getDeviceByPlantId } from "../../../../store/deviceSlice";
+import type { SinglePlantResult } from "../../../../model/single-plant.interface";
 import type { DeviceResult } from "../../../../model/devices.interface";
 import {
   convertDevicesToDiagram,
@@ -15,7 +15,7 @@ import {
 } from "../utils/diagramCalculations";
 import { Success } from "../../../utils/toast";
 
-export const useDiagramData = (projectId: string | undefined) => {
+export const useDiagramData = (plantId: string | undefined) => {
   const dispatch = useAppDispatch();
 
   const [nodes, setNodes] = useState<DiagramNode[]>([]);
@@ -23,7 +23,7 @@ export const useDiagramData = (projectId: string | undefined) => {
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
-  const [projectData, setProjectData] = useState<SingleProjectResult | null>(
+  const [plantData, setPlantData] = useState<SinglePlantResult | null>(
     null
   );
   const [deviceData, setDeviceData] = useState<DeviceResult[]>([]);
@@ -36,24 +36,24 @@ export const useDiagramData = (projectId: string | undefined) => {
 
   const convertDevicesToDiagramCallback = useCallback(
     (devices: DeviceResult[]) => {
-      const projectInfo = projectData ? {
-        project_name: projectData.project_name,
-        project_id: projectData.project_id
+      const plantInfo = plantData ? {
+        plant_name: plantData.plant_name,
+        plant_id: plantData.plant_id
       } : undefined;
-      return convertDevicesToDiagram(devices, departmentDimensions, projectInfo);
+      return convertDevicesToDiagram(devices, departmentDimensions, plantInfo);
     },
-    [departmentDimensions, projectData]
+    [departmentDimensions, plantData]
   );
 
   const fetchDiagram = useCallback(async () => {
-    if (!projectId) return;
+    if (!plantId) return;
 
     try {
-      await dispatch(getProjectById(projectId))
+      await dispatch(getPlantById(plantId))
         .unwrap()
         .then((res: any) => {
           if (res.success) {
-            setProjectData(res.data);
+            setPlantData(res.data);
 
             if (res.data.nodes && res.data.edges && res.data.nodes.length > 0) {
               const nodesWithDraggable = (res.data.nodes as DiagramNode[]).map(
@@ -92,13 +92,13 @@ export const useDiagramData = (projectId: string | undefined) => {
       console.error("Error fetching plant data:", err);
       setIsLoadingDiagram(false);
     }
-  }, [dispatch, projectId]);
+  }, [dispatch, plantId]);
 
   const fetchDeviceData = useCallback(async () => {
-    if (!projectId) return;
+    if (!plantId) return;
 
     try {
-      await dispatch(getDeviceByProjectId(parseInt(projectId)))
+      await dispatch(getDeviceByPlantId(parseInt(plantId)))
         .unwrap()
         .then((res: any) => {
           if (res.success) {
@@ -116,7 +116,7 @@ export const useDiagramData = (projectId: string | undefined) => {
       console.error("Error fetching device data:", err);
       setIsLoadingDiagram(false);
     }
-  }, [dispatch, projectId]);
+  }, [dispatch, plantId]);
 
   const updateNodesWithDynamicData = useCallback(() => {
     if (deviceData.length === 0 || nodes.length === 0) return;
@@ -141,7 +141,7 @@ export const useDiagramData = (projectId: string | undefined) => {
                 capacity: Number(matchingDevice?.params?.storageCapacity) || 0,
                 height: Number(matchingDevice?.params?.height) || 0,
                 departmentConnection: matchingDevice.department_connection,
-                projectConnection: matchingDevice.project_connection,
+                plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
               },
@@ -165,7 +165,7 @@ export const useDiagramData = (projectId: string | undefined) => {
                   Number(matchingDevice.last_record?.max) || 0,
                 isActive: matchingDevice.device_status === "active",
                 departmentConnection: matchingDevice.department_connection,
-                projectConnection: matchingDevice.project_connection,
+                plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
               },
@@ -190,7 +190,7 @@ export const useDiagramData = (projectId: string | undefined) => {
                 min: Number(matchingDevice.last_record?.min) || 0,
                 isActive: matchingDevice.device_status === "active",
                 departmentConnection: matchingDevice.department_connection,
-                projectConnection: matchingDevice.project_connection,
+                plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
               },
@@ -219,7 +219,7 @@ export const useDiagramData = (projectId: string | undefined) => {
                 frequency: Number(matchingDevice.last_record?.Frequency) || 0,
                 isActive: matchingDevice.device_status === "active",
                 departmentConnection: matchingDevice.department_connection,
-                projectConnection: matchingDevice.project_connection,
+                plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
               },
@@ -244,7 +244,7 @@ export const useDiagramData = (projectId: string | undefined) => {
                 firstMm: Number(matchingDevice.last_record?.first_mm) || 0,
                 isActive: matchingDevice.device_status === "active",
                 departmentConnection: matchingDevice.department_connection,
-                projectConnection: matchingDevice.project_connection,
+                plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
               },
@@ -255,7 +255,7 @@ export const useDiagramData = (projectId: string | undefined) => {
           const departmentDevices = deviceData.filter(
             (device) => device.department_id.toString() === departmentId
           );
-          
+
           if (departmentDevices.length > 0) {
             const latestDepartmentName = departmentDevices[0].department_name;
             if (latestDepartmentName && latestDepartmentName !== node.data.label) {
@@ -268,20 +268,20 @@ export const useDiagramData = (projectId: string | undefined) => {
               };
             }
           }
-        } else if (node.type === "group" && node.data.type === "project") {
-          const projectId = node.id.replace("project-", "");
-          const projectDevices = deviceData.filter(
-            (device) => device.project_id.toString() === projectId
+        } else if (node.type === "group" && node.data.type === "plant") {
+          const plantId = node.id.replace("plant-", "");
+          const plantDevices = deviceData.filter(
+            (device) => device.plant_id.toString() === plantId
           );
-          
-          if (projectDevices.length > 0) {
-            const latestProjectName = projectDevices[0].project_name;
-            if (latestProjectName && latestProjectName !== node.data.label) {
+
+          if (plantDevices.length > 0) {
+            const latestPlantName = plantDevices[0].plant_name;
+            if (latestPlantName && latestPlantName !== node.data.label) {
               return {
                 ...node,
                 data: {
                   ...node.data,
-                  label: latestProjectName,
+                  label: latestPlantName,
                 },
               };
             }
@@ -299,14 +299,14 @@ export const useDiagramData = (projectId: string | undefined) => {
   }, [deviceData, nodes.length]);
 
   const saveDiagramToAPI = useCallback(async () => {
-    if (!projectId) return;
+    if (!plantId) return;
 
     setIsSaving(true);
     try {
       const cleanNodes = cleanNodesForAPI(nodes, departmentDimensions);
 
       const diagramData = {
-        project_id: parseInt(projectId),
+        plant_id: parseInt(plantId),
         nodes: cleanNodes as any,
         edges: edges as any,
         department_dimensions: departmentDimensions,
@@ -330,7 +330,7 @@ export const useDiagramData = (projectId: string | undefined) => {
       console.error("Failed to save diagram to server:", error);
       setIsSaving(false);
     }
-  }, [dispatch, projectId, nodes, edges, departmentDimensions]);
+  }, [dispatch, plantId, nodes, edges, departmentDimensions]);
 
   const resetDiagram = useCallback(() => {
     setDepartmentDimensions({});
@@ -369,21 +369,21 @@ export const useDiagramData = (projectId: string | undefined) => {
   }, [departmentDimensions]);
 
   useEffect(() => {
-    if (projectId) {
+    if (plantId) {
       fetchDeviceData();
       diagramGeneratedRef.current = false;
       setIsLoadingDiagram(true);
       fetchDiagram();
     }
-  }, [fetchDiagram, fetchDeviceData, projectId]);
+  }, [fetchDiagram, fetchDeviceData, plantId]);
 
   useEffect(() => {
-    if (projectData && deviceData.length === 0 && isLoadingDiagram) {
+    if (plantData && deviceData.length === 0 && isLoadingDiagram) {
       setIsLoadingDiagram(false);
     }
 
     if (
-      projectData &&
+      plantData &&
       deviceData.length > 0 &&
       isLoadingDiagram &&
       !diagramGeneratedRef.current
@@ -408,7 +408,7 @@ export const useDiagramData = (projectId: string | undefined) => {
       }
     };
   }, [
-    projectData,
+    plantData,
     deviceData,
     isLoadingDiagram,
     convertDevicesToDiagramCallback,
@@ -493,7 +493,7 @@ export const useDiagramData = (projectId: string | undefined) => {
     setHasChanges,
     isSaving,
     isLoadingDiagram,
-    projectData,
+    plantData,
     deviceData,
     departmentDimensions,
     setDepartmentDimensions,

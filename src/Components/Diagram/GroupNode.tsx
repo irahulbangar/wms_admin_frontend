@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useReactFlow } from "reactflow";
 import { Edit } from "lucide-react";
-import type { NodeData } from "../../../model/single-project.interface";
+import type { NodeData } from "../../../model/single-plant.interface";
 import type { DeviceResult } from "../../../model/devices.interface";
 import type { DiagramEdge } from "./utils/diagramCalculations";
-import { calculateDepartmentFlowBalance, calculateProjectFlowBalance } from "./utils/diagramCalculations";
+import {
+  calculateDepartmentFlowBalance,
+  calculatePlantFlowBalance,
+} from "./utils/diagramCalculations";
 
 interface GroupNodeProps {
   data: NodeData;
@@ -45,7 +48,6 @@ const determineFMFlowDirection = (
   return inputConnections >= outputConnections;
 };
 
-
 const GroupNode: React.FC<GroupNodeProps> = ({
   data,
   id,
@@ -56,7 +58,6 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   const { getNodes, getEdges } = useReactFlow();
   const allNodes = getNodes();
   const allEdges = getEdges ? getEdges() : edges;
-
 
   const deviceDataKey = deviceData
     ? JSON.stringify(
@@ -105,14 +106,14 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   };
 
   const calculateTotalStock = () => {
-    if (data.type === "project" && deviceData && deviceData.length > 0) {
-      const projectId = parseInt(id.replace('project-', ''));
-      const projectBalance = calculateProjectFlowBalance(deviceData, projectId);
-      
-      if (projectBalance) {
+    if (data.type === "plant" && deviceData && deviceData.length > 0) {
+      const plantId = parseInt(id.replace("plant-", ""));
+      const plantBalance = calculatePlantFlowBalance(deviceData, plantId);
+
+      if (plantBalance) {
         return {
-          current: projectBalance.totalStock,
-          capacity: projectBalance.totalCapacity,
+          current: plantBalance.totalStock,
+          capacity: plantBalance.totalCapacity,
         };
       }
     }
@@ -171,9 +172,12 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
   const calculateTotalInOut = () => {
     if (data.type === "department" && deviceData && deviceData.length > 0) {
-      const departmentId = parseInt(id.replace('dept-', ''));
-      const flowBalance = calculateDepartmentFlowBalance(deviceData, departmentId);
-      
+      const departmentId = parseInt(id.replace("dept-", ""));
+      const flowBalance = calculateDepartmentFlowBalance(
+        deviceData,
+        departmentId
+      );
+
       if (flowBalance) {
         return {
           totalIn: flowBalance.totalIn,
@@ -182,14 +186,14 @@ const GroupNode: React.FC<GroupNodeProps> = ({
       }
     }
 
-    if (data.type === "project" && deviceData && deviceData.length > 0) {
-      const projectId = parseInt(id.replace('project-', ''));
-      const projectBalance = calculateProjectFlowBalance(deviceData, projectId);
-      
-      if (projectBalance) {
+    if (data.type === "plant" && deviceData && deviceData.length > 0) {
+      const plantId = parseInt(id.replace("plant-", ""));
+      const plantBalance = calculatePlantFlowBalance(deviceData, plantId);
+
+      if (plantBalance) {
         return {
-          totalIn: projectBalance.totalIn,
-          totalOut: projectBalance.totalOut,
+          totalIn: plantBalance.totalIn,
+          totalOut: plantBalance.totalOut,
         };
       }
     }
@@ -355,8 +359,8 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             </div>
           </div>
         )}
-        
-        {data.type === "project" && (
+
+        {data.type === "plant" && (
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">

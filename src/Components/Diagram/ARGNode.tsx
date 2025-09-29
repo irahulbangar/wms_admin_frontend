@@ -1,6 +1,6 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
-import type { NodeData } from "../../../model/single-project.interface";
+import type { NodeData } from "../../../model/single-plant.interface";
 
 interface ARGNodeProps {
   data: NodeData;

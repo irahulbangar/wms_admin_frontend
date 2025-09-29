@@ -19,7 +19,7 @@ export const departmentSlice = createSlice({
 export interface DepartmentPayload {
   department_name: string;
   department_info: string;
-  project_id: number;
+  plant_id: number;
 }
 
 // Create department
@@ -108,14 +108,14 @@ export const getDepartmentById = createAsyncThunk(
   }
 );
 
-// GET department by project id
-export const getDepartmentByProjectId = createAsyncThunk(
-  "department/getDepartmentByProjectId",
-  async (project_id: number, thunkAPI) => {
+// GET department by plant id
+export const getDepartmentByPlantId = createAsyncThunk(
+  "department/getDepartmentByPlantId",
+  async (plant_id: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get(
-        `/department/admin/department-project/${project_id}`,
+        `/department/admin/department-plant/${plant_id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

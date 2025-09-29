@@ -6,12 +6,12 @@ export interface UserPlantsResponse {
 
 export interface UserPlantResult {
   user_plant_id: number;
-  project_id: number;
+  plant_id: number;
   user_id: number;
   role: string;
   status: string;
   created_at: string;
   updated_at: string;
-  project_name: string;
+  plant_name: string;
   client_name: string;
 }

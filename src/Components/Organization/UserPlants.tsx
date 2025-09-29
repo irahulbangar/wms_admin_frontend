@@ -6,8 +6,8 @@ import {
   getUserPlantByUserId,
   updateUserPlantByUserId,
 } from "../../../store/userPlantSlice";
-import { getProjectsByOrganizationId } from "../../../store/projectSlice";
-import type { ProjectResult } from "../../../model/project.interface";
+import { getPlantsByOrganizationId } from "../../../store/plantSlice";
+import type { PlantResult } from "../../../model/plant.interface";
 import NoDataFound from "../NoDataFound";
 import { User } from "lucide-react";
 import type { UserPlantResult } from "../../../model/user-plants.interface";
@@ -21,7 +21,7 @@ interface UserPlantsProps {
 }
 
 interface UserPlantFormData {
-  project_id: number;
+  plant_id: number;
   role: string;
   status: string;
 }
@@ -34,10 +34,10 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   const dispatch = useAppDispatch();
 
   const [userPlants, setUserPlants] = useState<UserPlantResult[]>([]);
-  const [projects, setProjects] = useState<ProjectResult[]>([]);
+  const [plants, setPlants] = useState<PlantResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<UserPlantFormData>({
-    project_id: 0,
+    plant_id: 0,
     role: "",
     status: "",
   });
@@ -69,34 +69,34 @@ const UserPlants: React.FC<UserPlantsProps> = ({
     }
   }, [dispatch, userId]);
 
-  const fetchProjects = useCallback(async () => {
+  const fetchPlants = useCallback(async () => {
     try {
-      await dispatch(getProjectsByOrganizationId(organizationId))
+      await dispatch(getPlantsByOrganizationId(organizationId))
         .unwrap()
         .then((res) => {
           if (res.success && res.data) {
-            setProjects(res.data);
+            setPlants(res.data);
           }
         })
         .catch((error) => {
-          console.error("Error fetching projects:", error);
+          console.error("Error fetching plants:", error);
           Error(error as string);
         });
     } catch (error) {
-      console.error("Error fetching projects:", error);
+      console.error("Error fetching plants:", error);
       Error(error as string);
     }
   }, [dispatch, organizationId]);
 
   useEffect(() => {
     fetchUserPlants();
-    fetchProjects();
-  }, [fetchUserPlants, fetchProjects]);
+    fetchPlants();
+  }, [fetchUserPlants, fetchPlants]);
 
   const handleClose = () => {
     setEditingUserPlantId(null);
     setFormData({
-      project_id: 0,
+      plant_id: 0,
       role: "",
       status: "",
     });
@@ -106,7 +106,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formData.project_id) {
+    if (!formData.plant_id) {
       Error("Please select a plant");
       return;
     }
@@ -120,7 +120,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
     }
 
     const userPlantData = {
-      project_id: formData.project_id,
+      plant_id: formData.plant_id,
       role: formData.role || "org_user",
       status: formData.status || "active",
     };
@@ -141,7 +141,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             if (res.success) {
               Success(res.message);
               setFormData({
-                project_id: 0,
+                plant_id: 0,
                 role: "",
                 status: "",
               });
@@ -161,7 +161,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             if (res.success) {
               Success(res.message);
               setFormData({
-                project_id: 0,
+                plant_id: 0,
                 role: "",
                 status: "",
               });
@@ -190,7 +190,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
     if (userPlant) {
       setEditingUserPlantId(userPlantId);
       setFormData({
-        project_id: userPlant.project_id,
+        plant_id: userPlant.plant_id,
         role: userPlant.role,
         status: userPlant.status,
       });
@@ -218,19 +218,19 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             Plant
           </label>
           <select
-            value={formData.project_id}
+            value={formData.plant_id}
             onChange={(e) =>
               setFormData((prev) => ({
                 ...prev,
-                project_id: parseInt(e.target.value),
+                plant_id: parseInt(e.target.value),
               }))
             }
             className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
           >
             <option value="">Select Plant</option>
-            {projects.map((project) => (
-              <option key={project.project_id} value={project.project_id}>
-                {project.project_name}
+            {plants.map((plant) => (
+              <option key={plant.plant_id} value={plant.plant_id}>
+                {plant.plant_name}
               </option>
             ))}
           </select>
@@ -332,7 +332,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                           {index + 1}
                         </td>
                         <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
-                          {plant.project_name}
+                          {plant.plant_name}
                         </td>
                         <td className="px-6 py-4 font-roboto whitespace-nowrap text-center text-text-primary text-base">
                           {plant.client_name}
@@ -372,14 +372,14 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                             <User className="w-16 h-16 text-text-muted mx-auto mb-4" />
                           }
                           title={
-                            formData.project_id !== 0 ||
+                            formData.plant_id !== 0 ||
                             formData.role ||
                             formData.status
                               ? "No matching plants match your search/filter"
                               : "No plants found for this user"
                           }
                           description={
-                            formData.project_id !== 0 ||
+                            formData.plant_id !== 0 ||
                             formData.role ||
                             formData.status
                               ? "Try adjusting your filters or search terms"

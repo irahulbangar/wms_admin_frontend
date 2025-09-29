@@ -1,6 +1,6 @@
 import React from "react";
 import GroupNode from "./GroupNode";
-import type { NodeData } from "../../../model/single-project.interface";
+import type { NodeData } from "../../../model/single-plant.interface";
 import type { DiagramEdge } from "./utils/diagramCalculations";
 
 interface GroupNodeWrapperProps {

@@ -2,6 +2,7 @@ import {
   Building,
   Building2,
   ChevronDown,
+  Dock,
   FileText,
   LayoutDashboard,
   Monitor,
@@ -44,6 +45,12 @@ const menuItems = [
         label: "Plants",
         icon: <FileText className="w-5 h-5" />,
         href: "/organization/plants",
+      },
+      {
+        id: "departments",
+        label: "Departments",
+        icon: <Dock className="w-5 h-5" />,
+        href: "/organization/departments",
       },
       {
         id: "devices",

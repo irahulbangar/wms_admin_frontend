@@ -1,13 +1,13 @@
-export interface SingleProjectResponse {
+export interface SinglePlantResponse {
   success: boolean;
   message: string;
-  data: SingleProjectResult;
+  data: SinglePlantResult;
 }
 
-export interface SingleProjectResult {
-  project_id: number;
+export interface SinglePlantResult {
+  plant_id: number;
   organization_id: number;
-  project_name: string;
+  plant_name: string;
   latitude: string;
   longitude: string;
   address: string;
@@ -47,7 +47,7 @@ export interface NodeData {
   currentLevel?: number | string;
   height?: number;
   departmentConnection?: string;
-  projectConnection?: string;
+  plantConnection?: string;
   organizationConnection?: string;
   departmentName?: string;
   avg?: number;

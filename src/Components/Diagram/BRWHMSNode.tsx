@@ -1,6 +1,6 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
-import type { NodeData } from "../../../model/single-project.interface";
+import type { NodeData } from "../../../model/single-plant.interface";
 
 interface BRWHMSNodeProps {
   data: NodeData;
@@ -9,10 +9,9 @@ interface BRWHMSNodeProps {
 const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
   const isActive = data.isActive !== false;
   const departmentConnection = data.departmentConnection || "none";
-  const projectConnection = data.projectConnection || "none";
+  const plantConnection = data.plantConnection || "none";
   const organizationConnection = data.organizationConnection || "none";
   const departmentName = data.departmentName || "";
-
 
   return (
     <div
@@ -22,7 +21,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
       title={`
 Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
-Plant Connection : ${projectConnection}
+Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
 Totalizer Reading : ${data?.totalizerReading} Ltr
 Flow Rate : ${data?.avg} LPM
@@ -45,20 +44,13 @@ Flow Rate : ${data?.avg} LPM
         <div className="text-text-primary font-roboto text-xs font-medium">
           Flow:
         </div>
-        <div
-          className="font-semibold text-status-info font-roboto text-[10px] truncate px-1"
-        >
+        <div className="font-semibold text-status-info font-roboto text-[10px] truncate px-1">
           {data?.avg} LPM
         </div>
       </div>
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div
-          className="truncate text-center"
-        >
-          Totalizer : {data?.max} Ltr
-        </div>
-       
+        <div className="truncate text-center">Totalizer : {data?.max} Ltr</div>
       </div>
 
       <Handle
@@ -71,7 +63,6 @@ Flow Rate : ${data?.avg} LPM
         position={HandlePosition.Right}
         className="w-3 h-3 bg-blue-500"
       />
-
     </div>
   );
 };

@@ -51,7 +51,7 @@ export const getAllUserPlants = createAsyncThunk(
 );
 
 interface UserPlantPayload {
-  project_id: number;
+  plant_id: number;
   user_id: number;
   role: string;
   status: string;

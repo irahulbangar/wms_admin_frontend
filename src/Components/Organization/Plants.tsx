@@ -16,13 +16,6 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../NoDataFound";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import {
-  getAllProjects,
-  getProjectsByOrganizationId,
-  deleteProjectById,
-  setProjects,
-} from "../../../store/projectSlice";
-import type { ProjectResult } from "../../../model/project.interface";
 import { Error, Success, Warning } from "../../utils/toast";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 import {
@@ -31,6 +24,13 @@ import {
 } from "../../../store/organizationSlice";
 import AddUpdatePlant from "./AddUpdatePlant";
 import Pagination from "../Pagination";
+import type { PlantResult } from "../../../model/plant.interface";
+import {
+  deletePlantById,
+  getAllPlants,
+  getPlantsByOrganizationId,
+  setPlants,
+} from "../../../store/plantSlice";
 
 const Plants = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
@@ -39,30 +39,28 @@ const Plants = () => {
   const [showAddModalType, setShowAddModalType] = useState<"add" | "update">(
     "add"
   );
-  const [projectId, setProjectId] = useState<string>("");
+  const [plantId, setPlantId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterBy, setFilterBy] = useState("all");
-  const [filteredProjects, setFilteredProjects] = useState<ProjectResult[]>([]);
+  const [filteredPlants, setFilteredPlants] = useState<PlantResult[]>([]);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>(
     organization_id || "all"
   );
   const dispatch = useAppDispatch();
   const { organizations } = useAppSelector((state) => state.organization);
-  const { projects } = useAppSelector((state) => state.project);
+  const { plants } = useAppSelector((state) => state.plant);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [projectTitle, setProjectTitle] = useState<string | null>(null);
-  const [deleteProject, setDeleteProject] = useState<ProjectResult | null>(
-    null
-  );
+  const [plantTitle, setPlantTitle] = useState<string | null>(null);
+  const [deletePlant, setDeletePlant] = useState<PlantResult | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { admin } = useAppSelector((state) => state.admin);
   const totalItems = useMemo(() => {
-    return filteredProjects.length;
-  }, [filteredProjects]);
+    return filteredPlants.length;
+  }, [filteredPlants]);
 
   const totalPages = useMemo(() => {
     return Math.ceil(totalItems / rowsPerPage);
@@ -77,25 +75,25 @@ const Plants = () => {
     setCurrentPage(1);
   };
 
-  const handlePaginatedProjects = useMemo(() => {
-    return filteredProjects.slice(
+  const handlePaginatedPlants = useMemo(() => {
+    return filteredPlants.slice(
       (currentPage - 1) * rowsPerPage,
       currentPage * rowsPerPage
     );
-  }, [filteredProjects, currentPage, rowsPerPage]);
+  }, [filteredPlants, currentPage, rowsPerPage]);
 
   const handleConfirmDelete = async () => {
-    if (deleteProject) {
+    if (deletePlant) {
       setIsLoading(true);
-      await dispatch(deleteProjectById(deleteProject.project_id.toString()))
+      await dispatch(deletePlantById(deletePlant.plant_id.toString()))
         .unwrap()
         .then((res) => {
           if (res.success) {
             Success("Plant deleted successfully");
             if (selectedOrganizationId === "all") {
-              fetchProjects();
+              fetchPlants();
             } else {
-              getProjectByOrganizationId(selectedOrganizationId);
+              getPlantByOrganizationId(selectedOrganizationId);
             }
           }
         })
@@ -106,13 +104,13 @@ const Plants = () => {
           setIsLoading(false);
         });
       setShowDeletePopup(false);
-      setDeleteProject(null);
+      setDeletePlant(null);
     }
   };
 
   const handleCloseDeletePopup = () => {
     setShowDeletePopup(false);
-    setDeleteProject(null);
+    setDeletePlant(null);
   };
 
   const handleBackToOrganizations = () => {
@@ -123,16 +121,16 @@ const Plants = () => {
     navigate("/");
   };
 
-  const fetchProjects = useCallback(async () => {
+  const fetchPlants = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    await dispatch(getAllProjects())
+    await dispatch(getAllPlants())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          dispatch(setProjects(res.data));
+          dispatch(setPlants(res.data));
         } else {
-          Error(res.message || "Failed to fetch projects");
+          Error(res.message || "Failed to fetch plants");
         }
       })
       .catch((err) => {
@@ -143,7 +141,7 @@ const Plants = () => {
       });
   }, [dispatch]);
 
-  const getProjectByOrganizationId = useCallback(
+  const getPlantByOrganizationId = useCallback(
     async (orgId?: string) => {
       if (isLoading) return;
       setIsLoading(true);
@@ -151,11 +149,11 @@ const Plants = () => {
         const targetOrgId = orgId || organization_id;
         if (!targetOrgId) return;
 
-        await dispatch(getProjectsByOrganizationId(targetOrgId))
+        await dispatch(getPlantsByOrganizationId(targetOrgId))
           .unwrap()
           .then((res) => {
             if (res.success) {
-              dispatch(setProjects(res.data));
+              dispatch(setPlants(res.data));
             }
           })
           .catch((err) => {
@@ -194,7 +192,7 @@ const Plants = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    setProjects([]);
+    setPlants([]);
     setIsLoading(false);
     if (organizations.length === 0) {
       getAllOrganizations();
@@ -202,47 +200,47 @@ const Plants = () => {
 
     if (organization_id) {
       setSelectedOrganizationId(organization_id);
-      getProjectByOrganizationId(organization_id);
+      getPlantByOrganizationId(organization_id);
     } else {
       setSelectedOrganizationId("all");
-      if (projects.length === 0) {
-        fetchProjects();
+      if (plants.length === 0) {
+        fetchPlants();
       }
     }
   }, [
     organization_id,
-    getProjectByOrganizationId,
-    fetchProjects,
+    getPlantByOrganizationId,
+    fetchPlants,
     getAllOrganizations,
   ]);
 
   useEffect(() => {
-    let filtered = projects;
+    let filtered = plants;
 
     if (filterBy !== "all") {
-      filtered = filtered.filter((project) => project.status === filterBy);
+      filtered = filtered.filter((plant) => plant.status === filterBy);
     }
 
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
-        (project) =>
-          project.project_name.toLowerCase().includes(searchLower) ||
-          project.address.toLowerCase().includes(searchLower) ||
-          project.status.toLowerCase().includes(searchLower)
+        (plant) =>
+          plant.plant_name.toLowerCase().includes(searchLower) ||
+          plant.address.toLowerCase().includes(searchLower) ||
+          plant.status.toLowerCase().includes(searchLower)
       );
     }
 
-    setFilteredProjects(filtered);
-  }, [projects, filterBy, searchTerm]);
+    setFilteredPlants(filtered);
+  }, [plants, filterBy, searchTerm]);
 
   useEffect(() => {
     if (selectedOrganizationId === "all") {
-      fetchProjects();
+      fetchPlants();
     } else if (selectedOrganizationId !== "all") {
-      getProjectByOrganizationId(selectedOrganizationId);
+      getPlantByOrganizationId(selectedOrganizationId);
     }
-  }, [selectedOrganizationId, fetchProjects, getProjectByOrganizationId]);
+  }, [selectedOrganizationId, fetchPlants, getPlantByOrganizationId]);
 
   const filteredOrganizations = organizations.filter((organization) =>
     organization.organization_name
@@ -264,55 +262,55 @@ const Plants = () => {
     };
   }, []);
 
-  const handleAddProject = () => {
+  const handleAddPlant = () => {
     if (selectedOrganizationId === "all") {
       Warning("Please select an organization first before adding a plant");
       return;
     }
     setShowAddModalType("add");
-    setProjectId("");
+    setPlantId("");
     setShowAddModal(true);
   };
 
-  const handleEditProject = (id: string) => {
+  const handleEditPlant = (id: string) => {
     setShowAddModalType("update");
-    setProjectId(id);
+    setPlantId(id);
     setShowAddModal(true);
   };
 
-  const handleDeleteProject = async (id: string) => {
+  const handleDeletePlant = async (id: string) => {
     setShowDeletePopup(true);
-    setDeleteProject(
-      projects.find((project) => project.project_id.toString() === id) || null
+    setDeletePlant(
+      plants.find((plant) => plant.plant_id.toString() === id) || null
     );
-    setProjectTitle(
-      projects.find((project) => project.project_id.toString() === id)
-        ?.project_name || null
+    setPlantTitle(
+      plants.find((plant) => plant.plant_id.toString() === id)?.plant_name ||
+        null
     );
   };
 
   const handleModalClose = () => {
     setShowAddModal(false);
     setShowAddModalType("add");
-    setProjectId("");
+    setPlantId("");
   };
 
-  const handleProjectUpdate = (updatedData: {
+  const handlePlantUpdate = (updatedData: {
     success: boolean;
     data?: Record<string, unknown>;
   }) => {
     if (updatedData.success) {
       handleModalClose();
       if (selectedOrganizationId === "all") {
-        fetchProjects();
+        fetchPlants();
       } else {
-        getProjectByOrganizationId(selectedOrganizationId);
+        getPlantByOrganizationId(selectedOrganizationId);
       }
     }
   };
 
-  const handleViewDevices = (projectId: number, organizationId: number) => {
-    navigate(`/organization/devices/${projectId}/${organizationId}`);
+  const handleViewDevices = (plantId: number, organizationId: number) => {
+    navigate(`/organization/departments/${plantId}/${organizationId}`);
   };
 
   return (
@@ -396,7 +394,7 @@ const Plants = () => {
                   setSelectedOrganizationId("all");
                   setIsDropdownOpen(false);
                   setOrganizationSearchTerm("");
-                  fetchProjects();
+                  fetchPlants();
                 }}
               >
                 All Organization
@@ -413,7 +411,7 @@ const Plants = () => {
                       );
                       setIsDropdownOpen(false);
                       setOrganizationSearchTerm(organization.organization_name);
-                      getProjectByOrganizationId(
+                      getPlantByOrganizationId(
                         organization.organization_id.toString()
                       );
                     }}
@@ -442,7 +440,7 @@ const Plants = () => {
             />
           </div>
           <button
-            onClick={handleAddProject}
+            onClick={handleAddPlant}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
@@ -494,15 +492,15 @@ const Plants = () => {
                 </tr>
               </thead>
               <tbody>
-                {handlePaginatedProjects.length > 0 ? (
-                  handlePaginatedProjects.map((project, index) => (
+                {handlePaginatedPlants.length > 0 ? (
+                  handlePaginatedPlants.map((plant, index) => (
                     <tr
                       key={index}
                       className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer"
                       onDoubleClick={() =>
                         handleViewDevices(
-                          project?.project_id,
-                          project?.organization_id
+                          plant?.plant_id,
+                          plant?.organization_id
                         )
                       }
                     >
@@ -510,40 +508,40 @@ const Plants = () => {
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {project?.project_name || "N/A"}
+                        {plant?.plant_name || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {
                           organizations.find(
                             (org) =>
                               org.organization_id.toString() ===
-                              project.organization_id.toString()
+                              plant.organization_id.toString()
                           )?.organization_name
                         }
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {project?.latitude || "N/A"}
+                        {plant?.latitude || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {project?.longitude || "N/A"}
+                        {plant?.longitude || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {project?.address || "N/A"}
+                        {plant?.address || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         <span
                           className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
-                            project?.status
+                            plant?.status
                           )}`}
                         >
-                          {project?.status || "N/A"}
+                          {plant?.status || "N/A"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {fromatDateWithTime(project?.created_at) || "N/A"}
+                        {fromatDateWithTime(plant?.created_at) || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {fromatDateWithTime(project?.updated_at) || "N/A"}
+                        {fromatDateWithTime(plant?.updated_at) || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">
@@ -551,8 +549,8 @@ const Plants = () => {
                             <Eye
                               onClick={() =>
                                 handleViewDevices(
-                                  project?.project_id,
-                                  project?.organization_id
+                                  plant?.plant_id,
+                                  plant?.organization_id
                                 )
                               }
                               className="w-5 h-5 text-fuchsia-500 cursor-pointer"
@@ -562,9 +560,7 @@ const Plants = () => {
                           <span title="Edit plant" aria-label="Edit plant">
                             <Edit
                               onClick={() =>
-                                handleEditProject(
-                                  project?.project_id.toString()
-                                )
+                                handleEditPlant(plant?.plant_id.toString())
                               }
                               className="w-5 h-5 text-status-info cursor-pointer"
                             />
@@ -575,7 +571,7 @@ const Plants = () => {
                             aria-label="Edit diagram"
                             className="inline-flex cursor-pointer"
                             onClick={() =>
-                              navigate(`/diagram/${project?.project_id}`)
+                              navigate(`/diagram/${plant?.plant_id}`)
                             }
                           >
                             <ChartNetwork className="w-5 h-5 text-text-primary" />
@@ -588,9 +584,7 @@ const Plants = () => {
                             >
                               <Trash2
                                 onClick={() =>
-                                  handleDeleteProject(
-                                    project?.project_id.toString()
-                                  )
+                                  handleDeletePlant(plant?.plant_id.toString())
                                 }
                                 className="w-5 h-5 text-status-danger cursor-pointer"
                               />
@@ -648,7 +642,7 @@ const Plants = () => {
                             setSearchTerm("");
                             setFilterBy("all");
                           } else {
-                            handleAddProject();
+                            handleAddPlant();
                           }
                         }}
                       />
@@ -673,17 +667,17 @@ const Plants = () => {
         <AddUpdatePlant
           setShowModal={handleModalClose}
           type={showAddModalType}
-          projectId={projectId}
+          plantId={plantId}
           organizationId={
             selectedOrganizationId === "all"
               ? undefined
               : selectedOrganizationId
           }
-          onUpdateSuccess={handleProjectUpdate}
-          refreshProjects={
+          onUpdateSuccess={handlePlantUpdate}
+          refreshPlants={
             selectedOrganizationId === "all"
-              ? fetchProjects
-              : () => getProjectByOrganizationId(selectedOrganizationId)
+              ? fetchPlants
+              : () => getPlantByOrganizationId(selectedOrganizationId)
           }
         />
       )}
@@ -709,7 +703,7 @@ const Plants = () => {
             <div className="p-6">
               <p className="text-text-secondary mb-4 font-roboto">
                 Are you sure you want to delete this plant{" "}
-                <span className="font-bold">{projectTitle || "N/A"}</span>?
+                <span className="font-bold">{plantTitle || "N/A"}</span>?
               </p>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-border-primary">

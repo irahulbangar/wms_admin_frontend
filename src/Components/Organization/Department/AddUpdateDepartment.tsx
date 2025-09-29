@@ -1,17 +1,17 @@
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useAppDispatch } from "../../../store/store";
+import { useAppDispatch } from "../../../../store/store";
 import {
   createDepartment,
   getDepartmentById,
   updateDepartment,
-} from "../../../store/departmentSlice";
-import { Error, Success } from "../../utils/toast";
+} from "../../../../store/departmentSlice";
+import { Error, Success } from "../../../utils/toast";
 
 interface UpdateDepartmentProps {
   setShowAddDepartmentPopup: (show: boolean) => void;
   type: "add" | "update";
-  projectId?: number;
+  plantId?: number;
   departmentId?: number;
   onUpdateSuccess: () => void;
 }
@@ -19,7 +19,7 @@ interface UpdateDepartmentProps {
 const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
   setShowAddDepartmentPopup,
   type,
-  projectId,
+  plantId,
   departmentId,
   onUpdateSuccess,
 }) => {
@@ -62,7 +62,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
           createDepartment({
             department_name: newDepartmentName,
             department_info: "",
-            project_id: projectId || 0,
+            plant_id: plantId || 0,
           })
         )
           .unwrap()
@@ -81,7 +81,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
           updateDepartment({
             department_name: newDepartmentName,
             department_info: "",
-            project_id: projectId || 0,
+            plant_id: plantId || 0,
             department_id: departmentId || 0,
           })
         )

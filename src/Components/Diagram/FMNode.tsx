@@ -1,6 +1,6 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
-import type { NodeData } from "../../../model/single-project.interface";
+import type { NodeData } from "../../../model/single-plant.interface";
 
 interface FMNodeProps {
   data: NodeData;
@@ -13,7 +13,7 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
   const flowRate = Number(data.flowRate) || 0;
   const departmentConnection = data.departmentConnection || "none";
   const organizationConnection = data.organizationConnection || "none";
-  const projectConnection = data.projectConnection || "none";
+  const plantConnection = data.plantConnection || "none";
   const departmentName = data.departmentName || "none";
 
   return (
@@ -24,7 +24,7 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
       title={`
         Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
-Plant Connection : ${projectConnection}
+Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
 Totalizer Reading : ${totalizerReading} ${unit}
 Flow Rate : ${flowRate} LPM

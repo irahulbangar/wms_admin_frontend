@@ -47,13 +47,13 @@ export interface CreateDevicePayload {
   device_name: string;
   device_status: string;
   hwid: string;
-  project_id: number;
+  plant_id: number;
   device_type_id: number;
   device_family_id: number;
   department_id: number;
   visibility: string;
   department_connection: string;
-  project_connection: string;
+  plant_connection: string;
   organization_connection: string;
   device_flow_direction: string;
   params: object;
@@ -151,14 +151,14 @@ export const updateDevice = createAsyncThunk(
   }
 );
 
-// get device by project id
-export const getDeviceByProjectId = createAsyncThunk(
-  "device/getDeviceByProjectId",
-  async (projectId: number, thunkAPI) => {
+// get device by plant id
+export const getDeviceByPlantId = createAsyncThunk(
+  "device/getDeviceByPlantId",
+  async (plantId: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceResponse>(
-        `/device/admin/device-project/${projectId}`,
+        `/device/admin/device-plant/${plantId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -176,22 +176,22 @@ export const getDeviceByProjectId = createAsyncThunk(
   }
 );
 
-interface GetProjectByOrganizationId {
-  projectId: number;
+interface GetPlantByOrganizationId {
+  plantId: number;
   organizationId: number;
 }
 
-// Get device by organizationId and projectId
-export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
-  "device/getDeviceByOrganizationIdAndProjectId",
+// Get device by organizationId and plantId
+export const getDeviceByOrganizationIdAndPlantId = createAsyncThunk(
+  "device/getDeviceByOrganizationIdAndPlantId",
   async (
-    { projectId, organizationId }: GetProjectByOrganizationId,
+    { plantId, organizationId }: GetPlantByOrganizationId,
     thunkAPI
   ) => {
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceResponse>(
-        `/device/admin/project-organization/${projectId}/${organizationId}`,
+        `/device/admin/plant-organization/${plantId}/${organizationId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -203,7 +203,7 @@ export const getDeviceByOrganizationIdAndProjectId = createAsyncThunk(
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to get device by organizationId and projectId";
+          : "Failed to get device by organizationId and plantId";
       return rejectWithValue(errorMessage);
     }
   }

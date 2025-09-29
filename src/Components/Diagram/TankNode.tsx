@@ -1,6 +1,6 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
-import type { NodeData } from "../../../model/single-project.interface";
+import type { NodeData } from "../../../model/single-plant.interface";
 
 interface TankNodeProps {
   data: NodeData;
@@ -16,16 +16,17 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   const unit = data.unit || "Ltr";
   const departmentName = data.departmentName || "";
   const departmentConnection = data.departmentConnection || "";
-  const projectConnection = data.projectConnection || "";
+  const plantConnection = data.plantConnection || "";
   const organizationConnection = data.organizationConnection || "";
 
   return (
     <>
-      <div className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden"
-      title={`
+      <div
+        className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden"
+        title={`
 Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
-Plant Connection : ${projectConnection}
+Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
 Current Level : ${currentLevel} ${unit}
 Capacity : ${capacity} ${unit}

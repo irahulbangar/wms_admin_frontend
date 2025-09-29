@@ -18,7 +18,7 @@ import DiagramControls from "./Diagram/DiagramControls";
 import { ChartArea } from "lucide-react";
 
 const DiagramPage = () => {
-  const projectId = useParams().project_id;
+  const plantId = useParams().plant_id;
   const navigate = useNavigate();
 
   const {
@@ -33,7 +33,7 @@ const DiagramPage = () => {
     departmentDimensions,
     setDepartmentDimensions,
     saveDiagramToAPI,
-  } = useDiagramData(projectId);
+  } = useDiagramData(plantId);
 
   const {
     selectedEdge,

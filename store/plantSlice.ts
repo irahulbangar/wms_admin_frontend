@@ -1,61 +1,58 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type {
-  GetProjectsResponse,
-  ProjectResult,
-} from "../model/project.interface";
-import type { SingleProjectResponse } from "../model/single-project.interface";
 import type { NodesResult } from "../model/nodes.interface";
 import type { EdgesResult } from "../model/edges.interface";
+import type { GetPlantsResponse, PlantResult } from "../model/plant.interface";
+import type { SinglePlantResponse } from "../model/single-plant.interface";
 
-interface ProjectResponse {
+interface PlantResponse {
   success: boolean;
   message: string;
   data?: Record<string, unknown>;
 }
 
-interface ProjectState {
-  projects: ProjectResult[];
+interface PlantState {
+  plants: PlantResult[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: ProjectState = {
-  projects: [],
+const initialState: PlantState = {
+  plants: [],
   loading: false,
   error: null,
 };
 
-export const projectSlice = createSlice({
-  name: "project",
+export const plantSlice = createSlice({
+  name: "plant",
   initialState,
   reducers: {
-    setProjects: (state, action) => {
-      state.projects = action.payload;
+    setPlants: (state, action) => {
+      state.plants = action.payload;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getAllProjects.pending, (state) => {
+    builder.addCase(getAllPlants.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(getAllProjects.fulfilled, (state, action) => {
+    builder.addCase(getAllPlants.fulfilled, (state, action) => {
       state.loading = false;
-      state.projects = action.payload.data;
+      state.plants = action.payload.data;
     });
-    builder.addCase(getAllProjects.rejected, (state, action) => {
+    builder.addCase(getAllPlants.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.error.message || "Failed to fetch projects";
+      state.error = action.error.message || "Failed to fetch plants";
     });
   },
 });
 
-// Get all projects
-export const getAllProjects = createAsyncThunk(
-  "project/admin/getAllProjects",
+// Get all plants
+export const getAllPlants = createAsyncThunk(
+  "plant/admin/getAllPlants",
   async (_, thunkAPI) => {
     try {
-      const response = await api().get<GetProjectsResponse>(
-        "/project/admin/all-projects",
+      const response = await api().get<GetPlantsResponse>(
+        "/plant/admin/all-plants",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -65,19 +62,19 @@ export const getAllProjects = createAsyncThunk(
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch projects";
+        error instanceof Error ? error.message : "Failed to fetch plants";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
 
-// Get project by id
-export const getProjectById = createAsyncThunk(
-  "project/admin/getProjectById",
+// Get plant by id
+export const getPlantById = createAsyncThunk(
+  "plant/admin/getPlantById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get<SingleProjectResponse>(
-        `/project/admin/${id}`,
+      const response = await api().get<SinglePlantResponse>(
+        `/plant/admin/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -87,19 +84,19 @@ export const getProjectById = createAsyncThunk(
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch project";
+        error instanceof Error ? error.message : "Failed to fetch plant";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
 
-// Get all projects by organization id
-export const getProjectsByOrganizationId = createAsyncThunk(
-  "project/admin/getProjectsByOrganizationId",
+// Get all plants by organization id
+export const getPlantsByOrganizationId = createAsyncThunk(
+  "plant/admin/getPlantsByOrganizationId",
   async (organization_id: string, thunkAPI) => {
     try {
-      const response = await api().get<GetProjectsResponse>(
-        `/project/admin/organization-projects/${organization_id}`,
+      const response = await api().get<GetPlantsResponse>(
+        `/plant/admin/organization-plants/${organization_id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -109,14 +106,14 @@ export const getProjectsByOrganizationId = createAsyncThunk(
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch projects";
+        error instanceof Error ? error.message : "Failed to fetch plants";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
 
-interface ProjectPayload {
-  project_name: string;
+interface PlantPayload {
+  plant_name: string;
   latitude: string;
   longitude: string;
   address: string;
@@ -124,14 +121,14 @@ interface ProjectPayload {
   organization_id?: string;
 }
 
-// Add project
-export const addProject = createAsyncThunk(
-  "project/admin/addProject",
-  async (project: ProjectPayload, thunkAPI) => {
+// Add plant
+export const addPlant = createAsyncThunk(
+  "plant/admin/addPlant",
+  async (plant: PlantPayload, thunkAPI) => {
     try {
-      const response = await api().post<ProjectResponse>(
-        `/project/admin/create-project`,
-        project,
+      const response = await api().post<PlantResponse>(
+        `/plant/admin/create-plant`,
+        plant,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -141,20 +138,20 @@ export const addProject = createAsyncThunk(
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to add project";
+        error instanceof Error ? error.message : "Failed to add plant";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
 
-// Update project by id
-export const updateProjectById = createAsyncThunk(
-  "project/admin/updateProjectById",
-  async (project: ProjectPayload & { id: string }, thunkAPI) => {
+// Update plant by id
+export const updatePlantById = createAsyncThunk(
+  "plant/admin/updatePlantById",
+  async (plant: PlantPayload & { id: string }, thunkAPI) => {
     try {
-      const response = await api().put<ProjectResponse>(
-        `/project/admin/update-project/${project.id}`,
-        project,
+      const response = await api().put<PlantResponse>(
+        `/plant/admin/update-plant/${plant.id}`,
+        plant,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -164,19 +161,19 @@ export const updateProjectById = createAsyncThunk(
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to update project";
+        error instanceof Error ? error.message : "Failed to update plant";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
 
-// Delete project by id
-export const deleteProjectById = createAsyncThunk(
-  "project/deleteProjectById",
+// Delete plant by id
+export const deletePlantById = createAsyncThunk(
+  "plant/deletePlantById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().delete<ProjectResponse>(
-        `/project/admin/delete-project/${id}`,
+      const response = await api().delete<PlantResponse>(
+        `/plant/admin/delete-plant/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -186,25 +183,25 @@ export const deleteProjectById = createAsyncThunk(
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to delete project";
+        error instanceof Error ? error.message : "Failed to delete plant";
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
 );
 
 interface UpdateDiagramDataPayload {
-  project_id: number;
+  plant_id: number;
   nodes: NodesResult[];
   edges: EdgesResult[];
 }
 
 // Update diagram data (nodes and edges)
 export const updateDiagramData = createAsyncThunk(
-  "project/admin/updateDiagramData",
-  async ({ project_id, nodes, edges }: UpdateDiagramDataPayload, thunkAPI) => {
+  "plant/admin/updateDiagramData",
+  async ({ plant_id, nodes, edges }: UpdateDiagramDataPayload, thunkAPI) => {
     try {
       const response = await api().put(
-        `/project/admin/update-diagram/${project_id}`,
+        `/plant/admin/update-diagram/${plant_id}`,
         { nodes, edges },
         {
           headers: {
@@ -223,6 +220,6 @@ export const updateDiagramData = createAsyncThunk(
   }
 );
 
-export const { setProjects } = projectSlice.actions;
+export const { setPlants } = plantSlice.actions;
 
-export default projectSlice.reducer;
+export default plantSlice.reducer;

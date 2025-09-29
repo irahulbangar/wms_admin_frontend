@@ -1,6 +1,6 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
-import type { NodeData } from "../../../model/single-project.interface";
+import type { NodeData } from "../../../model/single-plant.interface";
 
 interface PHMCNodeProps {
   data: NodeData;
@@ -16,7 +16,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
   const currentB = data.currentB || 0;
   const frequency = data.frequency || 0;
   const departmentConnection = data.departmentConnection || "none";
-  const projectConnection = data.projectConnection || "none";
+  const plantConnection = data.plantConnection || "none";
   const organizationConnection = data.organizationConnection || "none";
   const departmentName = data.departmentName || "";
 
@@ -28,7 +28,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
       title={`
 Dept Name : ${departmentName}
 Dept Connection : ${departmentConnection}
-Plant Connection : ${projectConnection}
+Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
 Voltage (R) : ${voltageR / 10}V | Current (R) : ${currentR}A
 Voltage (Y) : ${voltageY / 10}V | Current (Y) : ${currentY}A
@@ -81,37 +81,37 @@ Frequency : ${frequency}Hz
             </div>
           </div>
         </div>
-          <div className="flex flex-col gap-0.5">
-            <div className="text-text-primary font-roboto text-[9px] font-medium text-center">
-              Current
+        <div className="flex flex-col gap-0.5">
+          <div className="text-text-primary font-roboto text-[9px] font-medium text-center">
+            Current
+          </div>
+          <div className="flex items-center justify-around gap-3">
+            <div className="flex flex-col gap-0.5">
+              <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+                R
+              </div>
+              <div className="font-medium text-status-danger font-roboto text-[9px]">
+                {currentR}A
+              </div>
             </div>
-            <div className="flex items-center justify-around gap-3">
-              <div className="flex flex-col gap-0.5">
-                <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
-                  R
-                </div>
-                <div className="font-medium text-status-danger font-roboto text-[9px]">
-                  {currentR}A
-                </div>
+            <div className="flex flex-col gap-0.5">
+              <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+                Y
               </div>
-              <div className="flex flex-col gap-0.5">
-                <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
-                  Y
-                </div>
-                <div className="font-medium text-status-warning font-roboto text-[9px]">
-                  {currentY}A
-                </div>
+              <div className="font-medium text-status-warning font-roboto text-[9px]">
+                {currentY}A
               </div>
-              <div className="flex flex-col gap-0.5">
-                <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
-                  B
-                </div>
-                <div className="font-medium text-status-info font-roboto text-[9px]">
-                  {currentB}A
-                </div>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+                B
+              </div>
+              <div className="font-medium text-status-info font-roboto text-[9px]">
+                {currentB}A
               </div>
             </div>
           </div>
+        </div>
       </div>
 
       <Handle

@@ -3,71 +3,71 @@ import { X } from "lucide-react";
 import { Success, Error } from "../../utils/toast";
 import { useAppDispatch } from "../../../store/store";
 import {
-  addProject,
-  updateProjectById,
-  getProjectById,
-} from "../../../store/projectSlice";
-import type { ProjectResult } from "../../../model/project.interface";
+  addPlant,
+  updatePlantById,
+  getPlantById,
+} from "../../../store/plantSlice";
+import type { PlantResult } from "../../../model/plant.interface";
 
-interface ProjectFormData {
-  project_name: string;
+interface PlantFormData {
+  plant_name: string;
   latitude: string;
   longitude: string;
   address: string;
   status: string;
 }
 
-interface AddUpdateProjectProps {
+interface AddUpdatePlantProps {
   setShowModal: (show: boolean) => void;
   type: "add" | "update";
-  projectId?: string;
+  plantId?: string;
   organizationId?: string;
   onUpdateSuccess?: (data: {
     success: boolean;
     data?: Record<string, unknown>;
   }) => void;
-  refreshProjects?: () => void;
+  refreshPlants?: () => void;
 }
 
-const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
+const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
   setShowModal,
   type,
-  projectId,
+  plantId,
   organizationId,
   onUpdateSuccess,
-  refreshProjects,
+  refreshPlants,
 }) => {
   const dispatch = useAppDispatch();
-  const [formData, setFormData] = useState<ProjectFormData>({
-    project_name: "",
+  const [formData, setFormData] = useState<PlantFormData>({
+    plant_name: "",
     latitude: "",
     longitude: "",
     address: "",
     status: "active",
   });
 
-  const [errors, setErrors] = useState<Partial<ProjectFormData>>({});
+  const [errors, setErrors] = useState<Partial<PlantFormData>>({});
 
   useEffect(() => {
-    if (type === "update" && projectId) {
-      loadProjectData();
+    if (type === "update" && plantId) {
+      loadPlantData();
     }
-  }, [type, projectId]);
+  }, [type, plantId]);
 
-  const loadProjectData = async () => {
-    if (!projectId) return;
+  const loadPlantData = async () => {
+    if (!plantId) return;
 
-    await dispatch(getProjectById(projectId))
+    await dispatch(getPlantById(plantId))
       .unwrap()
       .then((res) => {
         if (res.success && res.data) {
-          const project = res.data as unknown as ProjectResult;
+          const plant = res.data as unknown as PlantResult;
           const newFormData = {
-            project_name: project.project_name || "",
-            latitude: project.latitude || "",
-            longitude: project.longitude || "",
-            address: project.address || "",
-            status: project.status || "active",
+            plant_name: plant.plant_name || "",
+            latitude: plant.latitude || "",
+            longitude: plant.longitude || "",
+            address: plant.address || "",
+            status: plant.status || "active",
           };
           setFormData(newFormData);
         } else {
@@ -80,10 +80,10 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<ProjectFormData> = {};
+    const newErrors: Partial<PlantFormData> = {};
 
-    if (!formData.project_name.trim()) {
-      newErrors.project_name = "Plant name is required";
+    if (!formData.plant_name.trim()) {
+      newErrors.plant_name = "Plant name is required";
     }
 
     if (!formData.latitude.trim()) {
@@ -113,7 +113,7 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
       [name]: value,
     }));
 
-    if (errors[name as keyof ProjectFormData]) {
+    if (errors[name as keyof PlantFormData]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
@@ -134,19 +134,19 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
     }
 
     if (type === "add") {
-      const projectPayload = {
+      const plantPayload = {
         ...formData,
         organization_id: organizationId,
       };
 
-      await dispatch(addProject(projectPayload))
+      await dispatch(addPlant(plantPayload))
         .unwrap()
         .then((res) => {
           if (res.success) {
             Success(res.message);
             setShowModal(false);
-            if (refreshProjects) {
-              refreshProjects();
+            if (refreshPlants) {
+              refreshPlants();
             }
             if (onUpdateSuccess) {
               onUpdateSuccess({
@@ -162,25 +162,25 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           Error(`Failed to add plant: ${error}`);
         });
     } else {
-      if (!projectId) {
+      if (!plantId) {
         Error("Plant ID is required for update");
         return;
       }
 
-      const projectPayload = {
+      const plantPayload = {
         ...formData,
-        id: projectId,
+        id: plantId,
         organization_id: organizationId,
       };
 
-      await dispatch(updateProjectById(projectPayload))
+      await dispatch(updatePlantById(plantPayload))
         .unwrap()
         .then((res) => {
           if (res.success) {
             Success(res.message);
             setShowModal(false);
-            if (refreshProjects) {
-              refreshProjects();
+            if (refreshPlants) {
+              refreshPlants();
             }
             if (onUpdateSuccess) {
               onUpdateSuccess({
@@ -223,18 +223,18 @@ const AddUpdatePlant: React.FC<AddUpdateProjectProps> = ({
           </label>
           <input
             type="text"
-            name="project_name"
-            value={formData.project_name}
+            name="plant_name"
+            value={formData.plant_name}
             onChange={handleInputChange}
             className={`w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
-              errors.project_name
+              errors.plant_name
                 ? "border-status-danger"
                 : "border-border-primary"
             }`}
             placeholder="Enter plant name"
           />
-          {errors.project_name && (
-            <p className="text-status-danger text-sm">{errors.project_name}</p>
+          {errors.plant_name && (
+            <p className="text-status-danger text-sm">{errors.plant_name}</p>
           )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">

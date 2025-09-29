@@ -16,7 +16,7 @@ import type { DeviceResult } from "../../../model/devices.interface";
 import {
   deleteDevice,
   getAllDevices,
-  getDeviceByOrganizationIdAndProjectId,
+  getDeviceByOrganizationIdAndPlantId,
   setDevices,
 } from "../../../store/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -24,7 +24,7 @@ import {
   getOrganizations,
   setOrganizations,
 } from "../../../store/organizationSlice";
-import { getAllProjects, setProjects } from "../../../store/projectSlice";
+import { getAllPlants, setPlants } from "../../../store/plantSlice";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import { fromatDateWithTime } from "../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
@@ -33,15 +33,15 @@ import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import type { DepartmentResult } from "../../../model/department.interface";
 import { getDepartments } from "../../../store/departmentSlice";
-import AddUpdateDepartment from "./AddUpdateDepartment";
+import AddUpdateDepartment from "./Department/AddUpdateDepartment";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 import DeletePopup from "./DeletePopup";
 
 const Devices = () => {
   const navigate = useNavigate();
-  const { project_id, organization_id } = useParams<{
-    project_id: string;
+  const { plant_id, organization_id } = useParams<{
+    plant_id: string;
     organization_id: string;
   }>();
 
@@ -53,12 +53,12 @@ const Devices = () => {
   const [selectedOrganization, setSelectedOrganization] = useState(
     organization_id || "all"
   );
-  const [selectedProject, setSelectedProject] = useState(project_id || "all");
+  const [selectedPlant, setSelectedPlant] = useState(plant_id || "all");
   const { organizations } = useAppSelector((state) => state.organization);
-  const { projects } = useAppSelector((state) => state.project);
+  const { plants } = useAppSelector((state) => state.plant);
   const { devices } = useAppSelector((state) => state.device);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
-  const [projectId, setProjectId] = useState<number | null>(null);
+  const [plantId, setPlantId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
   const dispatch = useAppDispatch();
@@ -70,12 +70,12 @@ const Devices = () => {
   const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
   const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
     useState(false);
-  const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
+  const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
-  const [projectSearchTerm, setProjectSearchTerm] = useState("");
+  const [plantSearchTerm, setPlantSearchTerm] = useState("");
   const [organizationId, setOrganizationId] = useState<number>(0);
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
-  const projectDropdownRef = useRef<HTMLDivElement>(null);
+  const plantDropdownRef = useRef<HTMLDivElement>(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deviceName, setDeviceName] = useState<string | null>(null);
   const [deviceToDelete, setDeviceToDelete] = useState<DeviceResult | null>(
@@ -93,11 +93,11 @@ const Devices = () => {
         setOrganizationSearchTerm("");
       }
       if (
-        projectDropdownRef.current &&
-        !projectDropdownRef.current.contains(event.target as Node)
+        plantDropdownRef.current &&
+        !plantDropdownRef.current.contains(event.target as Node)
       ) {
-        setIsProjectDropdownOpen(false);
-        setProjectSearchTerm("");
+        setIsPlantDropdownOpen(false);
+        setPlantSearchTerm("");
       }
     };
 
@@ -144,19 +144,19 @@ const Devices = () => {
       });
   }, [dispatch]);
 
-  const fetchProjects = useCallback(async () => {
+  const fetchPlants = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    await dispatch(getAllProjects())
+    await dispatch(getAllPlants())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          dispatch(setProjects(res.data));
+          dispatch(setPlants(res.data));
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get projects");
+        Error("Failed to get plants");
       })
       .finally(() => {
         setIsLoading(false);
@@ -199,22 +199,22 @@ const Devices = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (organizations.length === 0 || projects.length === 0) {
+    if (organizations.length === 0 || plants.length === 0) {
       getOrganization();
-      fetchProjects();
+      fetchPlants();
     }
     getDeviceFamily();
     getDeviceType();
     getDepartment();
 
-    if (organization_id && project_id) {
+    if (organization_id && plant_id) {
       setIsLoading(true);
       setSelectedOrganization(organization_id);
-      setSelectedProject(project_id);
+      setSelectedPlant(plant_id);
 
       dispatch(
-        getDeviceByOrganizationIdAndProjectId({
-          projectId: parseInt(project_id),
+        getDeviceByOrganizationIdAndPlantId({
+          plantId: parseInt(plant_id),
           organizationId: parseInt(organization_id),
         })
       )
@@ -234,14 +234,14 @@ const Devices = () => {
         });
     } else {
       setSelectedOrganization("all");
-      setSelectedProject("all");
+      setSelectedPlant("all");
     }
   }, [
     organization_id,
-    project_id,
+    plant_id,
     dispatch,
     getOrganization,
-    fetchProjects,
+    fetchPlants,
     getDeviceFamily,
     getDeviceType,
     getDepartment,
@@ -269,17 +269,17 @@ const Devices = () => {
   }, [dispatch, setFilteredDevices, setDevices]);
 
   useEffect(() => {
-    if (organization_id && project_id) {
+    if (organization_id && plant_id) {
       return;
     }
 
-    if (selectedOrganization === "all" && selectedProject === "all") {
+    if (selectedOrganization === "all" && selectedPlant === "all") {
       refreshDevices();
-    } else if (selectedOrganization !== "all" && selectedProject !== "all") {
+    } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
       setIsLoading(true);
       dispatch(
-        getDeviceByOrganizationIdAndProjectId({
-          projectId: parseInt(selectedProject),
+        getDeviceByOrganizationIdAndPlantId({
+          plantId: parseInt(selectedPlant),
           organizationId: parseInt(selectedOrganization),
         })
       )
@@ -300,10 +300,10 @@ const Devices = () => {
     }
   }, [
     selectedOrganization,
-    selectedProject,
+    selectedPlant,
     dispatch,
     organization_id,
-    project_id,
+    plant_id,
     refreshDevices,
   ]);
 
@@ -329,19 +329,18 @@ const Devices = () => {
     }
 
     if (selectedOrganization !== "all") {
-      const orgProjectIds = projects
+      const orgPlantIds = plants
         .filter((p) => p.organization_id === parseInt(selectedOrganization))
-        .map((p) => p.project_id);
+        .map((p) => p.plant_id);
 
       filtered = filtered.filter((device: DeviceResult) =>
-        orgProjectIds.includes(device.project_id)
+        orgPlantIds.includes(device.plant_id)
       );
     }
 
-    if (selectedProject !== "all") {
+    if (selectedPlant !== "all") {
       filtered = filtered.filter(
-        (device: DeviceResult) =>
-          device.project_id === parseInt(selectedProject)
+        (device: DeviceResult) => device.plant_id === parseInt(selectedPlant)
       );
     }
 
@@ -350,8 +349,8 @@ const Devices = () => {
     devices,
     searchTerm,
     selectedOrganization,
-    selectedProject,
-    projects,
+    selectedPlant,
+    plants,
     deviceFamily,
   ]);
 
@@ -361,10 +360,10 @@ const Devices = () => {
       .includes(organizationSearchTerm.toLowerCase())
   );
 
-  const filteredProjects = projects.filter((proj) => {
-    const matchesSearch = proj.project_name
+  const filteredPlants = plants.filter((proj) => {
+    const matchesSearch = proj.plant_name
       .toLowerCase()
-      .includes(projectSearchTerm.toLowerCase());
+      .includes(plantSearchTerm.toLowerCase());
 
     if (selectedOrganization === "all") {
       return matchesSearch;
@@ -382,7 +381,7 @@ const Devices = () => {
         setIsOrganizationDropdownOpen(false);
       }
       if (!target.closest(".plant-dropdown")) {
-        setIsProjectDropdownOpen(false);
+        setIsPlantDropdownOpen(false);
       }
     };
 
@@ -394,22 +393,22 @@ const Devices = () => {
 
   useEffect(() => {
     if (selectedOrganization !== "all") {
-      const selectedPlant = projects.find(
-        (proj) => proj.project_id.toString() === selectedProject
+      const selectedPlants = plants.find(
+        (proj) => proj.plant_id.toString() === selectedPlant
       );
 
       if (
-        selectedPlant &&
-        selectedPlant.organization_id !== parseInt(selectedOrganization)
+        selectedPlants &&
+        selectedPlants.organization_id !== parseInt(selectedOrganization)
       ) {
-        setSelectedProject("all");
-        setProjectSearchTerm("");
+        setSelectedPlant("all");
+        setPlantSearchTerm("");
       }
     }
-  }, [selectedOrganization, selectedProject, projects]);
+  }, [selectedOrganization, selectedPlant, plants]);
 
   const handleAddDevice = () => {
-    if (selectedOrganization === "all" || selectedProject === "all") {
+    if (selectedOrganization === "all" || selectedPlant === "all") {
       Warning(
         "Please select both organization and plant before adding a device"
       );
@@ -417,24 +416,24 @@ const Devices = () => {
     }
 
     setIsAddDeviceOpen(true);
-    setProjectId(parseInt(selectedProject));
+    setPlantId(parseInt(selectedPlant));
     setOrganizationId(parseInt(selectedOrganization));
   };
 
   const handleEditDevice = (
     deviceId: number,
-    projectId: number,
+    plantId: number,
     departmentId: number,
     organizationId?: number
   ) => {
     const derivedOrganizationId: number =
       organizationId ||
-      projects.find((p) => p.project_id === projectId)?.organization_id ||
+      plants.find((p) => p.plant_id === plantId)?.organization_id ||
       (selectedOrganization !== "all" ? parseInt(selectedOrganization) : 0);
 
     setEditingDeviceId(deviceId);
     setIsEditDeviceOpen(true);
-    setProjectId(projectId);
+    setPlantId(plantId);
     setDepartmentId(departmentId);
     if (!derivedOrganizationId) {
       Warning(
@@ -451,7 +450,7 @@ const Devices = () => {
         refreshDeviceFamilies?: boolean;
         refreshDeviceTypes?: boolean;
         refreshOrganizations?: boolean;
-        refreshProjects?: boolean;
+        refreshPlants?: boolean;
       };
     }) => {
       if (isLoading) return;
@@ -476,17 +475,17 @@ const Devices = () => {
         return;
       }
 
-      if (result?.data?.refreshProjects) {
-        fetchProjects();
+      if (result?.data?.refreshPlants) {
+        fetchPlants();
         return;
       }
 
       setIsLoading(true);
 
-      if (organization_id && project_id) {
+      if (organization_id && plant_id) {
         dispatch(
-          getDeviceByOrganizationIdAndProjectId({
-            projectId: parseInt(project_id),
+          getDeviceByOrganizationIdAndPlantId({
+            plantId: parseInt(plant_id),
             organizationId: parseInt(organization_id),
           })
         )
@@ -504,10 +503,10 @@ const Devices = () => {
           .finally(() => {
             setIsLoading(false);
           });
-      } else if (selectedOrganization !== "all" && selectedProject !== "all") {
+      } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
         dispatch(
-          getDeviceByOrganizationIdAndProjectId({
-            projectId: parseInt(selectedProject),
+          getDeviceByOrganizationIdAndPlantId({
+            plantId: parseInt(selectedPlant),
             organizationId: parseInt(selectedOrganization),
           })
         )
@@ -532,9 +531,9 @@ const Devices = () => {
     [
       dispatch,
       selectedOrganization,
-      selectedProject,
+      selectedPlant,
       organization_id,
-      project_id,
+      plant_id,
       refreshDevices,
     ]
   );
@@ -577,7 +576,7 @@ const Devices = () => {
     });
   };
 
-  const handleBackToProjects = () => {
+  const handleBackToPlants = () => {
     navigate("/organization/plants");
   };
 
@@ -590,7 +589,7 @@ const Devices = () => {
   };
 
   const handleEditDepartment = (deptId: string) => {
-    if (selectedProject === "all") {
+    if (selectedPlant === "all") {
       Warning(
         "Please select a plant from the dropdown before updating the department"
       );
@@ -600,10 +599,10 @@ const Devices = () => {
     const deptDevices = groupedDevices[deptId] || [];
     const firstDevice = deptDevices[0];
 
-    if (firstDevice && firstDevice.project_id) {
+    if (firstDevice && firstDevice.plant_id) {
       setIsEditDepartmentOpen(true);
       setDepartmentId(parseInt(deptId));
-      setProjectId(parseInt(selectedProject));
+      setPlantId(parseInt(selectedPlant));
     } else {
       Warning(
         "No plant found for this department. Please ensure devices are assigned to this department."
@@ -677,23 +676,20 @@ const Devices = () => {
           <span>Organization</span>
         </button>
 
-        <>
-          <ChevronRight className="w-4 h-4 text-text-muted" />
-          <button
-            onClick={handleBackToProjects}
-            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-          >
-            <span>Plants</span>
-          </button>
-        </>
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+        <button
+          onClick={handleBackToPlants}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Plants</span>
+        </button>
 
-        {selectedProject !== "all" && (
+        {selectedPlant !== "all" && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
-              {projects.find(
-                (proj) => proj.project_id.toString() === selectedProject
-              )?.project_name || "Plant"}
+              {plants.find((proj) => proj.plant_id.toString() === selectedPlant)
+                ?.plant_name || "Plant"}
             </span>
           </>
         )}
@@ -753,10 +749,10 @@ const Devices = () => {
                   className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                   onClick={() => {
                     setSelectedOrganization("all");
-                    setSelectedProject("all");
+                    setSelectedPlant("all");
                     setIsOrganizationDropdownOpen(false);
                     setOrganizationSearchTerm("");
-                    setProjectSearchTerm("");
+                    setPlantSearchTerm("");
                   }}
                 >
                   All Organization
@@ -769,10 +765,10 @@ const Devices = () => {
                       className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                       onClick={() => {
                         setSelectedOrganization(org.organization_id.toString());
-                        setSelectedProject("all");
+                        setSelectedPlant("all");
                         setIsOrganizationDropdownOpen(false);
                         setOrganizationSearchTerm(org.organization_name);
-                        setProjectSearchTerm("");
+                        setPlantSearchTerm("");
                       }}
                     >
                       {org.organization_name}
@@ -788,31 +784,31 @@ const Devices = () => {
           </div>
           <div
             className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
-            ref={projectDropdownRef}
+            ref={plantDropdownRef}
           >
             <div className="relative">
               <input
                 type="text"
                 placeholder="Select plant..."
                 value={
-                  selectedProject === "all"
+                  selectedPlant === "all"
                     ? "All Plant"
-                    : projects.find(
-                        (proj) => proj.project_id.toString() === selectedProject
-                      )?.project_name || "Select plant..."
+                    : plants.find(
+                        (proj) => proj.plant_id.toString() === selectedPlant
+                      )?.plant_name || "Select plant..."
                 }
                 readOnly
                 className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
-                onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
+                onClick={() => setIsPlantDropdownOpen(!isPlantDropdownOpen)}
               />
               <ChevronDown
                 className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
-                  isProjectDropdownOpen ? "rotate-180" : ""
+                  isPlantDropdownOpen ? "rotate-180" : ""
                 }`}
               />
             </div>
 
-            {isProjectDropdownOpen && (
+            {isPlantDropdownOpen && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
                 <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
                   <div className="relative">
@@ -820,8 +816,8 @@ const Devices = () => {
                     <input
                       type="text"
                       placeholder="Search plants..."
-                      value={projectSearchTerm}
-                      onChange={(e) => setProjectSearchTerm(e.target.value)}
+                      value={plantSearchTerm}
+                      onChange={(e) => setPlantSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -831,26 +827,26 @@ const Devices = () => {
                 <div
                   className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                   onClick={() => {
-                    setSelectedProject("all");
-                    setIsProjectDropdownOpen(false);
-                    setProjectSearchTerm("");
+                    setSelectedPlant("all");
+                    setIsPlantDropdownOpen(false);
+                    setPlantSearchTerm("");
                   }}
                 >
                   All Plant
                 </div>
 
-                {filteredProjects.length > 0 ? (
-                  filteredProjects.map((proj) => (
+                {filteredPlants.length > 0 ? (
+                  filteredPlants.map((proj) => (
                     <div
-                      key={proj.project_id}
+                      key={proj.plant_id}
                       className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                       onClick={() => {
-                        setSelectedProject(proj.project_id.toString());
-                        setIsProjectDropdownOpen(false);
-                        setProjectSearchTerm(proj.project_name);
+                        setSelectedPlant(proj.plant_id.toString());
+                        setIsPlantDropdownOpen(false);
+                        setPlantSearchTerm(proj.plant_name);
                       }}
                     >
-                      {proj.project_name}
+                      {proj.plant_name}
                     </div>
                   ))
                 ) : (
@@ -1029,11 +1025,11 @@ const Devices = () => {
                               </td>
                               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 {
-                                  projects?.find(
+                                  plants?.find(
                                     (p) =>
-                                      p?.project_id?.toString() ===
-                                      device?.project_id?.toString()
-                                  )?.project_name
+                                      p?.plant_id?.toString() ===
+                                      device?.plant_id?.toString()
+                                  )?.plant_name
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize truncate">
@@ -1076,7 +1072,7 @@ const Devices = () => {
                                       onClick={() =>
                                         handleEditDevice(
                                           device?.device_id,
-                                          device?.project_id,
+                                          device?.plant_id,
                                           device?.department_id,
                                           device?.organization_id
                                         )
@@ -1173,7 +1169,7 @@ const Devices = () => {
           setShowAddModal={setIsAddDeviceOpen}
           type="add"
           deviceId={0}
-          project_id={projectId}
+          plant_id={plantId}
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
@@ -1188,7 +1184,7 @@ const Devices = () => {
           setShowAddModal={setIsEditDeviceOpen}
           type="update"
           deviceId={editingDeviceId}
-          project_id={projectId}
+          plant_id={plantId}
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
@@ -1198,12 +1194,12 @@ const Devices = () => {
         />
       )}
 
-      {isEditDepartmentOpen && projectId && (
+      {isEditDepartmentOpen && plantId && (
         <AddUpdateDepartment
           setShowAddDepartmentPopup={setIsEditDepartmentOpen}
           type="update"
           departmentId={departmentId}
-          projectId={projectId}
+          plantId={plantId}
           onUpdateSuccess={handleDepartmentUpdate}
         />
       )}

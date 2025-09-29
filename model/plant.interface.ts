@@ -1,13 +1,13 @@
-export interface GetProjectsResponse {
+export interface GetPlantsResponse {
   success: boolean;
   message: string;
-  data: ProjectResult[];
+  data: PlantResult[];
 }
 
-export interface ProjectResult {
-  project_id: number;
+export interface PlantResult {
+  plant_id: number;
   organization_id: number;
-  project_name: string;
+  plant_name: string;
   latitude: string;
   longitude: string;
   address: string;

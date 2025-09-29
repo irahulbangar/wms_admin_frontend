@@ -12,7 +12,7 @@ import {
 
 import { Error, Success } from "../../utils/toast";
 import type { DepartmentResult } from "../../../model/department.interface";
-import AddUpdateDepartment from "./AddUpdateDepartment";
+import AddUpdateDepartment from "./Department/AddUpdateDepartment";
 import { getDepartments } from "../../../store/departmentSlice";
 
 interface AddUpdateDeviceProps {
@@ -23,7 +23,7 @@ interface AddUpdateDeviceProps {
     success: boolean;
     data?: Record<string, unknown>;
   }) => void;
-  project_id: number | null;
+  plant_id: number | null;
   familyData: DeviceFamilyResult[];
   typeData: DeviceTypeResult[];
   departmentData: DepartmentResult[];
@@ -36,7 +36,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   type,
   deviceId,
   onUpdateSuccess,
-  project_id,
+  plant_id,
   familyData,
   typeData,
   departmentData,
@@ -47,7 +47,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<CreateDevicePayload>({
-    project_id: project_id || 0,
+    plant_id: plant_id || 0,
     device_family_id: 0,
     device_type_id: 0,
     device_name: "",
@@ -57,7 +57,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     organization_id: organizationId,
     visibility: "",
     department_connection: "",
-    project_connection: "",
+    plant_connection: "",
     organization_connection: "",
     device_flow_direction: "",
     params: {},
@@ -117,7 +117,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
   const resetForm = () => {
     setFormData({
-      project_id: project_id || 0,
+      plant_id: plant_id || 0,
       device_family_id: 0,
       device_type_id: 0,
       device_name: "",
@@ -128,7 +128,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       organization_id: organizationId,
       visibility: "",
       department_connection: "",
-      project_connection: "",
+      plant_connection: "",
       organization_connection: "",
       device_flow_direction: "",
     });
@@ -224,7 +224,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     setIsLoading(true);
     try {
       const deviceData = {
-        project_id: project_id || 0,
+        plant_id: plant_id || 0,
         device_family_id: formData.device_family_id,
         device_type_id: formData.device_type_id,
         device_name: formData.device_name,
@@ -234,7 +234,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_id: formData.organization_id || organizationId,
         visibility: formData.visibility,
         department_connection: formData.department_connection,
-        project_connection: formData.project_connection,
+        plant_connection: formData.plant_connection,
         organization_connection: formData.organization_connection,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
@@ -296,7 +296,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           if (res.success) {
             const deviceData = res.data;
             setFormData({
-              project_id: project_id || 0,
+              plant_id: plant_id || 0,
               device_family_id: deviceData.device_family_id,
               device_type_id: deviceData.device_type_id,
               device_name: deviceData.device_name,
@@ -307,7 +307,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               params: deviceData.params,
               visibility: deviceData.visibility,
               department_connection: deviceData.department_connection,
-              project_connection: deviceData.project_connection,
+              plant_connection: deviceData.plant_connection,
               organization_connection: deviceData.organization_connection,
               device_flow_direction: deviceData.device_flow_direction,
             });
@@ -368,7 +368,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         });
     } else if (type === "add") {
       setFormData({
-        project_id: project_id || 0,
+        plant_id: plant_id || 0,
         device_family_id: 0,
         device_type_id: 0,
         device_name: "",
@@ -379,7 +379,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         params: {},
         visibility: "",
         department_connection: "",
-        project_connection: "",
+        plant_connection: "",
         organization_connection: "",
         device_flow_direction: "",
       });
@@ -388,7 +388,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     type,
     deviceId,
     dispatch,
-    project_id,
+    plant_id,
     departmentId,
     familyData,
     organizationId,
@@ -667,6 +667,45 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Report Type
+                </label>
+                <select
+                  name="system_connection"
+                  value={formData.department_connection}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Report Type</option>
+                  <option value="in">In</option>
+                  <option value="out">Out</option>
+                  <option value="storage">Storage</option>
+                  <option value="percolation">Percolation</option>
+                  <option value="evaporation">Evaporation</option>
+                  <option value="westage">Westage</option>
+                  <option value="consumption">Consumption</option>
+                  <option value="regeneration">Regeneration</option>
+                  <option value="re-use">Re-use</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  System Connection
+                </label>
+                <select
+                  name="system_connection"
+                  value={formData.department_connection}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Department Connection</option>
+                  <option value="none">None</option>
+                  <option value="in">In</option>
+                  <option value="out">Out</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                   Department Connection
                 </label>
                 <select
@@ -688,8 +727,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   Plant Connection
                 </label>
                 <select
-                  name="project_connection"
-                  value={formData.project_connection}
+                  name="plant_connection"
+                  value={formData.plant_connection}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
@@ -1142,7 +1181,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         <AddUpdateDepartment
           setShowAddDepartmentPopup={setShowAddDepartmentPopup}
           type="add"
-          projectId={project_id || 0}
+          plantId={plant_id || 0}
           departmentId={departmentId}
           onUpdateSuccess={() => {
             refreshDepartmentData();

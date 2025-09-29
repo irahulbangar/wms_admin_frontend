@@ -76,6 +76,22 @@ function App() {
                   }
                 />
                 <Route
+                  path="/organization/departments"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/organization/departments/:plant_id/:organization_id"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/organization/devices"
                   element={
                     <ProtectedRoute>
@@ -84,7 +100,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/devices/:project_id/:organization_id"
+                  path="/organization/devices/:plant_id/:organization_id"
                   element={
                     <ProtectedRoute>
                       <HomePage />
@@ -132,7 +148,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/diagram/:project_id"
+                  path="/diagram/:plant_id"
                   element={
                     <ProtectedRoute>
                       <DiagramPage />

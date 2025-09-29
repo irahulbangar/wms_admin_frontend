@@ -6,7 +6,7 @@ export interface DeviceResponse {
 
 export interface DeviceResult {
   device_id: number;
-  project_id: number;
+  plant_id: number;
   device_family_id: number;
   device_type_id: number;
   hwid: string;
@@ -22,7 +22,7 @@ export interface DeviceResult {
   is_deleted: boolean;
   department_connection: string;
   organization_id?: number;
-  project_connection: string;
+  plant_connection: string;
   organization_connection: string;
   device_family: string;
   name: string;
@@ -30,7 +30,7 @@ export interface DeviceResult {
   device_type: string;
   device_type_name: string;
   department_name: string;
-  project_name: string;
+  plant_name: string;
   latitude: string;
   longitude: string;
   address: string;

@@ -1,5 +1,5 @@
 import type { DeviceResult } from "../../../../model/devices.interface";
-import type { NodeData } from "../../../../model/single-project.interface";
+import type { NodeData } from "../../../../model/single-plant.interface";
 
 export interface DiagramNode {
   id: string;
@@ -44,81 +44,81 @@ export interface DepartmentCalculations {
 export const convertDevicesToDiagram = (
   devices: DeviceResult[],
   departmentDimensions: Record<string, { width: number; height: number }>,
-  projectData?: { project_name: string; project_id: number }
+  plantData?: { plant_name: string; plant_id: number }
 ): { nodes: DiagramNode[]; edges: DiagramEdge[] } => {
   const nodes: DiagramNode[] = [];
   const edges: DiagramEdge[] = [];
 
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
 
-  const projectGroups = visibleDevices.reduce((acc, device) => {
-    const projectId = device.project_id.toString();
-    if (!acc[projectId]) {
-      acc[projectId] = {
-        project_id: device.project_id,
-        project_name: projectData?.project_name || device.project_name || `Project ${device.project_id}`,
+  const plantGroups = visibleDevices.reduce((acc, device) => {
+    const plantId = device.plant_id.toString();
+    if (!acc[plantId]) {
+      acc[plantId] = {
+        plant_id: device.plant_id,
+        plant_name: plantData?.plant_name || device.plant_name || `Plant ${device.plant_id}`,
         departments: {},
       };
     } else {
-      if (device.project_name && device.project_name !== acc[projectId].project_name && !projectData?.project_name) {
-        acc[projectId].project_name = device.project_name;
+      if (device.plant_name && device.plant_name !== acc[plantId].plant_name && !plantData?.plant_name) {
+        acc[plantId].plant_name = device.plant_name;
       }
     }
-    
+
     const deptId = device.department_id.toString();
-    if (!acc[projectId].departments[deptId]) {
-      acc[projectId].departments[deptId] = {
+    if (!acc[plantId].departments[deptId]) {
+      acc[plantId].departments[deptId] = {
         department_id: device.department_id,
         department_name: device.department_name || `Department ${device.department_id}`,
         devices: [],
       };
     } else {
-      if (device.department_name && device.department_name !== acc[projectId].departments[deptId].department_name) {
-        acc[projectId].departments[deptId].department_name = device.department_name;
+      if (device.department_name && device.department_name !== acc[plantId].departments[deptId].department_name) {
+        acc[plantId].departments[deptId].department_name = device.department_name;
       }
     }
-    acc[projectId].departments[deptId].devices.push(device);
+    acc[plantId].departments[deptId].devices.push(device);
     return acc;
-  }, {} as Record<string, { project_id: number; project_name: string; departments: Record<string, DepartmentGroup> }>);
+  }, {} as Record<string, { plant_id: number; plant_name: string; departments: Record<string, DepartmentGroup> }>);
 
-  Object.values(projectGroups).forEach((project, projectIndex) => {
-    const projectId = `project-${project.project_id}`;
-    
-    // Calculate dynamic project dimensions based on department count and content
-    const departmentCount = Object.values(project.departments).length;
-    
+  Object.values(plantGroups).forEach((plant, plantIndex) => {
+    const plantId = `plant-${plant.plant_id}`;
+
+    // Calculate dynamic plant dimensions based on department count and content
+    const departmentCount = Object.values(plant.departments).length;
+
     // Calculate optimal grid layout
     const maxDepartmentsPerRow = departmentCount <= 2 ? 2 : departmentCount <= 6 ? 3 : 4;
     const totalRows = Math.ceil(departmentCount / maxDepartmentsPerRow);
-    
+
     // Calculate department dimensions first
     const departmentSpacing = 20;
-    const projectPadding = 40;
+    const plantPadding = 40;
     const minDepartmentWidth = 650; // Minimum department width
     const minDepartmentHeight = 550; // Minimum department height
-    
-    // Calculate project width based on department count (minimum 1200px)
-    const projectWidth = Math.max(1200, projectPadding * 2 + maxDepartmentsPerRow * minDepartmentWidth + (maxDepartmentsPerRow - 1) * departmentSpacing);
-    
-    // Calculate project height based on department rows and content (minimum 650px)
-    const projectHeight = Math.max(650, projectPadding * 2 + 60 + totalRows * minDepartmentHeight + (totalRows - 1) * departmentSpacing);
-    
-    // Calculate project positioning based on dynamic width
-    const projectSpacing = 100; // Base spacing between projects
-    const projectX = projectIndex * (projectWidth + projectSpacing) + 0;
-    const projectY = 20;
+
+    // Calculate plant width based on department count (minimum 1200px)
+    const plantWidth = Math.max(1200, plantPadding * 2 + maxDepartmentsPerRow * minDepartmentWidth + (maxDepartmentsPerRow - 1) * departmentSpacing);
+
+    // Calculate plant height based on department rows and content (minimum 650px)
+    const plantHeight = Math.max(650, plantPadding * 2 + 60 + totalRows * minDepartmentHeight + (totalRows - 1) * departmentSpacing);
+
+    // Calculate plant positioning based on dynamic width
+    const plantSpacing = 100; // Base spacing between plants
+    const plantX = plantIndex * (plantWidth + plantSpacing) + 0;
+    const plantY = 20;
 
     nodes.push({
-      id: projectId,
+      id: plantId,
       data: {
-        label: project.project_name,
-        type: "project",
+        label: plant.plant_name,
+        type: "plant",
         unit: "Ltr",
       },
-      position: { x: projectX, y: projectY },
+      position: { x: plantX, y: plantY },
       style: {
-        width: projectWidth,
-        height: projectHeight,
+        width: plantWidth,
+        height: plantHeight,
         borderRadius: 15,
         border: "3px solid #3b82f6",
         backgroundColor: "rgba(59, 130, 246, 0.1)",
@@ -126,30 +126,30 @@ export const convertDevicesToDiagram = (
         pointerEvents: "auto",
       },
       type: "group",
-      width: projectWidth,
-      height: projectHeight,
+      width: plantWidth,
+      height: plantHeight,
       draggable: true,
       selectable: true,
       deletable: false,
       dragHandle: ".group-drag-handle",
     });
 
-      // Calculate available space for departments within dynamic project boundaries
-      const availableWidth = projectWidth - (2 * projectPadding);
-      const availableHeight = projectHeight - (2 * projectPadding) - 40; // 40px for project header
-      
-      // Calculate department dimensions based on available space
-      const departmentWidth = Math.max(minDepartmentWidth, (availableWidth - (maxDepartmentsPerRow - 1) * departmentSpacing) / maxDepartmentsPerRow);
-      const departmentHeight = Math.max(minDepartmentHeight, (availableHeight - (totalRows - 1) * departmentSpacing) / totalRows);
-      
-      Object.values(project.departments).forEach((department, deptIndex) => {
-        const deptId = `dept-${department.department_id}`;
-        
-        // Calculate position within project boundaries
-        const row = Math.floor(deptIndex / maxDepartmentsPerRow);
-        const col = deptIndex % maxDepartmentsPerRow;
-        const deptX = projectX + projectPadding + col * (departmentWidth + departmentSpacing);
-        const deptY = projectY + 60 + row * (departmentHeight + departmentSpacing);
+    // Calculate available space for departments within dynamic plant boundaries
+    const availableWidth = plantWidth - (2 * plantPadding);
+    const availableHeight = plantHeight - (2 * plantPadding) - 40; // 40px for plant header
+
+    // Calculate department dimensions based on available space
+    const departmentWidth = Math.max(minDepartmentWidth, (availableWidth - (maxDepartmentsPerRow - 1) * departmentSpacing) / maxDepartmentsPerRow);
+    const departmentHeight = Math.max(minDepartmentHeight, (availableHeight - (totalRows - 1) * departmentSpacing) / totalRows);
+
+    Object.values(plant.departments).forEach((department, deptIndex) => {
+      const deptId = `dept-${department.department_id}`;
+
+      // Calculate position within plant boundaries
+      const row = Math.floor(deptIndex / maxDepartmentsPerRow);
+      const col = deptIndex % maxDepartmentsPerRow;
+      const deptX = plantX + plantPadding + col * (departmentWidth + departmentSpacing);
+      const deptY = plantY + 60 + row * (departmentHeight + departmentSpacing);
 
       department.devices.sort((a: DeviceResult, b: DeviceResult) => {
         const aIsTank = a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
@@ -162,11 +162,11 @@ export const convertDevicesToDiagram = (
       // Calculate dynamic department dimensions based on device count
       const deviceCount = department.devices.length;
       const minDimensions = calculateMinimumDimensions(deviceCount);
-      
+
       // Use minimum department dimensions (650x550) and grow based on device content
       const dynamicWidth = Math.max(650, Math.max(departmentWidth, minDimensions.width));
       const dynamicHeight = Math.max(550, Math.max(departmentHeight, minDimensions.height));
-      
+
       const currentDimensions = departmentDimensions[deptId] || {
         width: dynamicWidth,
         height: dynamicHeight,
@@ -182,7 +182,7 @@ export const convertDevicesToDiagram = (
           unit: "Ltr",
         },
         position: { x: deptX, y: deptY },
-        parentId: projectId,
+        parentId: plantId,
         style: {
           width: deptWidth,
           height: deptHeight,
@@ -421,10 +421,10 @@ const createFMNode = (
   const tankAreaHeight =
     totalTanks > 0
       ? headerHeight +
-        20 +
-        totalTankRows * 60 +
-        Math.max(0, totalTankRows - 1) * 30 +
-        40
+      20 +
+      totalTankRows * 60 +
+      Math.max(0, totalTankRows - 1) * 30 +
+      40
       : headerHeight + 20;
 
   const maxFMsPerRow = Math.max(
@@ -444,12 +444,12 @@ const createFMNode = (
   const fmVerticalSpacing =
     totalFMRows > 1
       ? Math.max(
-          30,
-          Math.min(
-            50,
-            (fmSectionHeight - totalFMRows * fmHeight) / (totalFMRows - 1)
-          )
+        30,
+        Math.min(
+          50,
+          (fmSectionHeight - totalFMRows * fmHeight) / (totalFMRows - 1)
         )
+      )
       : 0;
 
   const row = Math.floor(fmIndex / maxFMsPerRow);
@@ -526,12 +526,12 @@ const createBRWHMSNode = (
   const brwhmsVerticalSpacing =
     totalRows > 1
       ? Math.max(
-          30,
-          Math.min(
-            50,
-            (brwhmsSectionHeight - totalRows * brwhmsHeight) / (totalRows - 1)
-          )
+        30,
+        Math.min(
+          50,
+          (brwhmsSectionHeight - totalRows * brwhmsHeight) / (totalRows - 1)
         )
+      )
       : 0;
 
   const row = Math.floor(brwhmsIndex / maxDevicesPerRow);
@@ -610,12 +610,12 @@ const createPHMCNode = (
   const phmcVerticalSpacing =
     totalRows > 1
       ? Math.max(
-          30,
-          Math.min(
-            50,
-            (phmcSectionHeight - totalRows * phmcHeight) / (totalRows - 1)
-          )
+        30,
+        Math.min(
+          50,
+          (phmcSectionHeight - totalRows * phmcHeight) / (totalRows - 1)
         )
+      )
       : 0;
 
   const row = Math.floor(phmcIndex / maxDevicesPerRow);
@@ -699,12 +699,12 @@ const createARGNode = (
   const argVerticalSpacing =
     totalRows > 1
       ? Math.max(
-          30,
-          Math.min(
-            50,
-            (argSectionHeight - totalRows * argHeight) / (totalRows - 1)
-          )
+        30,
+        Math.min(
+          50,
+          (argSectionHeight - totalRows * argHeight) / (totalRows - 1)
         )
+      )
       : 0;
 
   const row = Math.floor(argIndex / maxDevicesPerRow);
@@ -851,10 +851,10 @@ const calculateMinimumDimensions = (
   // Calculate width based on device count and available space
   const maxDevicesPerRow = Math.max(1, Math.floor(600 / (deviceWidth + deviceSpacing)));
   const totalRows = Math.ceil(deviceCount / maxDevicesPerRow);
-  
+
   // Calculate minimum width needed (starting from 650px minimum)
   const minWidth = Math.max(650, sideMargin * 2 + Math.min(deviceCount, maxDevicesPerRow) * (deviceWidth + deviceSpacing));
-  
+
   // Calculate minimum height needed (starting from 550px minimum)
   const minHeight = Math.max(550, headerHeight + footerHeight + totalRows * deviceHeight + (totalRows - 1) * deviceSpacing + 30);
 
@@ -866,31 +866,31 @@ const calculateMinimumDimensions = (
 
 const getDeviceFlowValue = (device: DeviceResult): number => {
   const { type, device_type, last_record } = device;
-  
+
   if (type === "fm") {
     return Number(last_record?.max) || 0;
   }
-  
+
   if (type === "brwhms") {
     return Number(last_record?.max) || 0;
   }
-  
+
   if (type === "phmc" && device_type === "New phmc") {
     return Number(last_record?.flowrate) || 0;
   }
-  
+
   return 0;
 };
 
 const shouldIncludeDevice = (device: DeviceResult): boolean => {
   const { type, device_type } = device;
-  
+
   if (type === "fm") return true;
-  
+
   if (type === "brwhms") return true;
-  
+
   if (type === "phmc" && device_type === "New phmc") return true;
-  
+
   return false;
 };
 
@@ -898,7 +898,7 @@ export const calculateDepartmentFlowBalances = (
   devices: DeviceResult[]
 ): DepartmentCalculations[] => {
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  
+
   const departmentGroups = visibleDevices.reduce((acc, device) => {
     const deptId = device.department_id;
     if (!acc[deptId]) {
@@ -954,7 +954,7 @@ export const calculateDepartmentFlowBalance = (
 ): DepartmentCalculations | null => {
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
   const departmentDevices = visibleDevices.filter(device => device.department_id === departmentId);
-  
+
   if (departmentDevices.length === 0) return null;
 
   let totalIn = 0;
@@ -991,9 +991,9 @@ export const calculateDepartmentFlowBalance = (
   };
 };
 
-export interface ProjectCalculations {
-  project_id: number;
-  project_name: string;
+export interface PlantCalculations {
+  plant_id: number;
+  plant_name: string;
   totalIn: number;
   totalOut: number;
   totalBalance: number;
@@ -1001,17 +1001,17 @@ export interface ProjectCalculations {
   totalCapacity: number;
 }
 
-export const calculateProjectFlowBalance = (
+export const calculatePlantFlowBalance = (
   devices: DeviceResult[],
-  projectId: number
-): ProjectCalculations | null => {
+  plantId: number
+): PlantCalculations | null => {
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  const projectDevices = visibleDevices.filter(device => device.project_id === projectId);
-  
-  if (projectDevices.length === 0) return null;
+  const plantDevices = visibleDevices.filter(device => device.plant_id === plantId);
 
-  const relevantDevices = projectDevices.filter(shouldIncludeDevice);
-  const tankDevices = projectDevices.filter(
+  if (plantDevices.length === 0) return null;
+
+  const relevantDevices = plantDevices.filter(shouldIncludeDevice);
+  const tankDevices = plantDevices.filter(
     (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
   );
 
@@ -1022,17 +1022,17 @@ export const calculateProjectFlowBalance = (
 
   relevantDevices.forEach((device) => {
     const flowValue = getDeviceFlowValue(device);
-    const { project_connection } = device;
+    const { plant_connection } = device;
 
-    if (project_connection === "in") {
+    if (plant_connection === "in") {
       totalIn += flowValue;
     }
 
-    if (project_connection === "out") {
+    if (plant_connection === "out") {
       totalOut += flowValue;
     }
 
-    if (project_connection === "both") {
+    if (plant_connection === "both") {
       totalIn += flowValue;
       totalOut += flowValue;
     }
@@ -1041,7 +1041,7 @@ export const calculateProjectFlowBalance = (
   tankDevices.forEach((device) => {
     const currentLevel = Number(device.last_record?.last_level) || 0;
     const capacity = Number(device.params?.storageCapacity) || 0;
-    
+
     totalStock += currentLevel;
     totalCapacity += capacity;
   });
@@ -1049,8 +1049,8 @@ export const calculateProjectFlowBalance = (
   const totalBalance = totalOut - totalIn;
 
   return {
-    project_id: projectId,
-    project_name: projectDevices[0].project_name || `Project ${projectId}`,
+    plant_id: plantId,
+    plant_name: plantDevices[0].plant_name || `Plant ${plantId}`,
     totalIn,
     totalOut,
     totalBalance,
