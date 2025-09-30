@@ -360,8 +360,8 @@ const Devices = () => {
       .includes(organizationSearchTerm.toLowerCase())
   );
 
-  const filteredPlants = plants.filter((proj) => {
-    const matchesSearch = proj.plant_name
+  const filteredPlants = plants.filter((plant) => {
+    const matchesSearch = plant.plant_name
       .toLowerCase()
       .includes(plantSearchTerm.toLowerCase());
 
@@ -370,7 +370,7 @@ const Devices = () => {
     }
 
     const matchesOrganization =
-      proj.organization_id === parseInt(selectedOrganization);
+      plant.organization_id === parseInt(selectedOrganization);
     return matchesSearch && matchesOrganization;
   });
 
@@ -394,7 +394,7 @@ const Devices = () => {
   useEffect(() => {
     if (selectedOrganization !== "all") {
       const selectedPlants = plants.find(
-        (proj) => proj.plant_id.toString() === selectedPlant
+        (plant) => plant.plant_id.toString() === selectedPlant
       );
 
       if (
@@ -688,7 +688,7 @@ const Devices = () => {
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
-              {plants.find((proj) => proj.plant_id.toString() === selectedPlant)
+              {plants.find((plant) => plant.plant_id.toString() === selectedPlant)
                 ?.plant_name || "Plant"}
             </span>
           </>
@@ -794,7 +794,7 @@ const Devices = () => {
                   selectedPlant === "all"
                     ? "All Plant"
                     : plants.find(
-                        (proj) => proj.plant_id.toString() === selectedPlant
+                        (plant) => plant.plant_id.toString() === selectedPlant
                       )?.plant_name || "Select plant..."
                 }
                 readOnly
@@ -836,17 +836,17 @@ const Devices = () => {
                 </div>
 
                 {filteredPlants.length > 0 ? (
-                  filteredPlants.map((proj) => (
+                  filteredPlants.map((plant) => (
                     <div
-                      key={proj.plant_id}
+                      key={plant.plant_id}
                       className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                       onClick={() => {
-                        setSelectedPlant(proj.plant_id.toString());
+                        setSelectedPlant(plant.plant_id.toString());
                         setIsPlantDropdownOpen(false);
-                        setPlantSearchTerm(proj.plant_name);
+                        setPlantSearchTerm(plant.plant_name);
                       }}
                     >
-                      {proj.plant_name}
+                      {plant.plant_name}
                     </div>
                   ))
                 ) : (
@@ -1026,8 +1026,8 @@ const Devices = () => {
                               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 {
                                   plants?.find(
-                                    (p) =>
-                                      p?.plant_id?.toString() ===
+                                    (plant) =>
+                                      plant?.plant_id?.toString() ===
                                       device?.plant_id?.toString()
                                   )?.plant_name
                                 }
