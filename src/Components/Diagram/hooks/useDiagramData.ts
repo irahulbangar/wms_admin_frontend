@@ -144,6 +144,8 @@ export const useDiagramData = (plantId: string | undefined) => {
                 plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
+                systemName: matchingDevice.system_name,
+                systemConnection: matchingDevice.system_connection,
               },
             };
           }
@@ -168,6 +170,8 @@ export const useDiagramData = (plantId: string | undefined) => {
                 plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
+                systemName: matchingDevice.system_name,
+                systemConnection: matchingDevice.system_connection,
               },
             };
           }
@@ -193,6 +197,8 @@ export const useDiagramData = (plantId: string | undefined) => {
                 plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
+                systemName: matchingDevice.system_name,
+                systemConnection: matchingDevice.system_connection,
               },
             };
           }
@@ -222,6 +228,8 @@ export const useDiagramData = (plantId: string | undefined) => {
                 plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
+                systemName: matchingDevice.system_name,
+                systemConnection: matchingDevice.system_connection,
               },
             };
           }
@@ -247,6 +255,8 @@ export const useDiagramData = (plantId: string | undefined) => {
                 plantConnection: matchingDevice.plant_connection,
                 organizationConnection: matchingDevice.organization_connection,
                 departmentName: matchingDevice.department_name,
+                systemName: matchingDevice.system_name,
+                systemConnection: matchingDevice.system_connection,
               },
             };
           }

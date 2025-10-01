@@ -50,6 +50,8 @@ export interface NodeData {
   plantConnection?: string;
   organizationConnection?: string;
   departmentName?: string;
+  systemName?: string;
+  systemConnection?: string;
   avg?: number;
   max?: number;
   min?: number;

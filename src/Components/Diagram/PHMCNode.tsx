@@ -18,7 +18,8 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
   const departmentConnection = data.departmentConnection || "none";
   const plantConnection = data.plantConnection || "none";
   const organizationConnection = data.organizationConnection || "none";
-  const departmentName = data.departmentName || "";
+  const systemName = data.systemName || "";
+  const systemConnection = data.systemConnection || "none";
 
   return (
     <div
@@ -26,8 +27,9 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`
-Dept Name : ${departmentName}
-Dept Connection : ${departmentConnection}
+System Name : ${systemName}
+System Connection : ${systemConnection}
+Department Connection : ${departmentConnection}
 Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
 Voltage (R) : ${voltageR / 10}V | Current (R) : ${currentR}A

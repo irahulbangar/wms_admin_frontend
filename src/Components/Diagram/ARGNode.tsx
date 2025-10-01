@@ -12,12 +12,24 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
   const minMm = Number(data.minMm) || 0;
   const lastMm = Number(data.lastMm) || 0;
   const firstMm = Number(data.firstMm) || 0;
+  const systemName = data.systemName || "";
+  const systemConnection = data.systemConnection || "none";
+  const departmentConnection = data.departmentConnection || "none";
+  const plantConnection = data.plantConnection || "none";
+  const organizationConnection = data.organizationConnection || "none";
 
   return (
     <div
       className={`relative w-24 h-20 bg-gradient-to-br from-purple-50 to-purple-100 border rounded-lg p-1 z-0 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
+      title={`
+System Name : ${systemName}
+System Connection : ${systemConnection}
+Department Connection : ${departmentConnection}
+Plant Connection : ${plantConnection}
+Organization Connection : ${organizationConnection}
+      `}
     >
       <div
         className="text-xs font-bold text-center mb-1 truncate px-1 text-purple-800"

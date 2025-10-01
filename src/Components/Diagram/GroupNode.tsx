@@ -397,6 +397,31 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             </div>
           </div>
         )}
+
+        {data.type === "system" && (
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total In :</div>
+                <div className="font-medium text-text-primary">
+                  {inOutData.totalIn.toFixed(1)} {unit}
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total Out :</div>
+                <div className="font-medium text-text-primary">
+                  {inOutData.totalOut.toFixed(1)} {unit}
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <div className="text-text-primary">Total Balance :</div>
+                <div className="font-medium text-text-primary">
+                  {totalBalance.toFixed(1)} {unit}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
