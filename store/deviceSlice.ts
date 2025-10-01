@@ -177,21 +177,22 @@ export const getDeviceByPlantId = createAsyncThunk(
 );
 
 interface GetPlantByOrganizationId {
-  plantId: number;
   organizationId: number;
+  plantId: number;
+  departmentId: number;
 }
 
 // Get device by organizationId and plantId
-export const getDeviceByOrganizationIdAndPlantId = createAsyncThunk(
-  "device/getDeviceByOrganizationIdAndPlantId",
+export const getDeviceByOrganizationIdAndPlantIdAndDepartmentId = createAsyncThunk(
+  "device/getDeviceByOrganizationIdAndPlantIdAndDepartmentId",
   async (
-    { plantId, organizationId }: GetPlantByOrganizationId,
+    { organizationId, plantId, departmentId }: GetPlantByOrganizationId,
     thunkAPI
   ) => {
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().get<DeviceResponse>(
-        `/device/admin/plant-organization/${plantId}/${organizationId}`,
+        `/device/admin/organization-plant-department/${organizationId}/${plantId}/${departmentId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -203,7 +204,7 @@ export const getDeviceByOrganizationIdAndPlantId = createAsyncThunk(
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to get device by organizationId and plantId";
+          : "Failed to get device by organizationId and plantId and departmentId";
       return rejectWithValue(errorMessage);
     }
   }

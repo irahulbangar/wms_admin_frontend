@@ -16,7 +16,7 @@ import type { DeviceResult } from "../../../model/devices.interface";
 import {
   deleteDevice,
   getAllDevices,
-  getDeviceByOrganizationIdAndPlantId,
+  getDeviceByOrganizationIdAndPlantIdAndDepartmentId,
   setDevices,
 } from "../../../store/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -40,9 +40,10 @@ import DeletePopup from "./DeletePopup";
 
 const Devices = () => {
   const navigate = useNavigate();
-  const { plant_id, organization_id } = useParams<{
-    plant_id: string;
+  const { organization_id, plant_id, department_id } = useParams<{
     organization_id: string;
+    plant_id: string;
+    department_id: string;
   }>();
 
   const [filteredDevices, setFilteredDevices] = useState<DeviceResult[]>([]);
@@ -54,8 +55,12 @@ const Devices = () => {
     organization_id || "all"
   );
   const [selectedPlant, setSelectedPlant] = useState(plant_id || "all");
+  const [selectedDepartment, setSelectedDepartment] = useState(
+    department_id || "all"
+  );
   const { organizations } = useAppSelector((state) => state.organization);
   const { plants } = useAppSelector((state) => state.plant);
+  const { departments } = useAppSelector((state) => state.department);
   const { devices } = useAppSelector((state) => state.device);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [plantId, setPlantId] = useState<number | null>(null);
@@ -71,11 +76,14 @@ const Devices = () => {
   const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
     useState(false);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
+  const [isDepartmentDropdownOpen, setIsDepartmentDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [plantSearchTerm, setPlantSearchTerm] = useState("");
+  const [departmentSearchTerm, setDepartmentSearchTerm] = useState("");
   const [organizationId, setOrganizationId] = useState<number>(0);
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
   const plantDropdownRef = useRef<HTMLDivElement>(null);
+  const departmentDropdownRef = useRef<HTMLDivElement>(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deviceName, setDeviceName] = useState<string | null>(null);
   const [deviceToDelete, setDeviceToDelete] = useState<DeviceResult | null>(
@@ -98,6 +106,13 @@ const Devices = () => {
       ) {
         setIsPlantDropdownOpen(false);
         setPlantSearchTerm("");
+      }
+      if (
+        departmentDropdownRef.current &&
+        !departmentDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDepartmentDropdownOpen(false);
+        setDepartmentSearchTerm("");
       }
     };
 
@@ -213,9 +228,10 @@ const Devices = () => {
       setSelectedPlant(plant_id);
 
       dispatch(
-        getDeviceByOrganizationIdAndPlantId({
+        getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
           plantId: parseInt(plant_id),
           organizationId: parseInt(organization_id),
+          departmentId: parseInt(department_id || "0"),
         })
       )
         .unwrap()
@@ -278,9 +294,10 @@ const Devices = () => {
     } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
       setIsLoading(true);
       dispatch(
-        getDeviceByOrganizationIdAndPlantId({
+        getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
           plantId: parseInt(selectedPlant),
           organizationId: parseInt(selectedOrganization),
+          departmentId: parseInt(selectedDepartment || "0"),
         })
       )
         .unwrap()
@@ -372,6 +389,20 @@ const Devices = () => {
     const matchesOrganization =
       plant.organization_id === parseInt(selectedOrganization);
     return matchesSearch && matchesOrganization;
+  });
+
+  const filteredDepartments = departments.filter((department) => {
+    const matchesSearch = department.department_name
+      .toLowerCase()
+      .includes(departmentSearchTerm.toLowerCase());
+      
+      if (selectedPlant === "all") {
+        return matchesSearch;
+      }
+
+      const matchesOrganization =
+        department.plant_id === parseInt(selectedPlant);
+      return matchesSearch && matchesOrganization;
   });
 
   useEffect(() => {
@@ -484,9 +515,10 @@ const Devices = () => {
 
       if (organization_id && plant_id) {
         dispatch(
-          getDeviceByOrganizationIdAndPlantId({
-            plantId: parseInt(plant_id),
+          getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
             organizationId: parseInt(organization_id),
+            plantId: parseInt(plant_id),
+            departmentId: parseInt(department_id || "0"),
           })
         )
           .unwrap()
@@ -505,9 +537,10 @@ const Devices = () => {
           });
       } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
         dispatch(
-          getDeviceByOrganizationIdAndPlantId({
+          getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
             plantId: parseInt(selectedPlant),
             organizationId: parseInt(selectedOrganization),
+            departmentId: parseInt(selectedDepartment),
           })
         )
           .unwrap()
@@ -852,6 +885,81 @@ const Devices = () => {
                 ) : (
                   <div className="px-3 py-2 text-text-secondary text-sm">
                     No plants found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div
+            className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
+            ref={departmentDropdownRef}
+          >
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Select department..."
+                value={
+                  selectedDepartment === "all"
+                    ? "All Department"
+                    : departments.find(
+                        (department) => department.department_id.toString() === selectedDepartment
+                      )?.department_name || "Select department..."
+                }
+                readOnly
+                className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                onClick={() => setIsDepartmentDropdownOpen(!isDepartmentDropdownOpen)}
+              />
+              <ChevronDown
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
+                  isDepartmentDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+
+            {isDepartmentDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                    <input
+                      type="text"
+                      placeholder="Search departments..."
+                      value={departmentSearchTerm}
+                      onChange={(e) => setDepartmentSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                  onClick={() => {
+                    setSelectedDepartment("all");
+                    setIsDepartmentDropdownOpen(false);
+                    setDepartmentSearchTerm("");
+                  }}
+                >
+                  All Department
+                </div>
+
+                {filteredDepartments.length > 0 ? (
+                  filteredDepartments.map((department) => (
+                    <div
+                      key={department.department_id}
+                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                      onClick={() => {
+                        setSelectedDepartment(department.department_id.toString());
+                        setIsDepartmentDropdownOpen(false);
+                        setDepartmentSearchTerm(department.department_name);
+                      }}
+                    >
+                      {department.department_name}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-text-secondary text-sm">
+                    No departments found
                   </div>
                 )}
               </div>
