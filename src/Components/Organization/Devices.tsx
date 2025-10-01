@@ -234,13 +234,13 @@ const Devices = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (organizations.length === 0 || plants.length === 0) {
+    if (organizations.length === 0 || plants.length === 0 || departments.length === 0) {
       getOrganization();
       fetchPlants();
+      getDepartment();
     }
     getDeviceFamily();
     getDeviceType();
-    getDepartment();
     getSystem();
 
     if (organization_id && plant_id) {
@@ -1038,10 +1038,11 @@ const Devices = () => {
           {Object.keys(groupedDevices).length > 0 ? (
             Object.entries(groupedDevices).map(([systemId, systemDevices]) => {
               const system = systemData.find(
-                (system) => system.system_id.toString() === systemId
+                (system) => system.system_id.toString() === parseInt(systemId).toString()
               );
+              
               const systemName =
-                system?.system_name.trim() ||
+                system?.system_name?.trim() ||
                 `${
                   systemId === "0" ? "Extra System" : `System ${systemId}`
                 }`;
