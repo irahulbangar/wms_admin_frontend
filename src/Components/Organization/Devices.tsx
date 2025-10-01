@@ -32,7 +32,7 @@ import { Error, Success, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import type { DepartmentResult } from "../../../model/department.interface";
-import { getDepartments } from "../../../store/departmentSlice";
+import { getAllDepartments } from "../../../store/departmentSlice";
 import AddUpdateDepartment from "./Department/AddUpdateDepartment";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
@@ -109,7 +109,7 @@ const Devices = () => {
 
   const getDepartment = useCallback(async () => {
     setIsLoading(true);
-    await dispatch(getDepartments())
+    await dispatch(getAllDepartments())
       .unwrap()
       .then((res) => {
         if (res.success) {

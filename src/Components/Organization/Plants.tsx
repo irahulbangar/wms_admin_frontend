@@ -456,7 +456,7 @@ const Plants = () => {
       ) : (
         <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
           <div className="overflow-auto h-[calc(100vh-280px)]">
-            <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+            <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedPlants?.length > 0 ? "h-auto" : "h-full"}`}>
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">

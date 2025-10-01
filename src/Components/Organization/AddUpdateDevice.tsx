@@ -13,7 +13,7 @@ import {
 import { Error, Success } from "../../utils/toast";
 import type { DepartmentResult } from "../../../model/department.interface";
 import AddUpdateDepartment from "./Department/AddUpdateDepartment";
-import { getDepartments } from "../../../store/departmentSlice";
+import { getAllDepartments } from "../../../store/departmentSlice";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -401,7 +401,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   }, [deviceId, type]);
 
   const refreshDepartmentData = async () => {
-    await dispatch(getDepartments())
+    await dispatch(getAllDepartments())
       .unwrap()
       .then((res) => {
         if (res.success) {
