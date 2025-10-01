@@ -84,7 +84,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/departments/:plant_id/:organization_id"
+                  path="/organization/departments/:organization_id/:plant_id"
                   element={
                     <ProtectedRoute>
                       <HomePage />
@@ -100,7 +100,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/devices/:plant_id/:organization_id/:department_id"
+                  path="/organization/devices/:organization_id/:plant_id/:department_id"
                   element={
                     <ProtectedRoute>
                       <HomePage />

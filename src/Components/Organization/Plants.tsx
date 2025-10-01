@@ -310,7 +310,7 @@ const Plants = () => {
   };
 
   const handleViewDevices = (plantId: number, organizationId: number) => {
-    navigate(`/organization/departments/${plantId}/${organizationId}`);
+    navigate(`/organization/departments/${organizationId}/${plantId}`);
   };
 
   return (

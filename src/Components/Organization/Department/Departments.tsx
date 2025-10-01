@@ -24,9 +24,9 @@ import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
 
 const Departments = () => {
-  const { plant_id, organization_id } = useParams<{
-    plant_id: string;
+  const { organization_id, plant_id } = useParams<{
     organization_id: string;
+    plant_id: string;
   }>();
   const navigate = useNavigate();
   const [selectedOrganization, setSelectedOrganization] = useState<string>(
@@ -112,24 +112,27 @@ const Departments = () => {
       );
     }
 
-    if (selectedOrganization !== "all") {
+    const currentOrganization = organization_id || selectedOrganization;
+    const currentPlant = plant_id || selectedPlant;
+
+    if (currentOrganization !== "all") {
       const orgPlantIds = plants
-        .filter((p) => p.organization_id === parseInt(selectedOrganization))
+        .filter((p) => p.organization_id === parseInt(currentOrganization))
         .map((p) => p.plant_id);
       filtered = filtered.filter((department: DepartmentResult) =>
         orgPlantIds.includes(department.plant_id)
       );
     }
 
-    if (selectedPlant !== "all") {
+    if (currentPlant !== "all") {
       filtered = filtered.filter(
         (department: DepartmentResult) =>
-          department.plant_id === parseInt(selectedPlant)
+          department.plant_id === parseInt(currentPlant)
       );
     }
 
     setFilteredDepartments(filtered);
-  }, [departments, selectedOrganization, selectedPlant, plants, searchTerm]);
+  }, [departments, selectedOrganization, selectedPlant, plants, searchTerm, organization_id, plant_id]);
 
   const filteredOrganizations = organizations.filter((org) =>
     org.organization_name
@@ -209,14 +212,17 @@ const Departments = () => {
   }, [selectedOrganization, selectedPlant, plants]);
 
   const handleAddDepartment = () => {
-    if (selectedOrganization === "all" || selectedPlant === "all") {
+    const currentOrganization = organization_id || selectedOrganization;
+    const currentPlant = plant_id || selectedPlant;
+    
+    if (currentOrganization === "all" || currentPlant === "all") {
       Warning("Please select both organization and plant before adding a department");
       return;
     }
 
     setIsAddDepartmentOpen(true);
-    setPlantId(parseInt(selectedPlant));
-    setOrganizationId(parseInt(selectedOrganization));
+    setPlantId(parseInt(currentPlant));
+    setOrganizationId(parseInt(currentOrganization));
   };
 
   const handleEditDepartment = (departmentId: number, plantId: number) => {
@@ -389,7 +395,7 @@ const Departments = () => {
   };
 
   const handleViewDevices = (departmentId: number, organizationId: number, plantId: number) => {
-    navigate(`/organization/devices/${plantId}/${organizationId}/${departmentId}`);
+    navigate(`/organization/devices/${organizationId}/${plantId}/${departmentId}`);
   };
 
   return (
@@ -420,12 +426,12 @@ const Departments = () => {
           <span>Plants</span>
         </button>
 
-        {selectedPlant !== "all" && (
+        {(plant_id || selectedPlant !== "all") && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
               {plants.find(
-                (plant) => plant.plant_id.toString() === selectedPlant
+                (plant) => plant.plant_id.toString() === (plant_id || selectedPlant)
               )?.plant_name || "Plant"}
             </span>
           </>
@@ -443,12 +449,12 @@ const Departments = () => {
                 type="text"
                 placeholder="Select organization..."
                 value={
-                  selectedOrganization === "all"
+                  (organization_id || selectedOrganization) === "all"
                     ? "All Organization"
                     : organizations.find(
                         (org) =>
                           org.organization_id.toString() ===
-                          selectedOrganization
+                          (organization_id || selectedOrganization)
                       )?.organization_name || "Select organization..."
                 }
                 readOnly
@@ -528,10 +534,10 @@ const Departments = () => {
                 type="text"
                 placeholder="Select plant..."
                 value={
-                  selectedPlant === "all"
+                  (plant_id || selectedPlant) === "all"
                     ? "All Plant"
                     : plants.find(
-                        (plant) => plant.plant_id.toString() === selectedPlant
+                        (plant) => plant.plant_id.toString() === (plant_id || selectedPlant)
                       )?.plant_name || "Select plant..."
                 }
                 readOnly
