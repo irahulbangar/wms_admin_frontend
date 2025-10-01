@@ -63,7 +63,8 @@ export const getAllSystems = createAsyncThunk(
 
 export interface SystemPayload {
   system_name: string;
-  system_info: string;
+  system_description: string;
+  status: string;
   plant_id: number;
   organization_id: number;
   department_id: number;
@@ -106,6 +107,24 @@ export const updateSystem = createAsyncThunk(
           },
         }
       );
+      return response.data;
+    } catch (error: unknown) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// Get system by id
+export const getSystemById = createAsyncThunk(
+  "system/getSystemById",
+  async (id: number, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().get(`/system/admin/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
       return response.data;
     } catch (error: unknown) {
       return rejectWithValue(error);

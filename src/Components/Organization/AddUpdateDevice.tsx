@@ -11,9 +11,11 @@ import {
 } from "../../../store/deviceSlice";
 
 import { Error, Success } from "../../utils/toast";
-import type { DepartmentResult } from "../../../model/department.interface";
-import AddUpdateDepartment from "./Department/AddUpdateDepartment";
-import { getAllDepartments } from "../../../store/departmentSlice";
+import { getAllSystems } from "../../../store/systemSlice";
+import AddUpdateSystem from "./AddUpdateSystem";
+import type { SystemResult } from "../../../model/system.interface";
+import type { ReportTypeResult } from "../../../model/report-type.interface";
+import { getAllReportTypes } from "../../../store/reportTypeSlice";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -26,9 +28,10 @@ interface AddUpdateDeviceProps {
   plant_id: number | null;
   familyData: DeviceFamilyResult[];
   typeData: DeviceTypeResult[];
-  departmentData: DepartmentResult[];
+  systemData: SystemResult[];
   departmentId: number;
   organizationId: number;
+  systemId: number;
 }
 
 const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
@@ -39,9 +42,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   plant_id,
   familyData,
   typeData,
-  departmentData,
+  systemData,
   departmentId,
   organizationId,
+  systemId,
 }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -57,12 +61,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     organization_id: organizationId,
     visibility: "",
     department_connection: "",
+    report_type_id: 0,
+    system_id: systemId,
+    system_connection: "",
     plant_connection: "",
     organization_connection: "",
     device_flow_direction: "",
     params: {},
   });
-  const [showAddDepartmentPopup, setShowAddDepartmentPopup] = useState(false);
+  const [showAddSystemPopup, setShowAddSystemPopup] = useState(false);
+  const [reportTypes, setReportTypes] = useState<ReportTypeResult[]>([]);
 
   const getSelectedDeviceFamilyName = () => {
     const selectedFamily = familyData.find(
@@ -128,6 +136,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       organization_id: organizationId,
       visibility: "",
       department_connection: "",
+      report_type_id: 0,
+      system_id: systemId,
+      system_connection: "",
       plant_connection: "",
       organization_connection: "",
       device_flow_direction: "",
@@ -234,6 +245,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_id: formData.organization_id || organizationId,
         visibility: formData.visibility,
         department_connection: formData.department_connection,
+        report_type_id: formData.report_type_id,
+        system_id: formData.system_id || systemId,
+        system_connection: formData.system_connection,
         plant_connection: formData.plant_connection,
         organization_connection: formData.organization_connection,
         params: (() => {
@@ -307,6 +321,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               params: deviceData.params,
               visibility: deviceData.visibility,
               department_connection: deviceData.department_connection,
+              report_type_id: deviceData.report_type_id,
+              system_id: deviceData.system_id || systemId,
+              system_connection: deviceData.system_connection,
               plant_connection: deviceData.plant_connection,
               organization_connection: deviceData.organization_connection,
               device_flow_direction: deviceData.device_flow_direction,
@@ -379,6 +396,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         params: {},
         visibility: "",
         department_connection: "",
+        report_type_id: 0,
+        system_id: systemId,
+        system_connection: "",
         plant_connection: "",
         organization_connection: "",
         device_flow_direction: "",
@@ -400,15 +420,15 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
   }, [deviceId, type]);
 
-  const refreshDepartmentData = async () => {
-    await dispatch(getAllDepartments())
+  const refreshSystemData = async () => {
+    await dispatch(getAllSystems())
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setShowAddDepartmentPopup(false);
+          setShowAddSystemPopup(false);
           onUpdateSuccess?.({
             success: true,
-            data: { refreshDepartments: true },
+            data: { refreshSystems: true },
           });
         }
       })
@@ -416,6 +436,21 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         console.log(err);
       });
   };
+
+  useEffect(() => {
+    dispatch(getAllReportTypes())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setReportTypes(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [dispatch]);
+
+  console.log('reportTypes', reportTypes);
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
@@ -603,33 +638,30 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Department
+                  System
                 </label>
                 <select
-                  name="department_id"
-                  value={formData.department_id}
+                  name="system_id"
+                  value={formData.system_id}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value === "add_new") {
-                      setShowAddDepartmentPopup(true);
-                      setFormData((prev) => ({ ...prev, department_id: 0 }));
+                      setShowAddSystemPopup(true);
+                      setFormData((prev) => ({ ...prev, system_id: 0 }));
                     } else {
-                      setShowAddDepartmentPopup(false);
+                      setShowAddSystemPopup(false);
                       setFormData((prev) => ({
                         ...prev,
-                        department_id: parseInt(value) || 0,
+                        system_id: parseInt(value) || 0,
                       }));
                     }
                   }}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">None</option>
-                  {departmentData.map((department) => (
-                    <option
-                      key={department.department_id}
-                      value={department.department_id}
-                    >
-                      {department.department_name}
+                  {systemData.map((system) => (
+                    <option key={system.system_id} value={system.system_id}>
+                      {system.system_name}
                     </option>
                   ))}
                   <option
@@ -670,21 +702,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   Report Type
                 </label>
                 <select
-                  name="system_connection"
-                  value={formData.department_connection}
+                  name="report_type_id"
+                  value={formData.report_type_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Report Type</option>
-                  <option value="in">In</option>
-                  <option value="out">Out</option>
-                  <option value="storage">Storage</option>
-                  <option value="percolation">Percolation</option>
-                  <option value="evaporation">Evaporation</option>
-                  <option value="westage">Westage</option>
-                  <option value="consumption">Consumption</option>
-                  <option value="regeneration">Regeneration</option>
-                  <option value="re-use">Re-use</option>
+                  {reportTypes.map((reportType) => (
+                    <option
+                      key={reportType.report_type_id}
+                      value={reportType.report_type_id}
+                    >
+                      {reportType.report_type_name}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -693,11 +724,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="system_connection"
-                  value={formData.department_connection}
+                  value={formData.system_connection}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
-                  <option value="0">Select Department Connection</option>
+                  <option value="0">Select System Connection</option>
                   <option value="none">None</option>
                   <option value="in">In</option>
                   <option value="out">Out</option>
@@ -1177,14 +1208,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       </div>
 
       {/* Add Department Popup */}
-      {showAddDepartmentPopup && (
-        <AddUpdateDepartment
-          setShowAddDepartmentPopup={setShowAddDepartmentPopup}
+      {showAddSystemPopup && (
+        <AddUpdateSystem
+          setShowAddSystemPopup={setShowAddSystemPopup}
           type="add"
           plantId={plant_id || 0}
           departmentId={departmentId}
+          organizationId={organizationId}
+          systemId={systemId || 0}
           onUpdateSuccess={() => {
-            refreshDepartmentData();
+            refreshSystemData();
           }}
         />
       )}

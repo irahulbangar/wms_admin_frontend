@@ -53,11 +53,14 @@ export interface CreateDevicePayload {
   department_id: number;
   visibility: string;
   department_connection: string;
+  report_type_id: number;
+  system_connection: string;
   plant_connection: string;
   organization_connection: string;
   device_flow_direction: string;
   params: object;
   organization_id: number;
+  system_id: number;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {

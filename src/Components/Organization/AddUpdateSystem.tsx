@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../store/store";
 import { Error, Success } from "../../utils/toast";
-import { createSystem, updateSystem } from "../../../store/systemSlice";
+import { createSystem, getSystemById, updateSystem } from "../../../store/systemSlice";
 
 
 interface AddUpdateSystemProps {
@@ -26,12 +26,14 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [newSystemName, setNewSystemName] = useState("");
-  const [errors, setErrors] = useState({ system_name: "", system_info: "" });
+  const [errors, setErrors] = useState({ system_name: "", system_info: "", status: "" });
   const [systemData, setSystemData] = useState({
     system_name: "",
     system_info: "",
+    status: "",
     plant_id: plantId || 0,
     organization_id: organizationId || 0,
+    department_id: departmentId || 0,
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,8 +61,10 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
       setSystemData({
         system_name: "",
         system_info: "",
+        status: "",
         plant_id: plantId || 0,
         organization_id: organizationId || 0,
+        department_id: departmentId || 0,
       });
     }
   }, [type, systemId, plantId, organizationId]);
@@ -83,7 +87,8 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
         await dispatch(
           createSystem({
             system_name: newSystemName,
-            system_info: systemData?.system_info,
+            system_description: systemData?.system_info,
+            status: "",
             plant_id: plantId || 0,
             organization_id: organizationId || 0,
             department_id: departmentId || 0,
@@ -105,7 +110,8 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
           updateSystem({
             system_id: systemId || 0,
             system_name: newSystemName,
-            system_info: systemData?.system_info,
+            system_description: systemData?.system_info,
+            status: "",
             plant_id: plantId || 0,
             department_id: departmentId || 0,
             organization_id: organizationId || 0,
@@ -192,6 +198,28 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             {errors.system_info && (
               <p className="text-status-danger text-sm mt-1 font-roboto">
                 {errors.system_info}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+              Status
+            </label>
+            <select
+              name="status"
+              value={systemData?.status}
+              onChange={(e) => setSystemData((prev) => ({ ...prev, status: e.target.value }))}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                errors.status ? "border-status-danger" : "border-border-primary"
+              }`}
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            {errors.status && (
+              <p className="text-status-danger text-sm mt-1 font-roboto">
+                {errors.status}
               </p>
             )}
           </div>

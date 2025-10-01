@@ -13,6 +13,7 @@ export interface DeviceResult {
   device_name: string;
   device_status: string;
   department_id: number;
+  system_id: number;
   created_at: string;
   updated_at: string;
   last_record_time: string;

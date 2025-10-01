@@ -37,6 +37,9 @@ import AddUpdateDepartment from "./Department/AddUpdateDepartment";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 import DeletePopup from "./DeletePopup";
+import type { SystemResult } from "../../../model/system.interface";
+import { getAllSystems } from "../../../store/systemSlice";
+import AddUpdateSystem from "./AddUpdateSystem";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -69,10 +72,11 @@ const Devices = () => {
   const dispatch = useAppDispatch();
   const [departmentData, setDepartmentData] = useState<DepartmentResult[]>([]);
   const [departmentId, setDepartmentId] = useState<number>(0);
-  const [collapsedDepartments, setCollapsedDepartments] = useState<Set<string>>(
+  const [systemId, setSystemId] = useState<number>(0);
+  const [collapsedSystems, setCollapsedSystems] = useState<Set<string>>(
     new Set()
   );
-  const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
+  const [isEditSystemOpen, setIsEditSystemOpen] = useState(false);
   const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
     useState(false);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
@@ -90,6 +94,7 @@ const Devices = () => {
     null
   );
   const { admin } = useAppSelector((state) => state.admin);
+  const [systemData, setSystemData] = useState<SystemResult[]>([]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -121,6 +126,24 @@ const Devices = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const getSystem = useCallback(async () => {
+    setIsLoading(true);
+    await dispatch(getAllSystems())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setSystemData(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get systems");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
 
   const getDepartment = useCallback(async () => {
     setIsLoading(true);
@@ -221,6 +244,7 @@ const Devices = () => {
     getDeviceFamily();
     getDeviceType();
     getDepartment();
+    getSystem();
 
     if (organization_id && plant_id) {
       setIsLoading(true);
@@ -261,6 +285,7 @@ const Devices = () => {
     getDeviceFamily,
     getDeviceType,
     getDepartment,
+    getSystem,
   ]);
 
   const refreshDevices = useCallback(async () => {
@@ -449,6 +474,7 @@ const Devices = () => {
     setIsAddDeviceOpen(true);
     setPlantId(parseInt(selectedPlant));
     setOrganizationId(parseInt(selectedOrganization));
+    setDepartmentId(parseInt(selectedDepartment));
   };
 
   const handleEditDevice = (
@@ -482,6 +508,7 @@ const Devices = () => {
         refreshDeviceTypes?: boolean;
         refreshOrganizations?: boolean;
         refreshPlants?: boolean;
+        refreshSystems?: boolean;
       };
     }) => {
       if (isLoading) return;
@@ -508,6 +535,11 @@ const Devices = () => {
 
       if (result?.data?.refreshPlants) {
         fetchPlants();
+        return;
+      }
+
+      if (result?.data?.refreshSystems) {
+        getSystem();
         return;
       }
 
@@ -581,29 +613,29 @@ const Devices = () => {
     }
   };
 
-  const groupDevicesByDepartment = (devices: DeviceResult[]) => {
+  const groupDevicesBySystem = (devices: DeviceResult[]) => {
     const grouped: { [key: string]: DeviceResult[] } = {};
 
     devices.forEach((device) => {
-      const deptId = device.department_id?.toString() || "unknown";
-      if (!grouped[deptId]) {
-        grouped[deptId] = [];
+      const systemId = device.system_id?.toString() || "unknown";
+      if (!grouped[systemId]) {
+        grouped[systemId] = [];
       }
-      grouped[deptId].push(device);
+      grouped[systemId].push(device);
     });
 
     return grouped;
   };
 
-  const groupedDevices = groupDevicesByDepartment(filteredDevices);
+  const groupedDevices = groupDevicesBySystem(filteredDevices);
 
-  const toggleDepartmentCollapse = (deptId: string) => {
-    setCollapsedDepartments((prev) => {
+  const toggleSystemCollapse = (systemId: string) => {
+    setCollapsedSystems((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(deptId)) {
-        newSet.delete(deptId);
+      if (newSet.has(systemId)) {
+        newSet.delete(systemId);
       } else {
-        newSet.add(deptId);
+        newSet.add(systemId);
       }
       return newSet;
     });
@@ -621,7 +653,7 @@ const Devices = () => {
     navigate("/");
   };
 
-  const handleEditDepartment = (deptId: string) => {
+  const handleEditSystem = (systemId: string) => {
     if (selectedPlant === "all") {
       Warning(
         "Please select a plant from the dropdown before updating the department"
@@ -629,22 +661,22 @@ const Devices = () => {
       return;
     }
 
-    const deptDevices = groupedDevices[deptId] || [];
-    const firstDevice = deptDevices[0];
+    const systemDevices = groupedDevices[systemId] || [];
+    const firstDevice = systemDevices[0];
 
     if (firstDevice && firstDevice.plant_id) {
-      setIsEditDepartmentOpen(true);
-      setDepartmentId(parseInt(deptId));
+      setIsEditSystemOpen(true);
+      setSystemId(parseInt(systemId));
       setPlantId(parseInt(selectedPlant));
     } else {
       Warning(
-        "No plant found for this department. Please ensure devices are assigned to this department."
+        "No plant found for this system. Please ensure devices are assigned to this system."
       );
     }
   };
 
-  const handleDepartmentUpdate = () => {
-    getDepartment();
+  const handleSystemUpdate = () => {
+    getSystem();
   };
 
   const handleDeleteDevice = (deviceId: number) => {
@@ -1020,17 +1052,17 @@ const Devices = () => {
               return (
                 <div
                   className={`${
-                    collapsedDepartments?.has(deptId) ? "mb-4" : "mb-0"
+                    collapsedSystems?.has(deptId) ? "mb-4" : "mb-0"
                   }`}
                   key={deptId}
                 >
                   <div className="bg-primary px-4 py-3 border-b border-border-primary flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => toggleDepartmentCollapse(deptId)}
+                        onClick={() => toggleSystemCollapse(deptId)}
                         className="p-1 hover:bg-secondary/50 bg-secondary/50 cursor-pointer rounded transition-colors"
                       >
-                        {collapsedDepartments?.has(deptId) ? (
+                        {collapsedSystems?.has(deptId) ? (
                           <ChevronDown className="w-5 h-5 text-text-primary" />
                         ) : (
                           <ChevronRight className="w-5 h-5 text-text-primary" />
@@ -1071,7 +1103,7 @@ const Devices = () => {
                       <div className="flex items-center gap-2">
                         {deptId !== "0" && (
                           <Edit
-                            onClick={() => handleEditDepartment(deptId)}
+                            onClick={() => handleEditSystem(deptId)}
                             className="w-5 h-5 text-status-info cursor-pointer"
                           />
                         )}
@@ -1082,7 +1114,7 @@ const Devices = () => {
                     </div>
                   </div>
 
-                  {!collapsedDepartments?.has(deptId) && (
+                  {!collapsedSystems?.has(deptId) && (
                     <div className="overflow-x-auto">
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
@@ -1281,9 +1313,10 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
-          departmentData={departmentData}
+          systemData={systemData}
           departmentId={departmentId}
           organizationId={organizationId}
+          systemId={0}
         />
       )}
 
@@ -1296,19 +1329,20 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
-          departmentData={departmentData}
+          systemData={systemData}
           departmentId={departmentId}
           organizationId={organizationId}
+          systemId={0}
         />
       )}
 
-      {isEditDepartmentOpen && plantId && (
-        <AddUpdateDepartment
-          setShowAddDepartmentPopup={setIsEditDepartmentOpen}
+      {isEditSystemOpen && plantId && (
+        <AddUpdateSystem
+          setShowAddSystemPopup={setIsEditSystemOpen}
           type="update"
-          departmentId={departmentId}
+          systemId={systemId}
           plantId={plantId}
-          onUpdateSuccess={handleDepartmentUpdate}
+          onUpdateSuccess={handleSystemUpdate}
         />
       )}
     </div>
