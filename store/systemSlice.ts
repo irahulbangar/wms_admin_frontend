@@ -131,3 +131,6 @@ export const getSystemById = createAsyncThunk(
     }
   }
 );
+
+export const { setSystems, setLoading, setError } = systemSlice.actions;
+export default systemSlice.reducer;

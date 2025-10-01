@@ -35,8 +35,7 @@ import { getAllDepartments, setDepartments } from "../../../store/departmentSlic
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 import DeletePopup from "./DeletePopup";
-import type { SystemResult } from "../../../model/system.interface";
-import { getAllSystems } from "../../../store/systemSlice";
+import { getAllSystems, setSystems } from "../../../store/systemSlice";
 import AddUpdateSystem from "./AddUpdateSystem";
 
 const Devices = () => {
@@ -91,7 +90,7 @@ const Devices = () => {
     null
   );
   const { admin } = useAppSelector((state) => state.admin);
-  const [systemData, setSystemData] = useState<SystemResult[]>([]);
+  const { systems } = useAppSelector((state) => state.system);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -130,7 +129,7 @@ const Devices = () => {
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setSystemData(res.data);
+          dispatch(setSystems(res.data));
         }
       })
       .catch((err) => {
@@ -1037,9 +1036,12 @@ const Devices = () => {
         <div className="relative overflow-x-auto pb-0 flex-1">
           {Object.keys(groupedDevices).length > 0 ? (
             Object.entries(groupedDevices).map(([systemId, systemDevices]) => {
-              const system = systemData.find(
-                (system) => system.system_id.toString() === parseInt(systemId).toString()
+              const system = systems?.find(
+                (system: any) => system.system_id.toString() === systemId
               );
+              console.log('System:', systems?.find(
+                (system: any) => system.system_id
+              ));
               
               const systemName =
                 system?.system_name?.trim() ||
@@ -1311,7 +1313,7 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
-          systemData={systemData}
+          systemData={systems}
           departmentId={departmentId}
           organizationId={organizationId}
           systemId={0}
@@ -1327,7 +1329,7 @@ const Devices = () => {
           onUpdateSuccess={handleDeviceUpdate}
           familyData={deviceFamily}
           typeData={deviceType}
-          systemData={systemData}
+          systemData={systems}
           departmentId={departmentId}
           organizationId={organizationId}
           systemId={0}
