@@ -24,6 +24,7 @@ export interface DeviceResult {
   department_connection: string;
   organization_id?: number;
   plant_connection: string;
+  system_connection: string;
   organization_connection: string;
   device_family: string;
   name: string;

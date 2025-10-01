@@ -7,6 +7,7 @@ import type { DiagramEdge } from "./utils/diagramCalculations";
 import {
   calculateDepartmentFlowBalance,
   calculatePlantFlowBalance,
+  calculateSystemFlowBalance,
 } from "./utils/diagramCalculations";
 
 interface GroupNodeProps {
@@ -194,6 +195,18 @@ const GroupNode: React.FC<GroupNodeProps> = ({
         return {
           totalIn: plantBalance.totalIn,
           totalOut: plantBalance.totalOut,
+        };
+      }
+    }
+
+    if (data.type === "system" && deviceData && deviceData.length > 0) {
+      const systemId = parseInt(id.replace("system-", ""));
+      const systemBalance = calculateSystemFlowBalance(deviceData, systemId);
+
+      if (systemBalance) {
+        return {
+          totalIn: systemBalance.totalIn,
+          totalOut: systemBalance.totalOut,
         };
       }
     }

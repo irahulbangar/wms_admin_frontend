@@ -1166,3 +1166,71 @@ export const calculatePlantFlowBalance = (
     totalCapacity,
   };
 };
+
+export interface SystemCalculations {
+  system_id: number;
+  system_name: string;
+  totalIn: number;
+  totalOut: number;
+  totalBalance: number;
+  totalStock: number;
+  totalCapacity: number;
+}
+
+export const calculateSystemFlowBalance = (
+  devices: DeviceResult[],
+  systemId: number
+): SystemCalculations | null => {
+  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
+  const systemDevices = visibleDevices.filter(device => device.system_id === systemId);
+
+  if (systemDevices.length === 0) return null;
+
+  const relevantDevices = systemDevices.filter(shouldIncludeDevice);
+  const tankDevices = systemDevices.filter(
+    (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+  );
+
+  let totalIn = 0;
+  let totalOut = 0;
+  let totalStock = 0;
+  let totalCapacity = 0;
+
+  relevantDevices.forEach((device) => {
+    const flowValue = getDeviceFlowValue(device);
+    const { system_connection } = device;
+
+    if (system_connection === "in") {
+      totalIn += flowValue;
+    }
+
+    if (system_connection === "out") {
+      totalOut += flowValue;
+    }
+
+    if (system_connection === "both") {
+      totalIn += flowValue;
+      totalOut += flowValue;
+    }
+  });
+
+  tankDevices.forEach((device) => {
+    const currentLevel = Number(device.last_record?.last_level) || 0;
+    const capacity = Number(device.params?.storageCapacity) || 0;
+
+    totalStock += currentLevel;
+    totalCapacity += capacity;
+  });
+
+  const totalBalance = totalOut - totalIn;
+
+  return {
+    system_id: systemId,
+    system_name: systemDevices[0].system_name || `System ${systemId}`,
+    totalIn,
+    totalOut,
+    totalBalance,
+    totalStock,
+    totalCapacity,
+  };
+};
