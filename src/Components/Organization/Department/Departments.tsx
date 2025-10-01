@@ -9,9 +9,19 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAppSelector } from "../../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../../store/store";
+import {
+  getOrganizations,
+  setOrganizations,
+} from "../../../../store/organizationSlice";
+import { getAllPlants, setPlants } from "../../../../store/plantSlice";
+import type { DepartmentResult } from "../../../../model/department.interface";
+import { Warning } from "../../../utils/toast";
+import { getAllDepartments, getDepartmentByOrganizationIdAndPlantId, setDepartments } from "../../../../store/departmentSlice";
+import AddUpdateDepartment from "./AddUpdateDepartment";
+import { fromatDateWithTime } from "../../../utils/utils";
 
 const Departments = () => {
   const { plant_id, organization_id } = useParams<{
@@ -34,6 +44,92 @@ const Departments = () => {
   const { organizations } = useAppSelector((state) => state.organization);
   const { plants } = useAppSelector((state) => state.plant);
   const { admin } = useAppSelector((state) => state.admin);
+  const { departments } = useAppSelector((state) => state.department);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const [filteredDepartments, setFilteredDepartments] = useState<
+    DepartmentResult[]
+  >([]);
+  const [isAddDepartmentOpen, setIsAddDepartmentOpen] = useState(false);
+  const [plantId, setPlantId] = useState<number | null>(null);
+  const [organizationId, setOrganizationId] = useState<number | null>(null);
+  const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
+  const [departmentId, setDepartmentId] = useState<number | null>(null);
+
+  const getOrganization = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          dispatch(setOrganizations(res.data));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get organizations");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
+
+  const fetchPlants = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getAllPlants())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          dispatch(setPlants(res.data));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get plants");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (organizations.length === 0 || plants.length === 0) {
+      getOrganization();
+      fetchPlants();
+    }
+  }, [getOrganization, fetchPlants]);
+
+  useEffect(() => {
+    let filtered = departments;
+
+    if (searchTerm) {
+      filtered = filtered.filter((department: DepartmentResult) =>
+        department.department_name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedOrganization !== "all") {
+      const orgPlantIds = plants
+        .filter((p) => p.organization_id === parseInt(selectedOrganization))
+        .map((p) => p.plant_id);
+      filtered = filtered.filter((department: DepartmentResult) =>
+        orgPlantIds.includes(department.plant_id)
+      );
+    }
+
+    if (selectedPlant !== "all") {
+      filtered = filtered.filter(
+        (department: DepartmentResult) =>
+          department.plant_id === parseInt(selectedPlant)
+      );
+    }
+
+    setFilteredDepartments(filtered);
+  }, [departments, selectedOrganization, selectedPlant, plants, searchTerm]);
 
   const filteredOrganizations = organizations.filter((org) =>
     org.organization_name
@@ -55,6 +151,231 @@ const Departments = () => {
     return matchesSearch && matchesOrganization;
   });
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        organizationDropdownRef.current &&
+        !organizationDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOrganizationDropdownOpen(false);
+        setOrganizationSearchTerm("");
+      }
+      if (
+        plantDropdownRef.current &&
+        !plantDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsPlantDropdownOpen(false);
+        setPlantSearchTerm("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".organization-dropdown")) {
+        setIsOrganizationDropdownOpen(false);
+      }
+      if (!target.closest(".plant-dropdown")) {
+        setIsPlantDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedOrganization !== "all") {
+      const selectedPlants = plants.find(
+        (plant) => plant.plant_id.toString() === selectedPlant
+      );
+
+      if (
+        selectedPlants &&
+        selectedPlants.organization_id !== parseInt(selectedOrganization)
+      ) {
+        setSelectedPlant("all");
+        setPlantSearchTerm("");
+      }
+    }
+  }, [selectedOrganization, selectedPlant, plants]);
+
+  const handleAddDepartment = () => {
+    if (selectedOrganization === "all" || selectedPlant === "all") {
+      Warning("Please select both organization and plant before adding a department");
+      return;
+    }
+
+    setIsAddDepartmentOpen(true);
+    setPlantId(parseInt(selectedPlant));
+    setOrganizationId(parseInt(selectedOrganization));
+  };
+
+  const handleEditDepartment = (departmentId: number, plantId: number) => {
+    const derivedOrganizationId: number =
+      plants.find((p) => p.plant_id === plantId)?.organization_id ||
+      (selectedOrganization !== "all" ? parseInt(selectedOrganization) : 0);
+
+    setDepartmentId(departmentId);
+    setIsEditDepartmentOpen(true);
+    setPlantId(plantId);
+    setOrganizationId(derivedOrganizationId);
+
+    if (!derivedOrganizationId) {
+      Warning("Organization not found for this department. Please select an organization first.");
+    }
+  };
+
+  const refreshDepartments = useCallback(() => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    dispatch(getAllDepartments())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          dispatch(setDepartments(res?.data));
+          setFilteredDepartments(res?.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get departments");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch, setFilteredDepartments, setDepartments]);
+
+  useEffect(() => {
+    if (organization_id && plant_id) {
+      setIsLoading(true);
+      dispatch(
+        getDepartmentByOrganizationIdAndPlantId({
+          plant_id: parseInt(plant_id),
+          organization_id: parseInt(organization_id),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDepartments(res?.data));
+            setFilteredDepartments(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to get departments");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+      return;
+    }
+
+    if (selectedOrganization === "all" && selectedPlant === "all") {
+      refreshDepartments();
+    } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
+      setIsLoading(true);
+      dispatch(
+        getDepartmentByOrganizationIdAndPlantId({
+          plant_id: parseInt(selectedPlant),
+          organization_id: parseInt(selectedOrganization),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDepartments(res?.data));
+            setFilteredDepartments(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to get departments");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [organization_id, plant_id, selectedOrganization, selectedPlant, dispatch, refreshDepartments]);
+
+  const handleDepartmentUpdate = useCallback((result?: {
+    data?: {
+      refreshPlants?: boolean;
+      refreshOrganizations?: boolean;
+    };
+  }) => {
+    if (isLoading) return;
+    
+    if (result?.data?.refreshPlants) {
+      fetchPlants();
+      return;
+    }
+
+    if (result?.data?.refreshOrganizations) {
+      getOrganization();
+      return;
+    }
+
+    setIsLoading(true);
+
+    if (organization_id && plant_id) {
+      dispatch(
+        getDepartmentByOrganizationIdAndPlantId({
+          plant_id: parseInt(plant_id),
+          organization_id: parseInt(organization_id),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDepartments(res?.data));
+            setFilteredDepartments(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to update department");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
+      dispatch(
+        getDepartmentByOrganizationIdAndPlantId({
+          plant_id: parseInt(selectedPlant),
+          organization_id: parseInt(selectedOrganization),
+        })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success) {
+            dispatch(setDepartments(res?.data));
+            setFilteredDepartments(res?.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Error("Failed to update department");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      refreshDepartments();
+    }
+
+  }, [dispatch, selectedOrganization, selectedPlant, organization_id, plant_id, refreshDepartments]);
+
   const handleBackToHome = () => {
     navigate("/");
   };
@@ -65,6 +386,10 @@ const Departments = () => {
 
   const handleBackToPlants = () => {
     navigate("/organization/plants");
+  };
+
+  const handleViewDevices = (departmentId: number, organizationId: number, plantId: number) => {
+    navigate(`/organization/devices/${plantId}/${organizationId}/${departmentId}`);
   };
 
   return (
@@ -99,8 +424,9 @@ const Departments = () => {
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
-              {plants.find((plant) => plant.plant_id.toString() === selectedPlant)
-                ?.plant_name || "Plant"}
+              {plants.find(
+                (plant) => plant.plant_id.toString() === selectedPlant
+              )?.plant_name || "Plant"}
             </span>
           </>
         )}
@@ -283,7 +609,7 @@ const Departments = () => {
               <button
                 onClick={() => {
                   setSearchTerm("");
-                  //   setFilteredDevices(devices);
+                  setFilteredDepartments(departments);
                 }}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 title="Clear search"
@@ -294,7 +620,7 @@ const Departments = () => {
           </div>
 
           <button
-            // onClick={handleAddDevice}
+            onClick={handleAddDepartment}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
@@ -315,6 +641,15 @@ const Departments = () => {
                   Department Name
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  Organization Name
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  Plant Name
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  Department Info
+                </th>
+                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                   Created At
                 </th>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
@@ -326,41 +661,82 @@ const Departments = () => {
               </tr>
             </thead>
             <tbody>
+              {filteredDepartments.map((department, index) => (
               <tr className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer">
                 <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                  1
+                  {index + 1}
                 </td>
                 <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  Testing
+                  {department.department_name}
                 </td>
                 <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  2025-08-09
+                  {department.organization_name}
                 </td>
                 <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  2025-06-09
+                  {department.plant_name}
+                </td>
+                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                  {department.department_info || "N/A"}
+                </td>
+                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                  {fromatDateWithTime(department.created_at)}
+                </td>
+                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                  {fromatDateWithTime(department.updated_at)}
                 </td>
                 <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                   <div className="flex items-center justify-center gap-2">
                     <span title="View devices" aria-label="View devices">
-                      <Eye className="w-5 h-5 text-fuchsia-500 cursor-pointer" />
+                      <Eye
+                        onClick={() =>
+                          handleViewDevices(department.department_id, department.organization_id, department.plant_id)
+                        }
+                      className="w-5 h-5 text-fuchsia-500 cursor-pointer" />
                     </span>
 
-                    <span title="Edit plant" aria-label="Edit plant">
-                      <Edit className="w-5 h-5 text-status-info cursor-pointer" />
+                    <span title="Edit department" aria-label="Edit department">
+                      <Edit
+                        onClick={() =>
+                          handleEditDepartment(department.department_id, department.plant_id)
+                        }
+                       className="w-5 h-5 text-status-info cursor-pointer" />
                     </span>
 
                     {admin?.role === "super_admin" && (
-                      <span title="Delete plant" aria-label="Delete plant">
+                      <span title="Delete department" aria-label="Delete department">
                         <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
                       </span>
                     )}
                   </div>
-                </td>
-              </tr>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {isAddDepartmentOpen && (
+        <AddUpdateDepartment
+          setShowAddDepartmentPopup={setIsAddDepartmentOpen}
+          type="add"
+          departmentId={departmentId || 0}
+          plantId={plantId || 0}
+          onUpdateSuccess={handleDepartmentUpdate}
+          organizationId={organizationId || 0}
+        />
+      )}
+
+      {isEditDepartmentOpen && (
+        <AddUpdateDepartment
+          setShowAddDepartmentPopup={setIsEditDepartmentOpen}
+          type="update"
+          departmentId={departmentId || 0}
+          plantId={plantId || 0}
+          onUpdateSuccess={handleDepartmentUpdate}
+          organizationId={organizationId || 0}
+        />
+      )}
     </div>
   );
 };

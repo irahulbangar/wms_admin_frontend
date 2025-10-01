@@ -100,7 +100,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/devices/:plant_id/:organization_id"
+                  path="/organization/devices/:plant_id/:organization_id/:department_id"
                   element={
                     <ProtectedRoute>
                       <HomePage />

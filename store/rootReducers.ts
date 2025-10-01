@@ -5,6 +5,7 @@ import plantReducer from "./plantSlice";
 import clientReducer from "./clientSlice";
 import deviceReducer from "./deviceSlice";
 import userPlantReducer from "./userPlantSlice";
+import departmentReducer from "./departmentSlice";
 
 const rootReducer = combineReducers({
   admin: adminReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   client: clientReducer,
   device: deviceReducer,
   userPlant: userPlantReducer,
+  department: departmentReducer,
 });
 
 export default rootReducer;

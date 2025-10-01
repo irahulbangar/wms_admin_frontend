@@ -14,6 +14,7 @@ interface UpdateDepartmentProps {
   plantId?: number;
   departmentId?: number;
   onUpdateSuccess: () => void;
+  organizationId?: number;
 }
 
 const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
@@ -22,12 +23,16 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
   plantId,
   departmentId,
   onUpdateSuccess,
+  organizationId,
 }) => {
   const dispatch = useAppDispatch();
   const [newDepartmentName, setNewDepartmentName] = useState("");
-  const [errors, setErrors] = useState({ department_name: "" });
+  const [errors, setErrors] = useState({ department_name: "", department_info: "" });
   const [departmentData, setDepartmentData] = useState({
     department_name: "",
+    department_info: "",
+    plant_id: plantId || 0,
+    organization_id: organizationId || 0,
   });
 
   const getDepartmentData = async () => {
@@ -61,8 +66,9 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
         await dispatch(
           createDepartment({
             department_name: newDepartmentName,
-            department_info: "",
+            department_info: departmentData?.department_info,
             plant_id: plantId || 0,
+            organization_id: organizationId || 0,
           })
         )
           .unwrap()
@@ -80,9 +86,10 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
         await dispatch(
           updateDepartment({
             department_name: newDepartmentName,
-            department_info: "",
+            department_info: departmentData?.department_info,
             plant_id: plantId || 0,
             department_id: departmentId || 0,
+            organization_id: organizationId || 0,
           })
         )
           .unwrap()
@@ -139,6 +146,28 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
             {errors.department_name && (
               <p className="text-status-danger text-sm mt-1 font-roboto">
                 {errors.department_name}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+              Department Info
+            </label>
+            <textarea
+              name="department_info"
+              placeholder="Enter department info"
+              value={departmentData?.department_info}
+              onChange={(e) => setDepartmentData((prev) => ({ ...prev, department_info: e.target.value }))}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                errors.department_info
+                  ? "border-status-danger"
+                  : "border-border-primary"
+              }`}
+            />
+            {errors.department_info && (
+              <p className="text-status-danger text-sm mt-1 font-roboto">
+                {errors.department_info}
               </p>
             )}
           </div>
