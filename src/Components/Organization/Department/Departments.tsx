@@ -711,7 +711,7 @@ const Departments = () => {
               handlePaginatedDepartments.map((department, index) => (
               <tr className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer">
                 <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                  {index + 1}
+                  {(currentPage - 1) * rowsPerPage + index + 1}
                 </td>
                 <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                   {department.department_name}
