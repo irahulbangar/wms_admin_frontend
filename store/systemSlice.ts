@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import { SystemResult } from "../model/system.interface";
+import type { SystemResult } from "../model/system.interface";
 
 interface SystemState {
   systems: SystemResult[];
