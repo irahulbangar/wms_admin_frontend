@@ -40,6 +40,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
       .unwrap()
       .then((res) => {
         setDepartmentData(res.data);
+        setNewDepartmentName(res.data.department_name);
       })
       .catch((err) => {
         console.log(err);
@@ -49,8 +50,16 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
   useEffect(() => {
     if (type === "update" && departmentId) {
       getDepartmentData();
+    } else if (type === "add") {
+      setNewDepartmentName("");
+      setDepartmentData({
+        department_name: "",
+        department_info: "",
+        plant_id: plantId || 0,
+        organization_id: organizationId || 0,
+      });
     }
-  }, [type, departmentId]);
+  }, [type, departmentId, plantId, organizationId]);
 
   const handleAddDepartment = async () => {
     if (!newDepartmentName.trim()) {
@@ -99,10 +108,13 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               setShowAddDepartmentPopup(false);
               setNewDepartmentName("");
               onUpdateSuccess();
+            } else {
+              Error(res.message);
             }
           })
           .catch((err) => {
-            Error(err.message);
+            console.log(err);
+            Error("Failed to update department");
           });
       }
     } catch (error) {
@@ -135,7 +147,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               type="text"
               name="department_name"
               placeholder="Enter department name"
-              value={newDepartmentName || departmentData?.department_name}
+              value={newDepartmentName}
               onChange={(e) => setNewDepartmentName(e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.department_name

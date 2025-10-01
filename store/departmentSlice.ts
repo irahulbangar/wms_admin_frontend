@@ -40,6 +40,18 @@ export const departmentSlice = createSlice({
       state.loading = false;
       state.error = action.error.message || "Failed to get departments";
     });
+    
+    builder.addCase(getDepartmentByOrganizationIdAndPlantId.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getDepartmentByOrganizationIdAndPlantId.fulfilled, (state, action) => {
+      state.loading = false;
+      state.departments = action.payload.data;
+    });
+    builder.addCase(getDepartmentByOrganizationIdAndPlantId.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "Failed to get departments";
+    });
   },
 });
 

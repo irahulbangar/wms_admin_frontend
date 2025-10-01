@@ -253,7 +253,7 @@ const Departments = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [dispatch, setFilteredDepartments, setDepartments]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (organization_id && plant_id) {
@@ -344,7 +344,7 @@ const Departments = () => {
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to update department");
+          Error("Failed to refresh departments");
         })
         .finally(() => {
           setIsLoading(false);
@@ -365,7 +365,7 @@ const Departments = () => {
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to update department");
+          Error("Failed to refresh departments");
         })
         .finally(() => {
           setIsLoading(false);
@@ -374,7 +374,7 @@ const Departments = () => {
       refreshDepartments();
     }
 
-  }, [dispatch, selectedOrganization, selectedPlant, organization_id, plant_id, refreshDepartments]);
+  }, [dispatch, selectedOrganization, selectedPlant, organization_id, plant_id, refreshDepartments, fetchPlants, getOrganization]);
 
   const handleBackToHome = () => {
     navigate("/");
