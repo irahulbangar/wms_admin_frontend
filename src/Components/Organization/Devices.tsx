@@ -31,9 +31,7 @@ import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Success, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
-import type { DepartmentResult } from "../../../model/department.interface";
-import { getAllDepartments } from "../../../store/departmentSlice";
-import AddUpdateDepartment from "./Department/AddUpdateDepartment";
+import { getAllDepartments, setDepartments } from "../../../store/departmentSlice";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 import DeletePopup from "./DeletePopup";
@@ -70,7 +68,6 @@ const Devices = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [deviceType, setDeviceType] = useState<DeviceTypeResult[]>([]);
   const dispatch = useAppDispatch();
-  const [departmentData, setDepartmentData] = useState<DepartmentResult[]>([]);
   const [departmentId, setDepartmentId] = useState<number>(0);
   const [systemId, setSystemId] = useState<number>(0);
   const [collapsedSystems, setCollapsedSystems] = useState<Set<string>>(
@@ -151,7 +148,7 @@ const Devices = () => {
       .unwrap()
       .then((res) => {
         if (res.success) {
-          setDepartmentData(res.data);
+          dispatch(setDepartments(res.data));
         }
       })
       .catch((err) => {
@@ -1039,30 +1036,30 @@ const Devices = () => {
       ) : (
         <div className="relative overflow-x-auto pb-0 flex-1">
           {Object.keys(groupedDevices).length > 0 ? (
-            Object.entries(groupedDevices).map(([deptId, deptDevices]) => {
-              const department = departmentData.find(
-                (dept) => dept.department_id.toString() === deptId
+            Object.entries(groupedDevices).map(([systemId, systemDevices]) => {
+              const system = systemData.find(
+                (system) => system.system_id.toString() === systemId
               );
-              const departmentName =
-                department?.department_name.trim() ||
+              const systemName =
+                system?.system_name.trim() ||
                 `${
-                  deptId === "0" ? "Extra Department" : `Department ${deptId}`
+                  systemId === "0" ? "Extra System" : `System ${systemId}`
                 }`;
-
+                
               return (
                 <div
                   className={`${
-                    collapsedSystems?.has(deptId) ? "mb-4" : "mb-0"
+                    collapsedSystems?.has(systemId) ? "mb-4" : "mb-0"
                   }`}
-                  key={deptId}
+                  key={systemId}
                 >
                   <div className="bg-primary px-4 py-3 border-b border-border-primary flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => toggleSystemCollapse(deptId)}
+                        onClick={() => toggleSystemCollapse(systemId)}
                         className="p-1 hover:bg-secondary/50 bg-secondary/50 cursor-pointer rounded transition-colors"
                       >
-                        {collapsedSystems?.has(deptId) ? (
+                        {collapsedSystems?.has(systemId) ? (
                           <ChevronDown className="w-5 h-5 text-text-primary" />
                         ) : (
                           <ChevronRight className="w-5 h-5 text-text-primary" />
@@ -1070,11 +1067,11 @@ const Devices = () => {
                       </button>
                       <div>
                         <h3 className="text-lg font-medium text-text-primary font-roboto">
-                          {departmentName}
+                          {systemName}
                         </h3>
                         <p className="text-sm text-text-secondary font-roboto">
-                          {deptDevices?.length} device
-                          {deptDevices?.length !== 1 ? "s" : ""}
+                          {systemDevices?.length} device
+                          {systemDevices?.length !== 1 ? "s" : ""}
                         </p>
                       </div>
                     </div>
@@ -1083,7 +1080,7 @@ const Devices = () => {
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-status-success rounded-full"></div>
                           <span className="text-xs text-text-secondary font-roboto">
-                            {deptDevices?.filter(
+                            {systemDevices?.filter(
                               (d) => d.device_status?.toLowerCase() === "active"
                             ).length || 0}{" "}
                             Active
@@ -1092,7 +1089,7 @@ const Devices = () => {
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-status-danger rounded-full"></div>
                           <span className="text-xs text-text-secondary font-roboto">
-                            {deptDevices?.filter(
+                            {systemDevices?.filter(
                               (d) =>
                                 d.device_status?.toLowerCase() === "inactive"
                             ).length || 0}{" "}
@@ -1101,20 +1098,20 @@ const Devices = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {deptId !== "0" && (
+                        {systemId !== "0" && (
                           <Edit
-                            onClick={() => handleEditSystem(deptId)}
+                            onClick={() => handleEditSystem(systemId)}
                             className="w-5 h-5 text-status-info cursor-pointer"
                           />
                         )}
-                        {deptDevices?.length < 1 && (
+                        {systemDevices?.length < 1 && (
                           <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
                         )}
                       </div>
                     </div>
                   </div>
 
-                  {!collapsedSystems?.has(deptId) && (
+                  {!collapsedSystems?.has(systemId) && (
                     <div className="overflow-x-auto">
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
@@ -1152,9 +1149,9 @@ const Devices = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {deptDevices?.map((device, index) => (
+                          {systemDevices?.map((device, index) => (
                             <tr
-                              key={`${deptId}-${device?.device_id} ${index}`}
+                              key={`${systemId}-${device?.device_id} ${index}`}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
