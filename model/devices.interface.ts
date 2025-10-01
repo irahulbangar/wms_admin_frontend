@@ -32,6 +32,7 @@ export interface DeviceResult {
   device_type_name: string;
   department_name: string;
   plant_name: string;
+  system_name: string;
   latitude: string;
   longitude: string;
   address: string;

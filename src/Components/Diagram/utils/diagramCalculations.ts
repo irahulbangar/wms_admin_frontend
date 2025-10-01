@@ -30,6 +30,12 @@ export interface DiagramEdge {
 export interface DepartmentGroup {
   department_id: number;
   department_name: string;
+  systems: Record<string, SystemGroup>;
+}
+
+export interface SystemGroup {
+  system_id: number;
+  system_name: string;
   devices: DeviceResult[];
 }
 
@@ -70,41 +76,66 @@ export const convertDevicesToDiagram = (
       acc[plantId].departments[deptId] = {
         department_id: device.department_id,
         department_name: device.department_name || `Department ${device.department_id}`,
-        devices: [],
+        systems: {},
       };
     } else {
       if (device.department_name && device.department_name !== acc[plantId].departments[deptId].department_name) {
         acc[plantId].departments[deptId].department_name = device.department_name;
       }
     }
-    acc[plantId].departments[deptId].devices.push(device);
+
+    const systemId = device.system_id.toString();
+    if (!acc[plantId].departments[deptId].systems[systemId]) {
+      acc[plantId].departments[deptId].systems[systemId] = {
+        system_id: device.system_id,
+        system_name: device.system_name || `System ${device.system_id}`,
+        devices: [],
+      };
+    } else {
+      if (device.system_name && device.system_name !== acc[plantId].departments[deptId].systems[systemId].system_name) {
+        acc[plantId].departments[deptId].systems[systemId].system_name = device.system_name;
+      }
+    }
+    acc[plantId].departments[deptId].systems[systemId].devices.push(device);
     return acc;
   }, {} as Record<string, { plant_id: number; plant_name: string; departments: Record<string, DepartmentGroup> }>);
 
   Object.values(plantGroups).forEach((plant, plantIndex) => {
     const plantId = `plant-${plant.plant_id}`;
 
-    // Calculate dynamic plant dimensions based on department count and content
     const departmentCount = Object.values(plant.departments).length;
 
-    // Calculate optimal grid layout
-    const maxDepartmentsPerRow = departmentCount <= 2 ? 2 : departmentCount <= 6 ? 3 : 4;
+    const maxDepartmentsPerRow = Math.max(1, Math.min(departmentCount, Math.floor(1600 / 900)));
     const totalRows = Math.ceil(departmentCount / maxDepartmentsPerRow);
 
-    // Calculate department dimensions first
-    const departmentSpacing = 20;
-    const plantPadding = 40;
-    const minDepartmentWidth = 650; // Minimum department width
-    const minDepartmentHeight = 550; // Minimum department height
+    const departmentSpacing = 30;
+    const plantPadding = 50;
+    const minDepartmentWidth = 900; // Minimum department width
+    const minDepartmentHeight = 700; // Minimum department height
 
-    // Calculate plant width based on department count (minimum 1200px)
-    const plantWidth = Math.max(1200, plantPadding * 2 + maxDepartmentsPerRow * minDepartmentWidth + (maxDepartmentsPerRow - 1) * departmentSpacing);
+    let requiredPlantWidth = plantPadding * 2 + maxDepartmentsPerRow * minDepartmentWidth + (maxDepartmentsPerRow - 1) * departmentSpacing;
+    let requiredPlantHeight = plantPadding * 2 + 80 + totalRows * minDepartmentHeight + (totalRows - 1) * departmentSpacing;
 
-    // Calculate plant height based on department rows and content (minimum 650px)
-    const plantHeight = Math.max(650, plantPadding * 2 + 60 + totalRows * minDepartmentHeight + (totalRows - 1) * departmentSpacing);
+    Object.values(plant.departments).forEach((department) => {
+      const totalSystemsInDept = Object.values(department.systems).length;
+      if (totalSystemsInDept > 1) {
+        const systemSpacing = 30;
+        const systemPadding = 40;
+        const systemsPerRow = Math.min(totalSystemsInDept, Math.floor((minDepartmentWidth - 2 * systemPadding) / (750 + systemSpacing)));
+        const totalSystemRows = Math.ceil(totalSystemsInDept / systemsPerRow);
+        
+        const requiredDeptWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * 750 + (systemsPerRow - 1) * systemSpacing);
+        const requiredDeptHeight = Math.max(minDepartmentHeight, 60 + 30 + totalSystemRows * 550 + (totalSystemRows - 1) * systemSpacing);
+        
+        requiredPlantWidth = Math.max(requiredPlantWidth, plantPadding * 2 + maxDepartmentsPerRow * requiredDeptWidth + (maxDepartmentsPerRow - 1) * departmentSpacing);
+        requiredPlantHeight = Math.max(requiredPlantHeight, plantPadding * 2 + 80 + totalRows * requiredDeptHeight + (totalRows - 1) * departmentSpacing);
+      }
+    });
 
-    // Calculate plant positioning based on dynamic width
-    const plantSpacing = 100; // Base spacing between plants
+    const plantWidth = Math.max(1400, requiredPlantWidth);
+    const plantHeight = Math.max(800, requiredPlantHeight);
+
+    const plantSpacing = 100;
     const plantX = plantIndex * (plantWidth + plantSpacing) + 0;
     const plantY = 20;
 
@@ -134,38 +165,43 @@ export const convertDevicesToDiagram = (
       dragHandle: ".group-drag-handle",
     });
 
-    // Calculate available space for departments within dynamic plant boundaries
     const availableWidth = plantWidth - (2 * plantPadding);
-    const availableHeight = plantHeight - (2 * plantPadding) - 40; // 40px for plant header
+    const availableHeight = plantHeight - (2 * plantPadding) - 80;
 
-    // Calculate department dimensions based on available space
     const departmentWidth = Math.max(minDepartmentWidth, (availableWidth - (maxDepartmentsPerRow - 1) * departmentSpacing) / maxDepartmentsPerRow);
     const departmentHeight = Math.max(minDepartmentHeight, (availableHeight - (totalRows - 1) * departmentSpacing) / totalRows);
 
     Object.values(plant.departments).forEach((department, deptIndex) => {
       const deptId = `dept-${department.department_id}`;
 
-      // Calculate position within plant boundaries
       const row = Math.floor(deptIndex / maxDepartmentsPerRow);
       const col = deptIndex % maxDepartmentsPerRow;
       const deptX = plantX + plantPadding + col * (departmentWidth + departmentSpacing);
-      const deptY = plantY + 60 + row * (departmentHeight + departmentSpacing);
+      const deptY = plantY + 80 + row * (departmentHeight + departmentSpacing);
 
-      department.devices.sort((a: DeviceResult, b: DeviceResult) => {
-        const aIsTank = a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
-        const bIsTank = b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
-        if (aIsTank && !bIsTank) return -1;
-        if (!aIsTank && bIsTank) return 1;
-        return a.device_id - b.device_id;
-      });
-
-      // Calculate dynamic department dimensions based on device count
-      const deviceCount = department.devices.length;
-      const minDimensions = calculateMinimumDimensions(deviceCount);
-
-      // Use minimum department dimensions (650x550) and grow based on device content
-      const dynamicWidth = Math.max(650, Math.max(departmentWidth, minDimensions.width));
-      const dynamicHeight = Math.max(550, Math.max(departmentHeight, minDimensions.height));
+      const deptSystemCount = Object.values(department.systems).length;
+      
+      let dynamicWidth: number;
+      let dynamicHeight: number;
+      
+      if (deptSystemCount === 1) {
+        dynamicWidth = Math.max(900, departmentWidth);
+        dynamicHeight = Math.max(700, departmentHeight);
+      } else {
+        const systemSpacing = 30;
+        const systemPadding = 40;
+        const systemHeaderHeight = 60;
+        const systemFooterHeight = 30;
+        
+        const systemsPerRow = Math.min(deptSystemCount, Math.floor((departmentWidth - 2 * systemPadding) / (750 + systemSpacing)));
+        const totalSystemRows = Math.ceil(deptSystemCount / systemsPerRow);
+        
+        const requiredWidth = Math.max(900, 2 * systemPadding + systemsPerRow * 750 + (systemsPerRow - 1) * systemSpacing);
+        const requiredHeight = Math.max(700, systemHeaderHeight + systemFooterHeight + totalSystemRows * 550 + (totalSystemRows - 1) * systemSpacing);
+        
+        dynamicWidth = Math.max(900, Math.max(departmentWidth, requiredWidth));
+        dynamicHeight = Math.max(700, Math.max(departmentHeight, requiredHeight));
+      }
 
       const currentDimensions = departmentDimensions[deptId] || {
         width: dynamicWidth,
@@ -201,108 +237,185 @@ export const convertDevicesToDiagram = (
         dragHandle: ".group-drag-handle",
       });
 
-      const tanks = department.devices.filter(
-        (device: DeviceResult) =>
-          device.type === "tank" ||
-          device.device_family?.toLowerCase().includes("tank")
-      );
+      const systemCount = Object.values(department.systems).length;
+      const systemSpacing = 30;
+      const systemPadding = 40;
+      const systemHeaderHeight = 60;
+      const systemFooterHeight = 30;
+      
+      let systemsPerRow: number;
+      let totalSystemRows: number;
+      let systemWidth: number;
+      let systemHeight: number;
+      
+      if (systemCount === 1) {
+        systemsPerRow = 1;
+        totalSystemRows = 1;
+        systemWidth = 650;
+        systemHeight = 550;
+      } else {
+        systemsPerRow = Math.min(systemCount, Math.floor((deptWidth - 2 * systemPadding) / (750 + systemSpacing)));
+        totalSystemRows = Math.ceil(systemCount / systemsPerRow);
+        
+        const availableSystemWidth = (deptWidth - 2 * systemPadding - (systemsPerRow - 1) * systemSpacing) / systemsPerRow;
+        const availableSystemHeight = (deptHeight - systemHeaderHeight - systemFooterHeight - (totalSystemRows - 1) * systemSpacing) / totalSystemRows;
+        
+        systemWidth = Math.max(750, Math.min(900, availableSystemWidth));
+        systemHeight = Math.max(550, Math.min(700, availableSystemHeight));
+      }
+      
+      Object.values(department.systems).forEach((system, systemIndex) => {
+        const systemId = `system-${system.system_id}`;
+        
+        const systemRow = Math.floor(systemIndex / systemsPerRow);
+        const systemCol = systemIndex % systemsPerRow;
+        
+        const systemX = deptX + systemPadding + systemCol * (systemWidth + systemSpacing);
+        const systemY = deptY + systemHeaderHeight + systemRow * (systemHeight + systemSpacing);
+        
+        const maxSystemX = deptX + deptWidth - systemWidth - systemPadding;
+        const maxSystemY = deptY + deptHeight - systemHeight - systemFooterHeight;
+        const finalSystemX = Math.min(systemX, maxSystemX);
+        const finalSystemY = Math.min(systemY, maxSystemY);
 
-      tanks.forEach((device: DeviceResult, tankIndex: number) => {
-        const deviceId = `${deptId}-tank${tankIndex + 1}`;
-        const tankNode = createTankNode(
-          device,
-          deviceId,
-          deptId,
-          deptWidth,
-          deptHeight,
-          tankIndex,
-          tanks.length
+        nodes.push({
+          id: systemId,
+          data: {
+            label: system.system_name,
+            type: "system",
+            unit: "Ltr",
+          },
+          position: { x: finalSystemX, y: finalSystemY },
+          parentId: deptId,
+          style: {
+            width: systemWidth,
+            height: systemHeight,
+            borderRadius: 8,
+            border: "2px solid #10b981",
+            backgroundColor: "rgba(16, 185, 129, 0.1)",
+            zIndex: 3,
+            pointerEvents: "auto",
+          },
+          type: "group",
+          width: systemWidth,
+          height: systemHeight,
+          draggable: true,
+          selectable: true,
+          deletable: false,
+          dragHandle: ".group-drag-handle",
+        });
+
+        system.devices.sort((a: DeviceResult, b: DeviceResult) => {
+          const aIsTank = a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
+          const bIsTank = b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
+          if (aIsTank && !bIsTank) return -1;
+          if (!aIsTank && bIsTank) return 1;
+          return a.device_id - b.device_id;
+        });
+    
+        const tanks = system.devices.filter(
+          (device: DeviceResult) =>
+            device.type === "tank" ||
+            device.device_family?.toLowerCase().includes("tank")
         );
-        nodes.push(tankNode);
-      });
 
-      const fms = department.devices.filter(
-        (device: DeviceResult) =>
-          device.type === "fm" ||
-          device.device_family?.toLowerCase().includes("flow")
-      );
+        tanks.forEach((device: DeviceResult, tankIndex: number) => {
+          const deviceId = `${systemId}-tank${tankIndex + 1}`;
+          const tankNode = createTankNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            tankIndex,
+            tanks.length
+          );
+          nodes.push(tankNode);
+        });
 
-      fms.forEach((device: DeviceResult, fmIndex: number) => {
-        const deviceId = `${deptId}-fm${fmIndex + 1}`;
-        const fmNode = createFMNode(
-          device,
-          deviceId,
-          deptId,
-          deptWidth,
-          deptHeight,
-          fmIndex,
-          fms.length,
-          tanks.length
+        const fms = system.devices.filter(
+          (device: DeviceResult) =>
+            device.type === "fm" ||
+            device.device_family?.toLowerCase().includes("flow")
         );
-        nodes.push(fmNode);
-      });
 
-      const brwhms = department.devices.filter(
-        (device: DeviceResult) =>
-          device.type === "brwhms" ||
-          device.device_family?.toLowerCase().includes("brwhms")
-      );
+        fms.forEach((device: DeviceResult, fmIndex: number) => {
+          const deviceId = `${systemId}-fm${fmIndex + 1}`;
+          const fmNode = createFMNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            fmIndex,
+            fms.length,
+            tanks.length
+          );
+          nodes.push(fmNode);
+        });
 
-      brwhms.forEach((device: DeviceResult, brwhmsIndex: number) => {
-        const deviceId = `${deptId}-brwhms${brwhmsIndex + 1}`;
-        const brwhmsNode = createBRWHMSNode(
-          device,
-          deviceId,
-          deptId,
-          deptWidth,
-          deptHeight,
-          brwhmsIndex,
-          brwhms.length,
-          tanks.length + fms.length
+        const brwhms = system.devices.filter(
+          (device: DeviceResult) =>
+            device.type === "brwhms" ||
+            device.device_family?.toLowerCase().includes("brwhms")
         );
-        nodes.push(brwhmsNode);
-      });
 
-      const phmcs = department.devices.filter(
-        (device: DeviceResult) =>
-          device.type === "phmc" ||
-          device.device_family?.toLowerCase().includes("phmc")
-      );
+        brwhms.forEach((device: DeviceResult, brwhmsIndex: number) => {
+          const deviceId = `${systemId}-brwhms${brwhmsIndex + 1}`;
+          const brwhmsNode = createBRWHMSNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            brwhmsIndex,
+            brwhms.length,
+            tanks.length + fms.length
+          );
+          nodes.push(brwhmsNode);
+        });
 
-      phmcs.forEach((device: DeviceResult, phmcIndex: number) => {
-        const deviceId = `${deptId}-phmc${phmcIndex + 1}`;
-        const phmcNode = createPHMCNode(
-          device,
-          deviceId,
-          deptId,
-          deptWidth,
-          deptHeight,
-          phmcIndex,
-          phmcs.length,
-          tanks.length + fms.length + brwhms.length
+        const phmcs = system.devices.filter(
+          (device: DeviceResult) =>
+            device.type === "phmc" ||
+            device.device_family?.toLowerCase().includes("phmc")
         );
-        nodes.push(phmcNode);
-      });
 
-      const args = department.devices.filter(
-        (device: DeviceResult) =>
-          device.type === "arg" ||
-          device.device_family?.toLowerCase().includes("arg")
-      );
+        phmcs.forEach((device: DeviceResult, phmcIndex: number) => {
+          const deviceId = `${systemId}-phmc${phmcIndex + 1}`;
+          const phmcNode = createPHMCNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            phmcIndex,
+            phmcs.length,
+            tanks.length + fms.length + brwhms.length
+          );
+          nodes.push(phmcNode);
+        });
 
-      args.forEach((device: DeviceResult, argIndex: number) => {
-        const deviceId = `${deptId}-arg${argIndex + 1}`;
-        const argNode = createARGNode(
-          device,
-          deviceId,
-          deptId,
-          deptWidth,
-          deptHeight,
-          argIndex,
-          args.length,
-          tanks.length + fms.length + brwhms.length + phmcs.length
+        const args = system.devices.filter(
+          (device: DeviceResult) =>
+            device.type === "arg" ||
+            device.device_family?.toLowerCase().includes("arg")
         );
-        nodes.push(argNode);
+
+        args.forEach((device: DeviceResult, argIndex: number) => {
+          const deviceId = `${systemId}-arg${argIndex + 1}`;
+          const argNode = createARGNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            argIndex,
+            args.length,
+            tanks.length + fms.length + brwhms.length + phmcs.length
+          );
+          nodes.push(argNode);
+        });
       });
     });
   });
@@ -319,10 +432,10 @@ const createTankNode = (
   tankIndex: number,
   totalTanks: number
 ): DiagramNode => {
-  const tankWidth = 120;
-  const tankHeight = 80;
-  const tankSpacing = 10;
-  const sideMargin = 30;
+  const tankWidth = 160;
+  const tankHeight = 100;
+  const tankSpacing = 20;
+  const sideMargin = 50;
 
   const availableWidth = groupWidth - 2 * sideMargin;
   const maxTanksPerRow = Math.max(
@@ -345,23 +458,23 @@ const createTankNode = (
   const deviceX = startX + col * (tankWidth + tankSpacing);
 
   let deviceY;
-  const headerHeight = 40;
-  const footerHeight = 20;
+  const headerHeight = 60;
+  const footerHeight = 30;
   const availableHeight = groupHeight - headerHeight - footerHeight;
 
   const tankSectionHeight = Math.min(
-    availableHeight * 0.6,
-    totalRows * (tankHeight + 10) + 30
+    availableHeight * 0.8,
+    totalRows * (tankHeight + 20) + 50
   );
-  const tankStartY = headerHeight + 10;
+  const tankStartY = headerHeight + 20;
 
   if (totalRows === 1) {
     deviceY = tankStartY + (tankSectionHeight - tankHeight) / 2;
   } else {
     const rowSpacing = Math.max(
-      30,
+      40,
       Math.min(
-        50,
+        70,
         (tankSectionHeight - totalRows * tankHeight) / (totalRows - 1)
       )
     );
@@ -407,25 +520,25 @@ const createFMNode = (
   totalFMs: number,
   totalTanks: number
 ): DiagramNode => {
-  const fmWidth = 140;
-  const fmHeight = 60;
-  const sideMargin = 10;
-  const fmSpacing = 10;
+  const fmWidth = 180;
+  const fmHeight = 80;
+  const sideMargin = 30;
+  const fmSpacing = 20;
 
   const availableWidth = groupWidth - 2 * sideMargin;
-  const maxTanksPerRow = Math.max(1, Math.floor(availableWidth / (50 + 30)));
+  const maxTanksPerRow = Math.max(1, Math.floor(availableWidth / (70 + 50)));
   const totalTankRows = Math.ceil(totalTanks / maxTanksPerRow);
 
-  const headerHeight = 20;
-  const footerHeight = 10;
+  const headerHeight = 40;
+  const footerHeight = 20;
   const tankAreaHeight =
     totalTanks > 0
       ? headerHeight +
-      20 +
-      totalTankRows * 60 +
-      Math.max(0, totalTankRows - 1) * 30 +
-      40
-      : headerHeight + 20;
+      30 +
+      totalTankRows * 80 +
+      Math.max(0, totalTankRows - 1) * 40 +
+      60
+      : headerHeight + 30;
 
   const maxFMsPerRow = Math.max(
     1,
@@ -433,20 +546,20 @@ const createFMNode = (
   );
   const totalFMRows = Math.ceil(totalFMs / maxFMsPerRow);
 
-  const fmStartY = tankAreaHeight + 40;
+  const fmStartY = tankAreaHeight + 60;
   const availableHeight = groupHeight - fmStartY - footerHeight;
 
   const fmSectionHeight = Math.min(
-    availableHeight * 0.4,
-    totalFMRows * (fmHeight + 30) + 40
+    availableHeight * 0.6,
+    totalFMRows * (fmHeight + 40) + 60
   );
 
   const fmVerticalSpacing =
     totalFMRows > 1
       ? Math.max(
-        30,
+        40,
         Math.min(
-          50,
+          70,
           (fmSectionHeight - totalFMRows * fmHeight) / (totalFMRows - 1)
         )
       )
@@ -460,7 +573,7 @@ const createFMNode = (
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (fmWidth + fmSpacing);
-  const deviceY = fmStartY + 20 + row * (fmHeight + fmVerticalSpacing);
+  const deviceY = fmStartY + 30 + row * (fmHeight + fmVerticalSpacing);
 
   const maxX = groupWidth - fmWidth - sideMargin;
   const maxY = groupHeight - fmHeight - footerHeight;
@@ -500,10 +613,10 @@ const createBRWHMSNode = (
   totalBRWHMS: number,
   previousDevicesCount: number
 ): DiagramNode => {
-  const brwhmsWidth = 140;
-  const brwhmsHeight = 80;
-  const sideMargin = 10;
-  const brwhmsSpacing = 10;
+  const brwhmsWidth = 180;
+  const brwhmsHeight = 100;
+  const sideMargin = 30;
+  const brwhmsSpacing = 20;
 
   const availableWidth = groupWidth - 2 * sideMargin;
   const maxDevicesPerRow = Math.max(
@@ -512,23 +625,23 @@ const createBRWHMSNode = (
   );
   const totalRows = Math.ceil(totalBRWHMS / maxDevicesPerRow);
 
-  const footerHeight = 10;
-  const previousDevicesHeight = previousDevicesCount > 0 ? 200 : 0;
+  const footerHeight = 20;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 300 : 0;
 
-  const brwhmsStartY = previousDevicesHeight + 40;
+  const brwhmsStartY = previousDevicesHeight + 60;
   const availableHeight = groupHeight - brwhmsStartY - footerHeight;
 
   const brwhmsSectionHeight = Math.min(
-    availableHeight * 0.4,
-    totalRows * (brwhmsHeight + 30) + 40
+    availableHeight * 0.6,
+    totalRows * (brwhmsHeight + 40) + 60
   );
 
   const brwhmsVerticalSpacing =
     totalRows > 1
       ? Math.max(
-        30,
+        40,
         Math.min(
-          50,
+          70,
           (brwhmsSectionHeight - totalRows * brwhmsHeight) / (totalRows - 1)
         )
       )
@@ -542,7 +655,7 @@ const createBRWHMSNode = (
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (brwhmsWidth + brwhmsSpacing);
-  const deviceY = brwhmsStartY + 20 + row * (brwhmsHeight + brwhmsVerticalSpacing);
+  const deviceY = brwhmsStartY + 30 + row * (brwhmsHeight + brwhmsVerticalSpacing);
 
   const maxX = groupWidth - brwhmsWidth - sideMargin;
   const maxY = groupHeight - brwhmsHeight - footerHeight;
@@ -584,10 +697,10 @@ const createPHMCNode = (
   totalPHMCs: number,
   previousDevicesCount: number
 ): DiagramNode => {
-  const phmcWidth = 140;
-  const phmcHeight = 100;
-  const sideMargin = 10;
-  const phmcSpacing = 10;
+  const phmcWidth = 180;
+  const phmcHeight = 120;
+  const sideMargin = 30;
+  const phmcSpacing = 20;
 
   const availableWidth = groupWidth - 2 * sideMargin;
   const maxDevicesPerRow = Math.max(
@@ -596,23 +709,23 @@ const createPHMCNode = (
   );
   const totalRows = Math.ceil(totalPHMCs / maxDevicesPerRow);
 
-  const footerHeight = 10;
-  const previousDevicesHeight = previousDevicesCount > 0 ? 300 : 0;
+  const footerHeight = 20;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 400 : 0;
 
-  const phmcStartY = previousDevicesHeight + 40;
+  const phmcStartY = previousDevicesHeight + 60;
   const availableHeight = groupHeight - phmcStartY - footerHeight;
 
   const phmcSectionHeight = Math.min(
-    availableHeight * 0.4,
-    totalRows * (phmcHeight + 30) + 40
+    availableHeight * 0.6,
+    totalRows * (phmcHeight + 40) + 60
   );
 
   const phmcVerticalSpacing =
     totalRows > 1
       ? Math.max(
-        30,
+        40,
         Math.min(
-          50,
+          70,
           (phmcSectionHeight - totalRows * phmcHeight) / (totalRows - 1)
         )
       )
@@ -626,7 +739,7 @@ const createPHMCNode = (
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (phmcWidth + phmcSpacing);
-  const deviceY = phmcStartY + 20 + row * (phmcHeight + phmcVerticalSpacing);
+  const deviceY = phmcStartY + 30 + row * (phmcHeight + phmcVerticalSpacing);
 
   const maxX = groupWidth - phmcWidth - sideMargin;
   const maxY = groupHeight - phmcHeight - footerHeight;
@@ -673,10 +786,10 @@ const createARGNode = (
   totalARGs: number,
   previousDevicesCount: number
 ): DiagramNode => {
-  const argWidth = 120;
-  const argHeight = 80;
-  const sideMargin = 10;
-  const argSpacing = 10;
+  const argWidth = 160;
+  const argHeight = 100;
+  const sideMargin = 30;
+  const argSpacing = 20;
 
   const availableWidth = groupWidth - 2 * sideMargin;
   const maxDevicesPerRow = Math.max(
@@ -685,23 +798,23 @@ const createARGNode = (
   );
   const totalRows = Math.ceil(totalARGs / maxDevicesPerRow);
 
-  const footerHeight = 10;
-  const previousDevicesHeight = previousDevicesCount > 0 ? 400 : 0;
+  const footerHeight = 20;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 500 : 0;
 
-  const argStartY = previousDevicesHeight + 40;
+  const argStartY = previousDevicesHeight + 60;
   const availableHeight = groupHeight - argStartY - footerHeight;
 
   const argSectionHeight = Math.min(
-    availableHeight * 0.4,
-    totalRows * (argHeight + 30) + 40
+    availableHeight * 0.6,
+    totalRows * (argHeight + 40) + 60
   );
 
   const argVerticalSpacing =
     totalRows > 1
       ? Math.max(
-        30,
+        40,
         Math.min(
-          50,
+          70,
           (argSectionHeight - totalRows * argHeight) / (totalRows - 1)
         )
       )
@@ -715,7 +828,7 @@ const createARGNode = (
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (argWidth + argSpacing);
-  const deviceY = argStartY + 20 + row * (argHeight + argVerticalSpacing);
+  const deviceY = argStartY + 30 + row * (argHeight + argVerticalSpacing);
 
   const maxX = groupWidth - argWidth - sideMargin;
   const maxY = groupHeight - argHeight - footerHeight;
@@ -814,55 +927,39 @@ export const cleanNodesForAPI = (
         data: cleanData,
       };
     } else if (node.type === "group") {
-      const currentDimensions = departmentDimensions[node.id];
-      if (currentDimensions) {
-        return {
-          ...node,
-          width: currentDimensions.width,
-          height: currentDimensions.height,
-          position: node.position,
-          draggable: true,
-          selectable: true,
-          deletable: false,
-          dragHandle: ".group-drag-handle",
-          style: {
-            ...node.style,
-            width: `${currentDimensions.width}px`,
-            height: `${currentDimensions.height}px`,
-            zIndex: 1,
-          },
-        };
+      if (node.data.type === "department") {
+        const currentDimensions = departmentDimensions[node.id];
+        if (currentDimensions) {
+          return {
+            ...node,
+            width: currentDimensions.width,
+            height: currentDimensions.height,
+            position: node.position,
+            draggable: true,
+            selectable: true,
+            deletable: false,
+            dragHandle: ".group-drag-handle",
+            style: {
+              ...node.style,
+              width: `${currentDimensions.width}px`,
+              height: `${currentDimensions.height}px`,
+              zIndex: 1,
+            },
+          };
+        }
       }
+      return {
+        ...node,
+        draggable: true,
+        selectable: true,
+        deletable: false,
+        dragHandle: ".group-drag-handle",
+      };
     }
     return node;
   });
 };
 
-const calculateMinimumDimensions = (
-  deviceCount: number
-): { width: number; height: number } => {
-  const headerHeight = 50; // Department header height
-  const footerHeight = 30; // Department footer height
-  const sideMargin = 30; // Side margins
-  const deviceSpacing = 20; // Spacing between devices
-  const deviceWidth = 140; // Average device width
-  const deviceHeight = 90; // Average device height
-
-  // Calculate width based on device count and available space
-  const maxDevicesPerRow = Math.max(1, Math.floor(600 / (deviceWidth + deviceSpacing)));
-  const totalRows = Math.ceil(deviceCount / maxDevicesPerRow);
-
-  // Calculate minimum width needed (starting from 650px minimum)
-  const minWidth = Math.max(650, sideMargin * 2 + Math.min(deviceCount, maxDevicesPerRow) * (deviceWidth + deviceSpacing));
-
-  // Calculate minimum height needed (starting from 550px minimum)
-  const minHeight = Math.max(550, headerHeight + footerHeight + totalRows * deviceHeight + (totalRows - 1) * deviceSpacing + 30);
-
-  return {
-    width: Math.min(1200, minWidth), // Cap at 1200px for very large departments
-    height: Math.min(1000, minHeight), // Cap at 1000px for very large departments
-  };
-};
 
 const getDeviceFlowValue = (device: DeviceResult): number => {
   const { type, device_type, last_record } = device;
@@ -905,10 +1002,19 @@ export const calculateDepartmentFlowBalances = (
       acc[deptId] = {
         department_id: deptId,
         department_name: device.department_name || `Department ${deptId}`,
+        systems: {},
+      };
+    }
+
+    const systemId = device.system_id.toString();
+    if (!acc[deptId].systems[systemId]) {
+      acc[deptId].systems[systemId] = {
+        system_id: device.system_id,
+        system_name: device.system_name || `System ${device.system_id}`,
         devices: [],
       };
     }
-    acc[deptId].devices.push(device);
+    acc[deptId].systems[systemId].devices.push(device);
     return acc;
   }, {} as Record<number, DepartmentGroup>);
 
@@ -916,24 +1022,26 @@ export const calculateDepartmentFlowBalances = (
     let totalIn = 0;
     let totalOut = 0;
 
-    group.devices.forEach((device) => {
-      if (!shouldIncludeDevice(device)) return;
+    Object.values(group.systems).forEach((system) => {
+      system.devices.forEach((device) => {
+        if (!shouldIncludeDevice(device)) return;
 
-      const flowValue = getDeviceFlowValue(device);
-      const { department_connection } = device;
+        const flowValue = getDeviceFlowValue(device);
+        const { department_connection } = device;
 
-      if (department_connection === "in") {
-        totalIn += flowValue;
-      }
+        if (department_connection === "in") {
+          totalIn += flowValue;
+        }
 
-      if (department_connection === "out") {
-        totalOut += flowValue;
-      }
+        if (department_connection === "out") {
+          totalOut += flowValue;
+        }
 
-      if (department_connection === "both") {
-        totalIn += flowValue;
-        totalOut += flowValue;
-      }
+        if (department_connection === "both") {
+          totalIn += flowValue;
+          totalOut += flowValue;
+        }
+      });
     });
 
     const totalBalance = totalOut - totalIn;
