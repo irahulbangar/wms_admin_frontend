@@ -25,7 +25,6 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
   organizationId,
 }) => {
   const dispatch = useAppDispatch();
-  const [newSystemName, setNewSystemName] = useState("");
   const [errors, setErrors] = useState({ system_name: "", system_info: "", status: "" });
   const [systemData, setSystemData] = useState({
     system_name: "",
@@ -37,16 +36,27 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log('systemData', systemData);
+
   const getSystemData = async () => {
     setIsLoading(true);
     await dispatch(getSystemById(systemId || 0))
       .unwrap()
       .then((res) => {
-        setSystemData(res.data);
-        setNewSystemName(res.data.system_name);
+        if (res.success && res.data) {
+          setSystemData({
+            system_name: res.data.system_name || "",
+            system_info: res.data.system_description || "",
+            status: res.data.status || "active",
+            plant_id: res.data.plant_id || plantId || 0,
+            organization_id: res.data.organization_id || organizationId || 0,
+            department_id: res.data.department_id || departmentId || 0,
+          });
+        }
       })
       .catch((err) => {
         console.log(err);
+        Error("Failed to load system data");
       })
       .finally(() => {
         setIsLoading(false);
@@ -57,7 +67,6 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
     if (type === "update" && systemId) {
       getSystemData();
     } else if (type === "add") {
-      setNewSystemName("");
       setSystemData({
         system_name: "",
         system_info: "",
@@ -70,7 +79,9 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
   }, [type, systemId, plantId, organizationId]);
 
   const handleAddSystem = async () => {
-    if (!newSystemName.trim()) {
+    setErrors({ system_name: "", system_info: "", status: "" });
+
+    if (!systemData.system_name.trim()) {
       setErrors((prev) => ({
         ...prev,
         system_name: "System name is required",
@@ -86,9 +97,9 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
       if (type === "add") {
         await dispatch(
           createSystem({
-            system_name: newSystemName,
+            system_name: systemData.system_name,
             system_description: systemData?.system_info,
-            status: "",
+            status: systemData.status || "active",
             plant_id: plantId || 0,
             organization_id: organizationId || 0,
             department_id: departmentId || 0,
@@ -99,19 +110,22 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             if (res.success) {
               Success(res.message);
               setShowAddSystemPopup(false);
-              setNewSystemName("");
               onUpdateSuccess();
             } else {
-              Error(res.message);
+              Error(res.message || "Failed to create system");
             }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error("Failed to create system");
           });
       } else {
         await dispatch(
           updateSystem({
             system_id: systemId || 0,
-            system_name: newSystemName,
+            system_name: systemData.system_name,
             system_description: systemData?.system_info,
-            status: "",
+            status: systemData.status || "active",
             plant_id: plantId || 0,
             department_id: departmentId || 0,
             organization_id: organizationId || 0,
@@ -122,10 +136,9 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             if (res.success) {
               Success(res.message);
               setShowAddSystemPopup(false);
-              setNewSystemName("");
               onUpdateSuccess();
             } else {
-              Error(res.message);
+              Error(res.message || "Failed to update system");
             }
           })
           .catch((err) => {
@@ -134,8 +147,8 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
           });
       }
     } catch (error) {
-      console.error("Error creating system:", error);
-      Error("Failed to create department");
+      console.error("Error with system operation:", error);
+      Error("Failed to perform system operation");
     } finally {
       setIsLoading(false);
     }
@@ -165,8 +178,8 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
               type="text"
               name="system_name"
               placeholder="Enter system name"
-              value={newSystemName}
-              onChange={(e) => setNewSystemName(e.target.value)}
+              value={systemData.system_name}
+              onChange={(e) => setSystemData((prev) => ({ ...prev, system_name: e.target.value }))}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.system_name
                   ? "border-status-danger"

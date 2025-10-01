@@ -1039,9 +1039,6 @@ const Devices = () => {
               const system = systems?.find(
                 (system: any) => system.system_id.toString() === systemId
               );
-              console.log('System:', systems?.find(
-                (system: any) => system.system_id
-              ));
               
               const systemName =
                 system?.system_name?.trim() ||
