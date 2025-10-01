@@ -34,8 +34,10 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
     plant_id: plantId || 0,
     organization_id: organizationId || 0,
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const getDepartmentData = async () => {
+    setIsLoading(true);
     await dispatch(getDepartmentById(departmentId || 0))
       .unwrap()
       .then((res) => {
@@ -44,6 +46,9 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
       })
       .catch((err) => {
         console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -69,6 +74,10 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
       }));
       return;
     }
+
+    if (isLoading) return;
+
+    setIsLoading(true);
 
     try {
       if (type === "add") {
@@ -120,6 +129,8 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
     } catch (error) {
       console.error("Error creating department:", error);
       Error("Failed to create department");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -195,7 +206,10 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
             <button
               type="button"
               onClick={handleAddDepartment}
-              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-roboto cursor-pointer"
+              disabled={isLoading}
+              className={`px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-roboto cursor-pointer ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               {type === "add" ? "Add Department" : "Update Department"}
             </button>

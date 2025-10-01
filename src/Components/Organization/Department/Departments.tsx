@@ -265,7 +265,10 @@ const Departments = () => {
 
   const refreshDepartments = useCallback(() => {
     if (isLoading) return;
-    setIsLoading(true);
+    
+    if (organization_id && plant_id) {
+      setIsLoading(true);
+    }
 
     dispatch(getAllDepartments())
       .unwrap()
