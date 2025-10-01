@@ -1,15 +1,17 @@
 import {
   ChevronDown,
   ChevronRight,
+  Dock,
   Edit,
   Eye,
   Home,
+  Loader2,
   PlusCircle,
   Search,
   Trash2,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import {
@@ -22,6 +24,8 @@ import { Warning } from "../../../utils/toast";
 import { getAllDepartments, getDepartmentByOrganizationIdAndPlantId, setDepartments } from "../../../../store/departmentSlice";
 import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
+import NoDataFound from "../../NoDataFound";
+import Pagination from "../../Pagination";
 
 const Departments = () => {
   const { organization_id, plant_id } = useParams<{
@@ -55,6 +59,25 @@ const Departments = () => {
   const [organizationId, setOrganizationId] = useState<number | null>(null);
   const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
   const [departmentId, setDepartmentId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const totalItems = useMemo(() => {
+    return filteredDepartments.length;
+  }, [filteredDepartments]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / rowsPerPage);
+  }, [totalItems, rowsPerPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
+  };
 
   const getOrganization = useCallback(async () => {
     if (isLoading) return;
@@ -311,6 +334,8 @@ const Departments = () => {
         .finally(() => {
           setIsLoading(false);
         });
+    } else {
+      refreshDepartments();
     }
   }, [organization_id, plant_id, selectedOrganization, selectedPlant, dispatch, refreshDepartments]);
 
@@ -397,6 +422,13 @@ const Departments = () => {
   const handleViewDevices = (departmentId: number, organizationId: number, plantId: number) => {
     navigate(`/organization/devices/${organizationId}/${plantId}/${departmentId}`);
   };
+
+  const handlePaginatedDepartments = useMemo(() => {
+    return filteredDepartments.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [filteredDepartments, currentPage, rowsPerPage]);
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -635,6 +667,11 @@ const Departments = () => {
         </div>
       </div>
 
+      {isLoading ? (
+        <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+        <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+      </div>
+      ) : (
       <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
         <div className="overflow-auto h-[calc(100vh-280px)]">
           <table className="w-full text-sm text-left rtl:text-right text-text-primary">
@@ -667,7 +704,8 @@ const Departments = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredDepartments.map((department, index) => (
+              { handlePaginatedDepartments.length > 0 ? (
+              handlePaginatedDepartments.map((department, index) => (
               <tr className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer">
                 <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                   {index + 1}
@@ -716,11 +754,66 @@ const Departments = () => {
                   </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              ) : (
+                <tr>
+                  <td colSpan={8} className="text-text-primary text-center font-roboto text-sm h-full">
+                    <NoDataFound
+                      icon={<Dock className="w-16 h-16 text-text-muted mx-auto mb-4" />}
+                      title={
+                        searchTerm || selectedOrganization !== "all"
+                          ? "No departments match your search/filter"
+                          : selectedOrganization === "all"
+                          ? "No departments found"
+                          : `No departments found for ${
+                              organizations.find(
+                                (org) => org.organization_id === selectedOrganization
+                              )?.organization_name ||
+                              `Organization ${selectedOrganization}`
+                            }`
+                      }
+                      description={
+                        searchTerm || selectedOrganization !== "all"
+                          ? "Try adjusting your search terms or filter criteria"
+                          : selectedOrganization === "all"
+                          ? "Add your first department to get started"
+                          : `Add your first department for ${
+                              organizations.find(
+                                (org) => org.organization_id === selectedOrganization
+                              )?.organization_name ||
+                              `Organization ${selectedOrganization}`
+                            } to get started`
+                      }
+                      buttonText={
+                        searchTerm || selectedOrganization !== "all"
+                          ? "Clear Search"
+                          : "Add Department"
+                      }
+                      buttonOnClick={() => {
+                        if (searchTerm || selectedOrganization !== "all") {
+                          setSearchTerm("");
+                          setSelectedOrganization("all");
+                        } else {
+                          setIsAddDepartmentOpen(true);
+                        }
+                      }}
+                    />
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rowsPerPage={rowsPerPage}
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </div>
+      )}
 
       {isAddDepartmentOpen && (
         <AddUpdateDepartment
