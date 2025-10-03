@@ -246,18 +246,15 @@ const OrganizationUsers = () => {
   const handleUpdateSuccess = (updatedUser: any) => {
     if (organizationId !== 0) {
       setOrganizationClients(prevClients => {
-        console.log("Previous organizationClients:", prevClients);
         const updated = prevClients.map(client => 
           client.client_id === updatedUser.client_id ? updatedUser : client
         );
-        console.log("Updated organizationClients:", updated);
         return updated;
       });
       
       setFilteredUsers(prevFiltered => {
         const updated = prevFiltered.map(client => {
           if (client.client_id === updatedUser.client_id) {
-            console.log("Updating client:", client, "with:", updatedUser);
             return updatedUser;
           }
           return client;
