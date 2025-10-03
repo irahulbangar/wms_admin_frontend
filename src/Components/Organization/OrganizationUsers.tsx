@@ -253,6 +253,24 @@ const OrganizationUsers = () => {
         console.log("Updated organizationClients:", updated);
         return updated;
       });
+      
+      setFilteredUsers(prevFiltered => {
+        const updated = prevFiltered.map(client => {
+          if (client.client_id === updatedUser.client_id) {
+            console.log("Updating client:", client, "with:", updatedUser);
+            return updatedUser;
+          }
+          return client;
+        });
+        return updated;
+      });
+    } else {
+      setFilteredUsers(prevFiltered => {
+        const updated = prevFiltered.map(client => 
+          client.client_id === updatedUser.client_id ? updatedUser : client
+        );
+        return updated;
+      });
     }
   };
 

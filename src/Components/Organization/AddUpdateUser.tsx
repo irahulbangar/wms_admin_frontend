@@ -36,8 +36,8 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
     client_phone: "",
     client_password: "",
     status: "active",
-    organization_id: "",
-  } as CreateClientPayload);
+    organization_id: 0,
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -130,7 +130,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               client_phone: "",
               client_password: "",
               status: "",
-              organization_id: "",
+              organization_id: 0,
             } as CreateClientPayload);
           })
           .catch((err) => {
@@ -161,6 +161,9 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 if (res.data) {
                   updatedUser = Array.isArray(res.data) ? res.data[0] : res.data;
                 } else {
+                  const selectedOrgId = formData.organization_id;
+                  const selectedOrg = organizationData.find(org => org.organization_id === selectedOrgId);
+                  
                   updatedUser = {
                     client_id: clientId,
                     client_name: formData.client_name,
@@ -168,10 +171,10 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                     client_phone: formData.client_phone,
                     client_password: formData.client_password,
                     status: formData.status,
-                    organization_id: formData.organization_id,
+                    organization_id: selectedOrgId,
                     created_at: "",
                     updated_at: new Date().toISOString(),
-                    organization_name: organizationData.find(org => org.organization_id.toString() === formData.organization_id.toString())?.organization_name || ""
+                    organization_name: selectedOrg?.organization_name || ""
                   };
                 }
                 onUpdateSuccess(updatedUser);
@@ -194,7 +197,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
   };
 
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, organization_id: organizationId.toString() }));
+    setFormData((prev) => ({ ...prev, organization_id: organizationId }));
   }, [organizationId]);
 
   useEffect(() => {
@@ -212,7 +215,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 client_phone: clientData.client_phone || "",
                 client_password: "",
                 status: clientData.status,
-                organization_id: clientData.organization_id || organizationId.toString(),
+                organization_id: clientData.organization_id || organizationId,
               } as CreateClientPayload);
             }
           }
