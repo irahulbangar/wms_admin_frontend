@@ -14,7 +14,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import store from "../store/store";
 import DiagramPage from "./Components/DiagramPage";
-import OrganizationDiagram from "./Components/OrganizationDiagram";
 
 function ThemedToast() {
   const { theme } = useTheme();
@@ -152,14 +151,6 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <DiagramPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/diagram/organization/:organization_id"
-                  element={
-                    <ProtectedRoute>
-                      <OrganizationDiagram />
                     </ProtectedRoute>
                   }
                 />
