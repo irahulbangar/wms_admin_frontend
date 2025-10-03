@@ -52,7 +52,7 @@ export interface CreateClientPayload {
   client_phone: string;
   client_password: string;
   status: string;
-  organization_id: number;
+  organization_id: string;
 }
 
 export interface UpdateClientPayload extends CreateClientPayload {

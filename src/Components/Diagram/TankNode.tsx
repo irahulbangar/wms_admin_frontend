@@ -19,6 +19,7 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   const organizationConnection = data.organizationConnection || "";
   const systemName = data.systemName || "";
   const systemConnection = data.systemConnection || "";
+  const deviceName = data.label || "";
 
   return (
     <>
@@ -26,6 +27,7 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
         className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden"
         title={`
 System Name : ${systemName}
+Device Name : ${deviceName}
 System Connection : ${systemConnection}
 Department Connection : ${departmentConnection}
 Plant Connection : ${plantConnection}
@@ -45,9 +47,7 @@ Capacity : ${capacity} ${unit}
         </div>
 
         <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-16">
-          <div className="truncate text-center" title={data.label}>
-            {data.label}
-          </div>
+          <div className="truncate text-center">{deviceName}</div>
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">

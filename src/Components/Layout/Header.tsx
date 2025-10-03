@@ -37,6 +37,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       "/profile": "Profile",
       "/organization": "Organizations",
       "/organization/plants": "Plants",
+      "/organization/departments": "Departments",
       "/organization/devices": "Devices",
       "/organization/users": "Organization Users",
       "/admin-users": "Admin Users",
@@ -97,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </button>
 
         <div className="block">
-          <h1 className="text-2xl font-black text-text-primary font-roboto">
+          <h1 className="text-2xl text-text-primary font-roboto">
             {getPageTitle()}
           </h1>
         </div>

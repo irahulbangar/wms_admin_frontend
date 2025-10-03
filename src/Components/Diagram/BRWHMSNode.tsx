@@ -13,6 +13,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
   const organizationConnection = data.organizationConnection || "none";
   const systemName = data.systemName || "";
   const systemConnection = data.systemConnection || "none";
+  const deviceName = data.label || "";
 
   return (
     <div
@@ -21,6 +22,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
       }`}
       title={`
 System Name : ${systemName}
+Device Name : ${deviceName}
 System Connection : ${systemConnection}
 Department Connection : ${departmentConnection}
 Plant Connection : ${plantConnection}
@@ -29,11 +31,8 @@ Totalizer Reading : ${data?.totalizerReading} Ltr
 Flow Rate : ${data?.avg} LPM
       `}
     >
-      <div
-        className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary"
-        title={data.label}
-      >
-        {data.label}
+      <div className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary">
+        {deviceName}
       </div>
 
       <div

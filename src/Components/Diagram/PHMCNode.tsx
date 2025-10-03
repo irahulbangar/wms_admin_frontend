@@ -20,6 +20,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
   const organizationConnection = data.organizationConnection || "none";
   const systemName = data.systemName || "";
   const systemConnection = data.systemConnection || "none";
+  const deviceName = data.label || "";
 
   return (
     <div
@@ -28,6 +29,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
       }`}
       title={`
 System Name : ${systemName}
+Device Name : ${deviceName}
 System Connection : ${systemConnection}
 Department Connection : ${departmentConnection}
 Plant Connection : ${plantConnection}
@@ -38,11 +40,8 @@ Voltage (B) : ${voltageB / 10}V | Current (B) : ${currentB}A
 Frequency : ${frequency}Hz
       `}
     >
-      <div
-        className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary"
-        title={data.label}
-      >
-        {data.label}
+      <div className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary">
+        {deviceName}
       </div>
 
       <div

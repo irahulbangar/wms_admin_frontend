@@ -16,6 +16,7 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
   const plantConnection = data.plantConnection || "none";
   const systemName = data.systemName || "";
   const systemConnection = data.systemConnection || "none";
+  const deviceName = data.label || "";
 
   return (
     <div
@@ -24,6 +25,7 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
       }`}
       title={`
 System Name : ${systemName}
+Device Name : ${deviceName}
 System Connection : ${systemConnection}
 Department Connection : ${departmentConnection}
 Plant Connection : ${plantConnection}

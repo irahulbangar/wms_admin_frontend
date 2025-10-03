@@ -1151,7 +1151,8 @@ const Devices = () => {
                         <tbody>
                           {systemDevices?.map((device, index) => (
                             <tr
-                              key={`${systemId}-${device?.device_id} ${index}`}
+                              onDoubleClick={() => handleEditDevice(device?.device_id, device?.plant_id, device?.department_id, device?.organization_id)}
+                              key={index}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
                               <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">

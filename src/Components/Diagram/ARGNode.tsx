@@ -17,6 +17,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
   const departmentConnection = data.departmentConnection || "none";
   const plantConnection = data.plantConnection || "none";
   const organizationConnection = data.organizationConnection || "none";
+  const deviceName = data.label || "";
 
   return (
     <div
@@ -25,17 +26,15 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
       }`}
       title={`
 System Name : ${systemName}
+Device Name : ${deviceName}
 System Connection : ${systemConnection}
 Department Connection : ${departmentConnection}
 Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
       `}
     >
-      <div
-        className="text-xs font-bold text-center mb-1 truncate px-1 text-purple-800"
-        title={data.label}
-      >
-        {data.label}
+      <div className="text-xs font-bold text-center mb-1 truncate px-1 text-purple-800">
+        {deviceName}
       </div>
 
       <div

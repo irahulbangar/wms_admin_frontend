@@ -36,7 +36,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
     client_phone: "",
     client_password: "",
     status: "active",
-    organization_id: 0,
+    organization_id: "",
   } as CreateClientPayload);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +113,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           client_phone: formData.client_phone,
           client_password: formData.client_password,
           status: formData.status,
-          organization_id: (formData.organization_id as number) || 1,
+          organization_id: formData.organization_id,
         };
 
         dispatch(createClient(clientData))
@@ -130,7 +130,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               client_phone: "",
               client_password: "",
               status: "",
-              organization_id: 0,
+              organization_id: "",
             } as CreateClientPayload);
           })
           .catch((err) => {
@@ -147,7 +147,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           client_phone: formData.client_phone,
           client_password: formData.client_password,
           status: formData.status,
-          organization_id: formData.organization_id as number,
+          organization_id: formData.organization_id,
         };
 
         dispatch(updateClient(clientData))
@@ -171,7 +171,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                     organization_id: formData.organization_id,
                     created_at: "",
                     updated_at: new Date().toISOString(),
-                    organization_name: organizationData.find(org => org.organization_id === formData.organization_id)?.organization_name || ""
+                    organization_name: organizationData.find(org => org.organization_id.toString() === formData.organization_id.toString())?.organization_name || ""
                   };
                 }
                 onUpdateSuccess(updatedUser);
@@ -194,7 +194,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
   };
 
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, organization_id: organizationId }));
+    setFormData((prev) => ({ ...prev, organization_id: organizationId.toString() }));
   }, [organizationId]);
 
   useEffect(() => {
@@ -212,7 +212,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 client_phone: clientData.client_phone || "",
                 client_password: "",
                 status: clientData.status,
-                organization_id: clientData.organization_id || organizationId,
+                organization_id: clientData.organization_id || organizationId.toString(),
               } as CreateClientPayload);
             }
           }
@@ -249,11 +249,6 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <input
-            type="hidden"
-            name="organization_id"
-            value={formData.organization_id}
-          />
 
           <div>
             <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
@@ -377,7 +372,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
             </label>
             <select
               name="organization_id"
-              value={formData.organization_id || ""}
+              value={formData.organization_id}
               disabled={isFetching}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.organization_id
@@ -390,7 +385,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               {organizationData.map((organization) => (
                 <option
                   key={organization.organization_id}
-                  value={organization.organization_id}
+                  value={organization.organization_id.toString()}
                 >
                   {organization.organization_name}
                 </option>
