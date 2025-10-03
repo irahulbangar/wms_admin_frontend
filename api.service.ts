@@ -1,7 +1,8 @@
 import axios from "axios";
 
-export const HOST =
-  import.meta.env.VITE_API_URL || "https://test.wmsonline.in/api";
+export const HOST = document.location.hostname === "localhost" ?
+  import.meta.env.VITE_API_URL :
+  document.location.origin + "/api";
 
 export const api = (baseURL?: string) => {
   const baseURLToUse = baseURL || HOST;
