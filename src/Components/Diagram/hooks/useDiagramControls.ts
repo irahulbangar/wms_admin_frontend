@@ -220,13 +220,11 @@ export const useDiagramControls = (
 
   const downloadDiagramAsImage = useCallback(async () => {
     try {
-      // Find the ReactFlow container
       const reactFlowElement = document.querySelector('.react-flow');
       if (!reactFlowElement) {
         throw new Error('ReactFlow container not found');
       }
 
-      // Create a temporary style element to hide controls and fix any color issues
       const tempStyle = document.createElement('style');
       tempStyle.id = 'dom-to-image-fix';
       tempStyle.textContent = `
@@ -272,8 +270,6 @@ export const useDiagramControls = (
         const rect = reactFlowElement.getBoundingClientRect();
         const scrollWidth = Math.max(reactFlowElement.scrollWidth, rect.width);
         const scrollHeight = Math.max(reactFlowElement.scrollHeight, rect.height);
-        
-        console.log('Diagram dimensions:', { scrollWidth, scrollHeight, rectWidth: rect.width, rectHeight: rect.height });
         
         // Try SVG first (better for large content)
         try {
