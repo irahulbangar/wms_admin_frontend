@@ -709,7 +709,7 @@ const Departments = () => {
             <tbody>
               { handlePaginatedDepartments.length > 0 ? (
               handlePaginatedDepartments.map((department, index) => (
-              <tr key={index} className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer">
+              <tr onDoubleClick={() => handleViewDevices(department.department_id, department.organization_id, department.plant_id)} key={index} className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer">
                 <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                   {(currentPage - 1) * rowsPerPage + index + 1}
                 </td>
