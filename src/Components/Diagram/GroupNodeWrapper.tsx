@@ -15,6 +15,7 @@ const GroupNodeWrapper: React.FC<GroupNodeWrapperProps> = ({
   edges = [],
 }) => {
   const deviceData = (window as any).deviceData || [];
+  
   return (
     <GroupNode data={data} id={id} deviceData={deviceData} edges={edges} />
   );

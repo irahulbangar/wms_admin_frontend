@@ -67,6 +67,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
           totalizerReading: d.last_record?.max,
           currentLevel: d.last_record?.last_level,
           capacity: d.params?.storageCapacity,
+          departmentId: d.department_id,
         }))
       )
     : "";
@@ -75,7 +76,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
   useEffect(() => {
     forceUpdate({});
-  }, [deviceDataKey]);
+  }, [deviceDataKey, id]);
 
   useEffect(() => {
     forceUpdate({});
@@ -90,7 +91,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     return () => {
       document.removeEventListener("deviceDataUpdated", handleDeviceDataUpdate);
     };
-  }, []);
+  }, [id]);
 
   const handleEditClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -119,32 +120,8 @@ const GroupNode: React.FC<GroupNodeProps> = ({
       }
     }
 
-    let totals = { current: 0, capacity: 0 };
-
-    if (allNodes && allNodes.length > 0) {
-      const departmentTanks = allNodes.filter(
-        (node) => node.type === "tank" && node.parentId === id
-      );
-
-      totals = departmentTanks.reduce(
-        (acc, tank) => {
-          const tankData = tank.data as NodeData;
-          return {
-            current: acc.current + (Number(tankData.currentLevel) || 0),
-            capacity: acc.capacity + (Number(tankData.capacity) || 0),
-          };
-        },
-        { current: 0, capacity: 0 }
-      );
-    }
-
-    if (
-      totals.current === 0 &&
-      totals.capacity === 0 &&
-      deviceData &&
-      deviceData.length > 0
-    ) {
-      const departmentId = parseInt(id);
+    if (data.type === "department" && deviceData && deviceData.length > 0) {
+      const departmentId = parseInt(id.replace("dept-", ""));
       const departmentDevices = deviceData.filter(
         (device) => device.department_id === departmentId
       );
@@ -155,13 +132,63 @@ const GroupNode: React.FC<GroupNodeProps> = ({
           device.device_family?.toLowerCase().includes("tank")
       );
 
-      totals = departmentTanks.reduce(
+      const totals = departmentTanks.reduce(
+        (acc, device) => {
+          const currentLevel = Number(device.last_record?.last_level) || 0;
+          const capacity = Number(device?.params?.storageCapacity) || 0;
+          
+          return {
+            current: acc.current + currentLevel,
+            capacity: acc.capacity + capacity,
+          };
+        },
+        { current: 0, capacity: 0 }
+      );
+
+      return totals;
+    }
+
+    if (data.type === "system" && deviceData && deviceData.length > 0) {
+      const systemId = parseInt(id.replace("system-", ""));
+      const systemDevices = deviceData.filter(
+        (device) => device.system_id === systemId
+      );
+
+      const systemTanks = systemDevices.filter(
+        (device) =>
+          device.type === "tank" ||
+          device.device_family?.toLowerCase().includes("tank")
+      );
+
+      const totals = systemTanks.reduce(
         (acc, device) => {
           return {
             current:
               acc.current + (Number(device.last_record?.last_level) || 0),
             capacity:
               acc.capacity + (Number(device?.params?.storageCapacity) || 0),
+          };
+        },
+        { current: 0, capacity: 0 }
+      );
+
+      return totals;
+    }
+
+    // Fallback to node-based calculation
+    let totals = { current: 0, capacity: 0 };
+
+    if (allNodes && allNodes.length > 0) {
+      const childTanks = allNodes.filter(
+        (node) => node.type === "tank" && node.parentId === id
+      );
+
+      totals = childTanks.reduce(
+        (acc, tank) => {
+          const tankData = tank.data as NodeData;
+          return {
+            current: acc.current + (Number(tankData.currentLevel) || 0),
+            capacity: acc.capacity + (Number(tankData.capacity) || 0),
           };
         },
         { current: 0, capacity: 0 }
@@ -214,22 +241,22 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     let totals = { totalIn: 0, totalOut: 0 };
 
     if (allNodes && allNodes.length > 0) {
-      const departmentFMs = allNodes.filter(
+      const childFMs = allNodes.filter(
         (node) => node.type === "fm" && node.parentId === id
       );
 
-      const departmentTanks = allNodes.filter(
+      const childTanks = allNodes.filter(
         (node) => node.type === "tank" && node.parentId === id
       );
 
-      totals = departmentFMs.reduce(
+      totals = childFMs.reduce(
         (acc, fm) => {
           const fmData = fm.data as NodeData;
           const totalVolume = fmData?.totalizerReading || 0;
 
           const isInput = determineFMFlowDirection(
             fm.id,
-            departmentTanks,
+            childTanks,
             allEdges
           );
 
