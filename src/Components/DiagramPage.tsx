@@ -148,28 +148,21 @@ const DiagramPage = () => {
     }
   };
 
-  // Test function to manually open sidebar
   const testOpenSidebar = () => {
-    console.log('Testing sidebar open');
-    console.log('Available nodes:', nodes);
     const plantNode = nodes.find(node => node.type === 'group' && node.data.type === 'plant');
     if (plantNode) {
-      console.log('Found plant node:', plantNode);
       handleGroupClick(plantNode.id, plantNode.data);
     } else {
-      console.log('No plant node found, using test data');
       handleGroupClick('plant-2', { label: 'Test Plant', type: 'plant' });
     }
   };
-
+    
   const handleNodeClickWithSidebar = (event: React.MouseEvent, node: any) => {
-    // Handle group click for sidebar first
     if (node.type === 'group' && (node.data.type === 'plant' || node.data.type === 'department' || node.data.type === 'system')) {
       handleGroupClick(node.id, node.data);
       return;
     }
     
-    // Call the original onNodeClick for non-group nodes
     onNodeClick(event, node);
   };
 
@@ -207,9 +200,10 @@ const DiagramPage = () => {
     }));
   }, [edges, selectedEdge]);
 
+
   const isDiagramEmpty = useMemo(() => {
-    return !isLoadingDiagram && nodes?.length === 0 && edges?.length === 0;
-  }, [isLoadingDiagram, nodes, edges]);
+    return nodes?.length === 0 && edges?.length === 0;
+  }, [nodes, edges]);
 
   return (
     <div className="bg-primary text-text-primary h-screen w-full">

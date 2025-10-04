@@ -54,7 +54,6 @@ export const useDiagramData = (plantId: string | undefined) => {
         .then((res: any) => {
           if (res.success) {
             setPlantData(res.data);
-
             if (res.data.nodes && res.data.edges && res.data.nodes.length > 0) {
               const nodesWithDraggable = (res.data.nodes as DiagramNode[]).map(
                 (node) => {
@@ -103,13 +102,11 @@ export const useDiagramData = (plantId: string | undefined) => {
         .then((res: any) => {
           if (res.success) {
             setDeviceData(res.data);
-            if (!res.data || res.data.length === 0) {
-              setIsLoadingDiagram(false);
-            }
           }
         })
         .catch((err: any) => {
           console.error("Error fetching device data:", err);
+        }).finally(() => {
           setIsLoadingDiagram(false);
         });
     } catch (err) {
@@ -119,16 +116,16 @@ export const useDiagramData = (plantId: string | undefined) => {
   }, [dispatch, plantId]);
 
   const updateNodesWithDynamicData = useCallback(() => {
-    if (deviceData.length === 0 || nodes.length === 0) return;
+    if (deviceData?.length === 0 || nodes?.length === 0) return;
 
     setNodes((currentNodes) => {
-      return currentNodes.map((node) => {
-        if (node.type === "tank") {
-          const matchingDevice = deviceData.find(
+      return currentNodes?.map((node) => {
+        if (node?.type === "tank") {
+          const matchingDevice = deviceData?.find(
             (device) =>
-              device.device_name === node.data.label &&
-              (device.type === "tank" ||
-                device.device_family?.toLowerCase().includes("tank"))
+              device?.device_name === node?.data?.label &&
+              (device?.type === "tank" ||
+                device?.device_family?.toLowerCase().includes("tank"))
           );
 
           if (matchingDevice) {
@@ -137,24 +134,24 @@ export const useDiagramData = (plantId: string | undefined) => {
               data: {
                 ...node.data,
                 currentLevel:
-                  Number(matchingDevice.last_record?.last_level) || 0,
+                  Number(matchingDevice?.last_record?.last_level) || 0,
                 capacity: Number(matchingDevice?.params?.storageCapacity) || 0,
                 height: Number(matchingDevice?.params?.height) || 0,
-                departmentConnection: matchingDevice.department_connection,
-                plantConnection: matchingDevice.plant_connection,
-                organizationConnection: matchingDevice.organization_connection,
-                departmentName: matchingDevice.department_name,
-                systemName: matchingDevice.system_name,
-                systemConnection: matchingDevice.system_connection,
+                departmentConnection: matchingDevice?.department_connection,
+                plantConnection: matchingDevice?.plant_connection,
+                organizationConnection: matchingDevice?.organization_connection,
+                departmentName: matchingDevice?.department_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: matchingDevice?.system_connection,
               },
             };
           }
-        } else if (node.type === "fm") {
-          const matchingDevice = deviceData.find(
+        } else if (node?.type === "fm") {
+          const matchingDevice = deviceData?.find(
             (device) =>
-              device.device_name === node.data.label &&
-              (device.type === "fm" ||
-                device.device_family?.toLowerCase().includes("flow"))
+              device?.device_name === node?.data?.label &&
+              (device?.type === "fm" ||
+                device?.device_family?.toLowerCase().includes("flow"))
           );
 
           if (matchingDevice) {
@@ -162,25 +159,25 @@ export const useDiagramData = (plantId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                flowRate: Number(matchingDevice.last_record?.avg) || 0,
+                flowRate: Number(matchingDevice?.last_record?.avg) || 0,
                 totalizerReading:
-                  Number(matchingDevice.last_record?.max) || 0,
-                isActive: matchingDevice.device_status === "active",
-                departmentConnection: matchingDevice.department_connection,
-                plantConnection: matchingDevice.plant_connection,
-                organizationConnection: matchingDevice.organization_connection,
-                departmentName: matchingDevice.department_name,
-                systemName: matchingDevice.system_name,
-                systemConnection: matchingDevice.system_connection,
+                  Number(matchingDevice?.last_record?.max) || 0,
+                isActive: matchingDevice?.device_status === "active",
+                departmentConnection: matchingDevice?.department_connection,
+                plantConnection: matchingDevice?.plant_connection,
+                organizationConnection: matchingDevice?.organization_connection,
+                departmentName: matchingDevice?.department_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: matchingDevice?.system_connection,
               },
             };
           }
-        } else if (node.type === "brwhms") {
-          const matchingDevice = deviceData.find(
+        } else if (node?.type === "brwhms") {
+          const matchingDevice = deviceData?.find(
             (device) =>
-              device.device_name === node.data.label &&
-              (device.type === "brwhms" ||
-                device.device_family?.toLowerCase().includes("brwhms"))
+              device?.device_name === node?.data?.label &&
+              (device?.type === "brwhms" ||
+                device?.device_family?.toLowerCase().includes("brwhms"))
           );
 
           if (matchingDevice) {
@@ -188,26 +185,26 @@ export const useDiagramData = (plantId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                flowRate: Number(matchingDevice.last_record?.flow) || 0,
-                avg: Number(matchingDevice.last_record?.avg) || 0,
-                max: Number(matchingDevice.last_record?.max) || 0,
-                min: Number(matchingDevice.last_record?.min) || 0,
-                isActive: matchingDevice.device_status === "active",
-                departmentConnection: matchingDevice.department_connection,
-                plantConnection: matchingDevice.plant_connection,
-                organizationConnection: matchingDevice.organization_connection,
-                departmentName: matchingDevice.department_name,
-                systemName: matchingDevice.system_name,
-                systemConnection: matchingDevice.system_connection,
+                flowRate: Number(matchingDevice?.last_record?.flow) || 0,
+                avg: Number(matchingDevice?.last_record?.avg) || 0,
+                max: Number(matchingDevice?.last_record?.max) || 0,
+                min: Number(matchingDevice?.last_record?.min) || 0,
+                isActive: matchingDevice?.device_status === "active",
+                departmentConnection: matchingDevice?.department_connection,
+                plantConnection: matchingDevice?.plant_connection,
+                organizationConnection: matchingDevice?.organization_connection,
+                departmentName: matchingDevice?.department_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: matchingDevice?.system_connection,
               },
             };
           }
-        } else if (node.type === "phmc") {
-          const matchingDevice = deviceData.find(
+        } else if (node?.type === "phmc") {
+          const matchingDevice = deviceData?.find(
             (device) =>
-              device.device_name === node.data.label &&
-              (device.type === "phmc" ||
-                device.device_family?.toLowerCase().includes("phmc"))
+              device?.device_name === node?.data?.label &&
+              (device?.type === "phmc" ||
+                device?.device_family?.toLowerCase().includes("phmc"))
           );
 
           if (matchingDevice) {
@@ -215,30 +212,30 @@ export const useDiagramData = (plantId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                pumpStatus: matchingDevice.last_record?.pumpstatus || "0",
-                voltageR: Number(matchingDevice.last_record?.voltage_r) || 0,
-                currentR: Number(matchingDevice.last_record?.Current_r) || 0,
-                voltageY: Number(matchingDevice.last_record?.voltage_y) || 0,
-                currentY: Number(matchingDevice.last_record?.Current_y) || 0,
-                voltageB: Number(matchingDevice.last_record?.voltage_b) || 0,
-                currentB: Number(matchingDevice.last_record?.Current_b) || 0,
-                frequency: Number(matchingDevice.last_record?.Frequency) || 0,
-                isActive: matchingDevice.device_status === "active",
-                departmentConnection: matchingDevice.department_connection,
-                plantConnection: matchingDevice.plant_connection,
-                organizationConnection: matchingDevice.organization_connection,
-                departmentName: matchingDevice.department_name,
-                systemName: matchingDevice.system_name,
-                systemConnection: matchingDevice.system_connection,
+                pumpStatus: matchingDevice?.last_record?.pumpstatus || "0",
+                voltageR: Number(matchingDevice?.last_record?.voltage_r) || 0,
+                currentR: Number(matchingDevice?.last_record?.Current_r) || 0,
+                voltageY: Number(matchingDevice?.last_record?.voltage_y) || 0,
+                currentY: Number(matchingDevice?.last_record?.Current_y) || 0,
+                voltageB: Number(matchingDevice?.last_record?.voltage_b) || 0,
+                currentB: Number(matchingDevice?.last_record?.Current_b) || 0,
+                frequency: Number(matchingDevice?.last_record?.Frequency) || 0,
+                isActive: matchingDevice?.device_status === "active",
+                departmentConnection: matchingDevice?.department_connection,
+                plantConnection: matchingDevice?.plant_connection,
+                organizationConnection: matchingDevice?.organization_connection,
+                departmentName: matchingDevice?.department_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: matchingDevice?.system_connection,
               },
             };
           }
-        } else if (node.type === "arg") {
-          const matchingDevice = deviceData.find(
+        } else if (node?.type === "arg") {
+          const matchingDevice = deviceData?.find(
             (device) =>
-              device.device_name === node.data.label &&
-              (device.type === "arg" ||
-                device.device_family?.toLowerCase().includes("arg"))
+              device?.device_name === node?.data?.label &&
+              (device?.type === "arg" ||
+                device?.device_family?.toLowerCase().includes("arg"))
           );
 
           if (matchingDevice) {
@@ -246,29 +243,29 @@ export const useDiagramData = (plantId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                maxMm: Number(matchingDevice.last_record?.max_mm) || 0,
-                minMm: Number(matchingDevice.last_record?.min_mm) || 0,
-                lastMm: Number(matchingDevice.last_record?.last_mm) || 0,
-                firstMm: Number(matchingDevice.last_record?.first_mm) || 0,
-                isActive: matchingDevice.device_status === "active",
-                departmentConnection: matchingDevice.department_connection,
-                plantConnection: matchingDevice.plant_connection,
-                organizationConnection: matchingDevice.organization_connection,
-                departmentName: matchingDevice.department_name,
-                systemName: matchingDevice.system_name,
-                systemConnection: matchingDevice.system_connection,
+                maxMm: Number(matchingDevice?.last_record?.max_mm) || 0,
+                minMm: Number(matchingDevice?.last_record?.min_mm) || 0,
+                lastMm: Number(matchingDevice?.last_record?.last_mm) || 0,
+                firstMm: Number(matchingDevice?.last_record?.first_mm) || 0,
+                isActive: matchingDevice?.device_status === "active",
+                departmentConnection: matchingDevice?.department_connection,
+                plantConnection: matchingDevice?.plant_connection,
+                organizationConnection: matchingDevice?.organization_connection,
+                departmentName: matchingDevice?.department_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: matchingDevice?.system_connection,
               },
             };
           }
         } else if (node.type === "group" && node.data.type === "department") {
           const departmentId = node.id.replace("dept-", "");
           const departmentDevices = deviceData.filter(
-            (device) => device.department_id.toString() === departmentId
+            (device) => device?.department_id?.toString() === departmentId
           );
 
-          if (departmentDevices.length > 0) {
-            const latestDepartmentName = departmentDevices[0].department_name;
-            if (latestDepartmentName && latestDepartmentName !== node.data.label) {
+          if (departmentDevices?.length > 0) {
+            const latestDepartmentName = departmentDevices[0]?.department_name;
+            if (latestDepartmentName && latestDepartmentName !== node?.data?.label) {
               return {
                 ...node,
                 data: {
@@ -281,10 +278,10 @@ export const useDiagramData = (plantId: string | undefined) => {
         } else if (node.type === "group" && node.data.type === "plant") {
           const plantId = node.id.replace("plant-", "");
           const plantDevices = deviceData.filter(
-            (device) => device.plant_id.toString() === plantId
+            (device) => device?.plant_id?.toString() === plantId
           );
 
-          if (plantDevices.length > 0) {
+          if (plantDevices?.length > 0) {
             const latestPlantName = plantDevices[0].plant_name;
             if (latestPlantName && latestPlantName !== node.data.label) {
               return {
@@ -344,12 +341,14 @@ export const useDiagramData = (plantId: string | undefined) => {
 
   const resetDiagram = useCallback(() => {
     setDepartmentDimensions({});
-    fetchDiagram();
-    fetchDeviceData();
-    Success("Diagram and department dimensions reset successfully!");
     setNodes([]);
     setEdges([]);
     setHasChanges(false);
+    diagramGeneratedRef.current = false;
+    setIsLoadingDiagram(true);
+    fetchDiagram();
+    fetchDeviceData();
+    Success("Diagram and department dimensions reset successfully!");
   }, [fetchDiagram, fetchDeviceData]);
 
   const syncDepartmentDimensionsWithNodes = useCallback(() => {
@@ -388,14 +387,14 @@ export const useDiagramData = (plantId: string | undefined) => {
   }, [fetchDiagram, fetchDeviceData, plantId]);
 
   useEffect(() => {
-    if (plantData && deviceData.length === 0 && isLoadingDiagram) {
+    if (plantData && deviceData.length === 0 && !isLoadingDiagram) {
       setIsLoadingDiagram(false);
     }
 
     if (
       plantData &&
       deviceData.length > 0 &&
-      isLoadingDiagram &&
+      !isLoadingDiagram &&
       !diagramGeneratedRef.current
     ) {
       if (generationTimeoutRef.current) {
@@ -403,12 +402,17 @@ export const useDiagramData = (plantId: string | undefined) => {
       }
 
       generationTimeoutRef.current = setTimeout(() => {
-        const { nodes: deviceNodes, edges: deviceEdges } =
-          convertDevicesToDiagramCallback(deviceData);
-        setNodes(deviceNodes);
-        setEdges(deviceEdges);
-        setIsLoadingDiagram(false);
-        diagramGeneratedRef.current = true;
+        try {
+          const { nodes: deviceNodes, edges: deviceEdges } =
+            convertDevicesToDiagramCallback(deviceData);
+          setNodes(deviceNodes);
+          setEdges(deviceEdges);
+          setIsLoadingDiagram(false);
+          diagramGeneratedRef.current = true;
+        } catch (error) {
+          console.error("Error generating diagram:", error);
+          setIsLoadingDiagram(false);
+        }
       }, 100);
     }
 
