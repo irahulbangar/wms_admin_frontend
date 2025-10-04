@@ -30,7 +30,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 }) => {
   const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
-  
+
   const flowChartRef = useRef<HTMLDivElement>(null);
   const storageChartRef = useRef<HTMLDivElement>(null);
 
@@ -47,51 +47,67 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     }
   }, [isOpen, onClose]);
 
-  // Initialize Flow Summary Chart
   useEffect(() => {
-    if (flowChartRef.current && isFlowSummaryExpanded && calculations && isOpen && selectedGroup) {
+    if (
+      flowChartRef.current &&
+      isFlowSummaryExpanded &&
+      calculations &&
+      isOpen &&
+      selectedGroup
+    ) {
       const chart = echarts.init(flowChartRef.current);
       const option = getFlowSummaryChartOption();
       chart.setOption(option);
-      
+
       const handleResize = () => chart.resize();
-      window.addEventListener('resize', handleResize);
-      
+      window.addEventListener("resize", handleResize);
+
       return () => {
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener("resize", handleResize);
         chart.dispose();
       };
     }
   }, [isFlowSummaryExpanded, calculations, isOpen, selectedGroup]);
 
-  // Initialize Storage Chart
   useEffect(() => {
-    if (storageChartRef.current && isStorageExpanded && calculations && "totalStock" in calculations && isOpen && selectedGroup) {
+    if (
+      storageChartRef.current &&
+      isStorageExpanded &&
+      calculations &&
+      "totalStock" in calculations &&
+      isOpen &&
+      selectedGroup
+    ) {
       const chart = echarts.init(storageChartRef.current);
       const option = getStorageChartOption();
       chart.setOption(option);
-      
+
       const handleResize = () => chart.resize();
-      window.addEventListener('resize', handleResize);
-      
+      window.addEventListener("resize", handleResize);
+
       return () => {
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener("resize", handleResize);
         chart.dispose();
       };
     }
   }, [isStorageExpanded, calculations, isOpen, selectedGroup]);
 
-  // Flow Summary Pie Chart Configuration
   const getFlowSummaryChartOption = () => {
     if (!calculations) return {};
-    
-    const data = [
-      { value: calculations.totalIn, name: "Total In", itemStyle: { color: "#3B82F6" } },
-      { value: calculations.totalOut, name: "Total Out", itemStyle: { color: "#10B981" } },
-    //   { value: Math.abs(calculations.totalBalance), name: "Balance", itemStyle: { color: calculations.totalBalance >= 0 ? "#F59E0B" : "#EF4444" } }
-    ].filter(item => item.value > 0);
 
-    // If no data, show empty state
+    const data = [
+      {
+        value: calculations.totalIn,
+        name: "Total In",
+        itemStyle: { color: "#3B82F6" },
+      },
+      {
+        value: calculations.totalOut,
+        name: "Total Out",
+        itemStyle: { color: "#10B981" },
+      },
+    ].filter((item) => item.value > 0);
+
     if (data.length === 0) {
       return {
         title: {
@@ -99,32 +115,32 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           left: "center",
           top: "center",
           textStyle: {
-            color: "#6B7280",
-            fontSize: 14
-          }
+            color: "#374151",
+            fontSize: 14,
+          },
         },
-        series: []
+        series: [],
       };
     }
 
     return {
       title: {
-        text: "Flow Summary",
+        text: `${selectedGroup?.name}`,
         left: "center",
         top: "10px",
         textStyle: {
           fontSize: 16,
           fontWeight: "bold",
-          color: "#374151"
-        }
+          color: "#374151",
+        },
       },
       tooltip: {
         trigger: "item",
-        formatter: "{b}: {c} Ltr ({d}%)"
+        formatter: "{b}: {c} Ltr ({d}%)",
       },
       series: [
         {
-          name: "Flow Summary",
+          name: `${selectedGroup?.name} Flow Summary`,
           type: "pie",
           radius: "70%",
           center: ["50%", "55%"],
@@ -132,22 +148,33 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           itemStyle: {
             borderRadius: 0,
             borderColor: "#fff",
-            borderWidth: 1
+            borderWidth: 1,
           },
           label: {
             show: true,
             position: "outside",
             formatter: "{b}",
-            fontSize: 12,
+            fontSize: 14,
             color: "#374151",
-            fontWeight: "normal"
+            fontWeight: "normal",
+            distance: 15,
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            borderColor: "#ccc",
+            borderWidth: 0,
+            borderRadius: 0,
+            padding: [4, 8],
           },
           emphasis: {
+            label: {
+              show: true,
+              fontSize: 14,
+              fontWeight: "bold",
+            },
             itemStyle: {
               shadowBlur: 10,
               shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)"
-            }
+              shadowColor: "rgba(0, 0, 0, 0.5)",
+            },
           },
           labelLine: {
             show: true,
@@ -155,39 +182,49 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             length2: 10,
             lineStyle: {
               color: "#999",
-              width: 1
-            }
+              width: 1,
+            },
           },
-          data: data
-        }
-      ]
+          data: data,
+        },
+      ],
     };
   };
 
-  // Storage Information Pie Chart Configuration
   const getStorageChartOption = () => {
-    if (!calculations || !("totalStock" in calculations) || !("totalCapacity" in calculations)) {
+    if (
+      !calculations ||
+      !("totalStock" in calculations) ||
+      !("totalCapacity" in calculations)
+    ) {
       return {
         title: {
-          text: "Storage Data Not Available",
+          text: `${selectedGroup?.name} Storage Data Not Available`,
           left: "center",
           top: "center",
           textStyle: {
             color: "#6B7280",
-            fontSize: 14
-          }
+            fontSize: 14,
+          },
         },
-        series: []
+        series: [],
       };
     }
 
     const availableStock = calculations.totalCapacity - calculations.totalStock;
     const data = [
-      { value: calculations.totalStock, name: "Current Stock", itemStyle: { color: "#F59E0B" } },
-      { value: availableStock, name: "Available Stock", itemStyle: { color: "#E5E7EB" } }
-    ].filter(item => item.value > 0);
+      {
+        value: calculations.totalStock,
+        name: "Current Stock",
+        itemStyle: { color: "#8B5CF6" },
+      },
+      {
+        value: availableStock,
+        name: "Available Stock",
+        itemStyle: { color: "#3B82F6" },
+      },
+    ].filter((item) => item.value > 0);
 
-    // If no data, show empty state
     if (data.length === 0) {
       return {
         title: {
@@ -196,31 +233,31 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           top: "center",
           textStyle: {
             color: "#6B7280",
-            fontSize: 14
-          }
+            fontSize: 14,
+          },
         },
-        series: []
+        series: [],
       };
     }
 
     return {
       title: {
-        text: "Storage Information",
+        text: `${selectedGroup?.name} Storage Information`,
         left: "center",
         top: "10px",
         textStyle: {
           fontSize: 16,
           fontWeight: "bold",
-          color: "#374151"
-        }
+          color: "#374151",
+        },
       },
       tooltip: {
         trigger: "item",
-        formatter: "{b}: {c} Ltr ({d}%)"
+        formatter: "{b}: {c} Ltr ({d}%)",
       },
       series: [
         {
-          name: "Storage",
+          name: `${selectedGroup?.name} Storage`,
           type: "pie",
           radius: "70%",
           center: ["50%", "55%"],
@@ -228,22 +265,33 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           itemStyle: {
             borderRadius: 0,
             borderColor: "#fff",
-            borderWidth: 1
+            borderWidth: 1,
           },
           label: {
             show: true,
             position: "outside",
             formatter: "{b}",
-            fontSize: 12,
+            fontSize: 14,
             color: "#374151",
-            fontWeight: "normal"
+            fontWeight: "normal",
+            distance: 15,
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            borderColor: "#ccc",
+            borderWidth: 0,
+            borderRadius: 0,
+            padding: [4, 8],
           },
           emphasis: {
+            label: {
+              show: true,
+              fontSize: 14,
+              fontWeight: "bold",
+            },
             itemStyle: {
               shadowBlur: 10,
               shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)"
-            }
+              shadowColor: "rgba(0, 0, 0, 0.5)",
+            },
           },
           labelLine: {
             show: true,
@@ -251,16 +299,15 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             length2: 10,
             lineStyle: {
               color: "#999",
-              width: 1
-            }
+              width: 1,
+            },
           },
-          data: data
-        }
-      ]
+          data: data,
+        },
+      ],
     };
   };
 
-  // Early returns after all hooks
   if (!isOpen || !selectedGroup) {
     return null;
   }
@@ -268,7 +315,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   if (!calculations) {
     return (
       <>
-        {/* Backdrop */}
         {isOpen && (
           <div
             className="fixed inset-0 bg-black/50 bg-opacity-50 z-40"
@@ -276,7 +322,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           />
         )}
 
-        {/* Sidebar */}
         <div
           className={`fixed right-0 top-0 h-full w-80 sm:w-96 bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
             isOpen ? "translate-x-0" : "translate-x-full"
@@ -286,19 +331,19 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             <div className="flex items-center space-x-2">
               <div
                 className={`w-3 h-3 rounded-full ${
-                  selectedGroup.type === "plant"
-                    ? "bg-blue-500"
-                    : selectedGroup.type === "department"
-                    ? "bg-green-500"
-                    : "bg-purple-500"
+                  selectedGroup?.type === "plant"
+                    ? "bg-status-info"
+                    : selectedGroup?.type === "department"
+                    ? "bg-status-success"
+                    : "bg-status-warning"
                 }`}
               ></div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {selectedGroup.name}
+                <h2 className="text-lg font-medium font-roboto text-text-primary">
+                  {selectedGroup?.name}
                 </h2>
-                <p className="text-xs text-gray-500 capitalize">
-                  {selectedGroup.type}
+                <p className="text-xs text-text-secondary capitalize">
+                  {selectedGroup?.type}
                 </p>
               </div>
             </div>
@@ -306,14 +351,16 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               onClick={onClose}
               className="p-1 hover:bg-border-primary rounded-full transition-colors"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-text-secondary" />
             </button>
           </div>
           <div className="p-4">
             <div className="flex items-center justify-center h-32">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                <p className="text-sm text-gray-600">Loading calculations...</p>
+                <p className="text-sm text-text-secondary">
+                  Loading calculations...
+                </p>
               </div>
             </div>
           </div>
@@ -321,8 +368,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       </>
     );
   }
-
-
 
   return (
     <>
@@ -333,30 +378,28 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         />
       )}
 
-      {/* Sidebar */}
       <div
         className={`fixed right-0 top-0 h-full w-80 sm:w-96 bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border-primary bg-primary">
           <div className="flex items-center space-x-2">
             <div
               className={`w-3 h-3 rounded-full ${
-                selectedGroup.type === "plant"
-                  ? "bg-blue-500"
-                  : selectedGroup.type === "department"
-                  ? "bg-green-500"
-                  : "bg-purple-500"
+                selectedGroup?.type === "plant"
+                  ? "bg-status-info"
+                  : selectedGroup?.type === "department"
+                  ? "bg-status-success"
+                  : "bg-status-warning"
               }`}
             ></div>
             <div>
               <h2 className="text-lg font-semibold text-text-primary">
-                {selectedGroup.name}
+                {selectedGroup?.name}
               </h2>
               <p className="text-xs text-text-secondary capitalize">
-                {selectedGroup.type}
+                {selectedGroup?.type}
               </p>
             </div>
           </div>
@@ -368,82 +411,95 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           </button>
         </div>
 
-         <div className="p-4 space-y-6 overflow-y-auto h-full pb-[100px]">
-           <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-             <div 
-               className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
-               onClick={() => setIsFlowSummaryExpanded(!isFlowSummaryExpanded)}
-             >
-               <div className="flex items-center justify-between">
-                 <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-                    <ChartArea className="w-4 h-4" />
-                   Flow Summary
-                 </h3>
-                 {isFlowSummaryExpanded ? (
-                   <ChevronDown className="w-4 h-4 text-text-secondary" />
-                 ) : (
-                   <ChevronRight className="w-4 h-4 text-text-secondary" />
-                 )}
-               </div>
-             </div>
-             
-             {isFlowSummaryExpanded && (
-               <div className="p-4">
-                 <div className="mb-4">
-                   <div 
-                     ref={flowChartRef}
-                     style={{ height: '200px', width: '100%' }}
-                   />
-                 </div>
-                 
-                 <div className="overflow-x-auto border border-border-primary rounded-lg">
-                   <table className="w-full text-sm">
-                     <tbody className="divide-y divide-border-primary">
-                       <tr className="hover:bg-secondary/10">
-                         <td className="px-4 py-3 text-text-secondary font-medium">
-                           Total In
-                         </td>
-                         <td className="px-4 py-3 text-right">
-                           <span className="font-semibold text-text-primary">
-                             {calculations.totalIn} Ltr
-                           </span>
-                         </td>
-                       </tr>
-                       <tr className="hover:bg-secondary/10">
-                         <td className="px-4 py-3 text-text-secondary font-medium">
-                           Total Out
-                         </td>
-                         <td className="px-4 py-3 text-right">
-                           <span className="font-semibold text-text-primary">
-                             {calculations.totalOut} Ltr
-                           </span>
-                         </td>
-                       </tr>
-                       <tr className="hover:bg-secondary/10">
-                         <td className="px-4 py-3 text-text-secondary font-medium">
-                           Balance
-                         </td>
-                         <td className="px-4 py-3 text-right">
-                           <span className="font-semibold text-text-primary">
-                             {calculations.totalBalance} Ltr
-                           </span>
-                         </td>
-                       </tr>
-                     </tbody>
-                   </table>
-                 </div>
-               </div>
-             )}
-           </div>
+        <div className="p-4 space-y-6 overflow-y-auto h-full pb-[100px]">
+          <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+            <div
+              className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+              onClick={() => setIsFlowSummaryExpanded(!isFlowSummaryExpanded)}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center gap-2">
+                  <ChartArea className="w-5 h-5" />
+                  Flow Summary
+                </h3>
+                {isFlowSummaryExpanded ? (
+                  <ChevronDown className="w-4 h-4 text-text-secondary" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-text-secondary" />
+                )}
+              </div>
+            </div>
+
+            {isFlowSummaryExpanded && (
+              <div className="p-4">
+                <div className="mb-4">
+                  <div
+                    ref={flowChartRef}
+                    style={{ height: "200px", width: "100%" }}
+                  />
+                </div>
+
+                <div className="overflow-x-auto border border-border-primary rounded-lg">
+                  <table className="w-full text-sm">
+                    <tbody className="divide-y divide-border-primary">
+                      <tr className="hover:bg-secondary/10">
+                        <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3.5 h-3.5 bg-status-info rounded-full"></div>
+                            Total In
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="font-medium text-text-primary text-base font-roboto">
+                            {calculations.totalIn} Ltr
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-secondary/10">
+                        <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3.5 h-3.5 bg-status-success rounded-full"></div>
+                            Total Out
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="font-medium text-text-primary text-base font-roboto">
+                            {calculations.totalOut} Ltr
+                          </span>  
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-secondary/10">
+                        <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                          <div className="flex items-center gap-2">
+                            {calculations.totalBalance >= 0 ? (
+                              <div className="w-3.5 h-3.5 bg-green-500 rounded-full"></div>
+                            ) : (
+                              <div className="w-3.5 h-3.5 bg-red-500 rounded-full"></div>
+                            )}
+                            Balance
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="font-medium text-text-primary text-base font-roboto">
+                            {calculations.totalBalance} Ltr
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
 
           {"totalStock" in calculations && "totalCapacity" in calculations && (
             <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-              <div 
+              <div
                 className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
                 onClick={() => setIsStorageExpanded(!isStorageExpanded)}
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-text-primary flex items-center space-x-2">
+                  <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center space-x-2">
                     <Package className="w-4 h-4" />
                     <span>Storage Information</span>
                   </h3>
@@ -454,35 +510,41 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   )}
                 </div>
               </div>
-              
+
               {isStorageExpanded && (
                 <div className="p-4">
                   <div className="mb-4">
-                    <div 
+                    <div
                       ref={storageChartRef}
-                      style={{ height: '200px', width: '100%' }}
+                      style={{ height: "200px", width: "100%" }}
                     />
                   </div>
-                  
+
                   <div className="overflow-x-auto border border-border-primary rounded-lg">
                     <table className="w-full text-sm">
                       <tbody className="divide-y divide-border-primary">
                         <tr className="hover:bg-secondary/10">
-                          <td className="px-4 py-3 text-text-secondary font-medium">
-                            Current Stock
+                          <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3.5 h-3.5 bg-[#8B5CF6] rounded-full"></div>
+                              Total Stock
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <span className="font-semibold text-text-primary">
+                            <span className="font-medium text-text-primary text-base font-roboto">
                               {calculations.totalStock} Ltr
                             </span>
                           </td>
                         </tr>
                         <tr className="hover:bg-secondary/10">
-                          <td className="px-4 py-3 text-text-secondary font-medium">
-                            Available Stock
+                          <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3.5 h-3.5 bg-[#3B82F6] rounded-full"></div>
+                              Available Capacity
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <span className="font-semibold text-text-primary">
+                            <span className="font-medium text-text-primary text-base font-roboto">
                               {calculations.totalCapacity -
                                 calculations.totalStock}{" "}
                               Ltr
@@ -490,11 +552,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                           </td>
                         </tr>
                         <tr className="hover:bg-secondary/10">
-                          <td className="px-4 py-3 text-text-secondary font-medium">
-                            Total Capacity
+                          <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3.5 h-3.5 bg-[#06B6D4] rounded-full"></div>
+                                Total Capacity
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <span className="font-semibold text-text-primary">
+                            <span className="font-medium text-text-primary text-base font-roboto">
                               {calculations.totalCapacity} Ltr
                             </span>
                           </td>
