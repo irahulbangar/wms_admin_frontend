@@ -45,6 +45,8 @@ export interface DepartmentCalculations {
   totalIn: number;
   totalOut: number;
   totalBalance: number;
+  totalStock: number;
+  totalCapacity: number;
 }
 
 export const convertDevicesToDiagram = (
@@ -1021,6 +1023,8 @@ export const calculateDepartmentFlowBalances = (
   return Object.values(departmentGroups).map((group) => {
     let totalIn = 0;
     let totalOut = 0;
+    let totalStock = 0;
+    let totalCapacity = 0;
 
     Object.values(group.systems).forEach((system) => {
       system.devices.forEach((device) => {
@@ -1042,6 +1046,19 @@ export const calculateDepartmentFlowBalances = (
           totalOut += flowValue;
         }
       });
+
+      // Calculate storage for tanks in this system
+      const tankDevices = system.devices.filter(
+        (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+      );
+
+      tankDevices.forEach((device) => {
+        const currentLevel = Number(device.last_record?.last_level) || 0;
+        const capacity = Number(device.params?.storageCapacity) || 0;
+
+        totalStock += currentLevel;
+        totalCapacity += capacity;
+      });
     });
 
     const totalBalance = totalOut - totalIn;
@@ -1052,6 +1069,8 @@ export const calculateDepartmentFlowBalances = (
       totalIn,
       totalOut,
       totalBalance,
+      totalStock,
+      totalCapacity,
     };
   });
 };
@@ -1065,12 +1084,17 @@ export const calculateDepartmentFlowBalance = (
 
   if (departmentDevices.length === 0) return null;
 
+  const relevantDevices = departmentDevices.filter(shouldIncludeDevice);
+  const tankDevices = departmentDevices.filter(
+    (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+  );
+
   let totalIn = 0;
   let totalOut = 0;
+  let totalStock = 0;
+  let totalCapacity = 0;
 
-  departmentDevices.forEach((device) => {
-    if (!shouldIncludeDevice(device)) return;
-
+  relevantDevices.forEach((device) => {
     const flowValue = getDeviceFlowValue(device);
     const { department_connection } = device;
 
@@ -1088,6 +1112,14 @@ export const calculateDepartmentFlowBalance = (
     }
   });
 
+  tankDevices.forEach((device) => {
+    const currentLevel = Number(device.last_record?.last_level) || 0;
+    const capacity = Number(device.params?.storageCapacity) || 0;
+
+    totalStock += currentLevel;
+    totalCapacity += capacity;
+  });
+
   const totalBalance = totalOut - totalIn;
 
   return {
@@ -1096,6 +1128,8 @@ export const calculateDepartmentFlowBalance = (
     totalIn,
     totalOut,
     totalBalance,
+    totalStock,
+    totalCapacity,
   };
 };
 

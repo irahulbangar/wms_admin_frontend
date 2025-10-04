@@ -324,7 +324,11 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             return;
           }
 
-          e.stopPropagation();
+          // Only stop propagation for edit button clicks
+          // Allow other clicks to bubble up for sidebar functionality
+          if (target.closest('button')) {
+            e.stopPropagation();
+          }
         }}
       />
 

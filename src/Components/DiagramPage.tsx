@@ -13,7 +13,9 @@ import { nodeTypes } from "./Diagram/nodeTypes";
 import { useDiagramData } from "./Diagram/hooks/useDiagramData";
 import { useDiagramControls } from "./Diagram/hooks/useDiagramControls";
 import { useDepartmentPopup } from "./Diagram/hooks/useDepartmentPopup";
+import { useRightSidebar } from "./Diagram/hooks/useRightSidebar";
 import DepartmentPopup from "./Diagram/DepartmentPopup";
+import RightSidebar from "./Diagram/RightSidebar";
 import DiagramControls from "./Diagram/DiagramControls";
 import { ChartArea } from "lucide-react";
 
@@ -33,6 +35,7 @@ const DiagramPage = () => {
     departmentDimensions,
     setDepartmentDimensions,
     saveDiagramToAPI,
+    deviceData,
   } = useDiagramData(plantId);
 
   const {
@@ -56,6 +59,14 @@ const DiagramPage = () => {
     handleDepartmentDimensionsChange,
     handleCloseDepartmentPopup,
   } = useDepartmentPopup(setNodes, setHasChanges, setDepartmentDimensions);
+
+  const {
+    isOpen: isRightSidebarOpen,
+    selectedGroup,
+    calculations,
+    closeSidebar: closeRightSidebar,
+    handleGroupClick,
+  } = useRightSidebar(deviceData);
 
   const handleNodeDragStop: NodeDragHandler = () => {
     setHasChanges(true);
@@ -137,6 +148,31 @@ const DiagramPage = () => {
     }
   };
 
+  // Test function to manually open sidebar
+  const testOpenSidebar = () => {
+    console.log('Testing sidebar open');
+    console.log('Available nodes:', nodes);
+    const plantNode = nodes.find(node => node.type === 'group' && node.data.type === 'plant');
+    if (plantNode) {
+      console.log('Found plant node:', plantNode);
+      handleGroupClick(plantNode.id, plantNode.data);
+    } else {
+      console.log('No plant node found, using test data');
+      handleGroupClick('plant-2', { label: 'Test Plant', type: 'plant' });
+    }
+  };
+
+  const handleNodeClickWithSidebar = (event: React.MouseEvent, node: any) => {
+    // Handle group click for sidebar first
+    if (node.type === 'group' && (node.data.type === 'plant' || node.data.type === 'department' || node.data.type === 'system')) {
+      handleGroupClick(node.id, node.data);
+      return;
+    }
+    
+    // Call the original onNodeClick for non-group nodes
+    onNodeClick(event, node);
+  };
+
   const transformedNodes = useMemo(() => {
     return nodes.map((node) => {
       if (node.id === selectedDepartment && node.type === "group") {
@@ -188,6 +224,7 @@ const DiagramPage = () => {
             onDeleteSelectedEdge={handleDeleteSelectedEdge}
             onClearAllEdges={handleClearAllEdgesWithConfirm}
             onDownloadDiagram={handleDownloadDiagram}
+            onTestSidebar={testOpenSidebar}
           />
 
           <div
@@ -229,7 +266,7 @@ const DiagramPage = () => {
                   onEdgesChange={handleEdgesChange}
                   onNodeDragStop={handleNodeDragStop}
                   onConnect={onConnect}
-                  onNodeClick={onNodeClick}
+                  onNodeClick={handleNodeClickWithSidebar}
                   onEdgeClick={onEdgeClick}
                   onPaneClick={onPaneClick}
                   onSelectionChange={onSelectionChange}
@@ -266,6 +303,13 @@ const DiagramPage = () => {
         departmentDimensions={departmentDimensions}
         onClose={handleCloseDepartmentPopup}
         onDimensionsChange={handleDepartmentDimensionsChange}
+      />
+
+      <RightSidebar
+        isOpen={isRightSidebarOpen}
+        onClose={closeRightSidebar}
+        selectedGroup={selectedGroup}
+        calculations={calculations}
       />
     </div>
   );
