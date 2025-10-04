@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { X, Package } from "lucide-react";
+import React, { useEffect, useState, useRef } from "react";
+import { X, Package, ChevronDown, ChevronRight, ChartArea } from "lucide-react";
+import * as echarts from "echarts";
 import type {
   PlantCalculations,
   DepartmentCalculations,
@@ -27,6 +28,239 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   selectedGroup,
   calculations,
 }) => {
+  const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
+  const [isStorageExpanded, setIsStorageExpanded] = useState(true);
+  
+  const flowChartRef = useRef<HTMLDivElement>(null);
+  const storageChartRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [isOpen, onClose]);
+
+  // Initialize Flow Summary Chart
+  useEffect(() => {
+    if (flowChartRef.current && isFlowSummaryExpanded && calculations && isOpen && selectedGroup) {
+      const chart = echarts.init(flowChartRef.current);
+      const option = getFlowSummaryChartOption();
+      chart.setOption(option);
+      
+      const handleResize = () => chart.resize();
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        chart.dispose();
+      };
+    }
+  }, [isFlowSummaryExpanded, calculations, isOpen, selectedGroup]);
+
+  // Initialize Storage Chart
+  useEffect(() => {
+    if (storageChartRef.current && isStorageExpanded && calculations && "totalStock" in calculations && isOpen && selectedGroup) {
+      const chart = echarts.init(storageChartRef.current);
+      const option = getStorageChartOption();
+      chart.setOption(option);
+      
+      const handleResize = () => chart.resize();
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        chart.dispose();
+      };
+    }
+  }, [isStorageExpanded, calculations, isOpen, selectedGroup]);
+
+  // Flow Summary Pie Chart Configuration
+  const getFlowSummaryChartOption = () => {
+    if (!calculations) return {};
+    
+    const data = [
+      { value: calculations.totalIn, name: "Total In", itemStyle: { color: "#3B82F6" } },
+      { value: calculations.totalOut, name: "Total Out", itemStyle: { color: "#10B981" } },
+    //   { value: Math.abs(calculations.totalBalance), name: "Balance", itemStyle: { color: calculations.totalBalance >= 0 ? "#F59E0B" : "#EF4444" } }
+    ].filter(item => item.value > 0);
+
+    // If no data, show empty state
+    if (data.length === 0) {
+      return {
+        title: {
+          text: "No Data Available",
+          left: "center",
+          top: "center",
+          textStyle: {
+            color: "#6B7280",
+            fontSize: 14
+          }
+        },
+        series: []
+      };
+    }
+
+    return {
+      title: {
+        text: "Flow Summary",
+        left: "center",
+        top: "10px",
+        textStyle: {
+          fontSize: 16,
+          fontWeight: "bold",
+          color: "#374151"
+        }
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: "{b}: {c} Ltr ({d}%)"
+      },
+      series: [
+        {
+          name: "Flow Summary",
+          type: "pie",
+          radius: "70%",
+          center: ["50%", "55%"],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 0,
+            borderColor: "#fff",
+            borderWidth: 1
+          },
+          label: {
+            show: true,
+            position: "outside",
+            formatter: "{b}",
+            fontSize: 12,
+            color: "#374151",
+            fontWeight: "normal"
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)"
+            }
+          },
+          labelLine: {
+            show: true,
+            length: 15,
+            length2: 10,
+            lineStyle: {
+              color: "#999",
+              width: 1
+            }
+          },
+          data: data
+        }
+      ]
+    };
+  };
+
+  // Storage Information Pie Chart Configuration
+  const getStorageChartOption = () => {
+    if (!calculations || !("totalStock" in calculations) || !("totalCapacity" in calculations)) {
+      return {
+        title: {
+          text: "Storage Data Not Available",
+          left: "center",
+          top: "center",
+          textStyle: {
+            color: "#6B7280",
+            fontSize: 14
+          }
+        },
+        series: []
+      };
+    }
+
+    const availableStock = calculations.totalCapacity - calculations.totalStock;
+    const data = [
+      { value: calculations.totalStock, name: "Current Stock", itemStyle: { color: "#F59E0B" } },
+      { value: availableStock, name: "Available Stock", itemStyle: { color: "#E5E7EB" } }
+    ].filter(item => item.value > 0);
+
+    // If no data, show empty state
+    if (data.length === 0) {
+      return {
+        title: {
+          text: "No Storage Data",
+          left: "center",
+          top: "center",
+          textStyle: {
+            color: "#6B7280",
+            fontSize: 14
+          }
+        },
+        series: []
+      };
+    }
+
+    return {
+      title: {
+        text: "Storage Information",
+        left: "center",
+        top: "10px",
+        textStyle: {
+          fontSize: 16,
+          fontWeight: "bold",
+          color: "#374151"
+        }
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: "{b}: {c} Ltr ({d}%)"
+      },
+      series: [
+        {
+          name: "Storage",
+          type: "pie",
+          radius: "70%",
+          center: ["50%", "55%"],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 0,
+            borderColor: "#fff",
+            borderWidth: 1
+          },
+          label: {
+            show: true,
+            position: "outside",
+            formatter: "{b}",
+            fontSize: 12,
+            color: "#374151",
+            fontWeight: "normal"
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)"
+            }
+          },
+          labelLine: {
+            show: true,
+            length: 15,
+            length2: 10,
+            lineStyle: {
+              color: "#999",
+              width: 1
+            }
+          },
+          data: data
+        }
+      ]
+    };
+  };
+
+  // Early returns after all hooks
   if (!isOpen || !selectedGroup) {
     return null;
   }
@@ -89,24 +323,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   }
 
 
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      return () => document.removeEventListener("keydown", handleEscape);
-    }
-  }, [isOpen, onClose]);
-
-
 
   return (
     <>
-      {/* Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 bg-opacity-50 z-40"
@@ -149,102 +368,142 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-4 space-y-6 overflow-y-auto h-full">
-          {/* Summary Table */}
-          <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-            <div className="bg-secondary/20 px-4 py-2 border-b border-border-primary">
-              <h3 className="text-sm font-semibold text-text-primary">
-                Flow Summary
-              </h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <tbody className="divide-y divide-border-primary">
-                  <tr className="hover:bg-secondary/10">
-                    <td className="px-4 py-3 text-text-secondary font-medium">
-                      Total In
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="font-semibold text-text-primary">
-                        {calculations.totalIn} Ltr
-                      </span>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-secondary/10">
-                    <td className="px-4 py-3 text-text-secondary font-medium">
-                      Total Out
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="font-semibold text-text-primary">
-                        {calculations.totalOut} Ltr
-                      </span>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-secondary/10">
-                    <td className="px-4 py-3 text-text-secondary font-medium">
-                      Balance
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="font-semibold text-text-primary">
-                        {calculations.totalBalance} Ltr
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+         <div className="p-4 space-y-6 overflow-y-auto h-full pb-[100px]">
+           <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+             <div 
+               className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+               onClick={() => setIsFlowSummaryExpanded(!isFlowSummaryExpanded)}
+             >
+               <div className="flex items-center justify-between">
+                 <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                    <ChartArea className="w-4 h-4" />
+                   Flow Summary
+                 </h3>
+                 {isFlowSummaryExpanded ? (
+                   <ChevronDown className="w-4 h-4 text-text-secondary" />
+                 ) : (
+                   <ChevronRight className="w-4 h-4 text-text-secondary" />
+                 )}
+               </div>
+             </div>
+             
+             {isFlowSummaryExpanded && (
+               <div className="p-4">
+                 <div className="mb-4">
+                   <div 
+                     ref={flowChartRef}
+                     style={{ height: '200px', width: '100%' }}
+                   />
+                 </div>
+                 
+                 <div className="overflow-x-auto border border-border-primary rounded-lg">
+                   <table className="w-full text-sm">
+                     <tbody className="divide-y divide-border-primary">
+                       <tr className="hover:bg-secondary/10">
+                         <td className="px-4 py-3 text-text-secondary font-medium">
+                           Total In
+                         </td>
+                         <td className="px-4 py-3 text-right">
+                           <span className="font-semibold text-text-primary">
+                             {calculations.totalIn} Ltr
+                           </span>
+                         </td>
+                       </tr>
+                       <tr className="hover:bg-secondary/10">
+                         <td className="px-4 py-3 text-text-secondary font-medium">
+                           Total Out
+                         </td>
+                         <td className="px-4 py-3 text-right">
+                           <span className="font-semibold text-text-primary">
+                             {calculations.totalOut} Ltr
+                           </span>
+                         </td>
+                       </tr>
+                       <tr className="hover:bg-secondary/10">
+                         <td className="px-4 py-3 text-text-secondary font-medium">
+                           Balance
+                         </td>
+                         <td className="px-4 py-3 text-right">
+                           <span className="font-semibold text-text-primary">
+                             {calculations.totalBalance} Ltr
+                           </span>
+                         </td>
+                       </tr>
+                     </tbody>
+                   </table>
+                 </div>
+               </div>
+             )}
+           </div>
 
-          {/* Storage Information (if available) */}
           {"totalStock" in calculations && "totalCapacity" in calculations && (
-            <div className="space-y-4">
-              <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-                <div className="bg-secondary/20 px-4 py-2 border-b border-border-primary">
+            <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+              <div 
+                className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+                onClick={() => setIsStorageExpanded(!isStorageExpanded)}
+              >
+                <div className="flex items-center justify-between">
                   <h3 className="text-sm font-semibold text-text-primary flex items-center space-x-2">
                     <Package className="w-4 h-4" />
                     <span>Storage Information</span>
                   </h3>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <tbody className="divide-y divide-border-primary">
-                      <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary font-medium">
-                          Current Stock
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <span className="font-semibold text-text-primary">
-                            {calculations.totalStock} Ltr
-                          </span>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary font-medium">
-                          Available Stock
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <span className="font-semibold text-text-primary">
-                            {calculations.totalCapacity -
-                              calculations.totalStock}{" "}
-                            Ltr
-                          </span>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary font-medium">
-                          Total Capacity
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <span className="font-semibold text-text-primary">
-                            {calculations.totalCapacity} Ltr
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  {isStorageExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-text-secondary" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-text-secondary" />
+                  )}
                 </div>
               </div>
+              
+              {isStorageExpanded && (
+                <div className="p-4">
+                  <div className="mb-4">
+                    <div 
+                      ref={storageChartRef}
+                      style={{ height: '200px', width: '100%' }}
+                    />
+                  </div>
+                  
+                  <div className="overflow-x-auto border border-border-primary rounded-lg">
+                    <table className="w-full text-sm">
+                      <tbody className="divide-y divide-border-primary">
+                        <tr className="hover:bg-secondary/10">
+                          <td className="px-4 py-3 text-text-secondary font-medium">
+                            Current Stock
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-semibold text-text-primary">
+                              {calculations.totalStock} Ltr
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-secondary/10">
+                          <td className="px-4 py-3 text-text-secondary font-medium">
+                            Available Stock
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-semibold text-text-primary">
+                              {calculations.totalCapacity -
+                                calculations.totalStock}{" "}
+                              Ltr
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-secondary/10">
+                          <td className="px-4 py-3 text-text-secondary font-medium">
+                            Total Capacity
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-semibold text-text-primary">
+                              {calculations.totalCapacity} Ltr
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
