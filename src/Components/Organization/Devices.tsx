@@ -312,7 +312,7 @@ const Devices = () => {
 
     if (selectedOrganization === "all" && selectedPlant === "all") {
       refreshDevices();
-    } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
+    } else if (selectedOrganization !== "all" && selectedPlant !== "all" && selectedDepartment !== "all") {
       setIsLoading(true);
       dispatch(
         getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
@@ -339,6 +339,7 @@ const Devices = () => {
   }, [
     selectedOrganization,
     selectedPlant,
+    selectedDepartment,
     dispatch,
     organization_id,
     plant_id,
@@ -460,9 +461,30 @@ const Devices = () => {
   }, [selectedOrganization, selectedPlant, plants]);
 
   const handleAddDevice = () => {
-    if (selectedOrganization === "all" || selectedPlant === "all") {
+    if (selectedOrganization === "all" && selectedPlant === "all" && selectedDepartment === "all") {
       Warning(
-        "Please select both organization and plant before adding a device"
+        "Please select both organization, plant and department before adding a device"
+      );
+      return;
+    }
+    
+    if (selectedOrganization === "all") {
+      Warning(
+        "Please select both organization before adding a device"
+      );
+      return;
+    }
+
+    if (selectedPlant === "all") {
+      Warning(
+        "Please select a plant before adding a device"
+      );
+      return;
+    }
+
+    if (selectedDepartment === "all") {
+      Warning(
+        "Please select a department before adding a device"
       );
       return;
     }
@@ -563,12 +585,12 @@ const Devices = () => {
           .finally(() => {
             setIsLoading(false);
           });
-      } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
+      } else if (selectedOrganization !== "all" && selectedPlant !== "all" && selectedDepartment !== "all") {
         dispatch(
           getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
             plantId: parseInt(selectedPlant),
             organizationId: parseInt(selectedOrganization),
-            departmentId: parseInt(selectedDepartment),
+            departmentId: parseInt(selectedDepartment || "0"),
           })
         )
           .unwrap()
@@ -596,6 +618,7 @@ const Devices = () => {
       organization_id,
       plant_id,
       refreshDevices,
+      selectedDepartment,
     ]
   );
 
@@ -652,7 +675,7 @@ const Devices = () => {
   const handleEditSystem = (systemId: string) => {
     if (selectedPlant === "all") {
       Warning(
-        "Please select a plant from the dropdown before updating the department"
+        "Please select a plant from the dropdown before updating the device"
       );
       return;
     }
