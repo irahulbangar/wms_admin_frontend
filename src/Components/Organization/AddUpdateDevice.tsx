@@ -659,11 +659,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">None</option>
-                  {systemData.map((system) => (
-                    <option key={system.system_id} value={system.system_id}>
-                      {system.system_name}
-                    </option>
-                  ))}
+                  {systemData
+                    .filter((system) => system.department_id === departmentId)
+                    .map((system) => (
+                      <option key={system.system_id} value={system.system_id}>
+                        {system.system_name}
+                      </option>
+                    ))}
                   <option
                     value="add_new"
                     className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
