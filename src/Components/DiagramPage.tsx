@@ -148,15 +148,6 @@ const DiagramPage = () => {
     }
   };
 
-  const testOpenSidebar = () => {
-    const plantNode = nodes.find(node => node.type === 'group' && node.data.type === 'plant');
-    if (plantNode) {
-      handleGroupClick(plantNode.id, plantNode.data);
-    } else {
-      handleGroupClick('plant-2', { label: 'Test Plant', type: 'plant' });
-    }
-  };
-    
   const handleNodeClickWithSidebar = (event: React.MouseEvent, node: any) => {
     if (node.type === 'group' && (node.data.type === 'plant' || node.data.type === 'department' || node.data.type === 'system')) {
       handleGroupClick(node.id, node.data);
@@ -218,7 +209,6 @@ const DiagramPage = () => {
             onDeleteSelectedEdge={handleDeleteSelectedEdge}
             onClearAllEdges={handleClearAllEdgesWithConfirm}
             onDownloadDiagram={handleDownloadDiagram}
-            onTestSidebar={testOpenSidebar}
           />
 
           <div

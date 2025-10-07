@@ -10,7 +10,6 @@ interface DiagramControlsProps {
   onDeleteSelectedEdge: () => void;
   onClearAllEdges: () => void;
   onDownloadDiagram: () => void;
-  onTestSidebar?: () => void;
 }
 
 const DiagramControls: React.FC<DiagramControlsProps> = ({
@@ -22,7 +21,6 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
   onDeleteSelectedEdge,
   onClearAllEdges,
   onDownloadDiagram,
-  onTestSidebar,
 }) => {
   const handleClearAllEdgesWithConfirm = () => {
     if (confirm("Are you sure you want to delete all connections?")) {
@@ -71,15 +69,6 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
               Download Image
             </button>
 
-            {onTestSidebar && (
-              <button
-                onClick={onTestSidebar}
-                className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
-                title="Test sidebar functionality"
-              >
-                Test Sidebar
-              </button>
-            )}
 
             <button
               onClick={onSaveDiagram}

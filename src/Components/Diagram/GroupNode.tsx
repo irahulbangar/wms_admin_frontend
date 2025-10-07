@@ -324,8 +324,6 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             return;
           }
 
-          // Only stop propagation for edit button clicks
-          // Allow other clicks to bubble up for sidebar functionality
           if (target.closest('button')) {
             e.stopPropagation();
           }
@@ -365,7 +363,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
           zIndex: 2,
         }}
       >
-        <div className="text-center flex items-start flex-col">
+        {/* <div className="text-center flex items-start flex-col">
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Stock :</div>
             <div className="font-medium text-text-primary">
@@ -378,8 +376,9 @@ const GroupNode: React.FC<GroupNodeProps> = ({
               {stockData.capacity.toFixed(0)} {unit}
             </div>
           </div>
-        </div>
-        {data.type === "department" && (
+        </div> */}
+        
+        {/* {data.type === "department" && (
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
@@ -402,9 +401,9 @@ const GroupNode: React.FC<GroupNodeProps> = ({
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
-        {data.type === "plant" && (
+        {/* {data.type === "plant" && (
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
@@ -427,9 +426,9 @@ const GroupNode: React.FC<GroupNodeProps> = ({
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
-        {data.type === "system" && (
+        {/* {data.type === "system" && (
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
@@ -452,7 +451,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
