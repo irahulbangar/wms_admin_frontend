@@ -450,8 +450,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       });
   }, [dispatch]);
 
-  console.log('reportTypes', reportTypes);
-
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -660,7 +658,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 >
                   <option value="0">None</option>
                   {systemData
-                    .filter((system) => system.department_id === departmentId && system.plant_id === plant_id && system.organization_id === organizationId)
+                    .filter(
+                      (system) =>
+                        system.department_id === departmentId &&
+                        system.plant_id === plant_id &&
+                        system.organization_id === organizationId
+                    )
                     .map((system) => (
                       <option key={system.system_id} value={system.system_id}>
                         {system.system_name}
@@ -720,34 +723,18 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   ))}
                 </select>
               </div>
+
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  System Connection
+                  Organization Connection
                 </label>
                 <select
-                  name="system_connection"
-                  value={formData.system_connection}
+                  name="organization_connection"
+                  value={formData.organization_connection}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
-                  <option value="0">Select System Connection</option>
-                  <option value="none">None</option>
-                  <option value="in">In</option>
-                  <option value="out">Out</option>
-                  <option value="both">Both</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Department Connection
-                </label>
-                <select
-                  name="department_connection"
-                  value={formData.department_connection}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
-                >
-                  <option value="0">Select Department Connection</option>
+                  <option value="0">Select Organization Connection</option>
                   <option value="none">None</option>
                   <option value="in">In</option>
                   <option value="out">Out</option>
@@ -775,15 +762,33 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Organization Connection
+                  Department Connection
                 </label>
                 <select
-                  name="organization_connection"
-                  value={formData.organization_connection}
+                  name="department_connection"
+                  value={formData.department_connection}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
-                  <option value="0">Select Organization Connection</option>
+                  <option value="0">Select Department Connection</option>
+                  <option value="none">None</option>
+                  <option value="in">In</option>
+                  <option value="out">Out</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  System Connection
+                </label>
+                <select
+                  name="system_connection"
+                  value={formData.system_connection}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select System Connection</option>
                   <option value="none">None</option>
                   <option value="in">In</option>
                   <option value="out">Out</option>
