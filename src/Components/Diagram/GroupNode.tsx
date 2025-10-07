@@ -379,6 +379,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             </div>
           </div>
         </div>
+        
         {data.type === "department" && (
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
