@@ -668,6 +668,10 @@ const Devices = () => {
     navigate("/organization");
   };
 
+  const handleBackToDepartments = () => {
+    navigate("/organization/departments");
+  };
+
   const handleBackToHome = () => {
     navigate("/");
   };
@@ -768,12 +772,20 @@ const Devices = () => {
           <span>Plants</span>
         </button>
 
-        {selectedPlant !== "all" && (
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+        <button
+          onClick={handleBackToDepartments}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Departments</span>
+        </button>
+
+        {selectedDepartment !== "all" && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
-              {plants.find((plant) => plant.plant_id.toString() === selectedPlant)
-                ?.plant_name || "Plant"}
+              {departments.find((department) => department.department_id.toString() === selectedDepartment)
+                ?.department_name || "Department"}
             </span>
           </>
         )}

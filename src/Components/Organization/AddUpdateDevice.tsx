@@ -660,7 +660,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 >
                   <option value="0">None</option>
                   {systemData
-                    .filter((system) => system.department_id === departmentId)
+                    .filter((system) => system.department_id === departmentId && system.plant_id === plant_id && system.organization_id === organizationId)
                     .map((system) => (
                       <option key={system.system_id} value={system.system_id}>
                         {system.system_name}
