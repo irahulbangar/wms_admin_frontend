@@ -1,26 +1,31 @@
 import React from "react";
-import { ChevronsLeft, Trash2, Download } from "lucide-react";
+import {Trash2, Download, Home } from "lucide-react";
+import Breadcrumb from "../Common/Breadcrumb";
+import type { BreadcrumbItem } from "../Common/Breadcrumb";
 
 interface DiagramControlsProps {
   hasChanges: boolean;
   isSaving: boolean;
   selectedEdge: string | null;
+  plantName?: string;
   onBack: () => void;
   onSaveDiagram: () => void;
   onDeleteSelectedEdge: () => void;
   onClearAllEdges: () => void;
   onDownloadDiagram: () => void;
+  onNavigate?: (path: string) => void;
 }
 
 const DiagramControls: React.FC<DiagramControlsProps> = ({
   hasChanges,
   isSaving,
   selectedEdge,
-  onBack,
+  plantName,
   onSaveDiagram,
   onDeleteSelectedEdge,
   onClearAllEdges,
   onDownloadDiagram,
+  onNavigate,
 }) => {
   const handleClearAllEdgesWithConfirm = () => {
     if (confirm("Are you sure you want to delete all connections?")) {
@@ -28,20 +33,35 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
     }
   };
 
-  return (
-    <div className="flex items-center px-4 py-2 bg-secondary/20 border-b border-border-primary gap-4">
-      <button
-        onClick={onBack}
-        className="px-4 py-2 bg-secondary border border-border-primary rounded-lg hover:bg-secondary/80 transition-colors cursor-pointer font-roboto flex items-center gap-2"
-      >
-        <ChevronsLeft />
-        Back
-      </button>
+  // Create breadcrumb items
+  const breadcrumbItems: BreadcrumbItem[] = [
+    {
+      label: "Home",
+      path: "/home",
+      icon: <Home className="w-4 h-4" />,
+    },
+    {
+      label: "Organization",
+      path: "/organization",
+    },
+    {
+      label: "Plants",
+      path: "/organization/plants",
+    },
+    {
+      label: plantName || "Diagram",
+      path: "#",
+      isActive: true,
+    },
+  ];
 
-      <div className="w-full">
+  return (
+    <div className="flex flex-col gap-1">
         <div className="flex justify-between items-center">
-          <h3 className="text-sm font-semibold">Diagram Controls</h3>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-4">
+            <Breadcrumb items={breadcrumbItems} onNavigate={onNavigate} />
+          </div>
+          <div className="flex gap-2 pt-3 pr-3">
             {selectedEdge && (
               <button
                 onClick={onDeleteSelectedEdge}
@@ -69,7 +89,6 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
               Download Image
             </button>
 
-
             <button
               onClick={onSaveDiagram}
               disabled={!hasChanges || isSaving}
@@ -91,7 +110,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 px-3">
           {selectedEdge && (
             <div className="flex items-center gap-2 text-text-secondary text-xs">
               <span className="w-2 h-2 bg-status-info rounded-full animate-pulse"></span>
@@ -111,7 +130,6 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 };

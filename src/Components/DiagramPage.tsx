@@ -36,6 +36,7 @@ const DiagramPage = () => {
     setDepartmentDimensions,
     saveDiagramToAPI,
     deviceData,
+    plantData,
   } = useDiagramData(plantId);
 
   const {
@@ -138,6 +139,10 @@ const DiagramPage = () => {
     navigate("/organization/plants");
   };
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+  };
+
   const handleDownloadDiagram = async () => {
     try {
       await downloadDiagramAsImage();
@@ -204,11 +209,13 @@ const DiagramPage = () => {
             hasChanges={hasChanges}
             isSaving={isSaving}
             selectedEdge={selectedEdge}
+            plantName={plantData?.plant_name}
             onBack={handleBack}
             onSaveDiagram={handleSaveDiagram}
             onDeleteSelectedEdge={handleDeleteSelectedEdge}
             onClearAllEdges={handleClearAllEdgesWithConfirm}
             onDownloadDiagram={handleDownloadDiagram}
+            onNavigate={handleNavigate}
           />
 
           <div
