@@ -209,7 +209,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     if (name === "device_family_id" || name === "device_type_id") {
       setFormData((prev) => ({ ...prev, [actualFieldName]: parseInt(value) || 0 }));
     } else if (fieldMappings[name]) {
-      setFormData((prev) => ({ ...prev, [actualFieldName]: parseInt(value) || 0 }));
+      // Handle connection fields - convert to integer, but handle "null" as -1 to distinguish from default
+      const numericValue = value === "null" ? -1 : parseInt(value) || 0;
+      setFormData((prev) => ({ ...prev, [actualFieldName]: numericValue }));
     } else {
       setFormData((prev) => ({ ...prev, [actualFieldName]: value }));
     }
@@ -263,14 +265,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         hwid: formData.hwid,
         organization_id: formData.organization_id || organizationId,
         visibility: formData.visibility,
-        in_department_id: formData.in_department_id,
-        out_department_id: formData.out_department_id,
+        in_department_id: formData.in_department_id === -1 ? 0 : formData.in_department_id,
+        out_department_id: formData.out_department_id === -1 ? 0 : formData.out_department_id,
         report_type_id: formData.report_type_id,
         system_id: formData.system_id || systemId,
-        in_system_id: formData.in_system_id,
-        out_system_id: formData.out_system_id,
-        in_plant_id: formData.in_plant_id,
-        out_plant_id: formData.out_plant_id,
+        in_system_id: formData.in_system_id === -1 ? 0 : formData.in_system_id,
+        out_system_id: formData.out_system_id === -1 ? 0 : formData.out_system_id,
+        in_plant_id: formData.in_plant_id === -1 ? 0 : formData.in_plant_id,
+        out_plant_id: formData.out_plant_id === -1 ? 0 : formData.out_plant_id,
         organization_connection: formData.organization_connection,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
@@ -794,11 +796,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="plant_in"
-                  value={formData.in_plant_id || ""}
+                  value={formData.in_plant_id === -1 ? "null" : formData.in_plant_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Plant</option>
+                  <option value="null">None</option>
                   {plantData.filter((plant) => plant.organization_id === organizationId).map((plant) => (
                     <option key={plant.plant_id} value={plant.plant_id}>
                       {plant.plant_name}
@@ -813,11 +816,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="plant_out"
-                  value={formData.out_plant_id || ""}
+                  value={formData.out_plant_id === -1 ? "null" : formData.out_plant_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Plant</option>
+                  <option value="null">None</option>
                   {plantData.filter((plant) => plant.organization_id === organizationId).map((plant) => (
                     <option key={plant.plant_id} value={plant.plant_id}>
                       {plant.plant_name}
@@ -839,11 +843,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="department_in"
-                  value={formData.in_department_id || ""}
+                  value={formData.in_department_id === -1 ? "null" : formData.in_department_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select Department</option>
+                  <option value="null">None</option>
                   {departmentData.filter((department) => department.plant_id === plant_id).map((department) => (
                     <option key={department.department_id} value={department.department_id}>
                       {department.department_name}
@@ -858,11 +863,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="department_out"
-                  value={formData.out_department_id || ""}
+                  value={formData.out_department_id === -1 ? "null" : formData.out_department_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
-                  <option value="0">Select Department Out</option>
+                  <option value="0">Select Department</option>
+                  <option value="null">None</option>
                   {departmentData.filter((department) => department.plant_id === plant_id).map((department) => (
                     <option key={department.department_id} value={department.department_id}>
                       {department.department_name}
@@ -884,11 +890,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="system_in"
-                  value={formData.in_system_id || ""}
+                  value={formData.in_system_id === -1 ? "null" : formData.in_system_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select System</option>
+                  <option value="null">None</option>
                   {systemData.filter((system) => system.plant_id === plant_id).map((system) => (
                     <option key={system.system_id} value={system.system_id}>
                       {system.system_name}
@@ -903,11 +910,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="system_out"
-                  value={formData.out_system_id || ""}
+                  value={formData.out_system_id === -1 ? "null" : formData.out_system_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
                   <option value="0">Select System</option>
+                  <option value="null">None</option>
                   {systemData.filter((system) => system.plant_id === plant_id).map((system) => (
                     <option key={system.system_id} value={system.system_id}>
                       {system.system_name}

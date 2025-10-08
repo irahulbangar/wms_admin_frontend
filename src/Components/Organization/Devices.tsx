@@ -242,7 +242,7 @@ const Devices = () => {
     getDeviceType();
     getSystem();
 
-    if (organization_id && plant_id) {
+    if (organization_id && plant_id && department_id) {
       setIsLoading(true);
       setSelectedOrganization(organization_id);
       setSelectedPlant(plant_id);
@@ -271,10 +271,12 @@ const Devices = () => {
     } else {
       setSelectedOrganization("all");
       setSelectedPlant("all");
+      setSelectedDepartment("all");
     }
   }, [
     organization_id,
     plant_id,
+    department_id,
     dispatch,
     getOrganization,
     fetchPlants,
@@ -310,7 +312,7 @@ const Devices = () => {
       return;
     }
 
-    if (selectedOrganization === "all" && selectedPlant === "all") {
+    if (selectedOrganization === "all" && selectedPlant === "all" && selectedDepartment === "all") {
       refreshDevices();
     } else if (selectedOrganization !== "all" && selectedPlant !== "all" && selectedDepartment !== "all") {
       setIsLoading(true);
@@ -563,7 +565,7 @@ const Devices = () => {
 
       setIsLoading(true);
 
-      if (organization_id && plant_id) {
+      if (organization_id && plant_id && department_id) {
         dispatch(
           getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
             organizationId: parseInt(organization_id),
