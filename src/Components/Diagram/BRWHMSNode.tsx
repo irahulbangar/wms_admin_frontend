@@ -57,12 +57,12 @@ Flow Rate : ${data?.avg} LPM
       <Handle
         type="target"
         position={HandlePosition.Left}
-        className="w-3 h-3 bg-blue-500"
+        className="w-3 h-3 bg-status-info"
       />
       <Handle
         type="source"
         position={HandlePosition.Right}
-        className="w-3 h-3 bg-blue-500"
+        className="w-3 h-3 bg-status-info"
       />
     </div>
   );
