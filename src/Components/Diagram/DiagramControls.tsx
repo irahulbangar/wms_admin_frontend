@@ -7,25 +7,28 @@ interface DiagramControlsProps {
   hasChanges: boolean;
   isSaving: boolean;
   selectedEdge: string | null;
+  selectedNodeForConnection: string | null;
   plantName?: string;
-  onBack: () => void;
   onSaveDiagram: () => void;
   onDeleteSelectedEdge: () => void;
   onClearAllEdges: () => void;
   onDownloadDiagram: () => void;
   onNavigate?: (path: string) => void;
+  onClearConnectionSelection?: () => void;
 }
 
 const DiagramControls: React.FC<DiagramControlsProps> = ({
   hasChanges,
   isSaving,
   selectedEdge,
+  selectedNodeForConnection,
   plantName,
   onSaveDiagram,
   onDeleteSelectedEdge,
   onClearAllEdges,
   onDownloadDiagram,
   onNavigate,
+  onClearConnectionSelection,
 }) => {
   const handleClearAllEdgesWithConfirm = () => {
     if (confirm("Are you sure you want to delete all connections?")) {
@@ -33,7 +36,6 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
     }
   };
 
-  // Create breadcrumb items
   const breadcrumbItems: BreadcrumbItem[] = [
     {
       label: "Home",
@@ -110,26 +112,40 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-6 px-3">
-          {selectedEdge && (
-            <div className="flex items-center gap-2 text-text-secondary text-xs">
-              <span className="w-2 h-2 bg-status-info rounded-full animate-pulse"></span>
-              Edge selected - Press Delete or use button to remove
-            </div>
-          )}
-          {hasChanges && (
-            <div className="flex items-center gap-2 text-text-secondary text-xs">
-              <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
-              Unsaved changes detected
-            </div>
-          )}
-          {!hasChanges && !selectedEdge && (
-            <div className="flex items-center gap-2 text-text-secondary text-xs">
-              <span className="w-2 h-2 bg-status-success rounded-full"></span>
-              All changes saved
-            </div>
-          )}
-        </div>
+         <div className="flex items-center gap-6 px-3">
+           {selectedNodeForConnection && (
+             <div className="flex items-center gap-2 text-text-secondary text-xs">
+               <span className="w-2 h-2 bg-status-success rounded-full animate-pulse"></span>
+               <span className="font-roboto text-status-info text-sm">Node selected for connection - Ctrl+click another node to connect</span>
+               {onClearConnectionSelection && (
+                 <button
+                   onClick={onClearConnectionSelection}
+                   className="ml-2 text-sm font-roboto text-status-danger hover:text-status-danger/80 underline"
+                 >
+                   Cancel
+                 </button>
+               )}
+             </div>
+           )}
+           {selectedEdge && (
+             <div className="flex items-center gap-2 text-text-secondary text-xs">
+               <span className="w-2 h-2 bg-status-info rounded-full animate-pulse"></span>
+               Edge selected - Press Delete or use button to remove
+             </div>
+           )}
+           {hasChanges && (
+             <div className="flex items-center gap-2 text-text-secondary text-xs">
+               <span className="w-2 h-2 bg-status-warning rounded-full animate-pulse"></span>
+               Unsaved changes detected
+             </div>
+           )}
+           {!hasChanges && !selectedEdge && !selectedNodeForConnection && (
+             <div className="flex items-center gap-2 text-text-secondary text-xs">
+               <span className="w-2 h-2 bg-status-success rounded-full"></span>
+               All changes saved
+             </div>
+           )}
+         </div>
     </div>
   );
 };

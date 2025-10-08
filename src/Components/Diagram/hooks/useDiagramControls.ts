@@ -10,6 +10,7 @@ export const useDiagramControls = (
   setHasChanges: (hasChanges: boolean) => void
 ) => {
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
+  const [selectedNodeForConnection, setSelectedNodeForConnection] = useState<string | null>(null);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -216,6 +217,75 @@ export const useDiagramControls = (
     }
   }, []);
 
+  const handleCtrlClickConnection = useCallback((event: React.MouseEvent, node: any) => {
+    if (node.type === "group") {
+      return;
+    }
+
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (selectedNodeForConnection === null) {
+        setSelectedNodeForConnection(node.id);
+        
+        const customEvent = new CustomEvent("nodeSelectedForConnection", {
+          detail: { nodeId: node.id, isFirst: true },
+        });
+        document.dispatchEvent(customEvent);
+      } else if (selectedNodeForConnection !== node.id) {
+        const newEdge: DiagramEdge = {
+          id: `${selectedNodeForConnection}-${node.id}`,
+          source: selectedNodeForConnection,
+          target: node.id,
+          animated: true,
+          style: {
+            stroke: "#6366f1",
+            strokeWidth: 3,
+          },
+          type: "smoothstep",
+        };
+
+        setEdges((currentEdges) => {
+          const edgeExists = currentEdges.some(
+            (edge) => 
+              (edge.source === selectedNodeForConnection && edge.target === node.id) ||
+              (edge.source === node.id && edge.target === selectedNodeForConnection)
+          );
+          
+          if (!edgeExists) {
+            return [...currentEdges, newEdge];
+          }
+          return currentEdges;
+        });
+
+        setHasChanges(true);
+        setSelectedNodeForConnection(null);
+
+        const customEvent = new CustomEvent("nodeSelectedForConnection", {
+          detail: { nodeId: null, isFirst: false },
+        });
+        document.dispatchEvent(customEvent);
+      } else {
+        setSelectedNodeForConnection(null);
+        
+        const customEvent = new CustomEvent("nodeSelectedForConnection", {
+          detail: { nodeId: null, isFirst: false },
+        });
+        document.dispatchEvent(customEvent);
+      }
+    }
+  }, [selectedNodeForConnection, setEdges, setHasChanges]);
+
+  const clearConnectionSelection = useCallback(() => {
+    setSelectedNodeForConnection(null);
+    
+    const customEvent = new CustomEvent("nodeSelectedForConnection", {
+      detail: { nodeId: null, isFirst: false },
+    });
+    document.dispatchEvent(customEvent);
+  }, []);
+
   const multiSelectionKeyCode = useMemo(() => ["Meta", "Ctrl"], []);
 
   const downloadDiagramAsImage = useCallback(async () => {
@@ -377,6 +447,7 @@ export const useDiagramControls = (
   return {
     selectedEdge,
     setSelectedEdge,
+    selectedNodeForConnection,
     onConnect,
     onEdgeClick,
     onPaneClick,
@@ -386,6 +457,8 @@ export const useDiagramControls = (
     handleMouseDown,
     handleClick,
     onNodeClick,
+    handleCtrlClickConnection,
+    clearConnectionSelection,
     multiSelectionKeyCode,
     downloadDiagramAsImage,
   };

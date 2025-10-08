@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -41,6 +41,7 @@ const DiagramPage = () => {
 
   const {
     selectedEdge,
+    selectedNodeForConnection,
     onConnect,
     onEdgeClick,
     onPaneClick,
@@ -50,6 +51,8 @@ const DiagramPage = () => {
     handleMouseDown,
     handleClick,
     onNodeClick,
+    handleCtrlClickConnection,
+    clearConnectionSelection,
     multiSelectionKeyCode,
     downloadDiagramAsImage,
   } = useDiagramControls(setEdges, setHasChanges);
@@ -135,9 +138,6 @@ const DiagramPage = () => {
     }
   };
 
-  const handleBack = () => {
-    navigate("/organization/plants");
-  };
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -149,11 +149,26 @@ const DiagramPage = () => {
       Success("Diagram downloaded successfully!");
     } catch (error) {
       console.error("Download failed:", error);
-      // You can add error handling here if needed
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && selectedNodeForConnection) {
+        clearConnectionSelection();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [selectedNodeForConnection, clearConnectionSelection]);
+
   const handleNodeClickWithSidebar = (event: React.MouseEvent, node: any) => {
+    if (event.ctrlKey || event.metaKey) {
+      handleCtrlClickConnection(event, node);
+      return;
+    }
+
     if (node.type === 'group' && (node.data.type === 'plant' || node.data.type === 'department' || node.data.type === 'system')) {
       handleGroupClick(node.id, node.data);
       return;
@@ -164,20 +179,35 @@ const DiagramPage = () => {
 
   const transformedNodes = useMemo(() => {
     return nodes.map((node) => {
+      let updatedNode = { ...node };
+
       if (node.id === selectedDepartment && node.type === "group") {
-        return {
-          ...node,
+        updatedNode = {
+          ...updatedNode,
           style: {
-            ...node.style,
+            ...updatedNode.style,
             border: "3px solid #3b82f6",
             boxShadow: "0 0 15px rgba(59, 130, 246, 0.3)",
             zIndex: 5,
           },
         };
       }
-      return node;
+
+      if (node.id === selectedNodeForConnection && node.type !== "group") {
+        updatedNode = {
+          ...updatedNode,
+          style: {
+            ...updatedNode.style,
+            border: "3px solid #10b981",
+            boxShadow: "0 0 15px rgba(16, 185, 129, 0.5)",
+            zIndex: 10,
+          },
+        };
+      }
+
+      return updatedNode;
     }) as any[];
-  }, [nodes, selectedDepartment]);
+  }, [nodes, selectedDepartment, selectedNodeForConnection]);
 
   const transformedEdges = useMemo(() => {
     return edges.map((edge) => ({
@@ -209,13 +239,14 @@ const DiagramPage = () => {
             hasChanges={hasChanges}
             isSaving={isSaving}
             selectedEdge={selectedEdge}
+            selectedNodeForConnection={selectedNodeForConnection}
             plantName={plantData?.plant_name}
-            onBack={handleBack}
             onSaveDiagram={handleSaveDiagram}
             onDeleteSelectedEdge={handleDeleteSelectedEdge}
             onClearAllEdges={handleClearAllEdgesWithConfirm}
             onDownloadDiagram={handleDownloadDiagram}
             onNavigate={handleNavigate}
+            onClearConnectionSelection={clearConnectionSelection}
           />
 
           <div
