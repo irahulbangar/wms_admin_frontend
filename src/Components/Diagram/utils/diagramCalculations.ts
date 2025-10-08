@@ -59,42 +59,42 @@ export const convertDevicesToDiagram = (
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
 
   const plantGroups = visibleDevices.reduce((acc, device) => {
-    const plantId = device.plant_id.toString();
+    const plantId = device.in_plant_id?.toString() || device.out_plant_id?.toString() || "unknown";
     if (!acc[plantId]) {
       acc[plantId] = {
-        plant_id: device.plant_id,
-        plant_name: plantData?.plant_name || device.plant_name || `Plant ${device.plant_id}`,
+        plant_id: device.in_plant_id || device.out_plant_id,
+        plant_name: plantData?.plant_name || device.in_plant_name || device.out_plant_name || `Plant ${device.in_plant_id || device.out_plant_id}`,
         departments: {},
       };
     } else {
-      if (device.plant_name && device.plant_name !== acc[plantId].plant_name && !plantData?.plant_name) {
-        acc[plantId].plant_name = device.plant_name;
+      if (device.in_plant_name && device.in_plant_name !== acc[plantId].plant_name && !plantData?.plant_name) {
+        acc[plantId].plant_name = device.in_plant_name;
       }
     }
 
-    const deptId = device.department_id.toString();
+    const deptId = device.in_department_id?.toString() || device.out_department_id?.toString() || "unknown";
     if (!acc[plantId].departments[deptId]) {
       acc[plantId].departments[deptId] = {
-        department_id: device.department_id,
-        department_name: device.department_name || `Department ${device.department_id}`,
+        department_id: device.in_department_id || device.out_department_id,
+        department_name: device.in_department_name || device.out_department_name || `Department ${device.in_department_id || device.out_department_id}`,
         systems: {},
       };
     } else {
-      if (device.department_name && device.department_name !== acc[plantId].departments[deptId].department_name) {
-        acc[plantId].departments[deptId].department_name = device.department_name;
+      if (device.in_department_name && device.in_department_name !== acc[plantId].departments[deptId].department_name) {
+        acc[plantId].departments[deptId].department_name = device.in_department_name;
       }
     }
 
-    const systemId = device.system_id.toString();
+    const systemId = device.in_system_id?.toString() || device.out_system_id?.toString() || "unknown";
     if (!acc[plantId].departments[deptId].systems[systemId]) {
       acc[plantId].departments[deptId].systems[systemId] = {
-        system_id: device.system_id,
-        system_name: device.system_name || `System ${device.system_id}`,
+        system_id: device.in_system_id || device.out_system_id,
+        system_name: device.in_system_name || device.out_system_name || `System ${device.in_system_id || device.out_system_id}`,
         devices: [],
       };
     } else {
-      if (device.system_name && device.system_name !== acc[plantId].departments[deptId].systems[systemId].system_name) {
-        acc[plantId].departments[deptId].systems[systemId].system_name = device.system_name;
+      if (device.in_system_name && device.in_system_name !== acc[plantId].departments[deptId].systems[systemId].system_name) {
+        acc[plantId].departments[deptId].systems[systemId].system_name = device.in_system_name;
       }
     }
     acc[plantId].departments[deptId].systems[systemId].devices.push(device);
@@ -270,8 +270,8 @@ export const convertDevicesToDiagram = (
         });
 
         system.devices.sort((a: DeviceResult, b: DeviceResult) => {
-          const aIsTank = a.type === "tank" || a.device_family?.toLowerCase().includes("tank");
-          const bIsTank = b.type === "tank" || b.device_family?.toLowerCase().includes("tank");
+          const aIsTank = a.device_family_type === "tank" || a.device_family?.toLowerCase().includes("tank");
+          const bIsTank = b.device_family_type === "tank" || b.device_family?.toLowerCase().includes("tank");
           if (aIsTank && !bIsTank) return -1;
           if (!aIsTank && bIsTank) return 1;
           return a.device_id - b.device_id;
@@ -279,7 +279,7 @@ export const convertDevicesToDiagram = (
     
         const tanks = system.devices.filter(
           (device: DeviceResult) =>
-            device.type === "tank" ||
+            device.device_family_type === "tank" ||
             device.device_family?.toLowerCase().includes("tank")
         );
 
@@ -299,7 +299,7 @@ export const convertDevicesToDiagram = (
 
         const fms = system.devices.filter(
           (device: DeviceResult) =>
-            device.type === "fm" ||
+            device.device_family_type === "fm" ||
             device.device_family?.toLowerCase().includes("flow")
         );
 
@@ -320,7 +320,7 @@ export const convertDevicesToDiagram = (
 
         const brwhms = system.devices.filter(
           (device: DeviceResult) =>
-            device.type === "brwhms" ||
+            device.device_family_type === "brwhms" ||
             device.device_family?.toLowerCase().includes("brwhms")
         );
 
@@ -341,7 +341,7 @@ export const convertDevicesToDiagram = (
 
         const phmcs = system.devices.filter(
           (device: DeviceResult) =>
-            device.type === "phmc" ||
+            device.device_family_type === "phmc" ||
             device.device_family?.toLowerCase().includes("phmc")
         );
 
@@ -362,7 +362,7 @@ export const convertDevicesToDiagram = (
 
         const args = system.devices.filter(
           (device: DeviceResult) =>
-            device.type === "arg" ||
+            device.device_family_type === "arg" ||
             device.device_family?.toLowerCase().includes("arg")
         );
 
@@ -459,12 +459,12 @@ const createTankNode = (
     capacity: Number(device?.params?.storageCapacity) || 0,
     currentLevel: Number(device.last_record?.last_level) || 0,
     height: Number(device?.params?.height) || 0,
-    departmentConnection: device?.department_connection,
-    plantConnection: device?.plant_connection,
-    organizationConnection: device?.organization_connection,
-    departmentName: device?.department_name,
-    systemName: device?.system_name,
-    systemConnection: device?.system_connection,
+    // departmentConnection: device?.department_connection,
+    // plantConnection: device?.plant_connection,
+    // organizationConnection: device?.organization_connection,
+    // departmentName: device?.department_name,
+    // systemName: device?.system_name,
+    // systemConnection: device?.system_connection,
   };
 
   return {
@@ -558,12 +558,12 @@ const createFMNode = (
     isActive: device.device_status === "active",
     totalizerReading: Number(device.last_record?.max) || 0,
     flowRate: Number(device.last_record?.avg) || 0,
-    departmentConnection: device?.department_connection,
-    plantConnection: device?.plant_connection,
-    organizationConnection: device?.organization_connection,
-    departmentName: device?.department_name,
-    systemName: device?.system_name,
-    systemConnection: device?.system_connection,
+    // departmentConnection: device?.department_connection,
+    // plantConnection: device?.plant_connection,
+    // organizationConnection: device?.organization_connection,
+    // departmentName: device?.department_name,
+    // systemName: device?.system_name,
+    // systemConnection: device?.system_connection,
   };
 
   return {
@@ -648,12 +648,12 @@ const createBRWHMSNode = (
     avg: Number(device.last_record?.avg) || 0,
     max: Number(device.last_record?.max) || 0,
     min: Number(device.last_record?.min) || 0,
-    departmentConnection: device?.department_connection,
-    plantConnection: device?.plant_connection,
-    organizationConnection: device?.organization_connection,
-    departmentName: device?.department_name,
-    systemName: device?.system_name,
-    systemConnection: device?.system_connection,
+    // departmentConnection: device?.department_connection,
+    // plantConnection: device?.plant_connection,
+    // organizationConnection: device?.organization_connection,
+    // departmentName: device?.department_name,
+    // systemName: device?.system_name,
+    // systemConnection: device?.system_connection,
   };
 
   return {
@@ -743,12 +743,12 @@ const createPHMCNode = (
     currentB: Number(device.last_record?.Current_b) || 0,
     current: Number(device.last_record?.Current_r) || 0,
     frequency: Number(device.last_record?.Frequency) || 0,
-    departmentConnection: device?.department_connection,
-    plantConnection: device?.plant_connection,
-    organizationConnection: device?.organization_connection,
-    departmentName: device?.department_name,
-    systemName: device?.system_name,
-    systemConnection: device?.system_connection,
+    // departmentConnection: device?.department_connection,
+    // plantConnection: device?.plant_connection,
+    // organizationConnection: device?.organization_connection,
+    // departmentName: device?.department_name,
+    // systemName: device?.system_name,
+    // systemConnection: device?.system_connection,
   };
 
   return {
@@ -950,17 +950,17 @@ export const cleanNodesForAPI = (
 
 
 const getDeviceFlowValue = (device: DeviceResult): number => {
-  const { type, device_type, last_record } = device;
+  const { device_family_type, device_type, last_record } = device;
 
-  if (type === "fm") {
+  if (device_family_type === "fm") {
     return Number(last_record?.max) || 0;
   }
 
-  if (type === "brwhms") {
+  if (device_family_type === "brwhms") {
     return Number(last_record?.max) || 0;
   }
 
-  if (type === "phmc" && device_type === "New phmc") {
+  if (device_family_type === "phmc" && device_type === "New phmc") {
     return Number(last_record?.flowrate) || 0;
   }
 
@@ -968,13 +968,13 @@ const getDeviceFlowValue = (device: DeviceResult): number => {
 };
 
 const shouldIncludeDevice = (device: DeviceResult): boolean => {
-  const { type, device_type } = device;
+  const { device_family_type, device_type } = device;
 
-  if (type === "fm") return true;
+  if (device_family_type === "fm") return true;
 
-  if (type === "brwhms") return true;
+  if (device_family_type === "brwhms") return true;
 
-  if (type === "phmc" && device_type === "New phmc") return true;
+  if (device_family_type === "phmc" && device_type === "New phmc") return true;
 
   return false;
 };
@@ -985,20 +985,20 @@ export const calculateDepartmentFlowBalances = (
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
 
   const departmentGroups = visibleDevices.reduce((acc, device) => {
-    const deptId = device.department_id;
+    const deptId = device.in_department_id || device.out_department_id;
     if (!acc[deptId]) {
       acc[deptId] = {
         department_id: deptId,
-        department_name: device.department_name || `Department ${deptId}`,
+        department_name: device.in_department_name || device.out_department_name || `Department ${deptId}`,
         systems: {},
       };
     }
 
-    const systemId = device.system_id.toString();
+    const systemId = device.in_system_id?.toString() || device.out_system_id?.toString() || "unknown";
     if (!acc[deptId].systems[systemId]) {
       acc[deptId].systems[systemId] = {
-        system_id: device.system_id,
-        system_name: device.system_name || `System ${device.system_id}`,
+        system_id: device.in_system_id || device.out_system_id,
+        system_name: device.in_system_name || device.out_system_name || `System ${device.in_system_id || device.out_system_id}`,
         devices: [],
       };
     }
@@ -1017,24 +1017,24 @@ export const calculateDepartmentFlowBalances = (
         if (!shouldIncludeDevice(device)) return;
 
         const flowValue = getDeviceFlowValue(device);
-        const { department_connection } = device;
+        const { in_department_connection, out_department_connection } = device;
 
-        if (department_connection === "in") {
+        if (in_department_connection === "in" || out_department_connection === "in") {
           totalIn += flowValue;
         }
 
-        if (department_connection === "out") {
+        if (in_department_connection === "out" || out_department_connection === "out") {
           totalOut += flowValue;
         }
 
-        if (department_connection === "both") {
+        if (in_department_connection === "both" || out_department_connection === "both") {
           totalIn += flowValue;
           totalOut += flowValue;
         }
       });
 
       const tankDevices = system.devices.filter(
-        (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+        (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
       );
 
       tankDevices.forEach((device) => {
@@ -1065,13 +1065,13 @@ export const calculateDepartmentFlowBalance = (
   departmentId: number
 ): DepartmentCalculations | null => {
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  const departmentDevices = visibleDevices.filter(device => device.department_id === departmentId);
+  const departmentDevices = visibleDevices.filter(device => device.in_department_id === departmentId || device.out_department_id === departmentId);
 
   if (departmentDevices.length === 0) return null;
 
   const relevantDevices = departmentDevices.filter(shouldIncludeDevice);
   const tankDevices = departmentDevices.filter(
-    (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+    (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
   );
 
   let totalIn = 0;
@@ -1109,7 +1109,7 @@ export const calculateDepartmentFlowBalance = (
 
   return {
     department_id: departmentId,
-    department_name: departmentDevices[0].department_name || `Department ${departmentId}`,
+    department_name: departmentDevices[0].in_department_name || departmentDevices[0].out_department_name || `Department ${departmentId}`,
     totalIn,
     totalOut,
     totalBalance,
@@ -1133,13 +1133,13 @@ export const calculatePlantFlowBalance = (
   plantId: number
 ): PlantCalculations | null => {
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  const plantDevices = visibleDevices.filter(device => device.plant_id === plantId);
+  const plantDevices = visibleDevices.filter(device => device.in_plant_id === plantId || device.out_plant_id === plantId);
 
   if (plantDevices.length === 0) return null;
 
   const relevantDevices = plantDevices.filter(shouldIncludeDevice);
   const tankDevices = plantDevices.filter(
-    (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+    (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
   );
 
   let totalIn = 0;
@@ -1177,7 +1177,7 @@ export const calculatePlantFlowBalance = (
 
   return {
     plant_id: plantId,
-    plant_name: plantDevices[0].plant_name || `Plant ${plantId}`,
+    plant_name: plantDevices[0].in_plant_name || plantDevices[0].out_plant_name || `Plant ${plantId}`,
     totalIn,
     totalOut,
     totalBalance,
@@ -1201,13 +1201,13 @@ export const calculateSystemFlowBalance = (
   systemId: number
 ): SystemCalculations | null => {
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  const systemDevices = visibleDevices.filter(device => device.system_id === systemId);
+  const systemDevices = visibleDevices.filter(device => device.in_system_id === systemId || device.out_system_id === systemId);
 
   if (systemDevices.length === 0) return null;
 
   const relevantDevices = systemDevices.filter(shouldIncludeDevice);
   const tankDevices = systemDevices.filter(
-    (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+    (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
   );
 
   let totalIn = 0;
@@ -1245,7 +1245,7 @@ export const calculateSystemFlowBalance = (
 
   return {
     system_id: systemId,
-    system_name: systemDevices[0].system_name || `System ${systemId}`,
+    system_name: systemDevices[0].in_system_name || systemDevices[0].out_system_name || `System ${systemId}`,
     totalIn,
     totalOut,
     totalBalance,

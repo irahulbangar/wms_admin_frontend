@@ -816,7 +816,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="plant_out"
-                  value={formData.out_plant_id === -1 ? "null" : formData.out_plant_id || ""}
+                  value={formData.out_plant_id === null || formData.out_plant_id === -1 ? "null" : formData.out_plant_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
