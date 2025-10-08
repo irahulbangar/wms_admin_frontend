@@ -68,6 +68,7 @@ const DiagramPage = () => {
     isOpen: isRightSidebarOpen,
     selectedGroup,
     calculations,
+    deviceData: sidebarDeviceData,
     closeSidebar: closeRightSidebar,
     handleGroupClick,
   } = useRightSidebar(deviceData);
@@ -332,6 +333,7 @@ const DiagramPage = () => {
         onClose={closeRightSidebar}
         selectedGroup={selectedGroup}
         calculations={calculations}
+        deviceData={sidebarDeviceData}
       />
     </div>
   );

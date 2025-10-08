@@ -6,6 +6,7 @@ import type {
   DepartmentCalculations,
   SystemCalculations,
 } from "./utils/diagramCalculations";
+import type { DeviceResult } from "../../../model/devices.interface";
 
 interface RightSidebarProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ interface RightSidebarProps {
     | DepartmentCalculations
     | SystemCalculations
     | null;
+  deviceData?: DeviceResult[];
 }
 
 const RightSidebar: React.FC<RightSidebarProps> = ({
@@ -27,12 +29,62 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   onClose,
   selectedGroup,
   calculations,
+  deviceData,
 }) => {
   const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
 
   const flowChartRef = useRef<HTMLDivElement>(null);
   const storageChartRef = useRef<HTMLDivElement>(null);
+
+  const getFilteredStorageData = () => {
+    if (!deviceData || !selectedGroup) {
+      return { totalStock: 0, totalCapacity: 0 };
+    }
+
+    let filteredDevices: DeviceResult[] = [];
+
+    if (selectedGroup.type === "plant") {
+      filteredDevices = deviceData.filter(device => 
+        device.plant_connection === "in" || device.plant_connection === "out"
+      );
+    } else if (selectedGroup.type === "department") {
+      const departmentId = parseInt(selectedGroup.id.replace("dept-", ""));
+      const departmentDevices = deviceData.filter(
+        (device) => device.department_id === departmentId
+      );
+      filteredDevices = departmentDevices.filter(device => 
+        device.department_connection === "in" || device.department_connection === "out"
+      );
+    } else if (selectedGroup.type === "system") {
+      const systemId = parseInt(selectedGroup.id.replace("system-", ""));
+      const systemDevices = deviceData.filter(
+        (device) => device.system_id === systemId
+      );
+      filteredDevices = systemDevices.filter(device => 
+        device.system_connection === "in" || device.system_connection === "out"
+      );
+    }
+
+    const tankDevices = filteredDevices.filter(
+      (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+    );
+
+    const totals = tankDevices.reduce(
+      (acc, device) => {
+        const currentLevel = Number(device.last_record?.last_level) || 0;
+        const capacity = Number(device?.params?.storageCapacity) || 0;
+        
+        return {
+          totalStock: acc.totalStock + currentLevel,
+          totalCapacity: acc.totalCapacity + capacity,
+        };
+      },
+      { totalStock: 0, totalCapacity: 0 }
+    );
+
+    return totals;
+  };
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -192,11 +244,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   };
 
   const getStorageChartOption = () => {
-    if (
-      !calculations ||
-      !("totalStock" in calculations) ||
-      !("totalCapacity" in calculations)
-    ) {
+    const filteredStorageData = getFilteredStorageData();
+    
+    if (filteredStorageData.totalStock === 0 && filteredStorageData.totalCapacity === 0) {
       return {
         title: {
           text: `${selectedGroup?.name} Storage Data Not Available`,
@@ -211,10 +261,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       };
     }
 
-    const availableStock = calculations.totalCapacity - calculations.totalStock;
+    const availableStock = filteredStorageData.totalCapacity - filteredStorageData.totalStock;
     const data = [
       {
-        value: calculations.totalStock,
+        value: filteredStorageData.totalStock,
         name: "Current Stock",
         itemStyle: { color: "#8B5CF6" },
       },
@@ -492,85 +542,86 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             )}
           </div>
 
-          {"totalStock" in calculations && "totalCapacity" in calculations && (
-            <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-              <div
-                className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
-                onClick={() => setIsStorageExpanded(!isStorageExpanded)}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center space-x-2">
-                    <Package className="w-4 h-4" />
-                    <span>Storage Information</span>
-                  </h3>
-                  {isStorageExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-text-secondary" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-text-secondary" />
-                  )}
+          {(() => {
+            const filteredStorageData = getFilteredStorageData();
+            return (filteredStorageData.totalStock > 0 || filteredStorageData.totalCapacity > 0) && (
+              <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+                <div
+                  className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+                  onClick={() => setIsStorageExpanded(!isStorageExpanded)}
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center space-x-2">
+                      <Package className="w-4 h-4" />
+                      <span>Storage Information</span>
+                    </h3>
+                    {isStorageExpanded ? (
+                      <ChevronDown className="w-4 h-4 text-text-secondary" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-text-secondary" />
+                    )}
+                  </div>
                 </div>
+
+                {isStorageExpanded && (
+                  <div className="p-4">
+                    <div className="mb-4">
+                      <div
+                        ref={storageChartRef}
+                        style={{ height: "200px", width: "100%" }}
+                      />
+                    </div>
+
+                    <div className="overflow-x-auto border border-border-primary rounded-lg">
+                      <table className="w-full text-sm">
+                        <tbody className="divide-y divide-border-primary">
+                          <tr className="hover:bg-secondary/10">
+                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3.5 h-3.5 bg-[#8B5CF6] rounded-full"></div>
+                                Total Stock
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span className="font-medium text-text-primary text-base font-roboto">
+                                {filteredStorageData.totalStock.toFixed(1)} Ltr
+                              </span>
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-secondary/10">
+                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3.5 h-3.5 bg-[#3B82F6] rounded-full"></div>
+                                Available Capacity
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span className="font-medium text-text-primary text-base font-roboto">
+                                {(filteredStorageData.totalCapacity - filteredStorageData.totalStock).toFixed(1)} Ltr
+                              </span>
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-secondary/10">
+                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3.5 h-3.5 bg-[#06B6D4] rounded-full"></div>
+                                  Total Capacity
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span className="font-medium text-text-primary text-base font-roboto">
+                                {filteredStorageData.totalCapacity.toFixed(1)} Ltr
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {isStorageExpanded && (
-                <div className="p-4">
-                  <div className="mb-4">
-                    <div
-                      ref={storageChartRef}
-                      style={{ height: "200px", width: "100%" }}
-                    />
-                  </div>
-
-                  <div className="overflow-x-auto border border-border-primary rounded-lg">
-                    <table className="w-full text-sm">
-                      <tbody className="divide-y divide-border-primary">
-                        <tr className="hover:bg-secondary/10">
-                          <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3.5 h-3.5 bg-[#8B5CF6] rounded-full"></div>
-                              Total Stock
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-medium text-text-primary text-base font-roboto">
-                              {calculations.totalStock} Ltr
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-secondary/10">
-                          <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3.5 h-3.5 bg-[#3B82F6] rounded-full"></div>
-                              Available Capacity
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-medium text-text-primary text-base font-roboto">
-                              {calculations.totalCapacity -
-                                calculations.totalStock}{" "}
-                              Ltr
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-secondary/10">
-                          <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3.5 h-3.5 bg-[#06B6D4] rounded-full"></div>
-                                Total Capacity
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-medium text-text-primary text-base font-roboto">
-                              {calculations.totalCapacity} Ltr
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+            );
+          })()}
         </div>
       </div>
     </>

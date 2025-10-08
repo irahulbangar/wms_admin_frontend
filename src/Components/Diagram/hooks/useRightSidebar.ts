@@ -25,7 +25,7 @@ export const useRightSidebar = (
     
     switch (selectedGroup.type) {
       case 'plant': {
-        const plantId = parseInt(groupId.replace('plant-', ''));
+        const plantId = deviceData[0]?.plant_id;
         return calculatePlantFlowBalance(deviceData, plantId);
       }
       
@@ -72,6 +72,7 @@ export const useRightSidebar = (
     isOpen,
     selectedGroup,
     calculations,
+    deviceData,
     openSidebar,
     closeSidebar,
     handleGroupClick
