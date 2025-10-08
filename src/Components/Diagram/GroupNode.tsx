@@ -175,7 +175,6 @@ const GroupNode: React.FC<GroupNodeProps> = ({
       return totals;
     }
 
-    // Fallback to node-based calculation
     let totals = { current: 0, capacity: 0 };
 
     if (allNodes && allNodes.length > 0) {
@@ -324,8 +323,6 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             return;
           }
 
-          // Only stop propagation for edit button clicks
-          // Allow other clicks to bubble up for sidebar functionality
           if (target.closest('button')) {
             e.stopPropagation();
           }

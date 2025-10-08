@@ -118,6 +118,35 @@ export const useDiagramData = (plantId: string | undefined) => {
     }
   }, [dispatch, plantId]);
 
+  const mergeNewDevicesWithSavedData = useCallback(() => {
+    if (deviceData?.length === 0 || nodes?.length === 0) return;
+
+    const savedDeviceIds = new Set(
+      nodes
+        ?.filter(node => node.type !== "group")
+        ?.map(node => {
+          const deviceName = node.data?.label;
+          return deviceName;
+        })
+        ?.filter(Boolean) || []
+    );
+
+    const newDevices = deviceData?.filter(device => 
+      !savedDeviceIds.has(device.device_name) && device.visibility !== "hidden"
+    ) || [];
+
+    if (newDevices.length === 0) return;
+
+    const { nodes: newDeviceNodes } = convertDevicesToDiagramCallback(newDevices);
+    
+    const deviceNodesOnly = newDeviceNodes.filter(node => node.type !== "group");
+    
+    if (deviceNodesOnly.length > 0) {
+      setNodes(currentNodes => [...(currentNodes || []), ...deviceNodesOnly]);
+      setHasChanges(true);
+    }
+  }, [deviceData, nodes, convertDevicesToDiagramCallback]);
+
   const updateNodesWithDynamicData = useCallback(() => {
     if (deviceData?.length === 0 || nodes?.length === 0) return;
 
@@ -456,12 +485,16 @@ export const useDiagramData = (plantId: string | undefined) => {
         detail: { deviceData, timestamp: Date.now() },
       });
       document.dispatchEvent(event);
+      
+      if (diagramGeneratedRef.current && nodes.length > 0) {
+        mergeNewDevicesWithSavedData();
+      }
     }
 
     return () => {
       delete (window as any).deviceData;
     };
-  }, [deviceData]);
+  }, [deviceData, mergeNewDevicesWithSavedData, nodes.length]);
 
   useEffect(() => {
     if (

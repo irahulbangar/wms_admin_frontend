@@ -106,7 +106,6 @@ export const convertDevicesToDiagram = (
 
     const departmentCount = Object.values(plant.departments).length;
 
-    // Calculate dynamic sizing based on actual content
     const departmentSpacing = 40;
     const plantPadding = 70;
     const minDepartmentWidth = 1400;
@@ -1034,7 +1033,6 @@ export const calculateDepartmentFlowBalances = (
         }
       });
 
-      // Calculate storage for tanks in this system
       const tankDevices = system.devices.filter(
         (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
       );

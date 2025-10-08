@@ -327,21 +327,17 @@ export const useDiagramControls = (
         }
       `;
       
-      // Add the temporary style
       document.head.appendChild(tempStyle);
 
-      // Wait for styles to apply
       await new Promise(resolve => setTimeout(resolve, 200));
 
       let dataUrl: string;
 
       try {
-        // Get the actual dimensions of the content
         const rect = reactFlowElement.getBoundingClientRect();
         const scrollWidth = Math.max(reactFlowElement.scrollWidth, rect.width);
         const scrollHeight = Math.max(reactFlowElement.scrollHeight, rect.height);
         
-        // Try SVG first (better for large content)
         try {
           const svgDataUrl = await domtoimage.toSvg(reactFlowElement as HTMLElement, {
             width: scrollWidth,
@@ -351,7 +347,6 @@ export const useDiagramControls = (
               height: `${scrollHeight}px`,
             },
             filter: (node: any) => {
-              // Skip controls and attribution
               if (node.classList?.contains('react-flow__controls') ||
                   node.classList?.contains('react-flow__attribution') ||
                   node.classList?.contains('react-flow__minimap')) {
@@ -361,14 +356,13 @@ export const useDiagramControls = (
             }
           });
           
-          // Convert SVG to PNG
           const img = new Image();
           img.crossOrigin = 'anonymous';
           
           dataUrl = await new Promise((resolve, reject) => {
             img.onload = () => {
               const canvas = document.createElement('canvas');
-              canvas.width = scrollWidth * 2; // 2x scale for high resolution
+              canvas.width = scrollWidth * 2;
               canvas.height = scrollHeight * 2;
               const ctx = canvas.getContext('2d');
               if (ctx) {
@@ -387,7 +381,6 @@ export const useDiagramControls = (
         } catch (svgError) {
           console.warn('SVG method failed, trying PNG directly:', svgError);
           
-          // Fallback to PNG with proper dimensions
           dataUrl = await domtoimage.toPng(reactFlowElement as HTMLElement, {
             quality: 1.0,
             bgcolor: '#ffffff',
@@ -398,7 +391,6 @@ export const useDiagramControls = (
               height: `${scrollHeight}px`,
             },
             filter: (node: any) => {
-              // Skip controls and attribution
               if (node.classList?.contains('react-flow__controls') ||
                   node.classList?.contains('react-flow__attribution') ||
                   node.classList?.contains('react-flow__minimap')) {
@@ -411,31 +403,26 @@ export const useDiagramControls = (
       } catch (domError) {
         console.warn('All dom-to-image methods failed, trying basic method:', domError);
         
-        // Final fallback: Basic capture without size constraints
         dataUrl = await domtoimage.toPng(reactFlowElement as HTMLElement, {
           quality: 0.95,
           bgcolor: '#ffffff'
         });
       }
 
-      // Remove the temporary style
       const styleElement = document.getElementById('dom-to-image-fix');
       if (styleElement) {
         styleElement.remove();
       }
 
-      // Create download link
       const link = document.createElement('a');
       link.download = `diagram-${new Date().toISOString().split('T')[0]}.png`;
       link.href = dataUrl;
       
-      // Trigger download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       console.error('Error downloading diagram:', error);
-      // Clean up temporary style if it exists
       const styleElement = document.getElementById('dom-to-image-fix');
       if (styleElement) {
         styleElement.remove();
