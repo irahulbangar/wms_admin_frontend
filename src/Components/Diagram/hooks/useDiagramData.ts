@@ -40,9 +40,9 @@ export const useDiagramData = (plantId: string | undefined) => {
         plant_name: plantData.plant_name,
         plant_id: plantData.plant_id
       } : undefined;
-      return convertDevicesToDiagram(devices, departmentDimensions, plantInfo);
+      return convertDevicesToDiagram(devices, plantInfo);
     },
-    [departmentDimensions, plantData]
+    [plantData]
   );
 
   const fetchDiagram = useCallback(async () => {
@@ -79,7 +79,10 @@ export const useDiagramData = (plantId: string | undefined) => {
                 );
               }
 
+              diagramGeneratedRef.current = true;
               setIsLoadingDiagram(false);
+            } else {
+              diagramGeneratedRef.current = false;
             }
           }
         })
