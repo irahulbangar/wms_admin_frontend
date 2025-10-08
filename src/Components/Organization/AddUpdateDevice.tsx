@@ -57,13 +57,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<CreateDevicePayload>({
-    plant_id: plant_id || 0,
     device_family_id: 0,
     device_type_id: 0,
     device_name: "",
     device_status: "",
     hwid: "",
-    department_id: departmentId,
     organization_id: organizationId,
     visibility: "",
     report_type_id: 0,
@@ -72,8 +70,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     out_system_id: 0,
     in_department_id: 0,
     out_department_id: 0,
-    in_plant_id: plant_id || 0,
-    out_plant_id: plant_id || 0,
+    in_plant_id: 0,
+    out_plant_id: 0,
     organization_connection: "",
     device_flow_direction: "",
     params: {},
@@ -134,13 +132,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
   const resetForm = () => {
     setFormData({
-      plant_id: plant_id || 0,
       device_family_id: 0,
       device_type_id: 0,
       device_name: "",
       device_status: "",
       hwid: "",
-      department_id: departmentId,
       params: {},
       organization_id: organizationId,
       visibility: "",
@@ -199,16 +195,29 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   ) => {
     const { name, value } = e.target;
 
+    const fieldMappings: Record<string, string> = {
+      'plant_in': 'in_plant_id',
+      'plant_out': 'out_plant_id',
+      'department_in': 'in_department_id',
+      'department_out': 'out_department_id',
+      'system_in': 'in_system_id',
+      'system_out': 'out_system_id',
+    };
+
+    const actualFieldName = fieldMappings[name] || name;
+
     if (name === "device_family_id" || name === "device_type_id") {
-      setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
+      setFormData((prev) => ({ ...prev, [actualFieldName]: parseInt(value) || 0 }));
+    } else if (fieldMappings[name]) {
+      setFormData((prev) => ({ ...prev, [actualFieldName]: parseInt(value) || 0 }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [actualFieldName]: value }));
     }
 
-    if (errors[name]) {
+    if (errors[actualFieldName]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
-        delete newErrors[name];
+        delete newErrors[actualFieldName];
         return newErrors;
       });
     }
@@ -247,13 +256,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     setIsLoading(true);
     try {
       const deviceData = {
-        plant_id: plant_id || 0,
         device_family_id: formData.device_family_id,
         device_type_id: formData.device_type_id,
         device_name: formData.device_name,
         device_status: formData.device_status,
         hwid: formData.hwid,
-        department_id: formData.department_id,
         organization_id: formData.organization_id || organizationId,
         visibility: formData.visibility,
         in_department_id: formData.in_department_id,
@@ -325,13 +332,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           if (res.success) {
             const deviceData = res.data;
             setFormData({
-              plant_id: plant_id || 0,
               device_family_id: deviceData.device_family_id,
               device_type_id: deviceData.device_type_id,
               device_name: deviceData.device_name,
               device_status: deviceData.device_status,
               hwid: deviceData.hwid,
-              department_id: deviceData.department_id,
               organization_id: deviceData.organization_id,
               params: deviceData.params,
               visibility: deviceData.visibility,
@@ -403,13 +408,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         });
     } else if (type === "add") {
       setFormData({
-        plant_id: plant_id || 0,
         device_family_id: 0,
         device_type_id: 0,
         device_name: "",
         device_status: "active",
         hwid: "",
-        department_id: departmentId,
         organization_id: organizationId,
         params: {},
         visibility: "",
@@ -429,8 +432,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     type,
     deviceId,
     dispatch,
-    plant_id,
-    departmentId,
     familyData,
     organizationId,
   ]);
@@ -661,7 +662,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="system_id"
-                  value={formData.system_id}
+                  value={formData.system_id || ""}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value === "add_new") {
@@ -681,7 +682,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   {systemData
                     .filter(
                       (system) =>
-                        system.department_id === departmentId &&
                         system.plant_id === plant_id &&
                         system.organization_id === organizationId
                     )
@@ -794,7 +794,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="plant_in"
-                  value={formData.in_plant_id}
+                  value={formData.in_plant_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
@@ -813,7 +813,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="plant_out"
-                  value={formData.out_plant_id}
+                  value={formData.out_plant_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
@@ -839,7 +839,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="department_in"
-                  value={formData.in_department_id}
+                  value={formData.in_department_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
@@ -858,7 +858,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="department_out"
-                  value={formData.out_department_id}
+                  value={formData.out_department_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
@@ -884,7 +884,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="system_in"
-                  value={formData.in_system_id}
+                  value={formData.in_system_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >
@@ -903,7 +903,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </label>
                 <select
                   name="system_out"
-                  value={formData.out_system_id}
+                  value={formData.out_system_id || ""}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
                 >

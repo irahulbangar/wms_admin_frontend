@@ -47,23 +47,21 @@ export interface CreateDevicePayload {
   device_name: string;
   device_status: string;
   hwid: string;
-  plant_id: number;
   device_type_id: number;
   device_family_id: number;
-  department_id: number;
   visibility: string;
   report_type_id: number;
   organization_connection: string;
   device_flow_direction: string;
   params: object;
   organization_id: number;
-  system_id: number;
-  in_system_id: number;
-  out_system_id: number;
-  in_department_id: number;
-  out_department_id: number;
-  in_plant_id: number;
-  out_plant_id: number;
+  system_id: number | null;
+  in_system_id: number | null;
+  out_system_id: number | null;
+  in_department_id: number | null;
+  out_department_id: number | null;
+  in_plant_id: number | null;
+  out_plant_id: number | null;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {
