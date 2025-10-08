@@ -10,7 +10,7 @@
   --color-gradient-start: var(--bg-gradient-start);
   --color-gradient-middle: var(--bg-gradient-middle);
   --color-gradient-end: var(--bg-gradient-end);
-
+  --color-dot: var(--bg-dot);
   /* Text Colors */
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
@@ -70,7 +70,7 @@
   --bg-gradient-start: #f8fafc;
   --bg-gradient-middle: #e0f2fe;
   --bg-gradient-end: #e0e7ff;
-
+  --bg-dot: #6d6d6d;
   /* Text Colors */
   --text-primary: #1e293b;
   --text-secondary: #475569;
@@ -130,6 +130,7 @@
   --bg-gradient-start: #374151;
   --bg-gradient-middle: #4b5563;
   --bg-gradient-end: #6b7280;
+  --bg-dot: #c7c4c4;
 
   /* Text Colors */
   --text-primary: #f1f5f9;
@@ -294,6 +295,7 @@ body {
 }
 
 .react-flow__handle {
-  width: 10px !important;
-  height: 10px !important;
+  width: 14px !important;
+  height: 14px !important;
+  background: var(--bg-dot) !important;
 }
