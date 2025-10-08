@@ -51,7 +51,6 @@ export interface DepartmentCalculations {
 
 export const convertDevicesToDiagram = (
   devices: DeviceResult[],
-  departmentDimensions: Record<string, { width: number; height: number }>,
   plantData?: { plant_name: string; plant_id: number }
 ): { nodes: DiagramNode[]; edges: DiagramEdge[] } => {
   const nodes: DiagramNode[] = [];
@@ -103,36 +102,53 @@ export const convertDevicesToDiagram = (
   }, {} as Record<string, { plant_id: number; plant_name: string; departments: Record<string, DepartmentGroup> }>);
 
   Object.values(plantGroups).forEach((plant, plantIndex) => {
-    const plantId = `plant-${plant.plant_id}`;
+    const plantId = `plant-${plant.plant_name}`;
 
     const departmentCount = Object.values(plant.departments).length;
 
-    const maxDepartmentsPerRow = Math.max(1, Math.min(departmentCount, Math.floor(2000 / 1400)));
-    const totalRows = Math.ceil(departmentCount / maxDepartmentsPerRow);
-
+    // Calculate dynamic sizing based on actual content
     const departmentSpacing = 40;
     const plantPadding = 70;
-    const minDepartmentWidth = 1400; // Minimum department width
-    const minDepartmentHeight = 1000; // Minimum department height
+    const minDepartmentWidth = 1400;
+    const minDepartmentHeight = 1000;
 
-    let requiredPlantWidth = plantPadding * 2 + maxDepartmentsPerRow * minDepartmentWidth + (maxDepartmentsPerRow - 1) * departmentSpacing;
-    let requiredPlantHeight = plantPadding * 2 + 80 + totalRows * minDepartmentHeight + (totalRows - 1) * departmentSpacing;
-
-    Object.values(plant.departments).forEach((department) => {
+    const departmentRequirements = Object.values(plant.departments).map((department) => {
       const totalSystemsInDept = Object.values(department.systems).length;
-      if (totalSystemsInDept > 1) {
+      
+      if (totalSystemsInDept === 1) {
+        return {
+          width: minDepartmentWidth,
+          height: minDepartmentHeight,
+          systemCount: totalSystemsInDept
+        };
+      } else {
         const systemSpacing = 30;
         const systemPadding = 40;
-        const systemsPerRow = Math.min(totalSystemsInDept, Math.floor((minDepartmentWidth - 2 * systemPadding) / (750 + systemSpacing)));
-        const totalSystemRows = Math.ceil(totalSystemsInDept / systemsPerRow);
+        const systemWidth = 1200;
+        const systemHeight = 800;
         
-        const requiredDeptWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * 750 + (systemsPerRow - 1) * systemSpacing);
-        const requiredDeptHeight = Math.max(minDepartmentHeight, 60 + 30 + totalSystemRows * 550 + (totalSystemRows - 1) * systemSpacing);
+        const systemsPerRow = totalSystemsInDept;
+        const totalSystemRows = 1;
         
-        requiredPlantWidth = Math.max(requiredPlantWidth, plantPadding * 2 + maxDepartmentsPerRow * requiredDeptWidth + (maxDepartmentsPerRow - 1) * departmentSpacing);
-        requiredPlantHeight = Math.max(requiredPlantHeight, plantPadding * 2 + 80 + totalRows * requiredDeptHeight + (totalRows - 1) * departmentSpacing);
+        const requiredWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * systemWidth + (systemsPerRow - 1) * systemSpacing);
+        const requiredHeight = Math.max(minDepartmentHeight, 80 + 40 + totalSystemRows * systemHeight + (totalSystemRows - 1) * systemSpacing);
+        
+        return {
+          width: requiredWidth,
+          height: requiredHeight,
+          systemCount: totalSystemsInDept
+        };
       }
     });
+
+    const maxDeptWidth = Math.max(...departmentRequirements.map(d => d.width));
+    const maxDeptHeight = Math.max(...departmentRequirements.map(d => d.height));
+    
+    const departmentsPerRow = departmentCount;
+    const totalDeptRows = 1;
+    
+    const requiredPlantWidth = plantPadding * 2 + departmentsPerRow * maxDeptWidth + (departmentsPerRow - 1) * departmentSpacing;
+    const requiredPlantHeight = plantPadding * 2 + 80 + totalDeptRows * maxDeptHeight + (totalDeptRows - 1) * departmentSpacing;
 
     const plantWidth = Math.max(2000, requiredPlantWidth);
     const plantHeight = Math.max(1200, requiredPlantHeight);
@@ -167,50 +183,15 @@ export const convertDevicesToDiagram = (
       dragHandle: ".group-drag-handle",
     });
 
-    const availableWidth = plantWidth - (2 * plantPadding);
-    const availableHeight = plantHeight - (2 * plantPadding) - 80;
-
-    const departmentWidth = Math.max(minDepartmentWidth, (availableWidth - (maxDepartmentsPerRow - 1) * departmentSpacing) / maxDepartmentsPerRow);
-    const departmentHeight = Math.max(minDepartmentHeight, (availableHeight - (totalRows - 1) * departmentSpacing) / totalRows);
-
     Object.values(plant.departments).forEach((department, deptIndex) => {
       const deptId = `dept-${department.department_id}`;
 
-      const row = Math.floor(deptIndex / maxDepartmentsPerRow);
-      const col = deptIndex % maxDepartmentsPerRow;
-      const deptX = plantX + plantPadding + col * (departmentWidth + departmentSpacing);
-      const deptY = plantY + 80 + row * (departmentHeight + departmentSpacing);
+      const deptRequirement = departmentRequirements[deptIndex];
+      const deptWidth = deptRequirement.width;
+      const deptHeight = deptRequirement.height;
 
-      const deptSystemCount = Object.values(department.systems).length;
-      
-      let dynamicWidth: number;
-      let dynamicHeight: number;
-      
-      if (deptSystemCount === 1) {
-        dynamicWidth = Math.max(1400, departmentWidth);
-        dynamicHeight = Math.max(1000, departmentHeight);
-      } else {
-        const systemSpacing = 50;
-        const systemPadding = 60;
-        const systemHeaderHeight = 80;
-        const systemFooterHeight = 40;
-        
-        const systemsPerRow = Math.min(deptSystemCount, Math.floor((departmentWidth - 2 * systemPadding) / (1200 + systemSpacing)));
-        const totalSystemRows = Math.ceil(deptSystemCount / systemsPerRow);
-        
-        const requiredWidth = Math.max(1400, 2 * systemPadding + systemsPerRow * 1200 + (systemsPerRow - 1) * systemSpacing);
-        const requiredHeight = Math.max(1000, systemHeaderHeight + systemFooterHeight + totalSystemRows * 800 + (totalSystemRows - 1) * systemSpacing);
-        
-        dynamicWidth = Math.max(1400, Math.max(departmentWidth, requiredWidth));
-        dynamicHeight = Math.max(1000, Math.max(departmentHeight, requiredHeight));
-      }
-
-      const currentDimensions = departmentDimensions[deptId] || {
-        width: dynamicWidth,
-        height: dynamicHeight,
-      };
-      const deptWidth = currentDimensions.width;
-      const deptHeight = currentDimensions.height;
+      const deptX = plantX + plantPadding + deptIndex * (deptWidth + departmentSpacing);
+      const deptY = plantY + 80;
 
       nodes.push({
         id: deptId,
@@ -239,38 +220,20 @@ export const convertDevicesToDiagram = (
         dragHandle: ".group-drag-handle",
       });
 
-      const systemCount = Object.values(department.systems).length;
-      const systemSpacing = 20;
-      const systemPadding = 10;
+      const systemSpacing = 30;
+      const systemPadding = 40;
       const systemHeaderHeight = 20;
       const systemFooterHeight = 40;
       
-      let systemsPerRow: number;
-      let totalSystemRows: number;
-      let systemWidth: number;
-      let systemHeight: number;
+      const systemWidth = 1200;
+      const systemHeight = 800;
       
-      if (systemCount === 1) {
-        systemsPerRow = 1;
-        totalSystemRows = 1;
-        systemWidth = 1000;
-        systemHeight = 800;
-      } else {
-        systemsPerRow = Math.min(systemCount, Math.floor((deptWidth - 2 * systemPadding) / (1200 + systemSpacing)));
-        totalSystemRows = Math.ceil(systemCount / systemsPerRow);
-        
-        const availableSystemWidth = (deptWidth - 2 * systemPadding - (systemsPerRow - 1) * systemSpacing) / systemsPerRow;
-        const availableSystemHeight = (deptHeight - systemHeaderHeight - systemFooterHeight - (totalSystemRows - 1) * systemSpacing) / totalSystemRows;
-        
-        systemWidth = Math.max(1200, Math.min(1400, availableSystemWidth));
-        systemHeight = Math.max(800, Math.min(1000, availableSystemHeight));
-      }
       
       Object.values(department.systems).forEach((system, systemIndex) => {
         const systemId = `system-${system.system_id}`;
         
-        const systemRow = Math.floor(systemIndex / systemsPerRow);
-        const systemCol = systemIndex % systemsPerRow;
+        const systemCol = systemIndex;
+        const systemRow = 0;
         
         const systemX = deptX + systemPadding + systemCol * (systemWidth + systemSpacing);
         const systemY = deptY + systemHeaderHeight + systemRow * (systemHeight + systemSpacing);
