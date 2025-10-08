@@ -38,7 +38,7 @@ Capacity : ${capacity} ${unit}
       >
         <div className="absolute inset-0 flex flex-col">
           <div
-            className="w-full bg-status-info/80 transition-all duration-500 ease-in-out"
+            className="w-full bg-status-info/70 transition-all duration-500 ease-in-out"
             style={{
               height: `${fillHeight}%`,
               marginTop: "auto",
@@ -59,12 +59,12 @@ Capacity : ${capacity} ${unit}
         <Handle
           type="target"
           position={HandlePosition.Left}
-          className="w-3 h-3 bg-status-info"
+          className="w-3 h-3 bg-[rgb(67 191 235)]"
         />
         <Handle
           type="source"
           position={HandlePosition.Right}
-          className="w-3 h-3 bg-status-info"
+          className="w-3 h-3 bg-[rgb(67 191 235)]"
         />
       </div>
       <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-20">
