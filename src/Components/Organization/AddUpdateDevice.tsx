@@ -16,6 +16,8 @@ import AddUpdateSystem from "./AddUpdateSystem";
 import type { SystemResult } from "../../../model/system.interface";
 import type { ReportTypeResult } from "../../../model/report-type.interface";
 import { getAllReportTypes } from "../../../store/reportTypeSlice";
+import type { PlantResult } from "../../../model/plant.interface";
+import type { DepartmentResult } from "../../../model/department.interface";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -32,6 +34,8 @@ interface AddUpdateDeviceProps {
   departmentId: number;
   organizationId: number;
   systemId: number;
+  plantData: PlantResult[];
+  departmentData: DepartmentResult[];
 }
 
 const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
@@ -46,6 +50,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   departmentId,
   organizationId,
   systemId,
+  plantData,
+  departmentData,
 }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -60,11 +66,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     department_id: departmentId,
     organization_id: organizationId,
     visibility: "",
-    department_connection: "",
     report_type_id: 0,
     system_id: systemId,
-    system_connection: "",
-    plant_connection: "",
+    in_system_id: 0,
+    out_system_id: 0,
+    in_department_id: 0,
+    out_department_id: 0,
+    in_plant_id: plant_id || 0,
+    out_plant_id: plant_id || 0,
     organization_connection: "",
     device_flow_direction: "",
     params: {},
@@ -135,11 +144,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       params: {},
       organization_id: organizationId,
       visibility: "",
-      department_connection: "",
       report_type_id: 0,
       system_id: systemId,
-      system_connection: "",
-      plant_connection: "",
+      in_system_id: 0,
+      out_system_id: 0,
+      in_department_id: 0,
+      out_department_id: 0,
+      in_plant_id: 0,
+      out_plant_id: 0,
       organization_connection: "",
       device_flow_direction: "",
     });
@@ -244,11 +256,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         department_id: formData.department_id,
         organization_id: formData.organization_id || organizationId,
         visibility: formData.visibility,
-        department_connection: formData.department_connection,
+        in_department_id: formData.in_department_id,
+        out_department_id: formData.out_department_id,
         report_type_id: formData.report_type_id,
         system_id: formData.system_id || systemId,
-        system_connection: formData.system_connection,
-        plant_connection: formData.plant_connection,
+        in_system_id: formData.in_system_id,
+        out_system_id: formData.out_system_id,
+        in_plant_id: formData.in_plant_id,
+        out_plant_id: formData.out_plant_id,
         organization_connection: formData.organization_connection,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
@@ -320,11 +335,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               organization_id: deviceData.organization_id,
               params: deviceData.params,
               visibility: deviceData.visibility,
-              department_connection: deviceData.department_connection,
+              in_department_id: deviceData.in_department_id,
+              out_department_id: deviceData.out_department_id,
               report_type_id: deviceData.report_type_id,
               system_id: deviceData.system_id || systemId,
-              system_connection: deviceData.system_connection,
-              plant_connection: deviceData.plant_connection,
+              in_system_id: deviceData.in_system_id,
+              out_system_id: deviceData.out_system_id,
+              in_plant_id: deviceData.in_plant_id,
+              out_plant_id: deviceData.out_plant_id,
               organization_connection: deviceData.organization_connection,
               device_flow_direction: deviceData.device_flow_direction,
             });
@@ -395,11 +413,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_id: organizationId,
         params: {},
         visibility: "",
-        department_connection: "",
+        in_department_id: 0,
+        out_department_id: 0,
         report_type_id: 0,
         system_id: systemId,
-        system_connection: "",
-        plant_connection: "",
+        in_system_id: 0,
+        out_system_id: 0,
+        in_plant_id: 0,
+        out_plant_id: 0,
         organization_connection: "",
         device_flow_direction: "",
       });
@@ -744,60 +765,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Plant Connection
-                </label>
-                <select
-                  name="plant_connection"
-                  value={formData.plant_connection}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
-                >
-                  <option value="0">Select Plant Connection</option>
-                  <option value="none">None</option>
-                  <option value="in">In</option>
-                  <option value="out">Out</option>
-                  <option value="both">Both</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Department Connection
-                </label>
-                <select
-                  name="department_connection"
-                  value={formData.department_connection}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
-                >
-                  <option value="0">Select Department Connection</option>
-                  <option value="none">None</option>
-                  <option value="in">In</option>
-                  <option value="out">Out</option>
-                  <option value="both">Both</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  System Connection
-                </label>
-                <select
-                  name="system_connection"
-                  value={formData.system_connection}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
-                >
-                  <option value="0">Select System Connection</option>
-                  <option value="none">None</option>
-                  <option value="in">In</option>
-                  <option value="out">Out</option>
-                  <option value="both">Both</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
                   Device Flow Direction
                 </label>
                 <select
@@ -810,6 +777,142 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="none">None</option>
                   <option value="single">Single Way</option>
                   <option value="multi">Multi Way</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                Plant Connection
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Plant In
+                </label>
+                <select
+                  name="plant_in"
+                  value={formData.in_plant_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Plant</option>
+                  {plantData.filter((plant) => plant.organization_id === organizationId).map((plant) => (
+                    <option key={plant.plant_id} value={plant.plant_id}>
+                      {plant.plant_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Plant Out
+                </label>
+                <select
+                  name="plant_out"
+                  value={formData.out_plant_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Plant</option>
+                  {plantData.filter((plant) => plant.organization_id === organizationId).map((plant) => (
+                    <option key={plant.plant_id} value={plant.plant_id}>
+                      {plant.plant_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                Department Connection
+              </label>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Department In
+                </label>
+                <select
+                  name="department_in"
+                  value={formData.in_department_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Department</option>
+                  {departmentData.filter((department) => department.plant_id === plant_id).map((department) => (
+                    <option key={department.department_id} value={department.department_id}>
+                      {department.department_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Department Out
+                </label>
+                <select
+                  name="department_out"
+                  value={formData.out_department_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select Department Out</option>
+                  {departmentData.filter((department) => department.plant_id === plant_id).map((department) => (
+                    <option key={department.department_id} value={department.department_id}>
+                      {department.department_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                System Connection
+              </label>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  System In
+                </label>
+                <select
+                  name="system_in"
+                  value={formData.in_system_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select System</option>
+                  {systemData.filter((system) => system.plant_id === plant_id).map((system) => (
+                    <option key={system.system_id} value={system.system_id}>
+                      {system.system_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  System Out
+                </label>
+                <select
+                  name="system_out"
+                  value={formData.out_system_id}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                >
+                  <option value="0">Select System</option>
+                  {systemData.filter((system) => system.plant_id === plant_id).map((system) => (
+                    <option key={system.system_id} value={system.system_id}>
+                      {system.system_name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

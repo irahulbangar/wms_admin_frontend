@@ -1350,6 +1350,8 @@ const Devices = () => {
           departmentId={departmentId}
           organizationId={organizationId}
           systemId={0}
+          plantData={plants}
+          departmentData={departments}
         />
       )}
 
@@ -1366,6 +1368,8 @@ const Devices = () => {
           departmentId={departmentId}
           organizationId={organizationId}
           systemId={0}
+          plantData={plants}
+          departmentData={departments}
         />
       )}
 
