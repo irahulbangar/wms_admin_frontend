@@ -62,6 +62,8 @@ export interface CreateDevicePayload {
   out_department_id: number | null;
   in_plant_id: number | null;
   out_plant_id: number | null;
+  plant_id: number | null;
+  department_id: number | null;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {

@@ -376,19 +376,19 @@ const Devices = () => {
         .map((p) => p.plant_id);
 
       filtered = filtered.filter((device: DeviceResult) =>
-        orgPlantIds.includes(device.in_plant_id) || orgPlantIds.includes(device.out_plant_id)
+        orgPlantIds.includes(device.plant_id)
       );
     }
 
     if (selectedPlant !== "all") {
       filtered = filtered.filter(
-        (device: DeviceResult) => device.in_plant_id === parseInt(selectedPlant) || device.out_plant_id === parseInt(selectedPlant)
+        (device: DeviceResult) => device.plant_id === parseInt(selectedPlant)
       );
     }
 
     if (selectedDepartment !== "all") {
       filtered = filtered.filter(
-        (device: DeviceResult) => device.in_department_id === parseInt(selectedDepartment) || device.out_department_id === parseInt(selectedDepartment)
+        (device: DeviceResult) => device.department_id === parseInt(selectedDepartment)
       );
     }
 
@@ -646,7 +646,7 @@ const Devices = () => {
     const grouped: { [key: string]: DeviceResult[] } = {};
 
     devices.forEach((device) => {
-      const systemId = device.in_system_id?.toString() || device.out_system_id?.toString() || "unknown";
+      const systemId = device.system_id?.toString() || "unknown";
       if (!grouped[systemId]) {
         grouped[systemId] = [];
       }
@@ -697,7 +697,7 @@ const Devices = () => {
     const systemDevices = groupedDevices[systemId] || [];
     const firstDevice = systemDevices[0];
 
-    if (firstDevice && firstDevice.in_plant_id || firstDevice.out_plant_id) {
+    if (firstDevice && firstDevice.plant_id) {
       setIsEditSystemOpen(true);
       setSystemId(parseInt(systemId));
       setPlantId(parseInt(selectedPlant));
@@ -1196,7 +1196,7 @@ const Devices = () => {
                         <tbody>
                           {systemDevices?.map((device, index) => (
                             <tr
-                              onDoubleClick={() => handleEditDevice(device?.device_id, device?.in_plant_id || device?.out_plant_id, device?.in_department_id || device?.out_department_id, device?.organization_id)}
+                              onDoubleClick={() => handleEditDevice(device?.device_id, device?.plant_id, device?.department_id, device?.organization_id)}
                               key={index}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
@@ -1211,8 +1211,7 @@ const Devices = () => {
                                   plants?.find(
                                     (plant) =>
                                       plant?.plant_id?.toString() ===
-                                      device?.in_plant_id?.toString() ||
-                                      device?.out_plant_id?.toString()
+                                      device?.plant_id?.toString()
                                   )?.plant_name
                                 }
                               </td>
@@ -1256,8 +1255,8 @@ const Devices = () => {
                                       onClick={() =>
                                         handleEditDevice(
                                           device?.device_id,
-                                          device?.in_plant_id || device?.out_plant_id,
-                                          device?.in_department_id || device?.out_department_id,
+                                          device?.plant_id,
+                                          device?.department_id,
                                           device?.organization_id
                                         )
                                       }

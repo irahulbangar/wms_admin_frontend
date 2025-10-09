@@ -7,12 +7,12 @@ export interface DeviceResponse {
 export interface DeviceResult {
   device_id: number
   organization_id: number
-  in_plant_id: number
-  out_plant_id: any
-  in_department_id: number
-  out_department_id: any
-  in_system_id: number
-  out_system_id: any
+  in_plant_id?: number
+  out_plant_id?: number
+  in_department_id?: number
+  out_department_id?: number
+  in_system_id?: number
+  out_system_id: number
   device_family_id: number
   device_type_id: number
   hwid: string
@@ -29,22 +29,28 @@ export interface DeviceResult {
   unit: string
   created_at: string
   updated_at: string
+  plant_id: any
+  department_id: any
+  system_id: any
   device_family: string
   device_family_type: string
   device_type: string
-  in_department_name: string
-  out_department_name: any
+  in_department_name?: string
+  out_department_name?: string
+  department_name: any
   organization_name: string
-  in_plant_name: string
-  out_plant_name: any
-  in_plant_latitude: string
-  out_plant_longitude: any
-  in_plant_longitude: string
-  out_plant_latitude: any
-  in_plant_address: string
-  out_plant_address: any
-  in_system_name: string
-  out_system_name: any
+  in_plant_name?: string
+  out_plant_name?: string
+  plant_name: any
+  in_plant_latitude?: string
+  out_plant_longitude?: string
+  in_plant_longitude?: string
+  out_plant_latitude?: string
+  in_plant_address?: string
+  out_plant_address?: string
+  in_system_name?: string
+  out_system_name: string
+  system_name: any
   report_type_name: string
 }
 

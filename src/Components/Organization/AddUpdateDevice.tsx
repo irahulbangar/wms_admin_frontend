@@ -75,6 +75,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     organization_connection: "",
     device_flow_direction: "",
     params: {},
+    plant_id: plant_id,
+    department_id: departmentId,
   });
   const [showAddSystemPopup, setShowAddSystemPopup] = useState(false);
   const [reportTypes, setReportTypes] = useState<ReportTypeResult[]>([]);
@@ -150,6 +152,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       out_plant_id: 0,
       organization_connection: "",
       device_flow_direction: "",
+      plant_id: plant_id,
+      department_id: departmentId,
     });
 
     setCommonParams({
@@ -274,6 +278,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         in_plant_id: formData.in_plant_id === -1 ? 0 : formData.in_plant_id,
         out_plant_id: formData.out_plant_id === -1 ? 0 : formData.out_plant_id,
         organization_connection: formData.organization_connection,
+        plant_id: formData.plant_id,
+        department_id: formData.department_id,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {
@@ -352,6 +358,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               out_plant_id: deviceData.out_plant_id,
               organization_connection: deviceData.organization_connection,
               device_flow_direction: deviceData.device_flow_direction,
+              plant_id: deviceData.plant_id,
+              department_id: deviceData.department_id,
             });
 
             const selectedFamily = familyData.find(
@@ -428,6 +436,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         out_plant_id: 0,
         organization_connection: "",
         device_flow_direction: "",
+        plant_id: plant_id,
+        department_id: departmentId,
       });
     }
   }, [
