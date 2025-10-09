@@ -109,7 +109,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
   const calculateTotalStock = () => {
     if (data.type === "plant" && deviceData && deviceData.length > 0) {
-      const plantId = deviceData[0]?.in_plant_id || deviceData[0]?.out_plant_id;
+      const plantId = deviceData[0]?.plant_id;
       
       const connectedDevices = deviceData.filter(device => 
         device.in_plant_id || device.out_plant_id
@@ -232,7 +232,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     }
 
     if (data.type === "plant" && deviceData && deviceData.length > 0) {
-      const plantId = deviceData[0]?.in_plant_id || deviceData[0]?.out_plant_id;
+      const plantId = deviceData[0]?.plant_id;
       
       const connectedDevices = deviceData.filter(device => 
         device.in_plant_id || device.out_plant_id
