@@ -67,7 +67,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
           totalizerReading: d.last_record?.max,
           currentLevel: d.last_record?.last_level,
           capacity: d.params?.storageCapacity,
-          departmentId: d.department_id,
+          departmentId: d.in_department_id || d.out_department_id,
         }))
       )
     : "";
@@ -109,10 +109,10 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
   const calculateTotalStock = () => {
     if (data.type === "plant" && deviceData && deviceData.length > 0) {
-      const plantId = deviceData[0]?.plant_id;
+      const plantId = deviceData[0]?.in_plant_id || deviceData[0]?.out_plant_id;
       
       const connectedDevices = deviceData.filter(device => 
-        device.plant_connection === "in" || device.plant_connection === "out"
+        device.in_plant_id || device.out_plant_id
       );
       
       const plantBalance = calculatePlantFlowBalance(connectedDevices, plantId);
@@ -128,16 +128,16 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     if (data.type === "department" && deviceData && deviceData.length > 0) {
       const departmentId = parseInt(id.replace("dept-", ""));
       const departmentDevices = deviceData.filter(
-        (device) => device.department_id === departmentId
+        (device) => device.in_department_id === departmentId || device.out_department_id === departmentId
       );
 
       const connectedDepartmentDevices = departmentDevices.filter(device => 
-        device.department_connection === "in" || device.department_connection === "out"
+        device.in_department_id || device.out_department_id
       );
 
       const departmentTanks = connectedDepartmentDevices.filter(
         (device) =>
-          device.type === "tank" ||
+          device.device_family_type === "tank" ||
           device.device_family?.toLowerCase().includes("tank")
       );
 
@@ -160,16 +160,16 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     if (data.type === "system" && deviceData && deviceData.length > 0) {
       const systemId = parseInt(id.replace("system-", ""));
       const systemDevices = deviceData.filter(
-        (device) => device.system_id === systemId
+        (device) => device.in_system_id === systemId || device.out_system_id === systemId
       );
 
       const connectedSystemDevices = systemDevices.filter(device => 
-        device.system_connection === "in" || device.system_connection === "out"
+        device.in_system_id || device.out_system_id
       );
 
       const systemTanks = connectedSystemDevices.filter(
         (device) =>
-          device.type === "tank" ||
+          device.device_family_type === "tank" ||
           device.device_family?.toLowerCase().includes("tank")
       );
 
@@ -215,7 +215,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
       const departmentId = parseInt(id.replace("dept-", ""));
       
       const connectedDevices = deviceData.filter(device => 
-        device.department_connection === "in" || device.department_connection === "out"
+        device.in_department_id || device.out_department_id
       );
       
       const flowBalance = calculateDepartmentFlowBalance(
@@ -232,10 +232,10 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     }
 
     if (data.type === "plant" && deviceData && deviceData.length > 0) {
-      const plantId = deviceData[0]?.plant_id;
+      const plantId = deviceData[0]?.in_plant_id || deviceData[0]?.out_plant_id;
       
       const connectedDevices = deviceData.filter(device => 
-        device.plant_connection === "in" || device.plant_connection === "out"
+        device.in_plant_id || device.out_plant_id
       );
       
       const plantBalance = calculatePlantFlowBalance(connectedDevices, plantId);
@@ -252,7 +252,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
       const systemId = parseInt(id.replace("system-", ""));
       
       const connectedDevices = deviceData.filter(device => 
-        device.system_connection === "in" || device.system_connection === "out"
+        device.in_system_id || device.out_system_id
       );
       
       const systemBalance = calculateSystemFlowBalance(connectedDevices, systemId);

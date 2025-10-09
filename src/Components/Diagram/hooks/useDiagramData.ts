@@ -156,7 +156,7 @@ export const useDiagramData = (plantId: string | undefined) => {
           const matchingDevice = deviceData?.find(
             (device) =>
               device?.device_name === node?.data?.label &&
-              (device?.type === "tank" ||
+              (device?.device_family_type === "tank" ||
                 device?.device_family?.toLowerCase().includes("tank"))
           );
 
@@ -169,12 +169,12 @@ export const useDiagramData = (plantId: string | undefined) => {
                   Number(matchingDevice?.last_record?.last_level) || 0,
                 capacity: Number(matchingDevice?.params?.storageCapacity) || 0,
                 height: Number(matchingDevice?.params?.height) || 0,
-                departmentConnection: matchingDevice?.department_connection,
-                plantConnection: matchingDevice?.plant_connection,
-                organizationConnection: matchingDevice?.organization_connection,
-                departmentName: matchingDevice?.department_name,
-                systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.system_connection,
+                // departmentConnection: matchingDevice?.department_connection,
+                // plantConnection: matchingDevice?.plant_connection,
+                // organizationConnection: matchingDevice?.organization_connection,
+                // departmentName: matchingDevice?.department_name,
+                // systemName: matchingDevice?.system_name,
+                // systemConnection: matchingDevice?.system_connection,
               },
             };
           }
@@ -182,7 +182,7 @@ export const useDiagramData = (plantId: string | undefined) => {
           const matchingDevice = deviceData?.find(
             (device) =>
               device?.device_name === node?.data?.label &&
-              (device?.type === "fm" ||
+              (device?.device_family_type === "fm" ||
                 device?.device_family?.toLowerCase().includes("flow"))
           );
 
@@ -195,12 +195,12 @@ export const useDiagramData = (plantId: string | undefined) => {
                 totalizerReading:
                   Number(matchingDevice?.last_record?.max) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.department_connection,
-                plantConnection: matchingDevice?.plant_connection,
-                organizationConnection: matchingDevice?.organization_connection,
-                departmentName: matchingDevice?.department_name,
-                systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.system_connection,
+                // departmentConnection: matchingDevice?.department_connection,
+                // plantConnection: matchingDevice?.plant_connection,
+                // organizationConnection: matchingDevice?.organization_connection,
+                // departmentName: matchingDevice?.department_name,
+                // systemName: matchingDevice?.system_name,
+                // systemConnection: matchingDevice?.system_connection,
               },
             };
           }
@@ -208,7 +208,7 @@ export const useDiagramData = (plantId: string | undefined) => {
           const matchingDevice = deviceData?.find(
             (device) =>
               device?.device_name === node?.data?.label &&
-              (device?.type === "brwhms" ||
+              (device?.device_family_type === "brwhms" ||
                 device?.device_family?.toLowerCase().includes("brwhms"))
           );
 
@@ -222,12 +222,12 @@ export const useDiagramData = (plantId: string | undefined) => {
                 max: Number(matchingDevice?.last_record?.max) || 0,
                 min: Number(matchingDevice?.last_record?.min) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.department_connection,
-                plantConnection: matchingDevice?.plant_connection,
-                organizationConnection: matchingDevice?.organization_connection,
-                departmentName: matchingDevice?.department_name,
-                systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.system_connection,
+                // departmentConnection: matchingDevice?.department_connection,
+                // plantConnection: matchingDevice?.plant_connection,
+                // organizationConnection: matchingDevice?.organization_connection,
+                // departmentName: matchingDevice?.department_name,
+                // systemName: matchingDevice?.system_name,
+                // systemConnection: matchingDevice?.system_connection,
               },
             };
           }
@@ -235,7 +235,7 @@ export const useDiagramData = (plantId: string | undefined) => {
           const matchingDevice = deviceData?.find(
             (device) =>
               device?.device_name === node?.data?.label &&
-              (device?.type === "phmc" ||
+              (device?.device_family_type === "phmc" ||
                 device?.device_family?.toLowerCase().includes("phmc"))
           );
 
@@ -253,12 +253,12 @@ export const useDiagramData = (plantId: string | undefined) => {
                 currentB: Number(matchingDevice?.last_record?.Current_b) || 0,
                 frequency: Number(matchingDevice?.last_record?.Frequency) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.department_connection,
-                plantConnection: matchingDevice?.plant_connection,
-                organizationConnection: matchingDevice?.organization_connection,
-                departmentName: matchingDevice?.department_name,
-                systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.system_connection,
+                // departmentConnection: matchingDevice?.department_connection,
+                // plantConnection: matchingDevice?.plant_connection,
+                // organizationConnection: matchingDevice?.organization_connection,
+                // departmentName: matchingDevice?.department_name,
+                // systemName: matchingDevice?.system_name,
+                // systemConnection: matchingDevice?.system_connection,
               },
             };
           }
@@ -266,7 +266,7 @@ export const useDiagramData = (plantId: string | undefined) => {
           const matchingDevice = deviceData?.find(
             (device) =>
               device?.device_name === node?.data?.label &&
-              (device?.type === "arg" ||
+              (device?.device_family_type === "arg" ||
                 device?.device_family?.toLowerCase().includes("arg"))
           );
 
@@ -280,23 +280,23 @@ export const useDiagramData = (plantId: string | undefined) => {
                 lastMm: Number(matchingDevice?.last_record?.last_mm) || 0,
                 firstMm: Number(matchingDevice?.last_record?.first_mm) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.department_connection,
-                plantConnection: matchingDevice?.plant_connection,
-                organizationConnection: matchingDevice?.organization_connection,
-                departmentName: matchingDevice?.department_name,
-                systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.system_connection,
+                // departmentConnection: matchingDevice?.department_connection,
+                // plantConnection: matchingDevice?.plant_connection,
+                // organizationConnection: matchingDevice?.organization_connection,
+                // departmentName: matchingDevice?.department_name,
+                // systemName: matchingDevice?.system_name,
+                // systemConnection: matchingDevice?.system_connection,
               },
             };
           }
         } else if (node.type === "group" && node.data.type === "department") {
           const departmentId = node.id.replace("dept-", "");
           const departmentDevices = deviceData.filter(
-            (device) => device?.department_id?.toString() === departmentId
+            (device) => device?.in_department_id?.toString() === departmentId || device?.out_department_id?.toString() === departmentId
           );
 
           if (departmentDevices?.length > 0) {
-            const latestDepartmentName = departmentDevices[0]?.department_name;
+            const latestDepartmentName = departmentDevices[0]?.in_department_name || departmentDevices[0]?.out_department_name;
             if (latestDepartmentName && latestDepartmentName !== node?.data?.label) {
               return {
                 ...node,
@@ -310,11 +310,11 @@ export const useDiagramData = (plantId: string | undefined) => {
         } else if (node.type === "group" && node.data.type === "plant") {
           const plantId = node.id.replace("plant-", "");
           const plantDevices = deviceData.filter(
-            (device) => device?.plant_id?.toString() === plantId
+            (device) => device?.in_plant_id?.toString() === plantId || device?.out_plant_id?.toString() === plantId
           );
 
           if (plantDevices?.length > 0) {
-            const latestPlantName = plantDevices[0].plant_name;
+            const latestPlantName = plantDevices[0].in_plant_name || plantDevices[0].out_plant_name;
             if (latestPlantName && latestPlantName !== node.data.label) {
               return {
                 ...node,

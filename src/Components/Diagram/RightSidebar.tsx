@@ -46,28 +46,28 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
     if (selectedGroup.type === "plant") {
       filteredDevices = deviceData.filter(device => 
-        device.plant_connection === "in" || device.plant_connection === "out"
+        device.in_plant_id || device.out_plant_id
       );
     } else if (selectedGroup.type === "department") {
       const departmentId = parseInt(selectedGroup.id.replace("dept-", ""));
       const departmentDevices = deviceData.filter(
-        (device) => device.department_id === departmentId
-      );
+        (device) => device.in_department_id === departmentId || device.out_department_id === departmentId
+      );  
       filteredDevices = departmentDevices.filter(device => 
-        device.department_connection === "in" || device.department_connection === "out"
+        device.in_department_id || device.out_department_id
       );
     } else if (selectedGroup.type === "system") {
       const systemId = parseInt(selectedGroup.id.replace("system-", ""));
       const systemDevices = deviceData.filter(
-        (device) => device.system_id === systemId
+        (device) => device.in_system_id === systemId || device.out_system_id === systemId
       );
       filteredDevices = systemDevices.filter(device => 
-        device.system_connection === "in" || device.system_connection === "out"
+        device.in_system_id || device.out_system_id
       );
     }
 
     const tankDevices = filteredDevices.filter(
-      (device) => device.type === "tank" || device.device_family?.toLowerCase().includes("tank")
+      (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
     );
 
     const totals = tankDevices.reduce(

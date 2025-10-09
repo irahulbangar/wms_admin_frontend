@@ -1017,20 +1017,20 @@ export const calculateDepartmentFlowBalances = (
         if (!shouldIncludeDevice(device)) return;
 
         const flowValue = getDeviceFlowValue(device);
-        const { in_department_connection, out_department_connection } = device;
+        const { in_department_id, out_department_id } = device;
 
-        if (in_department_connection === "in" || out_department_connection === "in") {
+        if (in_department_id) {
           totalIn += flowValue;
         }
 
-        if (in_department_connection === "out" || out_department_connection === "out") {
+        if (out_department_id) {
           totalOut += flowValue;
         }
 
-        if (in_department_connection === "both" || out_department_connection === "both") {
-          totalIn += flowValue;
-          totalOut += flowValue;
-        }
+        // if (in_department_connection === "both" || out_department_connection === "both") {
+        //   totalIn += flowValue;
+        //   totalOut += flowValue;
+        // }
       });
 
       const tankDevices = system.devices.filter(
@@ -1081,20 +1081,20 @@ export const calculateDepartmentFlowBalance = (
 
   relevantDevices.forEach((device) => {
     const flowValue = getDeviceFlowValue(device);
-    const { department_connection } = device;
+    const { in_department_id, out_department_id } = device;
 
-    if (department_connection === "in") {
+    if (in_department_id) {
       totalIn += flowValue;
     }
 
-    if (department_connection === "out") {
+    if (out_department_id) {
       totalOut += flowValue;
     }
 
-    if (department_connection === "both") {
-      totalIn += flowValue;
-      totalOut += flowValue;
-    }
+    // if (department_connection === "both") {
+    //   totalIn += flowValue;
+    //   totalOut += flowValue;
+    // }
   });
 
   tankDevices.forEach((device) => {
@@ -1149,20 +1149,20 @@ export const calculatePlantFlowBalance = (
 
   relevantDevices.forEach((device) => {
     const flowValue = getDeviceFlowValue(device);
-    const { plant_connection } = device;
+    const { in_plant_id, out_plant_id } = device;
 
-    if (plant_connection === "in") {
+    if (in_plant_id) {
       totalIn += flowValue;
     }
 
-    if (plant_connection === "out") {
+    if (out_plant_id) {
       totalOut += flowValue;
     }
 
-    if (plant_connection === "both") {
-      totalIn += flowValue;
-      totalOut += flowValue;
-    }
+    // if (plant_connection === "both") {
+    //   totalIn += flowValue;
+    //   totalOut += flowValue;
+    // }
   });
 
   tankDevices.forEach((device) => {
@@ -1217,20 +1217,20 @@ export const calculateSystemFlowBalance = (
 
   relevantDevices.forEach((device) => {
     const flowValue = getDeviceFlowValue(device);
-    const { system_connection } = device;
+    const { in_system_id, out_system_id } = device;
 
-    if (system_connection === "in") {
+    if (in_system_id) {
       totalIn += flowValue;
     }
 
-    if (system_connection === "out") {
+    if (out_system_id) {
       totalOut += flowValue;
     }
 
-    if (system_connection === "both") {
-      totalIn += flowValue;
-      totalOut += flowValue;
-    }
+    // if (system_connection === "both") {
+    //   totalIn += flowValue;
+    //   totalOut += flowValue;
+    // }
   });
 
   tankDevices.forEach((device) => {
