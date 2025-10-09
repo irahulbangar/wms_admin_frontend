@@ -62,8 +62,8 @@ export const convertDevicesToDiagram = (
     const plantId = device.in_plant_id?.toString() || device.out_plant_id?.toString() || "unknown";
     if (!acc[plantId]) {
       acc[plantId] = {
-        plant_id: device.in_plant_id || device.out_plant_id,
-        plant_name: plantData?.plant_name || device.in_plant_name || device.out_plant_name || `Plant ${device.in_plant_id || device.out_plant_id}`,
+        plant_id: device.plant_id,
+        plant_name: plantData?.plant_name || `Plant ${device.plant_id}`,
         departments: {},
       };
     } else {
@@ -75,8 +75,8 @@ export const convertDevicesToDiagram = (
     const deptId = device.in_department_id?.toString() || device.out_department_id?.toString() || "unknown";
     if (!acc[plantId].departments[deptId]) {
       acc[plantId].departments[deptId] = {
-        department_id: device.in_department_id || device.out_department_id,
-        department_name: device.in_department_name || device.out_department_name || `Department ${device.in_department_id || device.out_department_id}`,
+        department_id: device.department_id,
+        department_name: device.department_name || `Department ${device.department_id}`,
         systems: {},
       };
     } else {
@@ -85,16 +85,16 @@ export const convertDevicesToDiagram = (
       }
     }
 
-    const systemId = device.in_system_id?.toString() || device.out_system_id?.toString() || "unknown";
+    const systemId = device.system_id?.toString() || "unknown";
     if (!acc[plantId].departments[deptId].systems[systemId]) {
       acc[plantId].departments[deptId].systems[systemId] = {
-        system_id: device.in_system_id || device.out_system_id,
-        system_name: device.in_system_name || device.out_system_name || `System ${device.in_system_id || device.out_system_id}`,
+        system_id: device.system_id,
+        system_name: device.system_name || `System ${device.system_id}`,
         devices: [],
       };
     } else {
-      if (device.in_system_name && device.in_system_name !== acc[plantId].departments[deptId].systems[systemId].system_name) {
-        acc[plantId].departments[deptId].systems[systemId].system_name = device.in_system_name;
+      if (device.system_name !== acc[plantId].departments[deptId].systems[systemId].system_name) {
+        acc[plantId].departments[deptId].systems[systemId].system_name = device.system_name;
       }
     }
     acc[plantId].departments[deptId].systems[systemId].devices.push(device);
@@ -985,20 +985,20 @@ export const calculateDepartmentFlowBalances = (
   const visibleDevices = devices.filter(device => device.visibility !== "hidden");
 
   const departmentGroups = visibleDevices.reduce((acc, device) => {
-    const deptId = device.in_department_id || device.out_department_id;
+    const deptId = device.department_id;
     if (!acc[deptId]) {
       acc[deptId] = {
         department_id: deptId,
-        department_name: device.in_department_name || device.out_department_name || `Department ${deptId}`,
+        department_name: device.department_name || `Department ${deptId}`,
         systems: {},
       };
     }
 
-    const systemId = device.in_system_id?.toString() || device.out_system_id?.toString() || "unknown";
+    const systemId = device.system_id?.toString() || "unknown";
     if (!acc[deptId].systems[systemId]) {
       acc[deptId].systems[systemId] = {
-        system_id: device.in_system_id || device.out_system_id,
-        system_name: device.in_system_name || device.out_system_name || `System ${device.in_system_id || device.out_system_id}`,
+        system_id: device.system_id ,
+        system_name: device.system_name || `System ${device.system_id}`,
         devices: [],
       };
     }
