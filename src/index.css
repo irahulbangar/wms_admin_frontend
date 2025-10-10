@@ -68,7 +68,7 @@
 }
 
 .diagram-zoom-controls button:hover {
-  background: var(--bg-overlay);
+  background: var(--bg-overlay / 30);
   color: var(--text-primary);
 }
 

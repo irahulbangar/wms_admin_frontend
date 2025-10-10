@@ -77,25 +77,37 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
                 onClick={onZoomOut}
                 title="Zoom Out"
               >
-                <ZoomOut className="w-4 h-4" />
+                <ZoomOut className="w-4 h-4 text-status-success hover:text-status-success/80" />
               </button>
               <button
                 onClick={onFitView}
                 title="Fit to Screen"
               >
-                <Maximize2 className="w-4 h-4" />
+                <Maximize2 className="w-4 h-4 text-status-info hover:text-status-info/80" />
               </button>
               <button
                 onClick={onZoomIn}
                 title="Zoom In"
               >
-                <ZoomIn className="w-4 h-4" />
+                <ZoomIn className="w-4 h-4 text-status-success hover:text-status-success/80" />
               </button>
               <button
                 onClick={onResetView}
                 title="Reset View"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-4 h-4 text-text-primary hover:text-text-primary/80" />
+              </button>
+              <button
+                onClick={onDownloadDiagram}
+                title="Download Diagram"
+              >
+                <Download className="w-4 h-4 text-status-info hover:text-status-info/80" />
+              </button>
+              <button
+                onClick={handleClearAllEdgesWithConfirm}
+                title="Clear All Edges"
+              >
+               <Trash2 className="w-4 h-4 text-status-danger" />
               </button>
             </div>
 
@@ -105,26 +117,9 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
                 className="px-3 py-1 bg-status-danger hover:bg-status-danger/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2 whitespace-nowrap"
                 title="Delete selected edge"
               >
-                <Trash2 className="w-4 h-4" /> Delete Selected Edge
+                <Trash2 className="w-4 h-4" /> Delete Edge
               </button>
             )}
-
-            <button
-              onClick={handleClearAllEdgesWithConfirm}
-              className="px-3 py-1 bg-status-warning hover:bg-status-warning/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2 whitespace-nowrap"
-              title="Clear all connections"
-            >
-              <Trash2 className="w-4 h-4" /> Clear All Edges
-            </button>
-
-            <button
-              onClick={onDownloadDiagram}
-              className="px-3 py-1 bg-status-success hover:bg-status-success/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2 whitespace-nowrap"
-              title="Download diagram as PNG image"
-            >
-              <Download className="w-4 h-4" />
-              Download Image
-            </button>
 
             <button
               onClick={onSaveDiagram}

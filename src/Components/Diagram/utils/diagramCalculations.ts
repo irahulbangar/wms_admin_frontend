@@ -110,44 +110,75 @@ export const convertDevicesToDiagram = (
     const departmentRequirements = Object.values(plant.departments).map((department) => {
       const totalSystemsInDept = Object.values(department.systems).length;
       
-      if (totalSystemsInDept === 1) {
+      const systemSpacing = 30;
+      const systemPadding = 40;
+      const systemWidth = 1200;
+      const systemHeight = 800;
+      const systemHeaderHeight = 20;
+      const systemFooterHeight = 40;
+      
+      if (totalSystemsInDept === 0) {
         return {
           width: minDepartmentWidth,
           height: minDepartmentHeight,
-          systemCount: totalSystemsInDept
+          systemCount: totalSystemsInDept,
+          systemsPerRow: 0,
+          totalSystemRows: 0
+        };
+      } else if (totalSystemsInDept === 1) {
+        return {
+          width: Math.max(minDepartmentWidth, 2 * systemPadding),
+          height: Math.max(minDepartmentHeight, systemHeaderHeight + systemFooterHeight + systemHeight),
+          systemCount: totalSystemsInDept,
+          systemsPerRow: 1,
+          totalSystemRows: 1
         };
       } else {
-        const systemSpacing = 30;
-        const systemPadding = 40;
-        const systemWidth = 1200;
-        const systemHeight = 800;
+        const systemsPerRowWithMinWidth = Math.max(1, Math.floor((minDepartmentWidth - 2 * systemPadding) / (systemWidth + systemSpacing)));
         
-        const systemsPerRow = totalSystemsInDept;
-        const totalSystemRows = 1;
-        
-        const requiredWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * systemWidth + (systemsPerRow - 1) * systemSpacing);
-        const requiredHeight = Math.max(minDepartmentHeight, 80 + 40 + totalSystemRows * systemHeight + (totalSystemRows - 1) * systemSpacing);
-        
-        return {
-          width: requiredWidth,
-          height: requiredHeight,
-          systemCount: totalSystemsInDept
-        };
+        if (totalSystemsInDept <= systemsPerRowWithMinWidth) {
+          const systemsPerRow = totalSystemsInDept;
+          const totalSystemRows = 1;
+          const requiredWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * systemWidth + (systemsPerRow - 1) * systemSpacing);
+          const requiredHeight = Math.max(minDepartmentHeight, systemHeaderHeight + systemFooterHeight + systemHeight);
+          
+          return {
+            width: requiredWidth,
+            height: requiredHeight,
+            systemCount: totalSystemsInDept,
+            systemsPerRow,
+            totalSystemRows
+          };
+        } else {
+          const systemsPerRow = systemsPerRowWithMinWidth;
+          const totalSystemRows = Math.ceil(totalSystemsInDept / systemsPerRow);
+          
+          const requiredWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * systemWidth + (systemsPerRow - 1) * systemSpacing);
+          
+          const requiredHeight = Math.max(minDepartmentHeight, systemHeaderHeight + systemFooterHeight + totalSystemRows * systemHeight + (totalSystemRows - 1) * systemSpacing);
+          
+          return {
+            width: requiredWidth,
+            height: requiredHeight,
+            systemCount: totalSystemsInDept,
+            systemsPerRow,
+            totalSystemRows
+          };
+        }
       }
     });
 
-    const maxDeptWidth = Math.max(...departmentRequirements.map(d => d.width));
+    const totalDeptWidth = departmentRequirements.reduce((sum, dept) => sum + dept.width, 0) + (departmentCount - 1) * departmentSpacing;
     const maxDeptHeight = Math.max(...departmentRequirements.map(d => d.height));
     
-    const departmentsPerRow = departmentCount;
-    const totalDeptRows = 1;
+    const sourceSinkPadding = 400;
     
-    const requiredPlantWidth = plantPadding * 2 + departmentsPerRow * maxDeptWidth + (departmentsPerRow - 1) * departmentSpacing;
-    const requiredPlantHeight = plantPadding * 2 + 80 + totalDeptRows * maxDeptHeight + (totalDeptRows - 1) * departmentSpacing;
+    const requiredPlantWidth = plantPadding * 2 + totalDeptWidth + sourceSinkPadding;
+    const requiredPlantHeight = plantPadding * 2 + 80 + maxDeptHeight;
 
     const plantWidth = Math.max(2000, requiredPlantWidth);
     const plantHeight = Math.max(1200, requiredPlantHeight);
-
+    
     const plantSpacing = 100;
     const totalDiagramWidth = Object.values(plantGroups).length * (plantWidth + plantSpacing) - plantSpacing;
     const centerOffset = Math.max(0, (totalDiagramWidth - plantWidth) / 2);
@@ -222,6 +253,8 @@ export const convertDevicesToDiagram = (
       deletable: false,
     });
 
+    let cumulativeX = plantX + plantPadding + 200;
+    
     Object.values(plant.departments).forEach((department, deptIndex) => {
       const deptId = `dept-${department.department_id}`;
 
@@ -229,8 +262,15 @@ export const convertDevicesToDiagram = (
       const deptWidth = deptRequirement.width;
       const deptHeight = deptRequirement.height;
 
-      const deptX = plantX + plantPadding + deptIndex * (deptWidth + departmentSpacing);
+      const deptX = cumulativeX;
       const deptY = plantY + 80;
+      
+      const maxDeptX = plantX + plantWidth - deptWidth - plantPadding;
+      const maxDeptY = plantY + plantHeight - deptHeight - plantPadding;
+      const finalDeptX = Math.min(deptX, maxDeptX);
+      const finalDeptY = Math.min(deptY, maxDeptY);
+      
+      cumulativeX = finalDeptX + deptWidth + departmentSpacing;
 
       nodes.push({
         id: deptId,
@@ -239,7 +279,7 @@ export const convertDevicesToDiagram = (
           type: "department",
           unit: "Ltr",
         },
-        position: { x: deptX, y: deptY },
+        position: { x: finalDeptX, y: finalDeptY },
         parentId: plantId,
         style: {
           width: deptWidth,
@@ -271,14 +311,21 @@ export const convertDevicesToDiagram = (
       Object.values(department.systems).forEach((system, systemIndex) => {
         const systemId = `system-${system.system_id}`;
         
-        const systemCol = systemIndex;
-        const systemRow = 0;
+        const deptRequirement = departmentRequirements[deptIndex];
+        const systemsPerRow = deptRequirement.systemsPerRow;
+        const systemCol = systemIndex % systemsPerRow;
+        const systemRow = Math.floor(systemIndex / systemsPerRow);
         
-        const systemX = deptX + systemPadding + systemCol * (systemWidth + systemSpacing);
-        const systemY = deptY + systemHeaderHeight + systemRow * (systemHeight + systemSpacing);
+        const totalSystemsInDept = Object.values(department.systems).length;
+        const systemsInCurrentRow = Math.min(systemsPerRow, totalSystemsInDept - systemRow * systemsPerRow);
+        const rowWidth = systemsInCurrentRow * systemWidth + (systemsInCurrentRow - 1) * systemSpacing;
+        const rowStartX = finalDeptX + systemPadding + (deptWidth - 2 * systemPadding - rowWidth) / 2;
         
-        const maxSystemX = deptX + deptWidth - systemWidth - systemPadding;
-        const maxSystemY = deptY + deptHeight - systemHeight - systemFooterHeight;
+        const systemX = rowStartX + systemCol * (systemWidth + systemSpacing);
+        const systemY = finalDeptY + systemHeaderHeight + systemRow * (systemHeight + systemSpacing);
+        
+        const maxSystemX = finalDeptX + deptWidth - systemWidth - systemPadding;
+        const maxSystemY = finalDeptY + deptHeight - systemHeight - systemFooterHeight;
         const finalSystemX = Math.min(systemX, maxSystemX);
         const finalSystemY = Math.min(systemY, maxSystemY);
 
