@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
-import { useAppDispatch } from "../../../store/store";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
 import {
@@ -80,6 +80,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
   const [showAddSystemPopup, setShowAddSystemPopup] = useState(false);
   const [reportTypes, setReportTypes] = useState<ReportTypeResult[]>([]);
+  const { organizations } = useAppSelector((state) => state.organization);
 
   const getSelectedDeviceFamilyName = () => {
     const selectedFamily = familyData.find(
@@ -488,9 +489,26 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
-          <h2 className="text-2xl font-semibold text-text-primary font-roboto">
-            {type === "update" ? "Update Device" : "Add New Device"}
-          </h2>
+          <div className="flex flex-col">
+            <h2 className="text-2xl font-semibold text-text-primary font-roboto">
+              {type === "update" ? "Update Device" : "Add New Device"}
+            </h2>
+            <div className="flex items-center gap-2 mt-1 text-sm text-text-secondary">
+              <span className="font-medium font-roboto">
+                {(() => {
+                  const plant = plantData.find(p => p.plant_id === plant_id);
+                  const plantName = plant?.plant_name || "Unknown Plant";
+                  
+                  const department = departmentData.find(d => d.department_id === departmentId);
+                  const departmentName = department?.department_name || "Unknown Department";
+                  
+                  const organizationName = organizations.find(o => o.organization_id === organizationId)?.organization_name || "Unknown Organization";
+                  
+                  return `${organizationName} > ${plantName} > ${departmentName}`;
+                })()}
+              </span>
+            </div>
+          </div>
           <button
             onClick={() => {
               setShowAddModal(false);
