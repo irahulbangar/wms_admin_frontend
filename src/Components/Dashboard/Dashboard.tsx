@@ -6,6 +6,8 @@ import {
   FileText,
   Loader2,
   Monitor,
+  Dock,
+  // Grid,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
@@ -20,6 +22,10 @@ import type { DeviceResult } from "../../../model/devices.interface";
 import { getAllDevices } from "../../../store/deviceSlice";
 import type { PlantResult } from "../../../model/plant.interface";
 import { getAllPlants } from "../../../store/plantSlice";
+import type { DepartmentResult } from "../../../model/department.interface";
+// import type { SystemResult } from "../../../model/system.interface";
+// import { getAllSystems } from "../../../store/systemSlice";
+import { getAllDepartments } from "../../../store/departmentSlice";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
@@ -28,6 +34,8 @@ const Dashboard = () => {
   const [plants, setPlants] = useState<PlantResult[]>([]);
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
   const [devices, setDevices] = useState<DeviceResult[]>([]);
+  const [departments, setDepartments] = useState<DepartmentResult[]>([]);
+  // const [systems, setSystems] = useState<SystemResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -107,17 +115,56 @@ const Dashboard = () => {
       });
   }, [dispatch]);
 
+  const fetchDepartments = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getAllDepartments())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          setDepartments(res?.data);
+        }
+      })
+      .catch((err) => {
+        Error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
+
+  // const fetchSystems = useCallback(async () => {
+  //   if (isLoading) return;
+  //   setIsLoading(true);
+
+  //   await dispatch(getAllSystems())
+  //     .unwrap()
+  //     .then((res) => {
+  //       if (res.success) {
+  //         setSystems(res?.data);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       Error(err);
+  //     })
+  //     .finally(() => {
+  //       setIsLoading(false);
+  //     });
+  // }, [dispatch]);
+
   useEffect(() => {
     fetchOrganizations();
     fetchPlants();
     fetchUsers();
     fetchDevices();
+    fetchDepartments();
+    // fetchSystems();
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [fetchOrganizations, fetchPlants, fetchUsers, fetchDevices]);
+  }, [fetchOrganizations, fetchPlants, fetchUsers, fetchDevices, fetchDepartments]);
 
   const stats = [
     {
@@ -130,7 +177,7 @@ const Dashboard = () => {
       href: "/organization/users",
     },
     {
-      title: "Total Organization",
+      title: "Total Organizations",
       value: organizations.length,
       icon: Building,
       gradient: "from-[#e97251] to-[#f7b733]",
@@ -147,6 +194,24 @@ const Dashboard = () => {
       iconColor: "text-green-600",
       href: "/organization/plants",
     },
+    {
+      title: "Total Departments",
+      value: departments.length,
+      icon: Dock,
+      gradient: "from-[#4DA0B0] to-[#D39D38]",
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600",
+      href: "/organization/departments",
+    },
+    // {
+    //   title: "Total Systems",
+    //   value: systems.length,
+    //   icon: Grid,
+    //   gradient: "from-[#304352] to-[#d7d2cc]",
+    //   iconBg: "bg-green-100",
+    //   iconColor: "text-green-600",
+    //   href: "/organization/systems",
+    // },
     {
       title: "Total Devices",
       value: devices.length,
