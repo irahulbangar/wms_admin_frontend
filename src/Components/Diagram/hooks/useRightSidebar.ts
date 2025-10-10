@@ -25,7 +25,14 @@ export const useRightSidebar = (
     
     switch (selectedGroup.type) {
       case 'plant': {
-        const plantId = deviceData[0]?.plant_id;
+        const plantName = groupId.replace('plant-', '');
+        const plantDevice = deviceData.find(device => 
+          device.plant_name === plantName || 
+          device.in_plant_name === plantName || 
+          device.out_plant_name === plantName
+        );
+        const plantId = plantDevice?.plant_id || plantDevice?.in_plant_id || plantDevice?.out_plant_id;
+        if (!plantId) return null;
         return calculatePlantFlowBalance(deviceData, plantId);
       }
       

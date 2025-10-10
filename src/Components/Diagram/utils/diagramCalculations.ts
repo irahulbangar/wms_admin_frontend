@@ -1,6 +1,13 @@
 import type { DeviceResult } from "../../../../model/devices.interface";
 import type { NodeData } from "../../../../model/single-plant.interface";
 
+export interface ReportTypeCalculations {
+  reportType: string;
+  totalIn: number;
+  totalOut: number;
+  totalBalance: number;
+}
+
 export interface DiagramNode {
   id: string;
   data: NodeData;
@@ -47,6 +54,7 @@ export interface DepartmentCalculations {
   totalBalance: number;
   totalStock: number;
   totalCapacity: number;
+  reportTypeCalculations: ReportTypeCalculations[];
 }
 
 export const convertDevicesToDiagram = (
@@ -969,6 +977,50 @@ const shouldIncludeDevice = (device: DeviceResult): boolean => {
   return false;
 };
 
+const calculateReportTypeWiseFlow = (
+  devices: DeviceResult[],
+  groupId: number,
+  groupType: 'plant' | 'department' | 'system'
+): ReportTypeCalculations[] => {
+  const reportTypeMap = new Map<string, { totalIn: number; totalOut: number }>();
+
+  devices.forEach((device) => {
+    if (!shouldIncludeDevice(device)) return;
+
+    const flowValue = getDeviceFlowValue(device);
+    const reportType = device.report_type_name || 'Unknown';
+
+    if (!reportTypeMap.has(reportType)) {
+      reportTypeMap.set(reportType, { totalIn: 0, totalOut: 0 });
+    }
+
+    const reportTypeData = reportTypeMap.get(reportType)!;
+
+    if (groupType === 'plant' && device.in_plant_id === groupId) {
+      reportTypeData.totalIn += flowValue;
+    } else if (groupType === 'department' && device.in_department_id === groupId) {
+      reportTypeData.totalIn += flowValue;
+    } else if (groupType === 'system' && device.in_system_id === groupId) {
+      reportTypeData.totalIn += flowValue;
+    }
+
+    if (groupType === 'plant' && device.out_plant_id === groupId) {
+      reportTypeData.totalOut += flowValue;
+    } else if (groupType === 'department' && device.out_department_id === groupId) {
+      reportTypeData.totalOut += flowValue;
+    } else if (groupType === 'system' && device.out_system_id === groupId) {
+      reportTypeData.totalOut += flowValue;
+    }
+  });
+
+  return Array.from(reportTypeMap.entries()).map(([reportType, data]) => ({
+    reportType,
+    totalIn: data.totalIn,
+    totalOut: data.totalOut,
+    totalBalance: data.totalOut - data.totalIn,
+  }));
+};
+
 export const calculateDepartmentFlowBalances = (
   devices: DeviceResult[]
 ): DepartmentCalculations[] => {
@@ -1032,6 +1084,7 @@ export const calculateDepartmentFlowBalances = (
     });
 
     const totalBalance = totalOut - totalIn;
+    const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, group.department_id, 'department');
 
     return {
       department_id: group.department_id,
@@ -1041,6 +1094,7 @@ export const calculateDepartmentFlowBalances = (
       totalBalance,
       totalStock,
       totalCapacity,
+      reportTypeCalculations,
     };
   });
 };
@@ -1092,6 +1146,7 @@ export const calculateDepartmentFlowBalance = (
   });
 
   const totalBalance = totalOut - totalIn;
+  const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, departmentId, 'department');
 
   return {
     department_id: departmentId,
@@ -1101,6 +1156,7 @@ export const calculateDepartmentFlowBalance = (
     totalBalance,
     totalStock,
     totalCapacity,
+    reportTypeCalculations,
   };
 };
 
@@ -1112,6 +1168,7 @@ export interface PlantCalculations {
   totalBalance: number;
   totalStock: number;
   totalCapacity: number;
+  reportTypeCalculations: ReportTypeCalculations[];
 }
 
 export const calculatePlantFlowBalance = (
@@ -1161,6 +1218,7 @@ export const calculatePlantFlowBalance = (
   });
 
   const totalBalance = totalOut - totalIn;
+  const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, plantId, 'plant');
 
   return {
     plant_id: plantId,
@@ -1170,6 +1228,7 @@ export const calculatePlantFlowBalance = (
     totalBalance,
     totalStock,
     totalCapacity,
+    reportTypeCalculations,
   };
 };
 
@@ -1181,6 +1240,7 @@ export interface SystemCalculations {
   totalBalance: number;
   totalStock: number;
   totalCapacity: number;
+  reportTypeCalculations: ReportTypeCalculations[];
 }
 
 export const calculateSystemFlowBalance = (
@@ -1230,6 +1290,7 @@ export const calculateSystemFlowBalance = (
   });
 
   const totalBalance = totalOut - totalIn;
+  const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, systemId, 'system');
 
   return {
     system_id: systemId,
@@ -1239,5 +1300,6 @@ export const calculateSystemFlowBalance = (
     totalBalance,
     totalStock,
     totalCapacity,
+    reportTypeCalculations,
   };
 };

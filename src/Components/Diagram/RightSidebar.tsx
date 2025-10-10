@@ -33,9 +33,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 }) => {
   const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
+  const [isInConnectionExpanded, setIsInConnectionExpanded] = useState(true);
+  const [isOutConnectionExpanded, setIsOutConnectionExpanded] = useState(true);
 
   const flowChartRef = useRef<HTMLDivElement>(null);
   const storageChartRef = useRef<HTMLDivElement>(null);
+  const inConnectionChartRef = useRef<HTMLDivElement>(null);
+  const outConnectionChartRef = useRef<HTMLDivElement>(null);
 
   const getFilteredStorageData = () => {
     if (!deviceData || !selectedGroup) {
@@ -144,6 +148,54 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     }
   }, [isStorageExpanded, calculations, isOpen, selectedGroup]);
 
+  useEffect(() => {
+    if (
+      inConnectionChartRef.current &&
+      isInConnectionExpanded &&
+      calculations &&
+      'reportTypeCalculations' in calculations &&
+      calculations.reportTypeCalculations &&
+      isOpen &&
+      selectedGroup
+    ) {
+      const chart = echarts.init(inConnectionChartRef.current);
+      const option = getInConnectionChartOption();
+      chart.setOption(option);
+
+      const handleResize = () => chart.resize();
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        chart.dispose();
+      };
+    }
+  }, [isInConnectionExpanded, calculations, isOpen, selectedGroup]);
+
+  useEffect(() => {
+    if (
+      outConnectionChartRef.current &&
+      isOutConnectionExpanded &&
+      calculations &&
+      'reportTypeCalculations' in calculations &&
+      calculations.reportTypeCalculations &&
+      isOpen &&
+      selectedGroup
+    ) {
+      const chart = echarts.init(outConnectionChartRef.current);
+      const option = getOutConnectionChartOption();
+      chart.setOption(option);
+
+      const handleResize = () => chart.resize();
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        chart.dispose();
+      };
+    }
+  }, [isOutConnectionExpanded, calculations, isOpen, selectedGroup]);
+
   const getFlowSummaryChartOption = () => {
     if (!calculations) return {};
 
@@ -238,6 +290,174 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             },
           },
           data: data,
+        },
+      ],
+    };
+  };
+
+  const getReportTypeColor = (reportType: string): string => {
+    const colorMap: Record<string, string> = {
+      'Flow': '#3B82F6',
+      'Percolation': '#10B981',
+      'Evaporation': '#F59E0B',
+      'Consumption': '#EF4444',
+      'Wastage': '#8B5CF6',
+      'Regeneration': '#06B6D4',
+      'Re-use': '#84CC16',
+    };
+    
+    return colorMap[reportType] || '#3B82F6';
+  };
+
+  const getInConnectionChartOption = () => {
+    if (!calculations || !('reportTypeCalculations' in calculations) || !calculations.reportTypeCalculations) return {};
+
+    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
+    const inData = reportTypeCalculations
+      .filter((rt: any) => rt.totalIn > 0)
+      .map((rt: any) => ({
+        value: rt.totalIn,
+        name: rt.reportType,
+        itemStyle: { color: getReportTypeColor(rt.reportType) },
+      }));
+
+    if (inData.length === 0) {
+      return {
+        title: {
+          text: "No IN Data Available",
+          left: "center",
+          top: "center",
+          textStyle: {
+            color: "#374151",
+            fontSize: 14,
+          },
+        },
+        series: [],
+      };
+    }
+
+    return {
+      tooltip: {
+        trigger: "item",
+        formatter: (params: any) => {
+          const reportType = params.name;
+          const value = params.value;
+          const percentage = params.percent;
+          return `${reportType}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+        },
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        borderColor: "#ccc",
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
+          fontSize: 12,
+        },
+      },
+      series: [
+        {
+          name: "IN Connection",
+          type: "pie",
+          radius: "70%",
+          center: ["50%", "50%"],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 0,
+            borderColor: "#fff",
+            borderWidth: 1,
+          },
+          label: {
+            show: false,
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)",
+            },
+            label: {
+              show: true,
+              fontSize: 14,
+              fontWeight: "bold",
+            },
+          },
+          data: inData,
+        },
+      ],
+    };
+  };
+
+  const getOutConnectionChartOption = () => {
+    if (!calculations || !('reportTypeCalculations' in calculations) || !calculations.reportTypeCalculations) return {};
+
+    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
+    const outData = reportTypeCalculations
+      .filter((rt: any) => rt.totalOut > 0)
+      .map((rt: any) => ({
+        value: rt.totalOut,
+        name: rt.reportType,
+        itemStyle: { color: getReportTypeColor(rt.reportType) },
+      }));
+
+    if (outData.length === 0) {
+      return {
+        title: {
+          text: "No OUT Data Available",
+          left: "center",
+          top: "center",
+          textStyle: {
+            color: "#374151",
+            fontSize: 14,
+          },
+        },
+        series: [],
+      };
+    }
+
+    return {
+      tooltip: {
+        trigger: "item",
+        formatter: (params: any) => {
+          const reportType = params.name;
+          const value = params.value;
+          const percentage = params.percent;
+          return `${reportType}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+        },
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        borderColor: "#ccc",
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
+          fontSize: 12,
+        },
+      },
+      series: [
+        {
+          name: "OUT Connection",
+          type: "pie",
+          radius: "70%",
+          center: ["50%", "50%"],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 0,
+            borderColor: "#fff",
+            borderWidth: 1,
+          },
+          label: {
+            show: false,
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)",
+            },
+            label: {
+              show: true,
+              fontSize: 14,
+              fontWeight: "bold",
+            },
+          },
+          data: outData,
         },
       ],
     };
@@ -622,6 +842,132 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               </div>
             );
           })()}
+
+          {calculations && 'reportTypeCalculations' in calculations && calculations.reportTypeCalculations ? (
+            <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+              <div
+                className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+                onClick={() => setIsInConnectionExpanded(!isInConnectionExpanded)}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center gap-2">
+                    <ChartArea className="w-5 h-5" />
+                    IN Connection Report Types & Calculations
+                  </h3>
+                  {isInConnectionExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-text-secondary" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-text-secondary" />
+                  )}
+                </div>
+              </div>
+
+              {isInConnectionExpanded && (
+                <div className="p-4">
+                  <div className="mb-4">
+                    <div
+                      ref={inConnectionChartRef}
+                      style={{ height: "200px", width: "100%" }}
+                    />
+                  </div>
+
+                  <div className="overflow-x-auto border border-border-primary rounded-lg">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border-primary">
+                          <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
+                          <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border-primary">
+                        {(calculations.reportTypeCalculations as any[]).map((reportType: any) => (
+                          <tr key={reportType.reportType} className="hover:bg-secondary/10">
+                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3.5 h-3.5 rounded-full"
+                                  style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
+                                ></div>
+                                {reportType.reportType}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span className="font-medium text-text-primary text-base font-roboto">
+                                {reportType.totalIn > 0 ? `${reportType.totalIn.toFixed(1)} Ltr` : '0.0 Ltr'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
+
+          {calculations && 'reportTypeCalculations' in calculations && calculations.reportTypeCalculations ? (
+            <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+              <div
+                className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+                onClick={() => setIsOutConnectionExpanded(!isOutConnectionExpanded)}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center gap-2">
+                    <ChartArea className="w-5 h-5" />
+                    OUT Connection Report Types & Calculations
+                  </h3>
+                  {isOutConnectionExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-text-secondary" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-text-secondary" />
+                  )}
+                </div>
+              </div>
+
+              {isOutConnectionExpanded && (
+                <div className="p-4">
+                  <div className="mb-4">
+                    <div
+                      ref={outConnectionChartRef}
+                      style={{ height: "200px", width: "100%" }}
+                    />
+                  </div>
+
+                  <div className="overflow-x-auto border border-border-primary rounded-lg">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border-primary">
+                          <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
+                          <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border-primary">
+                        {(calculations.reportTypeCalculations as any[]).map((reportType: any) => (
+                          <tr key={reportType.reportType} className="hover:bg-secondary/10">
+                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3.5 h-3.5 rounded-full"
+                                  style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
+                                ></div>
+                                {reportType.reportType}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <span className="font-medium text-text-primary text-base font-roboto">
+                                {reportType.totalOut > 0 ? `${reportType.totalOut.toFixed(1)} Ltr` : '0.0 Ltr'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
     </>
