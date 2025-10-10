@@ -1,5 +1,5 @@
 import React from "react";
-import {Trash2, Download, Home } from "lucide-react";
+import {Trash2, Download, Home, ZoomIn, ZoomOut, Maximize2, RotateCcw } from "lucide-react";
 import Breadcrumb from "../Common/Breadcrumb";
 import type { BreadcrumbItem } from "../Common/Breadcrumb";
 
@@ -15,6 +15,10 @@ interface DiagramControlsProps {
   onDownloadDiagram: () => void;
   onNavigate?: (path: string) => void;
   onClearConnectionSelection?: () => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  onFitView?: () => void;
+  onResetView?: () => void;
 }
 
 const DiagramControls: React.FC<DiagramControlsProps> = ({
@@ -29,6 +33,10 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
   onDownloadDiagram,
   onNavigate,
   onClearConnectionSelection,
+  onZoomIn,
+  onZoomOut,
+  onFitView,
+  onResetView,
 }) => {
   const handleClearAllEdgesWithConfirm = () => {
     if (confirm("Are you sure you want to delete all connections?")) {
@@ -64,10 +72,37 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
             <Breadcrumb items={breadcrumbItems} onNavigate={onNavigate} />
           </div>
           <div className="flex gap-2 pt-3 pr-3">
+            <div className="diagram-zoom-controls">
+              <button
+                onClick={onZoomOut}
+                title="Zoom Out"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <button
+                onClick={onFitView}
+                title="Fit to Screen"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={onZoomIn}
+                title="Zoom In"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+              <button
+                onClick={onResetView}
+                title="Reset View"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            </div>
+
             {selectedEdge && (
               <button
                 onClick={onDeleteSelectedEdge}
-                className="px-3 py-2 bg-status-danger hover:bg-status-danger/80 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
+                className="px-3 py-1 bg-status-danger hover:bg-status-danger/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
                 title="Delete selected edge"
               >
                 <Trash2 className="w-4 h-4" /> Delete Selected Edge
@@ -76,7 +111,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
 
             <button
               onClick={handleClearAllEdgesWithConfirm}
-              className="px-3 py-2 bg-status-warning hover:bg-status-warning/80 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
+              className="px-3 py-1 bg-status-warning hover:bg-status-warning/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
               title="Clear all connections"
             >
               <Trash2 className="w-4 h-4" /> Clear All Edges
@@ -84,7 +119,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
 
             <button
               onClick={onDownloadDiagram}
-              className="px-3 py-2 bg-status-success hover:bg-status-success/80 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
+              className="px-3 py-1 bg-status-success hover:bg-status-success/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
               title="Download diagram as PNG image"
             >
               <Download className="w-4 h-4" />
@@ -94,7 +129,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
             <button
               onClick={onSaveDiagram}
               disabled={!hasChanges || isSaving}
-              className={`px-3 py-2 rounded-md text-sm flex items-center gap-1 transition-colors font-roboto ${
+              className={`px-3 py-1 h-9 rounded-md text-sm flex items-center gap-1 transition-colors font-roboto ${
                 hasChanges && !isSaving
                   ? "bg-status-info hover:bg-status-info/80 text-white cursor-pointer"
                   : "bg-overlay/30 text-text-muted cursor-not-allowed"

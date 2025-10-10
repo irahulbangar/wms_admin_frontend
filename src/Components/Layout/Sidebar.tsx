@@ -203,7 +203,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             return (
               <div key={item.id}>
                 <button
-                  className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
                     isMenuItemActive(item)
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
                       : "text-text-primary hover:bg-hover-bg-primary"
@@ -236,7 +236,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       return (
                         <button
                           key={submenu.id}
-                          className={`w-full flex items-center text-left p-2 text-sm rounded-lg transition-all cursor-pointer ${
+                          className={`w-full flex items-center text-left px-2 py-1.5 text-sm rounded-lg transition-all cursor-pointer ${
                             currentPage === submenu.id
                               ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
                               : "text-text-primary hover:text-text-primary hover:bg-hover-bg-primary"

@@ -141,8 +141,10 @@ export const convertDevicesToDiagram = (
     const plantHeight = Math.max(1200, requiredPlantHeight);
 
     const plantSpacing = 100;
-    const plantX = plantIndex * (plantWidth + plantSpacing) + 0;
-    const plantY = 20;
+    const totalDiagramWidth = Object.values(plantGroups).length * (plantWidth + plantSpacing) - plantSpacing;
+    const centerOffset = Math.max(0, (totalDiagramWidth - plantWidth) / 2);
+    const plantX = plantIndex * (plantWidth + plantSpacing) - centerOffset;
+    const plantY = 50;
 
     nodes.push({
       id: plantId,

@@ -6,6 +6,7 @@ import ReactFlow, {
   type NodeDragHandler,
   Controls,
   ConnectionMode,
+  useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Success } from "../utils/toast";
@@ -18,6 +19,138 @@ import DepartmentPopup from "./Diagram/DepartmentPopup";
 import RightSidebar from "./Diagram/RightSidebar";
 import DiagramControls from "./Diagram/DiagramControls";
 import { ChartArea } from "lucide-react";
+
+const DiagramWithZoomControls = ({ 
+  nodes: _nodes, 
+  edges: _edges, 
+  onNodesChange, 
+  onEdgesChange, 
+  onNodeDragStop, 
+  onConnect, 
+  onNodeClick, 
+  onEdgeClick, 
+  onPaneClick, 
+  onSelectionChange,
+  nodeTypes,
+  multiSelectionKeyCode,
+  transformedNodes,
+  transformedEdges
+}: any) => {
+  return (
+    <ReactFlow
+      className="h-full w-full"
+      style={{ width: "100%", height: "100%" }}
+      nodes={transformedNodes}
+      edges={transformedEdges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onNodeDragStop={onNodeDragStop}
+      onConnect={onConnect}
+      onNodeClick={onNodeClick}
+      onEdgeClick={onEdgeClick}
+      onPaneClick={onPaneClick}
+      onSelectionChange={onSelectionChange}
+      connectionMode={ConnectionMode.Loose}
+      nodeTypes={nodeTypes}
+      nodesDraggable={true}
+      nodesConnectable={true}
+      nodesFocusable={true}
+      edgesUpdatable={true}
+      edgesFocusable={true}
+      selectNodesOnDrag={false}
+      elevateNodesOnSelect={false}
+      elevateEdgesOnSelect={false}
+      panOnDrag={true}
+      panOnScroll={true}
+      fitView={true}
+      fitViewOptions={{
+        padding: 0.2,
+        minZoom: 0.1,
+        maxZoom: 2,
+        includeHiddenNodes: false
+      }}
+      attributionPosition="bottom-left"
+      deleteKeyCode={["Backspace", "Delete"]}
+      multiSelectionKeyCode={multiSelectionKeyCode}
+      minZoom={0.1}
+      maxZoom={2}
+    >
+      <Background variant={BackgroundVariant.Dots} />
+      <Controls />
+      <ZoomControls />
+    </ReactFlow>
+  );
+};
+
+const ZoomControls = () => {
+  const { zoomIn, zoomOut, fitView, setCenter, getNodes } = useReactFlow();
+
+  const handleZoomIn = () => {
+    zoomIn({ duration: 300 });
+  };
+
+  const handleZoomOut = () => {
+    zoomOut({ duration: 300 });
+  };
+
+  const handleFitView = () => {
+    fitView({ 
+      duration: 500, 
+      padding: 0.2,
+      minZoom: 0.1,
+      maxZoom: 2,
+      includeHiddenNodes: false
+    });
+  };
+
+  const handleResetView = () => {
+    const nodes = getNodes();
+    if (nodes.length > 0) {
+      const bounds = nodes.reduce((acc, node) => {
+        const x = node.position.x;
+        const y = node.position.y;
+        const width = node.width || 100;
+        const height = node.height || 100;
+        
+        return {
+          minX: Math.min(acc.minX, x),
+          maxX: Math.max(acc.maxX, x + width),
+          minY: Math.min(acc.minY, y),
+          maxY: Math.max(acc.maxY, y + height),
+        };
+      }, {
+        minX: Infinity,
+        maxX: -Infinity,
+        minY: Infinity,
+        maxY: -Infinity,
+      });
+
+      const centerX = (bounds.minX + bounds.maxX) / 2;
+      const centerY = (bounds.minY + bounds.maxY) / 2;
+      setCenter(centerX, centerY, { zoom: 0.8, duration: 500 });
+    } else {
+      setCenter(0, 0, { zoom: 1, duration: 500 });
+    }
+  };
+
+  useEffect(() => {
+    (window as any).diagramZoomControls = {
+      zoomIn: handleZoomIn,
+      zoomOut: handleZoomOut,
+      fitView: handleFitView,
+      resetView: handleResetView
+    };
+
+    const nodes = getNodes();
+    if (nodes.length > 0) {
+      setTimeout(() => {
+        handleFitView();
+      }, 100);
+    }
+  }, [getNodes().length]);
+
+  return null;
+};
 
 const DiagramPage = () => {
   const plantId = useParams().plant_id;
@@ -153,6 +286,38 @@ const DiagramPage = () => {
     }
   };
 
+  const handleZoomIn = useCallback(() => {
+    if ((window as any).diagramZoomControls?.zoomIn) {
+      (window as any).diagramZoomControls.zoomIn();
+    } else {
+      console.warn('Zoom controls not yet available');
+    }
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    if ((window as any).diagramZoomControls?.zoomOut) {
+      (window as any).diagramZoomControls.zoomOut();
+    } else {
+      console.warn('Zoom controls not yet available');
+    }
+  }, []);
+
+  const handleFitView = useCallback(() => {
+    if ((window as any).diagramZoomControls?.fitView) {
+      (window as any).diagramZoomControls.fitView();
+    } else {
+      console.warn('Zoom controls not yet available');
+    }
+  }, []);
+
+  const handleResetView = useCallback(() => {
+    if ((window as any).diagramZoomControls?.resetView) {
+      (window as any).diagramZoomControls.resetView();
+    } else {
+      console.warn('Zoom controls not yet available');
+    }
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && selectedNodeForConnection) {
@@ -248,6 +413,10 @@ const DiagramPage = () => {
             onDownloadDiagram={handleDownloadDiagram}
             onNavigate={handleNavigate}
             onClearConnectionSelection={clearConnectionSelection}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onFitView={handleFitView}
+            onResetView={handleResetView}
           />
 
           <div
@@ -280,11 +449,9 @@ const DiagramPage = () => {
                 style={{ width: "100%", height: "100%" }}
                 className="h-full w-full"
               >
-                <ReactFlow
-                  className="h-full w-full"
-                  style={{ width: "100%", height: "100%" }}
-                  nodes={transformedNodes}
-                  edges={transformedEdges}
+                <DiagramWithZoomControls
+                  nodes={nodes}
+                  edges={edges}
                   onNodesChange={handleNodesChange}
                   onEdgesChange={handleEdgesChange}
                   onNodeDragStop={handleNodeDragStop}
@@ -293,26 +460,11 @@ const DiagramPage = () => {
                   onEdgeClick={onEdgeClick}
                   onPaneClick={onPaneClick}
                   onSelectionChange={onSelectionChange}
-                  connectionMode={ConnectionMode.Loose}
                   nodeTypes={nodeTypes}
-                  nodesDraggable={true}
-                  nodesConnectable={true}
-                  nodesFocusable={true}
-                  edgesUpdatable={true}
-                  edgesFocusable={true}
-                  selectNodesOnDrag={false}
-                  elevateNodesOnSelect={false}
-                  elevateEdgesOnSelect={false}
-                  panOnDrag={true}
-                  panOnScroll={true}
-                  fitView
-                  attributionPosition="bottom-left"
-                  deleteKeyCode={["Backspace", "Delete"]}
                   multiSelectionKeyCode={multiSelectionKeyCode}
-                >
-                  <Background variant={BackgroundVariant.Dots} />
-                  <Controls />
-                </ReactFlow>
+                  transformedNodes={transformedNodes}
+                  transformedEdges={transformedEdges}
+                />
               </div>
             )}
           </div>
