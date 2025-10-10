@@ -240,19 +240,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       },
       tooltip: {
         trigger: "item",
-        formatter: (params: any) => {
-          const name = params.name;
-          const value = params.value;
-          const percentage = params.percent;
-          return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
-        },
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        borderColor: "#ccc",
-        borderWidth: 1,
-        textStyle: {
-          color: "#fff",
-          fontSize: 12,
-        },
+        formatter: "{b}: {c} Ltr ({d}%)",
       },
       series: [
         {
@@ -355,7 +343,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           const reportType = params.name;
           const value = params.value;
           const percentage = params.percent;
-          return `${reportType}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+          return `${reportType} ${value.toFixed(1)} Ltr (${percentage}%)`;
         },
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         borderColor: "#ccc",
@@ -432,7 +420,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           const reportType = params.name;
           const value = params.value;
           const percentage = params.percent;
-          return `${reportType}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+          return `${reportType} ${value.toFixed(1)} Ltr (${percentage}%)`;
         },
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         borderColor: "#ccc",
@@ -524,7 +512,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
     return {
       title: {
-        text: `${selectedGroup?.name}`,
+        text: `${selectedGroup?.name} Storage Information`,
         left: "center",
         top: "10px",
         textStyle: {
@@ -535,19 +523,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       },
       tooltip: {
         trigger: "item",
-        formatter: (params: any) => {
-          const name = params.name;
-          const value = params.value;
-          const percentage = params.percent;
-          return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
-        },
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        borderColor: "#ccc",
-        borderWidth: 1,
-        textStyle: {
-          color: "#fff",
-          fontSize: 12,
-        },
+        formatter: "{b}: {c} Ltr ({d}%)",
       },
       series: [
         {
