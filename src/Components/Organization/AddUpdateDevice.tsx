@@ -713,7 +713,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     .filter(
                       (system) =>
                         system.plant_id === plant_id &&
-                        system.organization_id === organizationId
+                        system.organization_id === organizationId &&
+                        system.department_id === departmentId
                     )
                     .map((system) => (
                       <option key={system.system_id} value={system.system_id}>
@@ -879,7 +880,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="null">None</option>
                   {departmentData.filter((department) => 
                     department.plant_id === plant_id && 
-                    department.organization_id === organizationId
+                    department.organization_id === organizationId &&
+                    department.department_id === departmentId
                   ).map((department) => (
                     <option key={department.department_id} value={department.department_id}>
                       {department.department_name}
@@ -902,7 +904,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="null">None</option>
                   {departmentData.filter((department) => 
                     department.plant_id === plant_id && 
-                    department.organization_id === organizationId
+                    department.organization_id === organizationId &&
+                    department.department_id === departmentId
                   ).map((department) => (
                     <option key={department.department_id} value={department.department_id}>
                       {department.department_name}
@@ -932,7 +935,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="null">None</option>
                   {systemData.filter((system) => 
                     system.plant_id === plant_id && 
-                    system.organization_id === organizationId
+                    system.organization_id === organizationId &&
+                    system.department_id === departmentId
                   ).map((system) => (
                     <option key={system.system_id} value={system.system_id}>
                       {system.system_name}
@@ -955,7 +959,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="null">None</option>
                   {systemData.filter((system) => 
                     system.plant_id === plant_id && 
-                    system.organization_id === organizationId
+                    system.organization_id === organizationId &&
+                    system.department_id === departmentId
                   ).map((system) => (
                     <option key={system.system_id} value={system.system_id}>
                       {system.system_name}
