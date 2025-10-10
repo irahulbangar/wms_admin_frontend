@@ -67,7 +67,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
 
   return (
     <div className="flex flex-col gap-1">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center flex-wrap">
           <div className="flex items-center gap-4">
             <Breadcrumb items={breadcrumbItems} onNavigate={onNavigate} />
           </div>
@@ -102,7 +102,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
             {selectedEdge && (
               <button
                 onClick={onDeleteSelectedEdge}
-                className="px-3 py-1 bg-status-danger hover:bg-status-danger/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
+                className="px-3 py-1 bg-status-danger hover:bg-status-danger/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2 whitespace-nowrap"
                 title="Delete selected edge"
               >
                 <Trash2 className="w-4 h-4" /> Delete Selected Edge
@@ -111,7 +111,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
 
             <button
               onClick={handleClearAllEdgesWithConfirm}
-              className="px-3 py-1 bg-status-warning hover:bg-status-warning/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
+              className="px-3 py-1 bg-status-warning hover:bg-status-warning/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2 whitespace-nowrap"
               title="Clear all connections"
             >
               <Trash2 className="w-4 h-4" /> Clear All Edges
@@ -119,7 +119,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
 
             <button
               onClick={onDownloadDiagram}
-              className="px-3 py-1 bg-status-success hover:bg-status-success/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2"
+              className="px-3 py-1 bg-status-success hover:bg-status-success/80 h-9 text-white rounded-md text-sm transition-colors font-roboto flex items-center gap-2 whitespace-nowrap"
               title="Download diagram as PNG image"
             >
               <Download className="w-4 h-4" />
@@ -129,7 +129,7 @@ const DiagramControls: React.FC<DiagramControlsProps> = ({
             <button
               onClick={onSaveDiagram}
               disabled={!hasChanges || isSaving}
-              className={`px-3 py-1 h-9 rounded-md text-sm flex items-center gap-1 transition-colors font-roboto ${
+              className={`px-3 py-1 h-9 rounded-md text-sm flex items-center gap-1 transition-colors font-roboto whitespace-nowrap ${
                 hasChanges && !isSaving
                   ? "bg-status-info hover:bg-status-info/80 text-white cursor-pointer"
                   : "bg-overlay/30 text-text-muted cursor-not-allowed"
