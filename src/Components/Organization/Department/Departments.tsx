@@ -493,7 +493,7 @@ const Departments = () => {
                       )?.organization_name || "Select organization..."
                 }
                 readOnly
-                className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
                 onClick={() =>
                   setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
                 }
@@ -517,7 +517,7 @@ const Departments = () => {
                       onChange={(e) =>
                         setOrganizationSearchTerm(e.target.value)
                       }
-                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -576,7 +576,7 @@ const Departments = () => {
                       )?.plant_name || "Select plant..."
                 }
                 readOnly
-                className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
                 onClick={() => setIsPlantDropdownOpen(!isPlantDropdownOpen)}
               />
               <ChevronDown
@@ -596,7 +596,7 @@ const Departments = () => {
                       placeholder="Search plants..."
                       value={plantSearchTerm}
                       onChange={(e) => setPlantSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -644,7 +644,7 @@ const Departments = () => {
               placeholder="Search departments..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+              className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
             />
             {searchTerm && (
               <button
@@ -662,7 +662,7 @@ const Departments = () => {
 
           <button
             onClick={handleAddDepartment}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto whitespace-nowrap"
+            className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
             Add Department
@@ -677,7 +677,7 @@ const Departments = () => {
       ) : (
       <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
         <div className="overflow-auto h-[calc(100vh-280px)]">
-          <table className="w-full text-sm text-left rtl:text-right text-text-primary">
+          <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedDepartments?.length > 0 ? "h-auto" : "h-full"}`}>
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">

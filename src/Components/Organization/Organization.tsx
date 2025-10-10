@@ -231,7 +231,7 @@ const Organization = () => {
                 setSearchTerm(value);
                 filterOrganizations(value);
               }}
-              className="md:w-92 w-full pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+              className="md:w-92 w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
             />
             {searchTerm && (
               <button
@@ -251,7 +251,7 @@ const Organization = () => {
               setOrganizationId("");
               setShowAddModal(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
+            className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
             Add Organization

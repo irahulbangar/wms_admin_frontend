@@ -341,7 +341,7 @@ const OrganizationUsers = () => {
                       )?.organization_name || "Select organization..."
                 }
                 readOnly
-                className="px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
                 onClick={() =>
                   setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
                 }
@@ -365,14 +365,14 @@ const OrganizationUsers = () => {
                       onChange={(e) =>
                         setOrganizationSearchTerm(e.target.value)
                       }
-                      className="w-full pl-10 pr-3 py-2 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                 </div>
 
                 <div
-                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                  className="px-3 py-1.5 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                   onClick={() => {
                     setOrganizationId(0);
                     setOrganizationSearchTerm("");
@@ -392,7 +392,7 @@ const OrganizationUsers = () => {
                   .map((organization, index) => (
                     <div
                       key={index}
-                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                      className="px-3 py-1.5 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                       onClick={() => {
                         setOrganizationId(organization.organization_id);
                         setOrganizationSearchTerm(
@@ -416,7 +416,7 @@ const OrganizationUsers = () => {
             <input
               type="text"
               placeholder="Search users..."
-              className="md:w-80 w-50 pl-10 pr-4 py-2 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+              className="md:w-80 w-50 pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -431,7 +431,7 @@ const OrganizationUsers = () => {
           </div>
           <button
             onClick={handleAddUser}
-            className="flex items-center gap-2 whitespace-nowrap px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+            className="flex items-center gap-2 whitespace-nowrap px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
           >
             <PlusCircle className="w-4 h-4" />
             Add User
