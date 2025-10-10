@@ -244,7 +244,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           const name = params.name;
           const value = params.value;
           const percentage = params.percent;
-          return `${name}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+          return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
         },
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         borderColor: "#ccc",
@@ -539,7 +539,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           const name = params.name;
           const value = params.value;
           const percentage = params.percent;
-          return `${name}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+          return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
         },
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         borderColor: "#ccc",
