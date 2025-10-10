@@ -898,36 +898,51 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     />
                   </div>
 
-                  <div className="overflow-x-auto border border-border-primary rounded-lg">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border-primary">
-                          <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
-                          <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border-primary">
-                        {(calculations.reportTypeCalculations as any[]).map((reportType: any) => (
-                          <tr key={reportType.reportType} className="hover:bg-secondary/10">
-                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-3.5 h-3.5 rounded-full"
-                                  style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
-                                ></div>
-                                {reportType.reportType}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className="font-medium text-text-primary text-base font-roboto">
-                                {reportType.totalIn > 0 ? `${reportType.totalIn.toFixed(1)} Ltr` : '0.0 Ltr'}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  {(() => {
+                    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
+                    const hasInData = reportTypeCalculations.some((rt: any) => rt.totalIn > 0);
+                    
+                    if (!hasInData) {
+                      return (
+                        null
+                      );
+                    }
+
+                    return (
+                      <div className="overflow-x-auto border border-border-primary rounded-lg">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-border-primary">
+                              <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
+                              <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border-primary">
+                            {reportTypeCalculations
+                              .filter((rt: any) => rt.totalIn > 0)
+                              .map((reportType: any) => (
+                              <tr key={reportType.reportType} className="hover:bg-secondary/10">
+                                <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                                  <div className="flex items-center gap-2">
+                                    <div 
+                                      className="w-3.5 h-3.5 rounded-full"
+                                      style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
+                                    ></div>
+                                    {reportType.reportType}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <span className="font-medium text-text-primary text-base font-roboto">
+                                    {reportType.totalIn.toFixed(1)} Ltr
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -961,36 +976,51 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     />
                   </div>
 
-                  <div className="overflow-x-auto border border-border-primary rounded-lg">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border-primary">
-                          <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
-                          <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border-primary">
-                        {(calculations.reportTypeCalculations as any[]).map((reportType: any) => (
-                          <tr key={reportType.reportType} className="hover:bg-secondary/10">
-                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-3.5 h-3.5 rounded-full"
-                                  style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
-                                ></div>
-                                {reportType.reportType}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className="font-medium text-text-primary text-base font-roboto">
-                                {reportType.totalOut > 0 ? `${reportType.totalOut.toFixed(1)} Ltr` : '0.0 Ltr'}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  {(() => {
+                    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
+                    const hasOutData = reportTypeCalculations.some((rt: any) => rt.totalOut > 0);
+                    
+                    if (!hasOutData) {
+                      return (
+                        null
+                      );
+                    }
+
+                    return (
+                      <div className="overflow-x-auto border border-border-primary rounded-lg">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-border-primary">
+                              <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
+                              <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border-primary">
+                            {reportTypeCalculations
+                              .filter((rt: any) => rt.totalOut > 0)
+                              .map((reportType: any) => (
+                              <tr key={reportType.reportType} className="hover:bg-secondary/10">
+                                <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                                  <div className="flex items-center gap-2">
+                                    <div 
+                                      className="w-3.5 h-3.5 rounded-full"
+                                      style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
+                                    ></div>
+                                    {reportType.reportType}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <span className="font-medium text-text-primary text-base font-roboto">
+                                    {reportType.totalOut.toFixed(1)} Ltr
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
