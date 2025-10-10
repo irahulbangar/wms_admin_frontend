@@ -180,6 +180,48 @@ export const convertDevicesToDiagram = (
       dragHandle: ".group-drag-handle",
     });
 
+    const sourceNodeId = `source-${plant.plant_id}`;
+    const sourceX = plantX - 200;
+    const sourceY = plantY + plantHeight / 2 - 40;
+    
+    nodes.push({
+      id: sourceNodeId,
+      data: {
+        type: "source",
+        label: `${plant.plant_name} Source`,
+        flowRate: 0,
+        totalizerReading: 0,
+        unit: "Ltr",
+        isActive: true,
+      },
+      position: { x: sourceX, y: sourceY },
+      type: "source",
+      draggable: true,
+      selectable: true,
+      deletable: false,
+    });
+
+    const sinkNodeId = `sink-${plant.plant_id}`;
+    const sinkX = plantX + plantWidth + 50;
+    const sinkY = plantY + plantHeight / 2 - 40;
+    
+    nodes.push({
+      id: sinkNodeId,
+      data: {
+        type: "sink",
+        label: `${plant.plant_name} Sink`,
+        flowRate: 0,
+        totalizerReading: 0,
+        unit: "Ltr",
+        isActive: true,
+      },
+      position: { x: sinkX, y: sinkY },
+      type: "sink",
+      draggable: true,
+      selectable: true,
+      deletable: false,
+    });
+
     Object.values(plant.departments).forEach((department, deptIndex) => {
       const deptId = `dept-${department.department_id}`;
 
