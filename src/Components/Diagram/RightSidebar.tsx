@@ -240,7 +240,19 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       },
       tooltip: {
         trigger: "item",
-        formatter: "{b}: {c} Ltr ({d}%)",
+        formatter: (params: any) => {
+          const name = params.name;
+          const value = params.value;
+          const percentage = params.percent;
+          return `${name}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+        },
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        borderColor: "#ccc",
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
+          fontSize: 12,
+        },
       },
       series: [
         {
@@ -512,7 +524,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
     return {
       title: {
-        text: `${selectedGroup?.name} Storage Information`,
+        text: `${selectedGroup?.name}`,
         left: "center",
         top: "10px",
         textStyle: {
@@ -523,7 +535,19 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       },
       tooltip: {
         trigger: "item",
-        formatter: "{b}: {c} Ltr ({d}%)",
+        formatter: (params: any) => {
+          const name = params.name;
+          const value = params.value;
+          const percentage = params.percent;
+          return `${name}<br/>Value: ${value.toFixed(1)} Ltr<br/>Percentage: ${percentage}%`;
+        },
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        borderColor: "#ccc",
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
+          fontSize: 12,
+        },
       },
       series: [
         {
