@@ -34,6 +34,7 @@ import {
 } from "../../../store/organizationSlice";
 import UserPlants from "./UserPlants";
 import Pagination from "../Pagination";
+import { ApiError } from "../../utils/errorHandler";
 
 const OrganizationUsers = () => {
   const navigate = useNavigate();
@@ -107,21 +108,23 @@ const OrganizationUsers = () => {
       await dispatch(getClientsByOrganizationId(organizationId))
         .unwrap()
         .then((res) => {
-          if (res?.data) {
+          if (res.success || res.status === 200) {
             setOrganizationClients(res.data);
             setFilteredUsers(res.data);
+          } else {
+            Error(res.message || "Failed to get clients");
           }
         })
         .catch((err) => {
-          console.error("Error fetching organization clients:", err);
-          Error(err as string);
+          console.log(err);
+          Error(err.message || "Failed to get clients");
         })
         .finally(() => {
           setIsLoading(false);
         });
     } catch (err) {
-      console.error("Error fetching organization clients:", err);
-      Error(err as string);
+      console.log(err);
+      Error(err instanceof ApiError ? err.message : "Failed to get clients");
     } finally {
       setIsLoading(false);
     }
@@ -165,10 +168,14 @@ const OrganizationUsers = () => {
     await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
-        dispatch(setOrganizations(res.data));
+        if (res.success || res.status === 200) {
+          dispatch(setOrganizations(res.data));
+        } else {
+          Error(res.message || "Failed to get organizations");
+        }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to get organizations");
       })
       .finally(() => {
         setIsLoading(false);
@@ -181,14 +188,16 @@ const OrganizationUsers = () => {
     dispatch(getAllClients())
       .unwrap()
       .then((res: ClientUsersResponse) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setClients(res.data));
           setFilteredUsers(res.data);
+        } else {
+          Error(res.message || "Failed to get clients");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error(err);
+        Error(err.message || "Failed to get clients");
       })
       .finally(() => {
         setIsLoading(false);
@@ -245,15 +254,15 @@ const OrganizationUsers = () => {
 
   const handleUpdateSuccess = (updatedUser: any) => {
     if (organizationId !== 0) {
-      setOrganizationClients(prevClients => {
-        const updated = prevClients.map(client => 
+      setOrganizationClients((prevClients) => {
+        const updated = prevClients.map((client) =>
           client.client_id === updatedUser.client_id ? updatedUser : client
         );
         return updated;
       });
-      
-      setFilteredUsers(prevFiltered => {
-        const updated = prevFiltered.map(client => {
+
+      setFilteredUsers((prevFiltered) => {
+        const updated = prevFiltered.map((client) => {
           if (client.client_id === updatedUser.client_id) {
             return updatedUser;
           }
@@ -262,8 +271,8 @@ const OrganizationUsers = () => {
         return updated;
       });
     } else {
-      setFilteredUsers(prevFiltered => {
-        const updated = prevFiltered.map(client => 
+      setFilteredUsers((prevFiltered) => {
+        const updated = prevFiltered.map((client) =>
           client.client_id === updatedUser.client_id ? updatedUser : client
         );
         return updated;
@@ -446,7 +455,11 @@ const OrganizationUsers = () => {
       ) : (
         <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
           <div className="overflow-auto h-[calc(100vh-295px)] table-scrollbar">
-            <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedUsers?.length > 0 ? "h-auto" : "h-full"}`}>
+            <table
+              className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                handlePaginatedUsers?.length > 0 ? "h-auto" : "h-full"
+              }`}
+            >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
                   <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">

@@ -45,14 +45,14 @@ const Dashboard = () => {
     await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           setOrganizations(res?.data);
         } else {
           Error(res.message || "Failed to fetch organizations");
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to fetch organizations");
       })
       .finally(() => {
         setIsLoading(false);
@@ -65,14 +65,14 @@ const Dashboard = () => {
     await dispatch(getAllPlants())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           setPlants(res?.data);
         } else {
           Error(res.message || "Failed to fetch plants");
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to fetch plants");
       })
       .finally(() => {
         setIsLoading(false);
@@ -85,12 +85,14 @@ const Dashboard = () => {
     await dispatch(getAllClients())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           setUsers(res?.data);
+        } else {
+          Error(res.message || "Failed to fetch users");
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to fetch users");
       })
       .finally(() => {
         setIsLoading(false);
@@ -103,12 +105,14 @@ const Dashboard = () => {
     await dispatch(getAllDevices())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           setDevices(res?.data);
+        } else {
+          Error(res.message || "Failed to fetch devices");
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to fetch devices");
       })
       .finally(() => {
         setIsLoading(false);
@@ -121,12 +125,14 @@ const Dashboard = () => {
     await dispatch(getAllDepartments())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           setDepartments(res?.data);
+        } else {
+          Error(res.message || "Failed to fetch departments");
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to fetch departments");
       })
       .finally(() => {
         setIsLoading(false);
@@ -140,12 +146,12 @@ const Dashboard = () => {
   //   await dispatch(getAllSystems())
   //     .unwrap()
   //     .then((res) => {
-  //       if (res.success) {
+  //       if (res.success || res.status === 200) {
   //         setSystems(res?.data);
   //       }
   //     })
   //     .catch((err) => {
-  //       Error(err);
+  //       Error(err.message || "Failed to fetch systems");
   //     })
   //     .finally(() => {
   //       setIsLoading(false);

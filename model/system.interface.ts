@@ -2,6 +2,7 @@ export interface SystemResponse {
   success: boolean;
   message: string;
   data: SystemResult[];
+  status: number;
 }
 
 export interface SystemResult {

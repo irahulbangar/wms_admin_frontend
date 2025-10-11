@@ -13,6 +13,7 @@ import { User } from "lucide-react";
 import type { UserPlantResult } from "../../../model/user-plants.interface";
 import { Error, Success } from "../../utils/toast";
 import { handleStatus } from "../../utils/utils";
+import { ApiError } from "../../utils/errorHandler";
 
 interface UserPlantsProps {
   onClose: () => void;
@@ -74,17 +75,19 @@ const UserPlants: React.FC<UserPlantsProps> = ({
       await dispatch(getPlantsByOrganizationId(organizationId))
         .unwrap()
         .then((res) => {
-          if (res.success && res.data) {
+          if (res.success || res.status === 200) {
             setPlants(res.data);
+          } else {
+            Error(res.message || "Failed to fetch plants");
           }
         })
         .catch((error) => {
           console.error("Error fetching plants:", error);
-          Error(error as string);
+          Error(error.message || "Failed to fetch plants");
         });
     } catch (error) {
       console.error("Error fetching plants:", error);
-      Error(error as string);
+      Error(error instanceof ApiError ? error.message : "Failed to fetch plants");
     }
   }, [dispatch, organizationId]);
 
@@ -138,7 +141,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
         )
           .unwrap()
           .then((res) => {
-            if (res.success) {
+            if (res.success || res.status === 200) {
               Success(res.message);
               setFormData({
                 plant_id: 0,
@@ -147,10 +150,12 @@ const UserPlants: React.FC<UserPlantsProps> = ({
               });
               setEditingUserPlantId(null);
               handleClose();
+            } else {
+              Error(res.message || "Failed to update user plant");
             }
           })
           .catch((error) => {
-            Error(error as string);
+            Error(error.message || "Failed to update user plant");
           });
       } else {
         await dispatch(
@@ -158,7 +163,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
         )
           .unwrap()
           .then((res) => {
-            if (res.success) {
+            if (res.success || res.status === 200) {
               Success(res.message);
               setFormData({
                 plant_id: 0,
@@ -167,17 +172,19 @@ const UserPlants: React.FC<UserPlantsProps> = ({
               });
               setEditingUserPlantId(null);
               handleClose();
+            } else {
+              Error(res.message || "Failed to create user plant");
             }
           })
           .catch((error) => {
-            Error(error as string);
+            Error(error.message || "Failed to create user plant");
           });
       }
 
       await fetchUserPlants();
     } catch (error) {
       console.error("Operation error:", error);
-      Error(error as string);
+      Error(error instanceof ApiError ? error.message : "Failed to assign plants");
     } finally {
       setLoading(false);
     }

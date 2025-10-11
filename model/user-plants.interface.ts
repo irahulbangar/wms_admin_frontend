@@ -2,6 +2,7 @@ export interface UserPlantsResponse {
   success: boolean;
   message: string;
   data: UserPlantResult[];
+  status: number;
 }
 
 export interface UserPlantResult {

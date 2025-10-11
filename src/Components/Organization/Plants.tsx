@@ -31,6 +31,7 @@ import {
   getPlantsByOrganizationId,
   setPlants,
 } from "../../../store/plantSlice";
+import { ApiError } from "../../utils/errorHandler";
 
 const Plants = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
@@ -88,17 +89,20 @@ const Plants = () => {
       await dispatch(deletePlantById(deletePlant.plant_id.toString()))
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             Success("Plant deleted successfully");
             if (selectedOrganizationId === "all") {
               fetchPlants();
             } else {
               getPlantByOrganizationId(selectedOrganizationId);
             }
+          } else {
+            Error(res.message || "Failed to delete plant");
           }
         })
         .catch((err) => {
           Error(err.message || "Failed to delete plant");
+          console.log(err);
         })
         .finally(() => {
           setIsLoading(false);
@@ -127,14 +131,16 @@ const Plants = () => {
     await dispatch(getAllPlants())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setPlants(res.data));
         } else {
           Error(res.message || "Failed to fetch plants");
+          console.log(res);
         }
       })
       .catch((err) => {
-        Error(err);
+        console.log(err);
+        Error(err.message || "Failed to fetch plants");
       })
       .finally(() => {
         setIsLoading(false);
@@ -152,20 +158,22 @@ const Plants = () => {
         await dispatch(getPlantsByOrganizationId(targetOrgId))
           .unwrap()
           .then((res) => {
-            if (res.success) {
+            if (res.success || res.status === 200) {
               dispatch(setPlants(res.data));
+            } else {
+              Error(res.message || "Failed to fetch plants");
+              console.log(res);
             }
           })
           .catch((err) => {
-            Error(err);
+            Error(err.message || "Failed to fetch plants");
+            console.log(err);
           })
           .finally(() => {
             setIsLoading(false);
           });
       } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.toString() : String(err);
-        Error(errorMessage || "An error occurred");
+        Error(err instanceof ApiError ? err.message : "Failed to fetch plants");
       } finally {
         setIsLoading(false);
       }
@@ -179,12 +187,14 @@ const Plants = () => {
     await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setOrganizations(res.data));
+        } else {
+          Error(res.message || "Failed to get organizations");
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to get organizations");
       })
       .finally(() => {
         setIsLoading(false);
@@ -466,7 +476,7 @@ const Plants = () => {
                     Plant Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                    Organization
+                    Organization Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
                     Latitude

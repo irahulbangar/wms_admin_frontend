@@ -1,18 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { SystemResult } from "../model/system.interface";
+import type { SystemResponse, SystemResult } from "../model/system.interface";
 import { handleApiError } from "../src/utils/errorHandler";
+import type { SingleSystemResponse } from "../model/single-interface";
 
 interface SystemState {
   systems: SystemResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
 }
 
 const initialState: SystemState = {
   systems: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
 };
 
 export const systemSlice = createSlice({
@@ -36,10 +41,14 @@ export const systemSlice = createSlice({
     builder.addCase(getAllSystems.fulfilled, (state, action) => {
       state.loading = false;
       state.systems = action.payload.data;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     });
     builder.addCase(getAllSystems.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || "Failed to get systems";
+      state.status = 0;
+      state.success = false;
     });
   },
 });
@@ -50,7 +59,7 @@ export const getAllSystems = createAsyncThunk(
   async (_, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get("/system/admin/all-systems", {
+      const response = await api().get<SystemResponse>("/system/admin/all-systems", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -124,7 +133,7 @@ export const getSystemById = createAsyncThunk(
   async (id: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get(`/system/admin/${id}`, {
+      const response = await api().get<SingleSystemResponse>(`/system/admin/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -138,4 +147,5 @@ export const getSystemById = createAsyncThunk(
 );
 
 export const { setSystems, setLoading, setError } = systemSlice.actions;
+
 export default systemSlice.reducer;

@@ -119,8 +119,8 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     if (type === "add") {
       dispatch(addOrganization(organizationData))
         .unwrap()
-        .then((res: { success: boolean }) => {
-          if (res.success) {
+        .then((res) => {
+          if (res.success || res.status === 200) {
             Success("Organization added successfully");
             setShowAddModal(false);
             setFormData({
@@ -136,10 +136,12 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             if (refreshOrganizations) {
               refreshOrganizations();
             }
+          } else {
+            Error(res.message || "Failed to add organization");
           }
         })
-        .catch((err: string) => {
-          Error(err);
+        .catch((err) => {
+          Error(err.message || "Failed to add organization");
         })
         .finally(() => {
           if (!onUpdateSuccess) {
@@ -149,17 +151,19 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     } else {
       dispatch(updateOrganization({ id: organizationId, ...organizationData }))
         .unwrap()
-        .then((res: { success: boolean; data?: Record<string, unknown> }) => {
-          if (res.success) {
+        .then((res) => {
+          if (res.success || res.status === 200) {
             Success("Organization updated successfully");
             setShowAddModal(false);
             if (refreshOrganizations) {
               refreshOrganizations();
             }
+          } else {
+            Error(res.message || "Failed to update organization");
           }
         })
-        .catch((err: string) => {
-          Error(err);
+        .catch((err) => {
+          Error(err.message || "Failed to update organization");
         })
         .finally(() => {
           if (!onUpdateSuccess) {
@@ -174,18 +178,22 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       dispatch(getOrganizationById(organizationId))
         .unwrap()
         .then((res) => {
-          setFormData({
-            name: res.data.organization_name,
-            address: res.data.address,
-            contactPerson: res.data.contact_person,
-            contactNumber: res.data.contact_number,
-            email: res.data.email,
-            notes: res.data.note,
-            status: res.data.status || "active",
-          });
+          if (res.success || res.status === 200) {
+            setFormData({
+              name: res.data.organization_name,
+              address: res.data.address,
+              contactPerson: res.data.contact_person,
+              contactNumber: res.data.contact_number,
+              email: res.data.email,
+              notes: res.data.note,
+              status: res.data.status || "active",
+            });
+          } else {
+            Error(res.message || "Failed to get organization");
+          }
         })
         .catch((err) => {
-          Error(err as string);
+          Error(err.message || "Failed to get organization");
         });
     } else if (type === "add") {
       setFormData({

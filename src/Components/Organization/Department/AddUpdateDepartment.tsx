@@ -7,6 +7,7 @@ import {
   updateDepartment,
 } from "../../../../store/departmentSlice";
 import { Error, Success } from "../../../utils/toast";
+import { ApiError } from "../../../utils/errorHandler";
 
 interface UpdateDepartmentProps {
   setShowAddDepartmentPopup: (show: boolean) => void;
@@ -41,11 +42,16 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
     await dispatch(getDepartmentById(departmentId || 0))
       .unwrap()
       .then((res) => {
-        setDepartmentData(res.data);
-        setNewDepartmentName(res.data.department_name);
+        if (res.success || res.status === 200) {
+          setDepartmentData(res.data);
+          setNewDepartmentName(res.data.department_name);
+        } else {
+          Error(res.message || "Failed to get department data");
+        }
       })
       .catch((err) => {
         console.log(err);
+        Error(err.message || "Failed to get department data");
       })
       .finally(() => {
         setIsLoading(false);
@@ -91,14 +97,17 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
         )
           .unwrap()
           .then((res) => {
-            if (res.success) {
-              Success(res.message);
+            if (res.success || res.status === 200) {
+              Success(res.message || "Department created successfully");
               setShowAddDepartmentPopup(false);
               setNewDepartmentName("");
               onUpdateSuccess();
             } else {
-              Error(res.message);
+              Error(res.message || "Failed to create department");
             }
+          })
+          .catch((err) => {
+            Error(err.message || "Failed to create department");
           });
       } else {
         await dispatch(
@@ -112,23 +121,23 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
         )
           .unwrap()
           .then((res) => {
-            if (res.success) {
-              Success(res.message);
+            if (res.success || res.status === 200) {
+              Success(res.message || "Department updated successfully");
               setShowAddDepartmentPopup(false);
               setNewDepartmentName("");
               onUpdateSuccess();
             } else {
-              Error(res.message);
+              Error(res.message || "Failed to update department");
             }
           })
           .catch((err) => {
             console.log(err);
-            Error("Failed to update department");
+            Error(err.message || "Failed to update department");
           });
       }
     } catch (error) {
       console.error("Error creating department:", error);
-      Error("Failed to create department");
+      Error(error instanceof ApiError ? error.message : "Failed to create department");
     } finally {
       setIsLoading(false);
     }

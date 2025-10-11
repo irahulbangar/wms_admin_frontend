@@ -7,12 +7,16 @@ interface DepartmentState {
   departments: DepartmentResult[];
   loading: boolean;
   error: string | null;
+  success: boolean;
+  status: number;
 }
 
 const initialState: DepartmentState = {
   departments: [],
   loading: false,
   error: null,
+  success: false,
+  status: 0,
 };
 
 export const departmentSlice = createSlice({
@@ -145,28 +149,6 @@ export const getDepartmentById = createAsyncThunk(
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = handleApiError(error);
-      return rejectWithValue(apiError);
-    }
-  }
-);
-
-// GET department by plant id
-export const getDepartmentByPlantId = createAsyncThunk(
-  "department/getDepartmentByPlantId",
-  async (plant_id: number, thunkAPI) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().get(
-        `/department/admin/department-plant/${plant_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
       return response.data;
     } catch (error: unknown) {
       const apiError = handleApiError(error);

@@ -20,7 +20,7 @@ import {
 } from "../../../../store/organizationSlice";
 import { getAllPlants, setPlants } from "../../../../store/plantSlice";
 import type { DepartmentResult } from "../../../../model/department.interface";
-import { Warning } from "../../../utils/toast";
+import { Error, Warning } from "../../../utils/toast";
 import { getAllDepartments, getDepartmentByOrganizationIdAndPlantId, setDepartments } from "../../../../store/departmentSlice";
 import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
@@ -273,14 +273,16 @@ const Departments = () => {
     dispatch(getAllDepartments())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setDepartments(res?.data));
           setFilteredDepartments(res?.data);
+        } else {
+          Error(res.message || "Failed to get departments");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get departments");
+        Error(err.message || "Failed to get departments");
       })
       .finally(() => {
         setIsLoading(false);
@@ -298,14 +300,16 @@ const Departments = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             dispatch(setDepartments(res?.data));
             setFilteredDepartments(res?.data);
+          } else {
+            Error(res.message || "Failed to get departments");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to get departments");
+          Error(err.message || "Failed to get departments");
         })
         .finally(() => {
           setIsLoading(false);
@@ -325,14 +329,16 @@ const Departments = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             dispatch(setDepartments(res?.data));
             setFilteredDepartments(res?.data);
+          } else {
+            Error(res.message || "Failed to get departments");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to get departments");
+          Error(err.message || "Failed to get departments");
         })
         .finally(() => {
           setIsLoading(false);
@@ -371,14 +377,16 @@ const Departments = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             dispatch(setDepartments(res?.data));
             setFilteredDepartments(res?.data);
+          } else {
+            Error(res.message || "Failed to refresh departments");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to refresh departments");
+          Error(err.message || "Failed to refresh departments");
         })
         .finally(() => {
           setIsLoading(false);
@@ -392,14 +400,16 @@ const Departments = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             dispatch(setDepartments(res?.data));
             setFilteredDepartments(res?.data);
+          } else {
+            Error(res.message || "Failed to refresh departments");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to refresh departments");
+          Error(err.message || "Failed to refresh departments");
         })
         .finally(() => {
           setIsLoading(false);
@@ -473,7 +483,7 @@ const Departments = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between lg:flex-row w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
+      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between lg:flex-nowrap w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
@@ -637,14 +647,14 @@ const Departments = () => {
           </div>
         </div>
         <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
-          <div className="flex-shrink-0 relative md:w-60 lg:w-92 w-full">
+          <div className="flex-shrink-0 relative md:w-60 lg:w-80 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
               placeholder="Search departments..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+              className="md:w-60 lg:w-80 w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
             />
             {searchTerm && (
               <button

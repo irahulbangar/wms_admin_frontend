@@ -2,6 +2,7 @@ export interface DeviceFamilyResponse {
   success: boolean;
   message: string;
   data: DeviceFamilyResult[];
+  status: number;
 }
 
 export interface DeviceFamilyResult {

@@ -2,6 +2,7 @@ export interface AdminUsersResponse {
   success: boolean;
   message: string;
   data: AdminUsers[];
+  status: number;
 }
 
 export interface AdminUsers {

@@ -10,12 +10,16 @@ interface DeviceFamilyState {
   deviceFamilies: DeviceFamilyResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
 }
 
 const initialState: DeviceFamilyState = {
   deviceFamilies: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
 };
 
 export const deviceFamilySlice = createSlice({
@@ -24,6 +28,8 @@ export const deviceFamilySlice = createSlice({
   reducers: {
     setDeviceFamilies: (state, action) => {
       state.deviceFamilies = action.payload;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;

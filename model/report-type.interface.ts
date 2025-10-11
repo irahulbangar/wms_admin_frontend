@@ -2,6 +2,7 @@ export interface ReportTypeResponse {
     success: boolean;
     message: string;
     data: ReportTypeResult[];
+    status: number;
 }
 
 export interface ReportTypeResult {

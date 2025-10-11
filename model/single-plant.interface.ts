@@ -2,6 +2,7 @@ export interface SinglePlantResponse {
   success: boolean;
   message: string;
   data: SinglePlantResult;
+  status: number;
 }
 
 export interface SinglePlantResult {

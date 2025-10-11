@@ -2,6 +2,7 @@ export interface ClientUsersResponse {
   success: boolean;
   message: string;
   data: ClientUsersResult[];
+  status: number;
 }
 
 export interface ClientUsersResult {

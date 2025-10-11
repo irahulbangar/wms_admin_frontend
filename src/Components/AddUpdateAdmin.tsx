@@ -41,7 +41,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
       dispatch(getAdminById(adminId))
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             const adminData = res.data;
             setFormData({
               name: adminData.name || "",
@@ -54,12 +54,11 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
               status: adminData.status || "active",
             });
           } else {
-            console.error("Invalid response structure:", res.message);
-            Error("Invalid admin data received");
+            Error(res.message || "Invalid admin data received");
           }
         })
         .catch((error) => {
-          console.error("Error fetching admin:", error.message);
+          console.log(error);
           Error("Failed to load admin data");
         });
     } else {

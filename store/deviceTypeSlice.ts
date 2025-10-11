@@ -10,12 +10,16 @@ interface DeviceTypeState {
   deviceTypes: DeviceTypeResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
 }
 
 const initialState: DeviceTypeState = {
   deviceTypes: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
 };
 
 export const deviceTypeSlice = createSlice({
@@ -24,6 +28,8 @@ export const deviceTypeSlice = createSlice({
   reducers: {
     setDeviceTypes: (state, action) => {
       state.deviceTypes = action.payload;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;

@@ -10,12 +10,18 @@ interface OrganizationState {
   organizations: OrganizationResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
+  message: string;
 }
 
 const initialState: OrganizationState = {
   organizations: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
+  message: "",
 };
 
 export const organizationSlice = createSlice({
@@ -24,6 +30,9 @@ export const organizationSlice = createSlice({
   reducers: {
     setOrganizations: (state, action) => {
       state.organizations = action.payload;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
+      state.message = action.payload.message;
     },
   },
   extraReducers: (builder) => {
@@ -33,10 +42,16 @@ export const organizationSlice = createSlice({
     builder.addCase(getOrganizations.fulfilled, (state, action) => {
       state.loading = false;
       state.organizations = action.payload.data;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
+      state.message = action.payload.message;
     });
     builder.addCase(getOrganizations.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || "Failed to fetch organizations";
+      state.status = 0;
+      state.success = false;
+      state.message = action.error.message || "Failed to fetch organizations";
     });
   },
 });

@@ -10,12 +10,18 @@ interface UserPlantState {
   userPlants: UserPlantResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
+  message: string;
 }
 
 const initialState: UserPlantState = {
   userPlants: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
+  message: "",
 };
 
 export const userPlantSlice = createSlice({
@@ -24,6 +30,9 @@ export const userPlantSlice = createSlice({
   reducers: {
     setUserPlants: (state, action) => {
       state.userPlants = action.payload;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
+      state.message = action.payload.message;
     },
   },
 });
@@ -90,7 +99,7 @@ export const getUserPlantByUserId = createAsyncThunk(
   async (user_id: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get(`/user-plant/admin/${user_id}`, {
+      const response = await api().get<UserPlantsResponse>(`/user-plant/admin/${user_id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

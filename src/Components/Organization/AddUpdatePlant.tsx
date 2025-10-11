@@ -60,7 +60,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
     await dispatch(getPlantById(plantId))
       .unwrap()
       .then((res) => {
-        if (res.success && res.data) {
+        if (res.success || res.status === 200) {
           const plant = res.data as unknown as PlantResult;
           const newFormData = {
             plant_name: plant.plant_name || "",
@@ -71,11 +71,11 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
           };
           setFormData(newFormData);
         } else {
-          Error(res.message);
+          Error(res.message || "Failed to load plant data");
         }
       })
       .catch((error) => {
-        Error(`Failed to load plant data: ${error}`);
+        Error(error.message || "Failed to load plant data");
       });
   };
 
@@ -142,7 +142,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
       await dispatch(addPlant(plantPayload))
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             Success(res.message);
             setShowModal(false);
             if (refreshPlants) {
@@ -155,11 +155,11 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
               });
             }
           } else {
-            Error(res.message);
+            Error(res.message || "Failed to add plant");
           }
         })
         .catch((error) => {
-          Error(`Failed to add plant: ${error}`);
+          Error(error.message || "Failed to add plant");
         });
     } else {
       if (!plantId) {
@@ -176,7 +176,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
       await dispatch(updatePlantById(plantPayload))
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             Success(res.message);
             setShowModal(false);
             if (refreshPlants) {
@@ -189,11 +189,11 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
               });
             }
           } else {
-            Error(res.message);
+            Error(res.message || "Failed to update plant");
           }
         })
         .catch((error) => {
-          Error(`Failed to update plant: ${error}`);
+          Error(error.message || "Failed to update plant");
         });
     }
   };

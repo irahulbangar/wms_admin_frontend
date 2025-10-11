@@ -2,6 +2,7 @@ export interface DepartmentResponse {
   success: boolean;
   message: string;
   data: DepartmentResult[];
+  status: number;
 }
 
 export interface DepartmentResult {

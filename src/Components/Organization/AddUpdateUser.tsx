@@ -10,6 +10,7 @@ import {
 import { useAppDispatch } from "../../../store/store";
 import { Error, Success } from "../../utils/toast";
 import type { OrganizationResult } from "../../../model/organizations.interface";
+import { ApiError } from "../../utils/errorHandler";
 
 interface AddUpdateUserProps {
   setShowAddModal: (show: boolean) => void;
@@ -119,10 +120,12 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
         dispatch(createClient(clientData))
           .unwrap()
           .then((res) => {
-            if (res.success) {
+            if (res.success || res.status === 200) {
               setShowAddModal(false);
               Success(res.message);
               onClose();
+            } else {
+              Error(res.message || "Something went wrong");
             }
             setFormData({
               client_name: "",
@@ -153,7 +156,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
         dispatch(updateClient(clientData))
           .unwrap()
           .then((res) => {
-            if (res.success) {
+            if (res.success || res.status === 200) {
               setShowAddModal(false);
               Success(res.message);
               if (onUpdateSuccess) {
@@ -180,6 +183,8 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 onUpdateSuccess(updatedUser);
               }
               onClose();
+            } else {
+              Error(res.message || "Something went wrong");
             }
           })
           .catch((err) => {
@@ -190,7 +195,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           });
       }
     } catch (error: unknown) {
-      Error((error as string) || "Something went wrong");
+      Error(error instanceof ApiError ? error.message : "Something went wrong");
       setIsLoading(false);
       setIsFetching(false);
     }
@@ -206,7 +211,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
       dispatch(getClientById(clientId))
         .unwrap()
         .then((res) => {
-          if (res.success && res.data) {
+          if (res.success || res.status === 200) {
             const clientData = Array.isArray(res.data) ? res.data[0] : res.data;
             if (clientData) {
               setFormData({
@@ -218,9 +223,12 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                 organization_id: clientData.organization_id || organizationId,
               } as CreateClientPayload);
             }
+          } else {
+            Error(res.message || "Something went wrong");
           }
         })
         .catch((err) => {
+          console.log(err);
           Error(err.message || "Something went wrong");
         })
         .finally(() => {

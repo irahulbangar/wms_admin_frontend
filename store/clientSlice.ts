@@ -10,12 +10,16 @@ interface ClientState {
   clients: ClientUsersResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
 }
 
 const initialState: ClientState = {
   clients: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
 };
 
 export const clientSlice = createSlice({
@@ -24,6 +28,8 @@ export const clientSlice = createSlice({
   reducers: {
     setClients: (state, action) => {
       state.clients = action.payload;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -39,10 +45,14 @@ export const clientSlice = createSlice({
     builder.addCase(getAllClients.fulfilled, (state, action) => {
       state.loading = false;
       state.clients = action.payload.data;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     });
     builder.addCase(getAllClients.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || "Failed to fetch clients";
+      state.status = 0;
+      state.success = false;
     });
   },
 });
@@ -179,7 +189,7 @@ export const getClientsByOrganizationId = createAsyncThunk(
   "client/getClientsByOrganizationId",
   async (organizationId: number, thunkAPI) => {
     try {
-      const response = await api().get(
+      const response = await api().get<ClientUsersResponse>(
         `/clients/admin/organization/${organizationId}`,
         {
           headers: {

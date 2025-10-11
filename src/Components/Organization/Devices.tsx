@@ -31,7 +31,10 @@ import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Success, Warning } from "../../utils/toast";
 import NoDataFound from "../NoDataFound";
 import type { DeviceTypeResult } from "../../../model/device-type.interface";
-import { getAllDepartments, setDepartments } from "../../../store/departmentSlice";
+import {
+  getAllDepartments,
+  setDepartments,
+} from "../../../store/departmentSlice";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 import DeletePopup from "./DeletePopup";
@@ -76,7 +79,8 @@ const Devices = () => {
   const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
     useState(false);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
-  const [isDepartmentDropdownOpen, setIsDepartmentDropdownOpen] = useState(false);
+  const [isDepartmentDropdownOpen, setIsDepartmentDropdownOpen] =
+    useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [plantSearchTerm, setPlantSearchTerm] = useState("");
   const [departmentSearchTerm, setDepartmentSearchTerm] = useState("");
@@ -128,13 +132,13 @@ const Devices = () => {
     await dispatch(getAllSystems())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setSystems(res.data));
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get systems");
+        Error(err.message || "Failed to get systems");
       })
       .finally(() => {
         setIsLoading(false);
@@ -146,13 +150,15 @@ const Devices = () => {
     await dispatch(getAllDepartments())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setDepartments(res.data));
+        } else {
+          Error(res.message || "Failed to get departments");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get departments");
+        Error(err.message || "Failed to get departments");
       })
       .finally(() => {
         setIsLoading(false);
@@ -165,13 +171,15 @@ const Devices = () => {
     await dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setOrganizations(res.data));
+        } else {
+          Error(res.message || "Failed to get organizations");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get organizations");
+        Error(err.message || "Failed to get organizations");
       })
       .finally(() => {
         setIsLoading(false);
@@ -184,13 +192,15 @@ const Devices = () => {
     await dispatch(getAllPlants())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setPlants(res.data));
+        } else {
+          Error(res.message || "Failed to get plants");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get plants");
+        Error(err.message || "Failed to get plants");
       })
       .finally(() => {
         setIsLoading(false);
@@ -202,13 +212,15 @@ const Devices = () => {
     await dispatch(getDeviceFamiliy())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           setDeviceFamily(res.data);
+        } else {
+          Error(res.message || "Failed to get device families");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get device families");
+        Error(err.message || "Failed to get device families");
       })
       .finally(() => {
         setIsLoading(false);
@@ -219,13 +231,15 @@ const Devices = () => {
     await dispatch(getDeviceTypes())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           setDeviceType(res.data);
+        } else {
+          Error(res.message || "Failed to get device types");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get device types");
+        Error(err.message || "Failed to get device types");
       })
       .finally(() => {
         setIsLoading(false);
@@ -233,7 +247,11 @@ const Devices = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (organizations.length === 0 || plants.length === 0 || departments.length === 0) {
+    if (
+      organizations.length === 0 ||
+      plants.length === 0 ||
+      departments.length === 0
+    ) {
       getOrganization();
       fetchPlants();
       getDepartment();
@@ -257,14 +275,16 @@ const Devices = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             dispatch(setDevices(res?.data));
             setFilteredDevices(res?.data);
+          } else {
+            Error(res.message || "Failed to get devices");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to get devices");
+          Error(err.message || "Failed to get devices");
         })
         .finally(() => {
           setIsLoading(false);
@@ -294,14 +314,16 @@ const Devices = () => {
     dispatch(getAllDevices())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setDevices(res?.data));
           setFilteredDevices(res?.data);
+        } else {
+          Error(res.message || "Failed to get devices");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error("Failed to get devices");
+        Error(err.message || "Failed to get devices");
       })
       .finally(() => {
         setIsLoading(false);
@@ -313,9 +335,17 @@ const Devices = () => {
       return;
     }
 
-    if (selectedOrganization === "all" && selectedPlant === "all" && selectedDepartment === "all") {
+    if (
+      selectedOrganization === "all" &&
+      selectedPlant === "all" &&
+      selectedDepartment === "all"
+    ) {
       refreshDevices();
-    } else if (selectedOrganization !== "all" && selectedPlant !== "all" && selectedDepartment !== "all") {
+    } else if (
+      selectedOrganization !== "all" &&
+      selectedPlant !== "all" &&
+      selectedDepartment !== "all"
+    ) {
       setIsLoading(true);
       dispatch(
         getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
@@ -326,14 +356,16 @@ const Devices = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             dispatch(setDevices(res?.data));
             setFilteredDevices(res?.data);
+          } else {
+            Error(res.message || "Failed to get devices");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error("Failed to get devices");
+          Error(err.message || "Failed to get devices");
         })
         .finally(() => {
           setIsLoading(false);
@@ -388,7 +420,8 @@ const Devices = () => {
 
     if (selectedDepartment !== "all") {
       filtered = filtered.filter(
-        (device: DeviceResult) => device.department_id === parseInt(selectedDepartment)
+        (device: DeviceResult) =>
+          device.department_id === parseInt(selectedDepartment)
       );
     }
 
@@ -427,14 +460,13 @@ const Devices = () => {
     const matchesSearch = department.department_name
       .toLowerCase()
       .includes(departmentSearchTerm.toLowerCase());
-      
-      if (selectedPlant === "all") {
-        return matchesSearch;
-      }
 
-      const matchesOrganization =
-        department.plant_id === parseInt(selectedPlant);
-      return matchesSearch && matchesOrganization;
+    if (selectedPlant === "all") {
+      return matchesSearch;
+    }
+
+    const matchesOrganization = department.plant_id === parseInt(selectedPlant);
+    return matchesSearch && matchesOrganization;
   });
 
   useEffect(() => {
@@ -471,31 +503,29 @@ const Devices = () => {
   }, [selectedOrganization, selectedPlant, plants]);
 
   const handleAddDevice = () => {
-    if (selectedOrganization === "all" && selectedPlant === "all" && selectedDepartment === "all") {
+    if (
+      selectedOrganization === "all" &&
+      selectedPlant === "all" &&
+      selectedDepartment === "all"
+    ) {
       Warning(
         "Please select both organization, plant and department before adding a device"
       );
       return;
     }
-    
+
     if (selectedOrganization === "all") {
-      Warning(
-        "Please select both organization before adding a device"
-      );
+      Warning("Please select both organization before adding a device");
       return;
     }
 
     if (selectedPlant === "all") {
-      Warning(
-        "Please select a plant before adding a device"
-      );
+      Warning("Please select a plant before adding a device");
       return;
     }
 
     if (selectedDepartment === "all") {
-      Warning(
-        "Please select a department before adding a device"
-      );
+      Warning("Please select a department before adding a device");
       return;
     }
 
@@ -583,19 +613,25 @@ const Devices = () => {
         )
           .unwrap()
           .then((res) => {
-            if (res.success) {
+            if (res.success || res.status === 200) {
               dispatch(setDevices(res?.data));
               setFilteredDevices(res?.data);
+            } else {
+              Error(res.message || "Failed to update device");
             }
           })
           .catch((err) => {
             console.log(err);
-            Error("Failed to update device");
+            Error(err.message || "Failed to update device");
           })
           .finally(() => {
             setIsLoading(false);
           });
-      } else if (selectedOrganization !== "all" && selectedPlant !== "all" && selectedDepartment !== "all") {
+      } else if (
+        selectedOrganization !== "all" &&
+        selectedPlant !== "all" &&
+        selectedDepartment !== "all"
+      ) {
         dispatch(
           getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
             plantId: parseInt(selectedPlant),
@@ -605,14 +641,16 @@ const Devices = () => {
         )
           .unwrap()
           .then((res) => {
-            if (res.success) {
+            if (res.success || res.status === 200) {
               dispatch(setDevices(res?.data));
               setFilteredDevices(res?.data);
+            } else {
+              Error(res.message || "Failed to update device");
             }
           })
           .catch((err) => {
             console.log(err);
-            Error("Failed to update device");
+            Error(err.message || "Failed to update device");
           })
           .finally(() => {
             setIsLoading(false);
@@ -736,7 +774,7 @@ const Devices = () => {
     await dispatch(deleteDevice(deviceToDelete.device_id.toString()))
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           Success(res.message);
           refreshDevices();
           setShowDeletePopup(false);
@@ -747,7 +785,7 @@ const Devices = () => {
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to delete device");
       })
       .finally(() => {
         setIsLoading(false);
@@ -794,8 +832,10 @@ const Devices = () => {
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
-              {departments.find((department) => department.department_id.toString() === selectedDepartment)
-                ?.department_name || "Department"}
+              {departments.find(
+                (department) =>
+                  department.department_id.toString() === selectedDepartment
+              )?.department_name || "Department"}
             </span>
           </>
         )}
@@ -975,12 +1015,16 @@ const Devices = () => {
                   selectedDepartment === "all"
                     ? "All Department"
                     : departments.find(
-                        (department) => department.department_id.toString() === selectedDepartment
+                        (department) =>
+                          department.department_id.toString() ===
+                          selectedDepartment
                       )?.department_name || "Select department..."
                 }
                 readOnly
                 className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
-                onClick={() => setIsDepartmentDropdownOpen(!isDepartmentDropdownOpen)}
+                onClick={() =>
+                  setIsDepartmentDropdownOpen(!isDepartmentDropdownOpen)
+                }
               />
               <ChevronDown
                 className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
@@ -1022,7 +1066,9 @@ const Devices = () => {
                       key={department.department_id}
                       className="px-3 py-1.5 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
                       onClick={() => {
-                        setSelectedDepartment(department.department_id.toString());
+                        setSelectedDepartment(
+                          department.department_id.toString()
+                        );
                         setIsDepartmentDropdownOpen(false);
                         setDepartmentSearchTerm(department.department_name);
                       }}
@@ -1084,13 +1130,11 @@ const Devices = () => {
               const system = systems?.find(
                 (system: any) => system.system_id.toString() === systemId
               );
-              
+
               const systemName =
                 system?.system_name?.trim() ||
-                `${
-                  systemId === "0" ? "Extra System" : `System ${systemId}`
-                }`;
-                
+                `${systemId === "0" ? "Extra System" : `System ${systemId}`}`;
+
               return (
                 <div
                   className={`${
@@ -1164,11 +1208,17 @@ const Devices = () => {
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Sr No
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap -center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Device Name
                             </th>
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                              Organization Name
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Plant Name
+                            </th>
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                              Department Name
                             </th>
                             <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
                               Device Family
@@ -1196,7 +1246,14 @@ const Devices = () => {
                         <tbody>
                           {systemDevices?.map((device, index) => (
                             <tr
-                              onDoubleClick={() => handleEditDevice(device?.device_id, device?.plant_id, device?.department_id, device?.organization_id)}
+                              onDoubleClick={() =>
+                                handleEditDevice(
+                                  device?.device_id,
+                                  device?.plant_id,
+                                  device?.department_id,
+                                  device?.organization_id
+                                )
+                              }
                               key={index}
                               className="border-b border-border-primary bg-primary hover:bg-primary/50"
                             >
@@ -1208,11 +1265,29 @@ const Devices = () => {
                               </td>
                               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 {
+                                  organizations?.find(
+                                    (org) =>
+                                      org?.organization_id?.toString() ===
+                                      device?.organization_id?.toString()
+                                  )?.organization_name
+                                }
+                              </td>
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                                {
                                   plants?.find(
                                     (plant) =>
                                       plant?.plant_id?.toString() ===
                                       device?.plant_id?.toString()
                                   )?.plant_name
+                                }
+                              </td>
+                              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                                {
+                                  departments?.find(
+                                    (department) =>
+                                      department?.department_id?.toString() ===
+                                      device?.department_id?.toString()
+                                  )?.department_name
                                 }
                               </td>
                               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize truncate">

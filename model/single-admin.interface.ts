@@ -2,6 +2,7 @@ export interface SingleAdminResponse {
   success: boolean;
   message: string;
   data: SingleAdminResult;
+  status: number;
 }
 
 export interface SingleAdminResult {

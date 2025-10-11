@@ -7,12 +7,16 @@ interface DeviceState {
   devices: DeviceResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
 }
 
 const initialState: DeviceState = {
   devices: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
 };
 
 export const deviceSlice = createSlice({
@@ -21,6 +25,8 @@ export const deviceSlice = createSlice({
   reducers: {
     setDevices: (state, action) => {
       state.devices = action.payload;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -36,10 +42,14 @@ export const deviceSlice = createSlice({
     builder.addCase(getAllDevices.fulfilled, (state, action) => {
       state.loading = false;
       state.devices = action.payload.data;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     });
     builder.addCase(getAllDevices.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || "Failed to fetch devices";
+      state.status = 0;
+      state.success = false;
     });
   },
 });
@@ -183,29 +193,30 @@ interface GetPlantByOrganizationId {
 }
 
 // Get device by organizationId and plantId
-export const getDeviceByOrganizationIdAndPlantIdAndDepartmentId = createAsyncThunk(
-  "device/getDeviceByOrganizationIdAndPlantIdAndDepartmentId",
-  async (
-    { organizationId, plantId, departmentId }: GetPlantByOrganizationId,
-    thunkAPI
-  ) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().get<DeviceResponse>(
-        `/device/admin/organization-plant-department/${organizationId}/${plantId}/${departmentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = handleApiError(error);
-      return rejectWithValue(apiError);
+export const getDeviceByOrganizationIdAndPlantIdAndDepartmentId =
+  createAsyncThunk(
+    "device/getDeviceByOrganizationIdAndPlantIdAndDepartmentId",
+    async (
+      { organizationId, plantId, departmentId }: GetPlantByOrganizationId,
+      thunkAPI
+    ) => {
+      const { rejectWithValue } = thunkAPI;
+      try {
+        const response = await api().get<DeviceResponse>(
+          `/device/admin/organization-plant-department/${organizationId}/${plantId}/${departmentId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        return response.data;
+      } catch (error: unknown) {
+        const apiError = handleApiError(error);
+        return rejectWithValue(apiError);
+      }
     }
-  }
-);
+  );
 
 // delete device
 export const deleteDevice = createAsyncThunk(
@@ -213,7 +224,7 @@ export const deleteDevice = createAsyncThunk(
   async (id: string, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().delete(`/device/admin/delete-device/${id}`, {
+      const response = await api().delete<DeviceResponse>(`/device/admin/delete-device/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

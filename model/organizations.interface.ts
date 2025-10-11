@@ -2,6 +2,7 @@ export interface GetOrganizationsResponse {
   success: boolean;
   message: string;
   data: OrganizationResult[];
+  status: number;
 }
 
 export interface OrganizationResult {

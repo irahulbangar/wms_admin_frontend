@@ -7,12 +7,18 @@ interface ReportTypeState {
   reportTypes: ReportTypeResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
+  message: string;
 }
 
 const initialState: ReportTypeState = {
   reportTypes: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
+  message: "",
 };
 
 export const reportTypeSlice = createSlice({
@@ -21,6 +27,9 @@ export const reportTypeSlice = createSlice({
   reducers: {
     setReportTypes: (state, action) => {
       state.reportTypes = action.payload;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
+      state.message = action.payload.message;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -36,10 +45,16 @@ export const reportTypeSlice = createSlice({
     builder.addCase(getAllReportTypes.fulfilled, (state, action) => {
       state.loading = false;
       state.reportTypes = action.payload.data;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
+      state.message = action.payload.message;
     });
     builder.addCase(getAllReportTypes.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || "Failed to fetch report types";
+      state.status = 0;
+      state.success = false;
+      state.message = action.error.message || "Failed to fetch report types";
     });
   },
 });

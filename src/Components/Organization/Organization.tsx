@@ -78,12 +78,14 @@ const Organization = () => {
     dispatch(getOrganizations())
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           dispatch(setOrganizations(res.data));
+        } else {
+          Error(res.message || "Failed to get organizations");
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to get organizations");
       })
       .finally(() => {
         setIsLoading(false);
@@ -96,7 +98,7 @@ const Organization = () => {
       return;
     }
 
-    const filtered = organizations.filter((organization) => {
+    const filtered = organizations.filter((organization: OrganizationResult) => {
       const searchLower = searchTerm.toLowerCase();
 
       return (
@@ -136,7 +138,7 @@ const Organization = () => {
     )
       .unwrap()
       .then((res) => {
-        if (res.success) {
+        if (res.success || res.status === 200) {
           Success(res.message);
           refreshOrganizations();
           setShowDeletePopup(false);
@@ -146,7 +148,7 @@ const Organization = () => {
         }
       })
       .catch((err) => {
-        Error(err);
+        Error(err.message || "Failed to delete organization");
       })
       .finally(() => {
         setIsLoading(false);
@@ -174,7 +176,7 @@ const Organization = () => {
   }) => {
     if (updatedData && updatedData.success && updatedData.data) {
       const data = updatedData.data;
-      organizations.map((org) =>
+      organizations.map((org: OrganizationResult) =>
         org.organization_id === parseInt(organizationId)
           ? {
               ...org,

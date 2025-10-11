@@ -2,6 +2,7 @@ export interface DeviceResponse {
   success: boolean;
   message: string;
   data: DeviceResult[];
+  status: number;
 }
 
 export interface DeviceResult {

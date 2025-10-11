@@ -10,18 +10,23 @@ interface PlantResponse {
   success: boolean;
   message: string;
   data?: Record<string, unknown>;
+  status: number;
 }
 
 interface PlantState {
   plants: PlantResult[];
   loading: boolean;
   error: string | null;
+  status: number;
+  success: boolean;
 }
 
 const initialState: PlantState = {
   plants: [],
   loading: false,
   error: null,
+  status: 0,
+  success: false,
 };
 
 export const plantSlice = createSlice({
@@ -39,10 +44,14 @@ export const plantSlice = createSlice({
     builder.addCase(getAllPlants.fulfilled, (state, action) => {
       state.loading = false;
       state.plants = action.payload.data;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
     });
     builder.addCase(getAllPlants.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || "Failed to fetch plants";
+      state.status = 0;
+      state.success = false;
     });
   },
 });
