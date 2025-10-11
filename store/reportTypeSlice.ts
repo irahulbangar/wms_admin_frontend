@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { ReportTypeResponse, ReportTypeResult } from "../model/report-type.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface ReportTypeState {
   reportTypes: ReportTypeResult[];
@@ -59,9 +60,8 @@ export const getAllReportTypes = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch report types";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );

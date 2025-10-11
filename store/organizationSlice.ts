@@ -4,6 +4,7 @@ import type {
   GetOrganizationsResponse,
   OrganizationResult,
 } from "../model/organizations.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface OrganizationState {
   organizations: OrganizationResult[];
@@ -54,11 +55,8 @@ export const getOrganizations = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to fetch organizations";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -91,9 +89,8 @@ export const addOrganization = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to add organization";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -114,11 +111,8 @@ export const updateOrganization = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to update organization";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -134,9 +128,8 @@ export const getOrganizationById = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to get organization";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -155,11 +148,8 @@ export const deleteOrganization = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to delete organization";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );

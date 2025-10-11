@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { SystemResult } from "../model/system.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface SystemState {
   systems: SystemResult[];
@@ -56,7 +57,8 @@ export const getAllSystems = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -83,7 +85,8 @@ export const createSystem = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -109,7 +112,8 @@ export const updateSystem = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -127,7 +131,8 @@ export const getSystemById = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );

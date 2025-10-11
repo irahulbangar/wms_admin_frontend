@@ -4,6 +4,7 @@ import type {
   ClientUsersResponse,
   ClientUsersResult,
 } from "../model/client-users.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface ClientState {
   clients: ClientUsersResult[];
@@ -75,9 +76,8 @@ export const createClient = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to create client";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -97,9 +97,8 @@ export const getAllClients = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch clients";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -126,9 +125,8 @@ export const getClientById = createAsyncThunk(
 
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch client";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -149,9 +147,8 @@ export const updateClient = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to update client";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -171,9 +168,8 @@ export const deleteClient = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to delete client";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -193,9 +189,8 @@ export const getClientsByOrganizationId = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch clients";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );

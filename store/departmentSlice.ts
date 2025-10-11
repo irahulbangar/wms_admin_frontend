@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { DepartmentResponse, DepartmentResult } from "../model/department.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface DepartmentState {
   departments: DepartmentResult[];
@@ -79,7 +80,8 @@ export const createDepartment = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -100,7 +102,8 @@ export const getAllDepartments = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -125,7 +128,8 @@ export const updateDepartment = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -143,7 +147,8 @@ export const getDepartmentById = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -164,7 +169,8 @@ export const getDepartmentByPlantId = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -185,7 +191,8 @@ export const getDepartmentByOrganizationIdAndPlantId = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      return rejectWithValue(error);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );

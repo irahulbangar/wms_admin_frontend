@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { loginAdmin } from "../../store/adminSlice";
 import Loader from "./Loader";
 import BackgroundImage from "../assets/images/background.jpg";
+import { ApiError } from "../utils/errorHandler";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -39,17 +40,21 @@ const Login: React.FC = () => {
       await dispatch(loginAdmin({ email, password }))
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res.success || res.status === 200) {
             navigate("/home");
-            Success(res.message);
+            Success(res.message || "Login successful!");
           } else {
-            Error(res.message);
+            Error(res.message || "Login failed. Please try again.");
           }
+        })
+        .catch((err) => {
+          Error(err.message || "Login failed. Please try again.");
         });
     } catch (error) {
-      console.error("Login error:", error);
       Error(
-        typeof error === "string" ? error : "An error occurred during login."
+        error instanceof ApiError
+          ? error.message
+          : "Login failed. Please try again."
       );
     }
   };

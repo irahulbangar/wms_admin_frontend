@@ -4,6 +4,7 @@ import type { NodesResult } from "../model/nodes.interface";
 import type { EdgesResult } from "../model/edges.interface";
 import type { GetPlantsResponse, PlantResult } from "../model/plant.interface";
 import type { SinglePlantResponse } from "../model/single-plant.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface PlantResponse {
   success: boolean;
@@ -61,9 +62,8 @@ export const getAllPlants = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch plants";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -83,9 +83,8 @@ export const getPlantById = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch plant";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -105,9 +104,8 @@ export const getPlantsByOrganizationId = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch plants";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -137,9 +135,8 @@ export const addPlant = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to add plant";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -160,9 +157,8 @@ export const updatePlantById = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to update plant";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -182,9 +178,8 @@ export const deletePlantById = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to delete plant";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -211,11 +206,8 @@ export const updateDiagramData = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to update diagram data";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );

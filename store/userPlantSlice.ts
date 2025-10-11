@@ -4,6 +4,7 @@ import type {
   UserPlantResult,
   UserPlantsResponse,
 } from "../model/user-plants.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface UserPlantState {
   userPlants: UserPlantResult[];
@@ -43,9 +44,8 @@ export const getAllUserPlants = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to get user plants";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -78,9 +78,8 @@ export const createUserPlant = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to create user plant";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -98,11 +97,8 @@ export const getUserPlantByUserId = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to get user plant by user id";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -124,11 +120,8 @@ export const updateUserPlantByUserId = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to update user plant by user plant id";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );

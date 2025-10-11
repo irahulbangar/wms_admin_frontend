@@ -199,7 +199,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
             <button
               type="button"
               onClick={() => setShowAddDepartmentPopup(false)}
-              className="px-4 py-2 text-text-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors font-roboto cursor-pointer"
+              className="px-4 py-1.5 text-text-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors font-roboto cursor-pointer"
             >
               Cancel
             </button>
@@ -207,7 +207,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               type="button"
               onClick={handleAddDepartment}
               disabled={isLoading}
-              className={`px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-roboto cursor-pointer ${
+              className={`px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 font-roboto cursor-pointer ${
                 isLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

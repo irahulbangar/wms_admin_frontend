@@ -3,6 +3,7 @@ import { api } from "../api.service";
 import { jwtDecode } from "jwt-decode";
 import type { AdminUsersResponse } from "../model/admin-users.interface";
 import type { SingleAdminResponse } from "../model/single-admin.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 // Extend JwtPayload to include custom properties
 interface CustomJwtPayload {
@@ -34,6 +35,7 @@ interface LoginResponse {
   token: string;
   admin: Admin;
   message: string;
+  status: number;
 }
 
 interface AdminState {
@@ -121,9 +123,11 @@ export const loginAdmin = createAsyncThunk(
     try {
       thunkAPI.dispatch(setLoading(true));
       const response = await api().post<LoginResponse>("/admin/login", data);
-      if (response.data.success) {
+      
+      if (response.data.success || response.data.status === 200) {
         localStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
         localStorage.setItem("accessToken", response.data.token);
+        
         const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
         const admin = {
           email: decodedToken.email,
@@ -135,15 +139,16 @@ export const loginAdmin = createAsyncThunk(
           location: decodedToken.location,
           department: decodedToken.department,
         };
+        
         localStorage.setItem("admin", JSON.stringify(admin));
         thunkAPI.dispatch(setAdmin(admin));
         thunkAPI.dispatch(setToken(response.data.token));
       }
+      
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Login failed";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     } finally {
       thunkAPI.dispatch(setLoading(false));
     }
@@ -162,9 +167,8 @@ export const getAllUsers = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch users";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -203,9 +207,8 @@ export const addAdminUser = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to add admin user";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -230,9 +233,8 @@ export const updateAdminProfile = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to update profile";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -252,9 +254,8 @@ export const getAdminById = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to get admin";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );
@@ -274,9 +275,8 @@ export const deleteAdminUser = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to delete admin user";
-      return thunkAPI.rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
     }
   }
 );

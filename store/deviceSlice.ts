@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { DeviceResponse, DeviceResult } from "../model/devices.interface";
+import { handleApiError } from "../src/utils/errorHandler";
 
 interface DeviceState {
   devices: DeviceResult[];
@@ -83,9 +84,8 @@ export const createDevice = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to create device";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -106,9 +106,8 @@ export const getAllDevices = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to get devices";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -126,9 +125,8 @@ export const getDeviceById = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to get device by id";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -150,9 +148,8 @@ export const updateDevice = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to update device";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -173,11 +170,8 @@ export const getDeviceByPlantId = createAsyncThunk(
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to get device by plant id";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -207,11 +201,8 @@ export const getDeviceByOrganizationIdAndPlantIdAndDepartmentId = createAsyncThu
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to get device by organizationId and plantId and departmentId";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
@@ -229,9 +220,8 @@ export const deleteDevice = createAsyncThunk(
       });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to delete device";
-      return rejectWithValue(errorMessage);
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
     }
   }
 );
