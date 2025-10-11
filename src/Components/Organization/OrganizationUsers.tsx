@@ -445,7 +445,7 @@ const OrganizationUsers = () => {
         </div>
       ) : (
         <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
-          <div className="overflow-auto h-[calc(100vh-280px)]">
+          <div className="overflow-auto h-[calc(100vh-295px)] table-scrollbar">
             <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedUsers?.length > 0 ? "h-auto" : "h-full"}`}>
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
@@ -478,7 +478,7 @@ const OrganizationUsers = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="min-h-[800px]">
                 {handlePaginatedUsers.length > 0 ? (
                   handlePaginatedUsers.map((user, index) => (
                     <tr

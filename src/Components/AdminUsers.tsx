@@ -184,7 +184,7 @@ const Users = () => {
         </div>
       ) : (
         <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
-          <div className="overflow-auto h-[calc(100vh-280px)]">
+          <div className="overflow-auto h-[calc(100vh-240px)] table-scrollbar">
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
               <thead className="text-xs text-text-primary uppercase border-b border-border-primary sticky top-0 z-20 shadow-sm">
                 <tr>
@@ -219,7 +219,7 @@ const Users = () => {
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="min-h-[800px]">
                 {handlePaginatedUsers?.length > 0 ? (
                   handlePaginatedUsers?.map((user, index) => (
                     <tr

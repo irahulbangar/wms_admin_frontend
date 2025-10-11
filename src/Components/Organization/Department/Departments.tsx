@@ -473,7 +473,7 @@ const Departments = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
+      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between lg:flex-row w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
         <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
@@ -676,7 +676,7 @@ const Departments = () => {
       </div>
       ) : (
       <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
-        <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-345px)] table-scrollbar">
+        <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-295px)] table-scrollbar">
           <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedDepartments?.length > 0 ? "h-auto" : "h-full"} min-w-[800px]`}>
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
