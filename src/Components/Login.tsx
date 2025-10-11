@@ -168,8 +168,8 @@ const Login: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
+          <div className="flex items-center justify-end">
+            {/* <div className="flex items-center">
               <input
                 id="remember-me"
                 name="remember-me"
@@ -182,7 +182,7 @@ const Login: React.FC = () => {
               >
                 Remember me
               </label>
-            </div>
+            </div> */}
 
             <div className="text-sm">
               <a
