@@ -676,8 +676,8 @@ const Departments = () => {
       </div>
       ) : (
       <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
-        <div className="overflow-auto h-[calc(100vh-280px)]">
-          <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedDepartments?.length > 0 ? "h-auto" : "h-full"}`}>
+        <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-345px)] table-scrollbar">
+          <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedDepartments?.length > 0 ? "h-auto" : "h-full"} min-w-[800px]`}>
             <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
               <tr>
                 <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
@@ -706,7 +706,7 @@ const Departments = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="min-h-[800px]">
               { handlePaginatedDepartments.length > 0 ? (
               handlePaginatedDepartments.map((department, index) => (
               <tr onDoubleClick={() => handleViewDevices(department.department_id, department.organization_id, department.plant_id)} key={index} className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer">
