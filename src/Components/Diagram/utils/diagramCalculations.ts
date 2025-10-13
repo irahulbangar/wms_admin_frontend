@@ -467,6 +467,27 @@ export const convertDevicesToDiagram = (
           );
           nodes.push(argNode);
         });
+
+        const virtuals = system.devices.filter(
+          (device: DeviceResult) =>
+            device.device_family_type === "virtual" ||
+            device.device_family?.toLowerCase().includes("virtual")
+        );
+
+        virtuals.forEach((device: DeviceResult, virtualIndex: number) => {
+          const deviceId = `${systemId}-valve${virtualIndex + 1}`;
+          const valveNode = createValveNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            virtualIndex,
+            virtuals.length,
+            tanks.length + fms.length + brwhms.length + phmcs.length + args.length
+          );
+          nodes.push(valveNode);
+        });
       });
     });
   });
@@ -932,6 +953,63 @@ const createARGNode = (
     type: "arg",
     width: argWidth,
     height: argHeight,
+  };
+};
+
+const createValveNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  valveIndex: number,
+  _totalValves: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const valveWidth = 60;
+  const valveHeight = 20;
+  const valveSpacing = 20;
+  const sideMargin = 50;
+  const footerHeight = 30;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxValvesPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (valveWidth + valveSpacing))
+  );
+
+  const row = Math.floor(valveIndex / maxValvesPerRow);
+  const col = valveIndex % maxValvesPerRow;
+
+  const deviceX = sideMargin + col * (valveWidth + valveSpacing);
+  const deviceY = 50 + previousDevicesCount * 30 + row * (valveHeight + valveSpacing);
+
+  const maxX = groupWidth - valveWidth - sideMargin;
+  const maxY = groupHeight - valveHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const virtualNodeData: NodeData = {
+    label: device.device_name,
+    type: "virtual",
+    unit: device.unit || "Ltr",
+    departmentConnection: device.in_department_id === null ? "None" : device.in_department_id ? "In" : "Out",
+    plantConnection: device.in_plant_id === null ? "None" : device.in_plant_id ? "In" : "Out",
+    organizationConnection: device.organization_connection || "none",
+    systemName: device.system_name || "",
+    systemConnection: device.in_system_id === null ? "None" : device.in_system_id ? "In" : "Out",
+  };
+
+  return {
+    id: deviceId,
+    data: virtualNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "valve",
+    width: valveWidth,
+    height: valveHeight,
   };
 };
 

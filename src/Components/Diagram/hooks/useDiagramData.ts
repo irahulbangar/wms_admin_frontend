@@ -284,6 +284,27 @@ export const useDiagramData = (plantId: string | undefined) => {
               },
             };
           }
+        } else if (node?.type === "virtual") {
+          const matchingDevice = deviceData?.find(
+            (device) =>
+              device?.device_name === node?.data?.label &&
+              (device?.device_family_type === "virtual" ||
+                device?.device_family?.toLowerCase().includes("virtual"))
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                departmentConnection: matchingDevice?.in_department_id === null ? "None" : matchingDevice?.in_department_id ? "In" : "Out",
+                plantConnection: matchingDevice?.in_plant_id === null ? "None" : matchingDevice?.in_plant_id ? "In" : "Out",
+                organizationConnection: matchingDevice?.organization_connection,
+                systemName: matchingDevice?.system_name,
+                systemConnection: matchingDevice?.in_system_id === null ? "None" : matchingDevice?.in_system_id ? "In" : "Out",
+              },
+            };
+          }
         } else if (node.type === "group" && node.data.type === "department") {
           const departmentId = node.id.replace("dept-", "");
           const departmentDevices = deviceData.filter(

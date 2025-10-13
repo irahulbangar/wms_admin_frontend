@@ -6,6 +6,7 @@ import ARGNode from "./ARGNode";
 import GroupNodeWrapper from "./GroupNodeWrapper";
 import SourceNode from "./SourceNode";
 import SinkNode from "./SinkNode";
+import VirtualNode from "./VirtualNode";
 
 export const nodeTypes = {
   tank: TankNode,
@@ -16,4 +17,5 @@ export const nodeTypes = {
   group: GroupNodeWrapper,
   source: SourceNode,
   sink: SinkNode,
+  virtual: VirtualNode,
 };
