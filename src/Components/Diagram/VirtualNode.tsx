@@ -16,7 +16,7 @@ const VirtualNode: React.FC<VirtualNodeProps> = ({ data }) => {
   return (
     <>
       <div
-        className={`relative w-24 h-10 border border-status-warning bg-status-warning/30 rounded-lg p-2 z-10 flex items-center justify-center`}
+        className={`relative w-24 h-10 border border-status-warning bg-status-warning rounded-lg p-2 z-10 flex items-center justify-center`}
         title={`
 System Name: ${systemName}
 Device Name: ${data.label}
@@ -26,14 +26,14 @@ Plant Connection: ${plantConnection}
 Organization Connection: ${organizationConnection}
         `}
       >
-        <div className="text-text-primary font-roboto font-medium text-center mb-1 truncate px-1 text-xs">
+        <div className="text-text-primary font-roboto font-medium text-center truncate px-1 text-xs">
           {data.label}
         </div>
 
         <Handle
           type="target"
           position={HandlePosition.Left}
-          id="valve-input"
+          id="virtual-input"
           className="w-3 h-3 bg-status-info border-2 border-status-info"
           style={{
             left: -6,
@@ -45,7 +45,7 @@ Organization Connection: ${organizationConnection}
         <Handle
           type="source"
           position={HandlePosition.Right}
-          id="valve-output"
+          id="virtual-output"
           className="w-3 h-3 bg-status-info border-2 border-status-info"
           style={{
             right: -6,

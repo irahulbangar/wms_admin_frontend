@@ -475,8 +475,8 @@ export const convertDevicesToDiagram = (
         );
 
         virtuals.forEach((device: DeviceResult, virtualIndex: number) => {
-          const deviceId = `${systemId}-valve${virtualIndex + 1}`;
-          const valveNode = createValveNode(
+          const deviceId = `${systemId}-virtual${virtualIndex + 1}`;
+          const virtualNode = createVirtualNode(
             device,
             deviceId,
             systemId,
@@ -486,7 +486,7 @@ export const convertDevicesToDiagram = (
             virtuals.length,
             tanks.length + fms.length + brwhms.length + phmcs.length + args.length
           );
-          nodes.push(valveNode);
+          nodes.push(virtualNode);
         });
       });
     });
@@ -956,36 +956,36 @@ const createARGNode = (
   };
 };
 
-const createValveNode = (
+const createVirtualNode = (
   device: DeviceResult,
   deviceId: string,
   groupId: string,
   groupWidth: number,
   groupHeight: number,
-  valveIndex: number,
-  _totalValves: number,
+  virtualIndex: number,
+  _totalVirtuals: number,
   previousDevicesCount: number
 ): DiagramNode => {
-  const valveWidth = 60;
-  const valveHeight = 20;
-  const valveSpacing = 20;
+  const virtualWidth = 60;
+  const virtualHeight = 20;
+  const virtualSpacing = 20;
   const sideMargin = 50;
   const footerHeight = 30;
 
   const availableWidth = groupWidth - 2 * sideMargin;
-  const maxValvesPerRow = Math.max(
+  const maxVirtualsPerRow = Math.max(
     1,
-    Math.floor(availableWidth / (valveWidth + valveSpacing))
+    Math.floor(availableWidth / (virtualWidth + virtualSpacing))
   );
 
-  const row = Math.floor(valveIndex / maxValvesPerRow);
-  const col = valveIndex % maxValvesPerRow;
+  const row = Math.floor(virtualIndex / maxVirtualsPerRow);
+  const col = virtualIndex % maxVirtualsPerRow;
 
-  const deviceX = sideMargin + col * (valveWidth + valveSpacing);
-  const deviceY = 50 + previousDevicesCount * 30 + row * (valveHeight + valveSpacing);
+  const deviceX = sideMargin + col * (virtualWidth + virtualSpacing);
+  const deviceY = 50 + previousDevicesCount * 30 + row * (virtualHeight + virtualSpacing);
 
-  const maxX = groupWidth - valveWidth - sideMargin;
-  const maxY = groupHeight - valveHeight - footerHeight;
+  const maxX = groupWidth - virtualWidth - sideMargin;
+  const maxY = groupHeight - virtualHeight - footerHeight;
   const finalX = Math.min(deviceX, maxX);
   const finalY = Math.min(deviceY, maxY);
 
@@ -1000,17 +1000,19 @@ const createValveNode = (
     systemConnection: device.in_system_id === null ? "None" : device.in_system_id ? "In" : "Out",
   };
 
-  return {
+  const result = {
     id: deviceId,
     data: virtualNodeData,
     position: { x: finalX, y: finalY },
     parentId: groupId,
     sourcePosition: "right",
     targetPosition: "left",
-    type: "valve",
-    width: valveWidth,
-    height: valveHeight,
+    type: "virtual",
+    width: virtualWidth,
+    height: virtualHeight,
   };
+  
+  return result;
 };
 
 export const cleanNodesForAPI = (
