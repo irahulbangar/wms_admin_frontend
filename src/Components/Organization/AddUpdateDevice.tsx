@@ -234,35 +234,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.device_family_id) {
-      newErrors.device_family_id = "Device Family is required";
-    }
-    if (!formData.device_type_id) {
-      newErrors.device_type_id = "Device Type is required";
-    }
-    if (!formData.device_name.trim()) {
-      newErrors.device_name = "Device Name is required";
-    }
-    if (!formData.device_status) {
-      newErrors.device_status = "Device Status is required";
-    }
-    if (formData.hwid && formData.hwid.length !== 15) {
-      newErrors.hwid = "HWID number must be exactly 15 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
 
     setIsLoading(true);
     try {
