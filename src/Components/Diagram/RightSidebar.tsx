@@ -234,7 +234,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         top: "10px",
         textStyle: {
           fontSize: 16,
-          fontWeight: "bold",
+          fontWeight: "semibold",
           color: "#374151",
         },
       },
@@ -284,7 +284,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             label: {
               show: true,
               fontSize: 14,
-              fontWeight: "bold",
+              fontWeight: "semibold",
             },
             itemStyle: {
               shadowBlur: 10,
@@ -389,7 +389,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             label: {
               show: true,
               fontSize: 14,
-              fontWeight: "bold",
+              fontWeight: "semibold",
             },
           },
           data: inData,
@@ -466,7 +466,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             label: {
               show: true,
               fontSize: 14,
-              fontWeight: "bold",
+              fontWeight: "semibold",
             },
           },
           data: outData,
@@ -529,7 +529,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         top: "10px",
         textStyle: {
           fontSize: 16,
-          fontWeight: "bold",
+          fontWeight: "semibold",
           color: "#374151",
         },
       },
@@ -582,7 +582,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             label: {
               show: true,
               fontSize: 14,
-              fontWeight: "bold",
+              fontWeight: "semibold",
             },
             itemStyle: {
               shadowBlur: 10,
@@ -717,7 +717,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center gap-2">
                   <ChartArea className="w-5 h-5" />
-                  Flow Summary
+                  Flow Summary Report
                 </h3>
                 {isFlowSummaryExpanded ? (
                   <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -747,8 +747,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="font-medium text-text-primary text-base font-roboto">
-                            {calculations.totalIn} Ltr
+                          <span className="text-text-primary text-base font-roboto">
+                            {calculations.totalIn} <span className="italic text-text-secondary font-roboto">Ltr</span>
                           </span>
                         </td>
                       </tr>
@@ -760,8 +760,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="font-medium text-text-primary text-base font-roboto">
-                            {calculations.totalOut} Ltr
+                          <span className="text-text-primary text-base font-roboto">
+                            {calculations.totalOut} <span className="italic text-text-secondary font-roboto">Ltr</span>
                           </span>  
                         </td>
                       </tr>
@@ -769,16 +769,16 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         <td className="px-4 py-3 text-text-secondary text-base font-medium">
                           <div className="flex items-center gap-2">
                             {calculations.totalBalance >= 0 ? (
-                              <div className="w-3.5 h-3.5 bg-green-500 rounded-full"></div>
+                              <div className="w-3.5 h-3.5 bg-status-success rounded-full"></div>
                             ) : (
-                              <div className="w-3.5 h-3.5 bg-red-500 rounded-full"></div>
+                              <div className="w-3.5 h-3.5 bg-status-danger rounded-full"></div>
                             )}
                             Balance
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="font-medium text-text-primary text-base font-roboto">
-                            {calculations.totalBalance} Ltr
+                          <span className="text-text-primary text-base font-roboto">
+                            {calculations.totalBalance} <span className="italic text-text-secondary font-roboto">Ltr</span>
                           </span>
                         </td>
                       </tr>
@@ -800,7 +800,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center space-x-2">
                       <Package className="w-4 h-4" />
-                      <span>Storage Information</span>
+                      <span>Storage Summary Report</span>
                     </h3>
                     {isStorageExpanded ? (
                       <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -830,8 +830,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               </div>
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <span className="font-medium text-text-primary text-base font-roboto">
-                                {filteredStorageData.totalStock.toFixed(1)} Ltr
+                              <span className="text-text-primary text-base font-roboto">
+                                {filteredStorageData.totalStock.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
                               </span>
                             </td>
                           </tr>
@@ -843,8 +843,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               </div>
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <span className="font-medium text-text-primary text-base font-roboto">
-                                {(filteredStorageData.totalCapacity - filteredStorageData.totalStock).toFixed(1)} Ltr
+                              <span className="text-text-primary text-base font-roboto">
+                                {(filteredStorageData.totalCapacity - filteredStorageData.totalStock).toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
                               </span>
                             </td>
                           </tr>
@@ -856,8 +856,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               </div>
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <span className="font-medium text-text-primary text-base font-roboto">
-                                {filteredStorageData.totalCapacity.toFixed(1)} Ltr
+                              <span className="text-text-primary text-base font-roboto">
+                                {filteredStorageData.totalCapacity.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
                               </span>
                             </td>
                           </tr>
@@ -932,8 +932,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                  <span className="font-medium text-text-primary text-base font-roboto">
-                                    {reportType.totalIn.toFixed(1)} Ltr
+                                  <span className="text-text-primary text-base font-roboto">
+                                    {reportType.totalIn.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
                                   </span>
                                 </td>
                               </tr>
@@ -1010,8 +1010,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                  <span className="font-medium text-text-primary text-base font-roboto">
-                                    {reportType.totalOut.toFixed(1)} Ltr
+                                  <span className="text-text-primary text-base font-roboto">
+                                    {reportType.totalOut.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
                                   </span>
                                 </td>
                               </tr>
