@@ -26,7 +26,7 @@ Plant Connection: ${plantConnection}
 Organization Connection: ${organizationConnection}
         `}
       >
-        <div className="text-text-primary font-roboto font-medium text-center truncate px-1 text-xs">
+        <div className="text-white font-roboto font-medium text-center truncate px-1 text-xs">
           {data.label}
         </div>
 
