@@ -31,7 +31,7 @@ Totalizer Reading : ${data?.totalizerReading} Ltr
 Flow Rate : ${data?.avg} LPM
       `}
     >
-      <div className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary">
+      <div className="text-xs font-medium text-center mb-1 truncate px-1 text-text-primary">
         {deviceName}
       </div>
 
@@ -45,13 +45,13 @@ Flow Rate : ${data?.avg} LPM
         <div className="text-text-primary font-roboto text-xs font-medium">
           Flow:
         </div>
-        <div className="font-semibold text-status-info font-roboto text-[10px] truncate px-1">
+        <div className="font-medium text-status-info font-roboto text-[10px] truncate px-1">
           {data?.avg} LPM
         </div>
       </div>
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div className="truncate text-center">Totalizer : {data?.max} Ltr</div>
+        <div className="truncate text-center font-medium font-roboto text-xs">Totalizer : {data?.max} Ltr</div>
       </div>
 
       <Handle

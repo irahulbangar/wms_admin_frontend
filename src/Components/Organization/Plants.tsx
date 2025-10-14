@@ -713,7 +713,7 @@ const Plants = () => {
             <div className="p-6">
               <p className="text-text-secondary mb-4 font-roboto">
                 Are you sure you want to delete this plant{" "}
-                <span className="font-bold">{plantTitle || "N/A"}</span>?
+                <span className="font-medium font-roboto">{plantTitle || "N/A"}</span>?
               </p>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-border-primary">

@@ -8,7 +8,7 @@ const Profile: React.FC = () => {
   return (
     <div className="max-w-full">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary font-roboto">
+        <h1 className="text-3xl font-medium text-text-primary font-roboto">
           Profile Settings
         </h1>
         <p className="text-text-secondary mt-2 font-roboto">

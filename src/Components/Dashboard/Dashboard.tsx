@@ -277,7 +277,7 @@ const Dashboard = () => {
                     <p className="text-base font-medium text-white font-roboto">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-bold text-white mt-1 font-roboto">
+                    <p className="text-2xl font-medium text-white mt-1 font-roboto">
                       {stat.value}
                     </p>
                   </div>

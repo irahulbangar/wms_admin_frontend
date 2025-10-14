@@ -34,7 +34,7 @@ Totalizer Reading : ${totalizerReading} ${unit}
 Flow Rate : ${flowRate} LPM
         `}
     >
-      <div className="text-xs font-bold text-center mb-1 truncate px-1">
+      <div className="text-xs font-medium text-center mb-1 truncate px-1">
         {data.label}
       </div>
 
@@ -54,7 +54,7 @@ Flow Rate : ${flowRate} LPM
       </div>
 
       <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div className="truncate text-center">
+        <div className="truncate text-center font-medium">
           Totalizer : {totalizerReading} {unit}
         </div>
       </div>

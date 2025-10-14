@@ -11,7 +11,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
   const maxMm = Number(data.maxMm) || 0;
   const minMm = Number(data.minMm) || 0;
   const lastMm = Number(data.lastMm) || 0;
-  const firstMm = Number(data.firstMm) || 0;
+  // const firstMm = Number(data.firstMm) || 0;
   const systemName = data.systemName || "";
   const systemConnection = data.systemConnection || "none";
   const departmentConnection = data.departmentConnection || "none";
@@ -33,7 +33,7 @@ Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
       `}
     >
-      <div className="text-xs font-bold text-center mb-1 truncate px-1 text-purple-800">
+      <div className="text-xs font-medium text-center mb-1 truncate px-1 text-purple-800">
         {deviceName}
       </div>
 
@@ -44,12 +44,11 @@ Organization Connection : ${organizationConnection}
       />
 
       <div className="text-center mb-1">
-        <div className="text-text-primary font-roboto text-xs font-semibold">
+        <div className="text-text-primary font-roboto text-xs font-medium">
           Rain:
         </div>
         <div
-          className="font-semibold text-purple-600 font-roboto text-[10px] truncate px-1"
-          title={`${lastMm} mm`}
+          className="font-medium text-purple-600 font-roboto text-[10px] truncate px-1"
         >
           {lastMm} mm
         </div>
@@ -57,8 +56,7 @@ Organization Connection : ${organizationConnection}
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
         <div
-          className="truncate text-center"
-          title={`Max: ${maxMm}mm, Min: ${minMm}mm, First: ${firstMm}mm`}
+          className="truncate text-center font-medium font-roboto text-xs"
         >
           Max: {maxMm}mm | Min: {minMm}mm
         </div>

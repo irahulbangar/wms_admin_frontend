@@ -40,7 +40,7 @@ Voltage (B) : ${voltageB / 10}V | Current (B) : ${currentB}A
 Frequency : ${frequency}Hz
       `}
     >
-      <div className="text-xs font-bold text-center mb-1 truncate px-1 text-text-primary">
+      <div className="text-xs font-medium text-center mb-1 truncate px-1 text-text-primary">
         {deviceName}
       </div>
 
@@ -60,7 +60,7 @@ Frequency : ${frequency}Hz
               <div className="text-text-primary font-roboto text-[9px] font-medium">
                 R
               </div>
-              <div className="font-medium font-roboto text-[9px] text-status-danger">
+              <div className="font-medium font-roboto text-[9px] text-status-danger text-xs">
                 {voltageR / 10} V
               </div>
             </div>

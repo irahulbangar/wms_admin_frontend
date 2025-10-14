@@ -51,7 +51,7 @@ Capacity : ${capacity} ${unit}
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-bold text-text-primary bg-secondary/80 px-1 rounded">
+          <span className="text-xs font-medium text-text-primary bg-secondary/80 px-1 rounded">
             {percentage.toFixed(2)}%
           </span>
         </div>
@@ -69,7 +69,7 @@ Capacity : ${capacity} ${unit}
       </div>
       <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-20">
         <div
-          className="truncate text-center"
+          className="truncate text-center font-medium font-roboto text-xs"
           title={`${currentLevel}/${capacity} ${unit}`}
         >
           {currentLevel}/{capacity} {unit}
