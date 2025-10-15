@@ -1,6 +1,7 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
+import brwhmsIcon from "../../assets/images/brwhms-logo.png";
 
 interface BRWHMSNodeProps {
   data: NodeData;
@@ -17,7 +18,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-28 h-15 bg-secondary border rounded-lg p-1 z-10 ${
+      className={`relative w-25 h-fit bg-secondary border rounded-lg p-1 z-10 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`
@@ -31,8 +32,12 @@ Totalizer Reading : ${data?.totalizerReading} Ltr
 Flow Rate : ${data?.avg} LPM
       `}
     >
-      <div className="text-xs font-medium text-center mb-1 truncate px-1 text-text-primary">
+      <div className="text-xs font-medium text-left text-wrap mb-1 px-1 text-text-primary">
         {deviceName}
+      </div>
+
+      <div className="flex justify-center items-center">
+        <img src={brwhmsIcon} alt="brwhms" className="w-8 h-8 object-contain" />
       </div>
 
       <div
@@ -51,7 +56,9 @@ Flow Rate : ${data?.avg} LPM
       </div>
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div className="truncate text-center font-medium font-roboto text-xs">Totalizer : {data?.max} Ltr</div>
+        <div className="truncate text-center font-medium font-roboto text-xs">
+          Totalizer : {data?.max} Ltr
+        </div>
       </div>
 
       <Handle

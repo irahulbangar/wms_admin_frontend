@@ -1,6 +1,7 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
+import argIcon from "../../assets/images/arg-logo.png";
 
 interface ARGNodeProps {
   data: NodeData;
@@ -21,7 +22,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-24 h-20 bg-gradient-to-br from-purple-50 to-purple-100 border rounded-lg p-1 z-0 ${
+      className={`relative w-25 h-fit bg-gradient-to-br from-purple-50 to-purple-100 border rounded-lg p-1 z-0 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`
@@ -33,8 +34,12 @@ Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
       `}
     >
-      <div className="text-xs font-medium text-center mb-1 truncate px-1 text-purple-800">
+      <div className="text-xs font-medium text-left text-wrap mb-1 px-1 text-purple-800">
         {deviceName}
+      </div>
+
+      <div className="flex justify-center items-center">
+        <img src={argIcon} alt="arg" className="w-8 h-8 object-contain" />
       </div>
 
       <div
@@ -47,17 +52,13 @@ Organization Connection : ${organizationConnection}
         <div className="text-text-primary font-roboto text-xs font-medium">
           Rain:
         </div>
-        <div
-          className="font-medium text-purple-600 font-roboto text-[10px] truncate px-1"
-        >
+        <div className="font-medium text-purple-600 font-roboto text-[10px] truncate px-1">
           {lastMm} mm
         </div>
       </div>
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div
-          className="truncate text-center font-medium font-roboto text-xs"
-        >
+        <div className="truncate text-center font-medium font-roboto text-xs">
           Max: {maxMm}mm | Min: {minMm}mm
         </div>
       </div>

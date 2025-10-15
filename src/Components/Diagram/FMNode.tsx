@@ -1,6 +1,7 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
+import fmIcon from "../../assets/images/fm-logo.svg";
 
 interface FMNodeProps {
   data: NodeData;
@@ -20,7 +21,7 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-24 h-16 bg-secondary border rounded-lg p-1 z-10 ${
+      className={`relative w-25 h-fit bg-secondary border rounded-lg p-1 z-10 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`
@@ -34,8 +35,12 @@ Totalizer Reading : ${totalizerReading} ${unit}
 Flow Rate : ${flowRate} LPM
         `}
     >
-      <div className="text-xs font-medium text-center mb-1 truncate px-1">
+      <div className="text-xs font-medium text-left text-wrap mb-1 px-1">
         {data.label}
+      </div>
+
+      <div className="flex justify-center items-center">
+        <img src={fmIcon} alt="fm" className="w-8 h-8 object-contain" />
       </div>
 
       <div

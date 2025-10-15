@@ -1,6 +1,7 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
+import phmcIcon from "../../assets/images/phmc-logo.png";
 
 interface PHMCNodeProps {
   data: NodeData;
@@ -24,7 +25,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-32 h-30 bg-secondary border rounded-lg p-1 z-10 ${
+      className={`relative w-fit h-fit bg-secondary border rounded-lg p-1 z-10 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`
@@ -40,8 +41,12 @@ Voltage (B) : ${voltageB / 10}V | Current (B) : ${currentB}A
 Frequency : ${frequency}Hz
       `}
     >
-      <div className="text-xs font-medium text-center mb-1 truncate px-1 text-text-primary">
+      <span className="text-xs text-left mb-1 font-roboto text-text-primary text-wrap z-10 px-1">
         {deviceName}
+      </span>
+
+      <div className="flex justify-center items-center">
+        <img src={phmcIcon} alt="phmc" className="w-8 h-8 object-contain" />
       </div>
 
       <div
