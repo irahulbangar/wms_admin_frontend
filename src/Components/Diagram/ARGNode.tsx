@@ -22,9 +22,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-25 h-fit bg-gradient-to-br from-purple-50 to-purple-100 border rounded-lg p-1 z-0 ${
-        isActive ? "border-status-success" : "border-border-primary"
-      }`}
+      className="relative w-25 h-fit bg-gradient-to-br from-purple-50 to-purple-100 border border-border-primary rounded-lg p-1 z-0"
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
@@ -34,12 +32,12 @@ Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
       `}
     >
-      <div className="text-xs font-medium text-left text-wrap mb-1 px-1 text-purple-800">
+      <div className="text-sm font-medium text-left text-wrap mb-1 px-1 text-purple-800 leading-4">
         {deviceName}
       </div>
 
       <div className="flex justify-center items-center">
-        <img src={argIcon} alt="arg" className="w-8 h-8 object-contain" />
+        <img src={argIcon} alt="arg" className="w-12 h-12 object-contain" />
       </div>
 
       <div

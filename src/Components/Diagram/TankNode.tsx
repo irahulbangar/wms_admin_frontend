@@ -25,7 +25,7 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   return (
     <div className="relative">
       <div
-        className="relative w-25 h-25 bg-secondary border rounded-md border-border-primary overflow-hidden"
+        className="relative w-25 h-35 bg-primary/50 border border-status-info rounded-md overflow-hidden"
         title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
@@ -39,7 +39,7 @@ Capacity : ${capacity} ${unit}
       >
         <div className="absolute inset-0 z-0">
           <div
-            className="absolute bottom-0 left-22 right-0 bg-status-info/70 transition-all duration-500 ease-in-out"
+            className="absolute bottom-0 left-22 right-0 bg-[#23a9e1] transition-all duration-500 ease-in-out"
             style={{
               height: `${fillHeight}%`,
               width: "100%",
@@ -47,12 +47,10 @@ Capacity : ${capacity} ${unit}
           />
         </div>
 
-        <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-16 z-10">
-          <div className="truncate text-center">{deviceName}</div>
-        </div>
+        <div className="text-left font-roboto text-sm text-wrap p-1 font-medium text-text-primary leading-4">{deviceName}</div>
 
-        <div className="absolute inset-0 flex justify-center items-center z-20">
-          <img src={tankIcon} alt="tank" className="w-8 h-8 object-contain" />
+        <div className="absolute inset-0 top-8 flex justify-center items-center z-20">
+          <img src={tankIcon} alt="tank" className="w-12 h-12 object-contain" />
         </div>
 
         <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 z-30">

@@ -21,9 +21,7 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-25 h-fit bg-secondary border rounded-lg p-1 z-10 ${
-        isActive ? "border-status-success" : "border-border-primary"
-      }`}
+      className="relative w-25 h-fit bg-primary/50 border border-border-primary rounded-lg p-1 z-10"
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
@@ -35,12 +33,12 @@ Totalizer Reading : ${totalizerReading} ${unit}
 Flow Rate : ${flowRate} LPM
         `}
     >
-      <div className="text-xs font-medium text-left text-wrap mb-1 px-1">
+      <div className="text-sm font-medium text-left text-wrap mb-1 px-1 leading-4 text-text-primary">
         {data.label}
       </div>
 
       <div className="flex justify-center items-center">
-        <img src={fmIcon} alt="fm" className="w-8 h-8 object-contain" />
+        <img src={fmIcon} alt="fm" className="w-12 h-12 object-contain" />
       </div>
 
       <div

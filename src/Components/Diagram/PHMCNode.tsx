@@ -25,9 +25,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-30 h-50 bg-secondary border rounded-lg p-1 z-10 ${
-        isActive ? "border-status-success" : "border-border-primary"
-      }`}
+      className="relative w-30 h-52 bg-primary/50 border border-border-primary rounded-lg p-1 z-10"
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
@@ -41,12 +39,12 @@ Voltage (B) : ${voltageB / 10}V | Current (B) : ${currentB}A
 Frequency : ${frequency}Hz
       `}
     >
-      <span className="text-xs text-left mb-1 font-roboto text-text-primary text-wrap z-10 px-1">
+      <div className="text-sm text-left font-medium font-roboto text-text-primary text-wrap z-10 px-1 leading-4">
         {deviceName}
-      </span>
+      </div>
 
       <div className="flex justify-center items-center">
-        <img src={phmcIcon} alt="phmc" className="w-8 h-8 object-contain" />
+        <img src={phmcIcon} alt="phmc" className="w-12 h-12 object-contain" />
       </div>
 
       <div
