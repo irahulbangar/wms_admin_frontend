@@ -47,7 +47,7 @@ Capacity : ${capacity} ${unit}
           />
         </div>
 
-        <div className="text-left font-roboto text-sm text-wrap p-1 font-medium text-text-primary leading-4">{deviceName}</div>
+        <div className="text-left font-roboto text-sm text-wrap py-1 px-2 font-medium text-text-primary leading-4">{deviceName}</div>
 
         <div className="absolute inset-0 top-8 flex justify-center items-center z-20">
           <img src={tankIcon} alt="tank" className="w-12 h-12 object-contain" />
