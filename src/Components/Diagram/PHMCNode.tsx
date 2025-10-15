@@ -25,7 +25,7 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-fit h-fit bg-secondary border rounded-lg p-1 z-10 ${
+      className={`relative w-30 h-50 bg-secondary border rounded-lg p-1 z-10 ${
         isActive ? "border-status-success" : "border-border-primary"
       }`}
       title={`

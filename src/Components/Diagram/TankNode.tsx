@@ -1,6 +1,7 @@
 import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
+import tankIcon from "../../assets/images/tank-logo.svg";
 
 interface TankNodeProps {
   data: NodeData;
@@ -22,9 +23,9 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   const deviceName = data.label || "";
 
   return (
-    <>
+    <div className="relative">
       <div
-        className="relative w-20 h-24 bg-secondary border border-border-primary rounded-lg overflow-hidden"
+        className="relative w-25 h-25 bg-secondary border rounded-md border-border-primary overflow-hidden"
         title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
@@ -36,38 +37,43 @@ Current Level : ${currentLevel} ${unit}
 Capacity : ${capacity} ${unit}
       `}
       >
-        <div className="absolute inset-0 flex flex-col">
+        <div className="absolute inset-0 z-0">
           <div
-            className="w-full bg-status-info/70 transition-all duration-500 ease-in-out"
+            className="absolute bottom-0 left-22 right-0 bg-status-info/70 transition-all duration-500 ease-in-out"
             style={{
               height: `${fillHeight}%`,
-              marginTop: "auto",
+              width: "100%",
             }}
           />
         </div>
 
-        <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-16">
+        <div className="absolute top-1 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-16 z-10">
           <div className="truncate text-center">{deviceName}</div>
         </div>
 
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-medium text-text-primary bg-secondary/80 px-1 rounded">
-            {percentage.toFixed(2)}%
+        <div className="absolute inset-0 flex justify-center items-center z-20">
+          <img src={tankIcon} alt="tank" className="w-8 h-8 object-contain" />
+        </div>
+
+        <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 z-30">
+          <span className="text-xs font-medium text-text-primary bg-secondary/90 px-1 rounded">
+            {percentage.toFixed(1)}%
           </span>
         </div>
 
         <Handle
           type="target"
           position={HandlePosition.Left}
-          className="w-3 h-3 bg-[rgb(67 191 235)]"
+          className="w-3 h-3 bg-[rgb(67 191 235)] z-40"
         />
         <Handle
           type="source"
           position={HandlePosition.Right}
-          className="w-3 h-3 bg-[rgb(67 191 235)]"
+          className="w-3 h-3 bg-[rgb(67 191 235)] z-40"
         />
       </div>
-      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-20">
+
+      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-roboto text-text-primary max-w-20">
         <div
           className="truncate text-center font-medium font-roboto text-xs"
           title={`${currentLevel}/${capacity} ${unit}`}
@@ -75,7 +81,7 @@ Capacity : ${capacity} ${unit}
           {currentLevel}/{capacity} {unit}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
