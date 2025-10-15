@@ -39,7 +39,7 @@ Capacity : ${capacity} ${unit}
       >
         <div className="absolute inset-0 z-0">
           <div
-            className="absolute bottom-0 left-22 right-0 bg-[#23a9e1] transition-all duration-500 ease-in-out"
+            className="absolute bottom-0 left-22 right-0 bg-status-info transition-all duration-500 ease-in-out"
             style={{
               height: `${fillHeight}%`,
               width: "100%",
