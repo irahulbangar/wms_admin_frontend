@@ -126,6 +126,7 @@ interface PlantPayload {
   address: string;
   status: string;
   organization_id?: string;
+  unit: string;
 }
 
 // Add plant

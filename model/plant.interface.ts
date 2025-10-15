@@ -13,6 +13,7 @@ export interface PlantResult {
   longitude: string;
   address: string;
   status: string;
+  unit: string;
   created_at: string;
   updated_at: string;
 }

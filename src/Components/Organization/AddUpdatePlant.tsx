@@ -15,6 +15,7 @@ interface PlantFormData {
   longitude: string;
   address: string;
   status: string;
+  unit: string;
 }
 
 interface AddUpdatePlantProps {
@@ -44,6 +45,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
     longitude: "",
     address: "",
     status: "active",
+    unit: "ltr",
   });
 
   const [errors, setErrors] = useState<Partial<PlantFormData>>({});
@@ -68,6 +70,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             longitude: plant.longitude || "",
             address: plant.address || "",
             status: plant.status || "active",
+            unit: plant.unit || "ltr",
           };
           setFormData(newFormData);
         } else {
@@ -79,28 +82,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
       });
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<PlantFormData> = {};
-
-    if (!formData.plant_name.trim()) {
-      newErrors.plant_name = "Plant name is required";
-    }
-
-    if (!formData.latitude.trim()) {
-      newErrors.latitude = "Latitude is required";
-    }
-
-    if (!formData.longitude.trim()) {
-      newErrors.longitude = "Longitude is required";
-    }
-
-    if (!formData.address.trim()) {
-      newErrors.address = "Address is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -124,9 +105,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
 
     if (type === "add" && !organizationId) {
       Error("Organization ID is required to add a plant");
@@ -233,9 +211,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             }`}
             placeholder="Enter plant name"
           />
-          {errors.plant_name && (
-            <p className="text-status-danger text-sm">{errors.plant_name}</p>
-          )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Latitude
@@ -250,9 +225,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
               errors.latitude ? "border-status-danger" : "border-border-primary"
             }`}
           />
-          {errors.latitude && (
-            <p className="text-status-danger text-sm">{errors.latitude}</p>
-          )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Longitude
@@ -269,9 +241,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
                 : "border-border-primary"
             }`}
           />
-          {errors.longitude && (
-            <p className="text-status-danger text-sm">{errors.longitude}</p>
-          )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Address
@@ -286,9 +255,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             }`}
             placeholder="Enter address"
           />
-          {errors.address && (
-            <p className="text-status-danger text-sm">{errors.address}</p>
-          )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Status
@@ -301,6 +267,19 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
           >
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
+          </select>
+
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            Unit
+          </label>
+          <select
+            name="unit"
+            value={formData.unit}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+          >
+            <option value="Ltr">Ltr</option>
+            <option value="M^3">M^3</option>
           </select>
 
           <div className="flex items-center justify-end gap-4 pt-6">
