@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAppDispatch } from "../../../../store/store";
-import {
-  getPlantById,
-  updateDiagramData,
-} from "../../../../store/plantSlice";
+import { getPlantById, updateDiagramData } from "../../../../store/plantSlice";
 import { getDeviceByPlantId } from "../../../../store/deviceSlice";
 import type { SinglePlantResult } from "../../../../model/single-plant.interface";
 import type { DeviceResult } from "../../../../model/devices.interface";
@@ -23,9 +20,7 @@ export const useDiagramData = (plantId: string | undefined) => {
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDiagram, setIsLoadingDiagram] = useState(false);
-  const [plantData, setPlantData] = useState<SinglePlantResult | null>(
-    null
-  );
+  const [plantData, setPlantData] = useState<SinglePlantResult | null>(null);
   const [deviceData, setDeviceData] = useState<DeviceResult[]>([]);
   const [departmentDimensions, setDepartmentDimensions] = useState<
     Record<string, { width: number; height: number }>
@@ -36,10 +31,12 @@ export const useDiagramData = (plantId: string | undefined) => {
 
   const convertDevicesToDiagramCallback = useCallback(
     (devices: DeviceResult[]) => {
-      const plantInfo = plantData ? {
-        plant_name: plantData.plant_name,
-        plant_id: plantData.plant_id
-      } : undefined;
+      const plantInfo = plantData
+        ? {
+            plant_name: plantData.plant_name,
+            plant_id: plantData.plant_id,
+          }
+        : undefined;
       return convertDevicesToDiagram(devices, plantInfo);
     },
     [plantData]
@@ -109,7 +106,8 @@ export const useDiagramData = (plantId: string | undefined) => {
         })
         .catch((err: any) => {
           console.error("Error fetching device data:", err);
-        }).finally(() => {
+        })
+        .finally(() => {
           setIsLoadingDiagram(false);
         });
     } catch (err) {
@@ -123,29 +121,92 @@ export const useDiagramData = (plantId: string | undefined) => {
 
     const savedDeviceIds = new Set(
       nodes
-        ?.filter(node => node.type !== "group")
-        ?.map(node => {
+        ?.filter((node) => node.type !== "group")
+        ?.map((node) => {
           const deviceName = node.data?.label;
           return deviceName;
         })
         ?.filter(Boolean) || []
     );
 
-    const newDevices = deviceData?.filter(device => 
-      !savedDeviceIds.has(device.device_name) && device.visibility !== "hidden"
-    ) || [];
+    const newDevices =
+      deviceData?.filter(
+        (device) =>
+          !savedDeviceIds.has(device.device_name) &&
+          device.visibility !== "hidden"
+      ) || [];
 
     if (newDevices.length === 0) return;
 
-    const { nodes: newDeviceNodes } = convertDevicesToDiagramCallback(newDevices);
-    
-    const deviceNodesOnly = newDeviceNodes.filter(node => node.type !== "group");
-    
+    const { nodes: newDeviceNodes } =
+      convertDevicesToDiagramCallback(newDevices);
+
+    const deviceNodesOnly = newDeviceNodes.filter(
+      (node) => node.type !== "group"
+    );
+
     if (deviceNodesOnly.length > 0) {
-      setNodes(currentNodes => [...(currentNodes || []), ...deviceNodesOnly]);
+      setNodes((currentNodes) => [...(currentNodes || []), ...deviceNodesOnly]);
       setHasChanges(true);
     }
   }, [deviceData, nodes, convertDevicesToDiagramCallback]);
+
+  const getSystemConnection = (matchingDevice: any): string => {
+    if (
+      matchingDevice.in_system_id === null &&
+      matchingDevice.out_system_id === null
+    ) {
+      return "None";
+    }
+    if (matchingDevice.in_system_id && matchingDevice.out_system_id) {
+      return "Both";
+    }
+    if (matchingDevice.in_system_id && !matchingDevice.out_system_id) {
+      return "In";
+    }
+    if (!matchingDevice.in_system_id && matchingDevice.out_system_id) {
+      return "Out";
+    }
+    return "None";
+  };
+
+  const getPlantConnection = (matchingDevice: any): string => {
+    if (
+      matchingDevice.in_plant_id === null &&
+      matchingDevice.out_plant_id === null
+    ) {
+      return "None";
+    }
+    if (matchingDevice.in_plant_id && matchingDevice.out_plant_id) {
+      return "Both";
+    }
+    if (matchingDevice.in_plant_id && !matchingDevice.out_plant_id) {
+      return "In";
+    }
+    if (!matchingDevice.in_plant_id && matchingDevice.out_plant_id) {
+      return "Out";
+    }
+    return "None";
+  };
+
+  const getDepartmentConnection = (matchingDevice: any): string => {
+    if (
+      matchingDevice.in_department_id === null &&
+      matchingDevice.out_department_id === null
+    ) {
+      return "None";
+    }
+    if (matchingDevice.in_department_id && matchingDevice.out_department_id) {
+      return "Both";
+    }
+    if (matchingDevice.in_department_id && !matchingDevice.out_department_id) {
+      return "In";
+    }
+    if (!matchingDevice.in_department_id && matchingDevice.out_department_id) {
+      return "Out";
+    }
+    return "None";
+  };
 
   const updateNodesWithDynamicData = useCallback(() => {
     if (deviceData?.length === 0 || nodes?.length === 0) return;
@@ -169,11 +230,11 @@ export const useDiagramData = (plantId: string | undefined) => {
                   Number(matchingDevice?.last_record?.last_level) || 0,
                 capacity: Number(matchingDevice?.params?.storageCapacity) || 0,
                 height: Number(matchingDevice?.params?.height) || 0,
-                departmentConnection: matchingDevice?.in_department_id === null ? "None" : matchingDevice?.in_department_id ? "In" : "Out",
-                plantConnection: matchingDevice?.in_plant_id === null ? "None" : matchingDevice?.in_plant_id ? "In" : "Out",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
+                systemConnection: getSystemConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.in_system_id === null ? "None" : matchingDevice?.in_system_id ? "In" : "Out",
               },
             };
           }
@@ -191,14 +252,13 @@ export const useDiagramData = (plantId: string | undefined) => {
               data: {
                 ...node.data,
                 flowRate: Number(matchingDevice?.last_record?.avg) || 0,
-                totalizerReading:
-                  Number(matchingDevice?.last_record?.max) || 0,
+                totalizerReading: Number(matchingDevice?.last_record?.max) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.in_department_id === null ? "None" : matchingDevice?.in_department_id ? "In" : "Out",
-                plantConnection: matchingDevice?.in_plant_id === null ? "None" : matchingDevice?.in_plant_id ? "In" : "Out",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.in_system_id === null ? "None" : matchingDevice?.in_system_id ? "In" : "Out",
+                systemConnection: getSystemConnection(matchingDevice),
               },
             };
           }
@@ -220,11 +280,11 @@ export const useDiagramData = (plantId: string | undefined) => {
                 max: Number(matchingDevice?.last_record?.max) || 0,
                 min: Number(matchingDevice?.last_record?.min) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.in_department_id === null ? "None" : matchingDevice?.in_department_id ? "In" : "Out",
-                plantConnection: matchingDevice?.in_plant_id === null ? "None" : matchingDevice?.in_plant_id ? "In" : "Out",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.in_system_id === null ? "None" : matchingDevice?.in_system_id ? "In" : "Out",
+                systemConnection: getSystemConnection(matchingDevice),
               },
             };
           }
@@ -250,11 +310,11 @@ export const useDiagramData = (plantId: string | undefined) => {
                 currentB: Number(matchingDevice?.last_record?.Current_b) || 0,
                 frequency: Number(matchingDevice?.last_record?.Frequency) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.in_department_id === null ? "None" : matchingDevice?.in_department_id ? "In" : "Out",
-                plantConnection: matchingDevice?.in_plant_id === null ? "None" : matchingDevice?.in_plant_id ? "In" : "Out",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.in_system_id === null ? "None" : matchingDevice?.in_system_id ? "In" : "Out",
+                systemConnection: getSystemConnection(matchingDevice),
               },
             };
           }
@@ -276,11 +336,11 @@ export const useDiagramData = (plantId: string | undefined) => {
                 lastMm: Number(matchingDevice?.last_record?.last_mm) || 0,
                 firstMm: Number(matchingDevice?.last_record?.first_mm) || 0,
                 isActive: matchingDevice?.device_status === "active",
-                departmentConnection: matchingDevice?.in_department_id === null ? "None" : matchingDevice?.in_department_id ? "In" : "Out",
-                plantConnection: matchingDevice?.in_plant_id === null ? "None" : matchingDevice?.in_plant_id ? "In" : "Out",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.in_system_id === null ? "None" : matchingDevice?.in_system_id ? "In" : "Out",
+                systemConnection: getSystemConnection(matchingDevice),
               },
             };
           }
@@ -297,23 +357,30 @@ export const useDiagramData = (plantId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                departmentConnection: matchingDevice?.in_department_id === null ? "None" : matchingDevice?.in_department_id ? "In" : "Out",
-                plantConnection: matchingDevice?.in_plant_id === null ? "None" : matchingDevice?.in_plant_id ? "In" : "Out",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                systemConnection: matchingDevice?.in_system_id === null ? "None" : matchingDevice?.in_system_id ? "In" : "Out",
+                systemConnection: getSystemConnection(matchingDevice),
               },
             };
           }
         } else if (node.type === "group" && node.data.type === "department") {
           const departmentId = node.id.replace("dept-", "");
           const departmentDevices = deviceData.filter(
-            (device) => device?.in_department_id?.toString() === departmentId || device?.out_department_id?.toString() === departmentId
+            (device) =>
+              device?.in_department_id?.toString() === departmentId ||
+              device?.out_department_id?.toString() === departmentId
           );
 
           if (departmentDevices?.length > 0) {
-            const latestDepartmentName = departmentDevices[0]?.in_department_name || departmentDevices[0]?.out_department_name;
-            if (latestDepartmentName && latestDepartmentName !== node?.data?.label) {
+            const latestDepartmentName =
+              departmentDevices[0]?.in_department_name ||
+              departmentDevices[0]?.out_department_name;
+            if (
+              latestDepartmentName &&
+              latestDepartmentName !== node?.data?.label
+            ) {
               return {
                 ...node,
                 data: {
@@ -326,11 +393,14 @@ export const useDiagramData = (plantId: string | undefined) => {
         } else if (node.type === "group" && node.data.type === "plant") {
           const plantId = node.id.replace("plant-", "");
           const plantDevices = deviceData.filter(
-            (device) => device?.in_plant_id?.toString() === plantId || device?.out_plant_id?.toString() === plantId
+            (device) =>
+              device?.in_plant_id?.toString() === plantId ||
+              device?.out_plant_id?.toString() === plantId
           );
 
           if (plantDevices?.length > 0) {
-            const latestPlantName = plantDevices[0].in_plant_name || plantDevices[0].out_plant_name;
+            const latestPlantName =
+              plantDevices[0].in_plant_name || plantDevices[0].out_plant_name;
             if (latestPlantName && latestPlantName !== node.data.label) {
               return {
                 ...node,
@@ -501,7 +571,7 @@ export const useDiagramData = (plantId: string | undefined) => {
         detail: { deviceData, timestamp: Date.now() },
       });
       document.dispatchEvent(event);
-      
+
       if (diagramGeneratedRef.current && nodes.length > 0) {
         mergeNewDevicesWithSavedData();
       }
