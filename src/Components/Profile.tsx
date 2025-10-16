@@ -7,11 +7,11 @@ const Profile: React.FC = () => {
 
   return (
     <div className="max-w-full">
-      <div className="mb-8">
-        <h1 className="text-3xl font-medium text-text-primary font-roboto">
+      <div className="mb-4">
+        <span className="text-2xl font-medium text-text-primary font-roboto">
           Profile Settings
-        </h1>
-        <p className="text-text-secondary mt-2 font-roboto">
+        </span>
+        <p className="text-text-secondary font-roboto">
           Manage your account information and preferences
         </p>
       </div>
@@ -23,7 +23,7 @@ const Profile: React.FC = () => {
               <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-12 h-12 text-white" />
               </div>
-              <h2 className="text-xl font-semibold text-text-primary font-roboto">
+              <h2 className="text-xl font-medium text-text-primary font-roboto">
                 {admin?.name}
               </h2>
               <p className="text-text-secondary font-roboto">{admin?.role}</p>
@@ -57,7 +57,7 @@ const Profile: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-card border border-border-primary rounded-xl p-6 shadow-sm font-roboto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-text-primary font-roboto">
+              <h3 className="text-lg font-medium text-text-primary font-roboto">
                 Personal Information
               </h3>
             </div>

@@ -91,7 +91,7 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full relative z-10 bg-primary rounded-lg shadow-xl p-8">
         <div className="flex items-center justify-between">
           <div className="flex flex-col mb-6">
-            <h2 className="text-3xl font-bold text-text-primary mb-1 font-roboto">
+            <h2 className="text-3xl font-semibold text-text-primary mb-1 font-roboto">
               Welcome Back
             </h2>
             <p className="text-text-secondary font-roboto">

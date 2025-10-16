@@ -18,7 +18,7 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({
   return (
     <div className="text-center py-12 bg-primary rounded-lg h-full flex flex-col items-center justify-center">
       {icon}
-      <h3 className="text-lg font-semibold text-text-primary mb-2 font-roboto">
+      <h3 className="text-lg font-medium text-text-primary mb-2 font-roboto">
         {title}
       </h3>
       <p className="text-text-secondary mb-4 font-roboto">{description}</p>

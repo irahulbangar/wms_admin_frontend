@@ -68,7 +68,7 @@ Type: Sink Node
       />
 
       {/* Label */}
-      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-red-600 font-semibold bg-white px-2 py-1 rounded shadow">
+      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-red-600 font-medium bg-white px-2 py-1 rounded shadow">
         SINK
       </div>
     </div>

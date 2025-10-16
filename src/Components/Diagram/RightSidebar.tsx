@@ -692,7 +692,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               }`}
             ></div>
             <div>
-              <h2 className="text-lg font-semibold text-text-primary">
+              <h2 className="text-lg font-medium text-text-primary">
                 {selectedGroup?.name}
               </h2>
               <p className="text-xs text-text-secondary capitalize">
@@ -702,7 +702,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-border-primary rounded-full transition-colors"
+            className="p-1 hover:bg-border-primary rounded-full transition-colors cursor-pointer"
           >
             <X className="w-5 h-5 text-text-secondary" />
           </button>
@@ -715,7 +715,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               onClick={() => setIsFlowSummaryExpanded(!isFlowSummaryExpanded)}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center gap-2">
+                <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
                   <ChartArea className="w-5 h-5" />
                   Flow Summary Report
                 </h3>
@@ -798,7 +798,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   onClick={() => setIsStorageExpanded(!isStorageExpanded)}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center space-x-2">
+                    <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center space-x-2">
                       <Package className="w-4 h-4" />
                       <span>Storage Summary Report</span>
                     </h3>
@@ -877,9 +877,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 onClick={() => setIsInConnectionExpanded(!isInConnectionExpanded)}
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center gap-2">
+                  <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
                     <ChartArea className="w-5 h-5" />
-                    IN Connection Report Types & Calculations
+                    Report Types IN Calculations
                   </h3>
                   {isInConnectionExpanded ? (
                     <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -955,9 +955,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 onClick={() => setIsOutConnectionExpanded(!isOutConnectionExpanded)}
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-medium font-roboto text-text-primary flex items-center gap-2">
+                  <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
                     <ChartArea className="w-5 h-5" />
-                    OUT Connection Report Types & Calculations
+                    Report Types OUT Calculations
                   </h3>
                   {isOutConnectionExpanded ? (
                     <ChevronDown className="w-4 h-4 text-text-secondary" />

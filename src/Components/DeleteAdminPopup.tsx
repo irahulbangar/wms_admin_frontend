@@ -29,7 +29,7 @@ const DeleteAdminPopup: React.FC<DeleteAdminPopupProps> = ({
       <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full transform transition-all">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
           <div className="flex items-center gap-3">
-            <h3 className="text-xl font-semibold text-text-primary font-roboto">
+            <h3 className="text-xl font-medium text-text-primary font-roboto">
               Delete Admin User
             </h3>
           </div>

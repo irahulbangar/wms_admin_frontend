@@ -244,7 +244,7 @@ const Dashboard = () => {
           <div className="flex items-center md:justify-end justify-center space-x-3">
             <div className="flex items-center space-x-2 text-text-primary">
               <Calendar className="w-5 h-5 text-text-secondary" />
-              <span className="font-roboto font-semibold text-base">
+              <span className="font-roboto font-medium text-base">
                 {currentTime.toLocaleDateString("en-IN", {
                   weekday: "short",
                   day: "numeric",
@@ -255,7 +255,7 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center space-x-2 text-text-primary">
               <Clock className="w-5 h-5 text-text-secondary" />
-              <span className="font-roboto font-semibold text-base">
+              <span className="font-roboto font-medium text-base">
                 {currentTime.toLocaleTimeString("en-IN", {
                   hour: "2-digit",
                   minute: "2-digit",

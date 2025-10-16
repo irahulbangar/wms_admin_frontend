@@ -241,7 +241,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
-          <h2 className="text-xl font-semibold text-text-primary font-roboto">
+          <h2 className="text-xl font-medium text-text-primary font-roboto">
             {type === "update" ? "Update User" : "Add New User"}
             {isFetching && type === "update" && (
               <span className="ml-2 text-sm text-text-muted">

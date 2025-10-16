@@ -209,7 +209,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
-          <h2 className="text-xl font-semibold text-text-primary font-roboto">
+          <h2 className="text-xl font-medium text-text-primary font-roboto">
             {editingUserPlantId ? "Edit User Plant" : "Add User Plants"}
           </h2>
           <button

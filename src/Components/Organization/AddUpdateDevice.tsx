@@ -475,7 +475,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-semibold text-text-primary font-roboto">
+            <h2 className="text-2xl font-medium text-text-primary font-roboto">
               {type === "update" ? "Update Device" : "Add New Device"}
             </h2>
             <div className="flex items-center gap-2 mt-1 text-sm text-text-secondary">
@@ -514,7 +514,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2">
+              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2">
                 Device Details
               </label>
             </div>
@@ -722,7 +722,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
 
             <div>
-              <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 Device Connection
               </label>
             </div>
@@ -780,7 +780,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="none">None</option>
                   <option value="in">In</option>
                   <option value="out">Out</option>
-                  <option value="both">Both</option>
                 </select>
               </div>
 
@@ -1011,7 +1010,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
             {/* Common Parameters */}
             <div>
-              <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 Common Parameters
               </label>
             </div>
@@ -1117,7 +1116,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             {getSelectedDeviceFamilyName() === "tank" && (
               <>
                 <div>
-                  <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                  <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                     Tank Parameters
                   </label>
                 </div>
@@ -1222,7 +1221,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             {getSelectedDeviceFamilyName() === "brwhms" && (
               <>
                 <div>
-                  <label className="block text-xl font-semibold text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                  <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                     BRWHMS Parameters
                   </label>
                 </div>

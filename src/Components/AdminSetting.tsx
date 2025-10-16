@@ -7,7 +7,6 @@ import {
   Save,
   Shield,
   Palette,
-  User,
   Lock,
 } from "lucide-react";
 import { useState } from "react";
@@ -148,7 +147,7 @@ const AdminSetting = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Settings className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary font-roboto">
+              <h2 className="text-xl font-medium text-text-primary font-roboto">
                 Theme Settings
               </h2>
             </div>
@@ -192,7 +191,7 @@ const AdminSetting = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Shield className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary font-roboto">
+              <h2 className="text-xl font-medium text-text-primary font-roboto">
                 Change Password
               </h2>
             </div>
@@ -300,29 +299,6 @@ const AdminSetting = () => {
                 )}
               </button>
             </form>
-          </div>
-        )}
-
-        {activeTab === "profile" && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <User className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-semibold text-text-primary font-roboto">
-                Profile Settings
-              </h2>
-            </div>
-
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-text-muted" />
-              </div>
-              <h3 className="text-lg font-medium text-text-primary mb-2 font-roboto">
-                Profile Settings
-              </h3>
-              <p className="text-text-secondary font-roboto">
-                Profile settings functionality coming soon...
-              </p>
-            </div>
           </div>
         )}
       </div>

@@ -212,7 +212,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
         <div className="flex items-center justify-between sticky top-0 bg-primary px-6 py-4 border-b border-border-primary z-10">
-          <h2 className="text-xl font-semibold text-text-primary font-roboto">
+          <h2 className="text-xl font-medium text-text-primary font-roboto">
             {type === "add" ? "Add New Organization" : "Update Organization"}
           </h2>
           <button

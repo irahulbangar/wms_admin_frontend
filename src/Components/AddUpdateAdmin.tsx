@@ -199,7 +199,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-card border border-border-primary rounded-xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto h-full">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary">
-          <h2 className="text-xl font-semibold text-text-primary font-roboto">
+          <h2 className="text-xl font-medium text-text-primary font-roboto">
             {type === "update" ? "Update Admin" : "Add Admin"}
           </h2>
           <button
