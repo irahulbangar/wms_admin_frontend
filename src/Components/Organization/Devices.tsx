@@ -709,7 +709,11 @@ const Devices = () => {
   };
 
   const handleBackToPlants = () => {
-    navigate("/organization/plants");
+    if (organization_id) {
+      navigate(`/organization/plants/${organization_id}`);
+    } else {
+      navigate("/organization/plants");
+    }
   };
 
   const handleBackToOrganizations = () => {
@@ -717,7 +721,11 @@ const Devices = () => {
   };
 
   const handleBackToDepartments = () => {
-    navigate("/organization/departments");
+    if (organization_id && plant_id) {
+      navigate(`/organization/departments/${organization_id}/${plant_id}`);
+    } else {
+      navigate("/organization/departments");
+    }
   };
 
   const handleBackToHome = () => {

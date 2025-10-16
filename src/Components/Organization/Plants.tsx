@@ -149,7 +149,6 @@ const Plants = () => {
 
   const getPlantByOrganizationId = useCallback(
     async (orgId?: string) => {
-      if (isLoading) return;
       setIsLoading(true);
       try {
         const targetOrgId = orgId || organization_id;
@@ -210,6 +209,7 @@ const Plants = () => {
 
     if (organization_id) {
       setSelectedOrganizationId(organization_id);
+      getPlantByOrganizationId(organization_id);
     } else {
       setSelectedOrganizationId("all");
       fetchPlants();
@@ -217,6 +217,7 @@ const Plants = () => {
   }, [
     organization_id,
     fetchPlants,
+    getPlantByOrganizationId,
     getAllOrganizations,
   ]);
 
@@ -240,13 +241,22 @@ const Plants = () => {
     setFilteredPlants(filtered);
   }, [plants, filterBy, searchTerm]);
 
+  // This useEffect handles dropdown changes (not URL parameter changes)
   useEffect(() => {
+    // Only trigger if selectedOrganizationId changed due to dropdown selection
+    // and not due to URL parameter (which is handled in the first useEffect)
     if (selectedOrganizationId === "all") {
       fetchPlants();
-    } else if (selectedOrganizationId !== "all") {
+    } else if (selectedOrganizationId !== "all" && !organization_id) {
+      // Only call API if there's no organization_id in URL (dropdown selection)
       getPlantByOrganizationId(selectedOrganizationId);
     }
-  }, [selectedOrganizationId, fetchPlants, getPlantByOrganizationId]);
+  }, [
+    selectedOrganizationId,
+    fetchPlants,
+    getPlantByOrganizationId,
+    organization_id,
+  ]);
 
   const filteredOrganizations = organizations.filter((organization) =>
     organization.organization_name
@@ -462,7 +472,11 @@ const Plants = () => {
       ) : (
         <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
           <div className="overflow-auto h-[calc(100vh-295px)] table-scrollbar">
-            <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedPlants?.length > 0 ? "h-auto" : "h-full"}`}>
+            <table
+              className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                handlePaginatedPlants?.length > 0 ? "h-auto" : "h-full"
+              }`}
+            >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
@@ -709,7 +723,10 @@ const Plants = () => {
             <div className="p-6">
               <p className="text-text-secondary mb-4 font-roboto">
                 Are you sure you want to delete this plant{" "}
-                <span className="font-medium font-roboto">{plantTitle || "N/A"}</span>?
+                <span className="font-medium font-roboto">
+                  {plantTitle || "N/A"}
+                </span>
+                ?
               </p>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-border-primary">

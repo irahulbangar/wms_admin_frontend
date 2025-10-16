@@ -483,7 +483,12 @@ const Departments = () => {
   };
 
   const handleBackToPlants = () => {
-    navigate("/organization/plants");
+    const currentOrganization = organization_id || selectedOrganization;
+    if (currentOrganization && currentOrganization !== "all") {
+      navigate(`/organization/plants/${currentOrganization}`);
+    } else {
+      navigate("/organization/plants");
+    }
   };
 
   const handleViewDevices = (
