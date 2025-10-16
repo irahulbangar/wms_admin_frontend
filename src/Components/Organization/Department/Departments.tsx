@@ -21,7 +21,11 @@ import {
 import { getAllPlants, setPlants } from "../../../../store/plantSlice";
 import type { DepartmentResult } from "../../../../model/department.interface";
 import { Error, Warning } from "../../../utils/toast";
-import { getAllDepartments, getDepartmentByOrganizationIdAndPlantId, setDepartments } from "../../../../store/departmentSlice";
+import {
+  getAllDepartments,
+  getDepartmentByOrganizationIdAndPlantId,
+  setDepartments,
+} from "../../../../store/departmentSlice";
 import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
@@ -125,6 +129,26 @@ const Departments = () => {
   }, [getOrganization, fetchPlants]);
 
   useEffect(() => {
+    if (organization_id) {
+      setSelectedOrganization(organization_id);
+    } else {
+      setSelectedOrganization("all");
+    }
+
+    if (plant_id) {
+      setSelectedPlant(plant_id);
+    } else {
+      setSelectedPlant("all");
+    }
+
+    if (!organization_id && !plant_id) {
+      setOrganizationSearchTerm("");
+      setPlantSearchTerm("");
+      refreshDepartments();
+    }
+  }, [organization_id, plant_id]);
+
+  useEffect(() => {
     let filtered = departments;
 
     if (searchTerm) {
@@ -155,7 +179,15 @@ const Departments = () => {
     }
 
     setFilteredDepartments(filtered);
-  }, [departments, selectedOrganization, selectedPlant, plants, searchTerm, organization_id, plant_id]);
+  }, [
+    departments,
+    selectedOrganization,
+    selectedPlant,
+    plants,
+    searchTerm,
+    organization_id,
+    plant_id,
+  ]);
 
   const filteredOrganizations = organizations.filter((org) =>
     org.organization_name
@@ -237,9 +269,11 @@ const Departments = () => {
   const handleAddDepartment = () => {
     const currentOrganization = organization_id || selectedOrganization;
     const currentPlant = plant_id || selectedPlant;
-    
+
     if (currentOrganization === "all" || currentPlant === "all") {
-      Warning("Please select both organization and plant before adding a department");
+      Warning(
+        "Please select both organization and plant before adding a department"
+      );
       return;
     }
 
@@ -259,13 +293,15 @@ const Departments = () => {
     setOrganizationId(derivedOrganizationId);
 
     if (!derivedOrganizationId) {
-      Warning("Organization not found for this department. Please select an organization first.");
+      Warning(
+        "Organization not found for this department. Please select an organization first."
+      );
     }
   };
 
   const refreshDepartments = useCallback(() => {
     if (isLoading) return;
-    
+
     if (organization_id && plant_id) {
       setIsLoading(true);
     }
@@ -346,79 +382,97 @@ const Departments = () => {
     } else {
       refreshDepartments();
     }
-  }, [organization_id, plant_id, selectedOrganization, selectedPlant, dispatch, refreshDepartments]);
+  }, [
+    organization_id,
+    plant_id,
+    selectedOrganization,
+    selectedPlant,
+    dispatch,
+    refreshDepartments,
+  ]);
 
-  const handleDepartmentUpdate = useCallback((result?: {
-    data?: {
-      refreshPlants?: boolean;
-      refreshOrganizations?: boolean;
-    };
-  }) => {
-    if (isLoading) return;
-    
-    if (result?.data?.refreshPlants) {
-      fetchPlants();
-      return;
-    }
+  const handleDepartmentUpdate = useCallback(
+    (result?: {
+      data?: {
+        refreshPlants?: boolean;
+        refreshOrganizations?: boolean;
+      };
+    }) => {
+      if (isLoading) return;
 
-    if (result?.data?.refreshOrganizations) {
-      getOrganization();
-      return;
-    }
+      if (result?.data?.refreshPlants) {
+        fetchPlants();
+        return;
+      }
 
-    setIsLoading(true);
+      if (result?.data?.refreshOrganizations) {
+        getOrganization();
+        return;
+      }
 
-    if (organization_id && plant_id) {
-      dispatch(
-        getDepartmentByOrganizationIdAndPlantId({
-          plant_id: parseInt(plant_id),
-          organization_id: parseInt(organization_id),
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success || res.status === 200) {
-            dispatch(setDepartments(res?.data));
-            setFilteredDepartments(res?.data);
-          } else {
-            Error(res.message || "Failed to refresh departments");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error(err.message || "Failed to refresh departments");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
-      dispatch(
-        getDepartmentByOrganizationIdAndPlantId({
-          plant_id: parseInt(selectedPlant),
-          organization_id: parseInt(selectedOrganization),
-        })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success || res.status === 200) {
-            dispatch(setDepartments(res?.data));
-            setFilteredDepartments(res?.data);
-          } else {
-            Error(res.message || "Failed to refresh departments");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          Error(err.message || "Failed to refresh departments");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      refreshDepartments();
-    }
+      setIsLoading(true);
 
-  }, [dispatch, selectedOrganization, selectedPlant, organization_id, plant_id, refreshDepartments, fetchPlants, getOrganization]);
+      if (organization_id && plant_id) {
+        dispatch(
+          getDepartmentByOrganizationIdAndPlantId({
+            plant_id: parseInt(plant_id),
+            organization_id: parseInt(organization_id),
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success || res.status === 200) {
+              dispatch(setDepartments(res?.data));
+              setFilteredDepartments(res?.data);
+            } else {
+              Error(res.message || "Failed to refresh departments");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error(err.message || "Failed to refresh departments");
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
+        dispatch(
+          getDepartmentByOrganizationIdAndPlantId({
+            plant_id: parseInt(selectedPlant),
+            organization_id: parseInt(selectedOrganization),
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success || res.status === 200) {
+              dispatch(setDepartments(res?.data));
+              setFilteredDepartments(res?.data);
+            } else {
+              Error(res.message || "Failed to refresh departments");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            Error(err.message || "Failed to refresh departments");
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      } else {
+        refreshDepartments();
+      }
+    },
+    [
+      dispatch,
+      selectedOrganization,
+      selectedPlant,
+      organization_id,
+      plant_id,
+      refreshDepartments,
+      fetchPlants,
+      getOrganization,
+    ]
+  );
 
   const handleBackToHome = () => {
     navigate("/");
@@ -432,8 +486,14 @@ const Departments = () => {
     navigate("/organization/plants");
   };
 
-  const handleViewDevices = (departmentId: number, organizationId: number, plantId: number) => {
-    navigate(`/organization/devices/${organizationId}/${plantId}/${departmentId}`);
+  const handleViewDevices = (
+    departmentId: number,
+    organizationId: number,
+    plantId: number
+  ) => {
+    navigate(
+      `/organization/devices/${organizationId}/${plantId}/${departmentId}`
+    );
   };
 
   const handlePaginatedDepartments = useMemo(() => {
@@ -476,7 +536,8 @@ const Departments = () => {
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
               {plants.find(
-                (plant) => plant.plant_id.toString() === (plant_id || selectedPlant)
+                (plant) =>
+                  plant.plant_id.toString() === (plant_id || selectedPlant)
               )?.plant_name || "Plant"}
             </span>
           </>
@@ -582,7 +643,9 @@ const Departments = () => {
                   (plant_id || selectedPlant) === "all"
                     ? "All Plant"
                     : plants.find(
-                        (plant) => plant.plant_id.toString() === (plant_id || selectedPlant)
+                        (plant) =>
+                          plant.plant_id.toString() ===
+                          (plant_id || selectedPlant)
                       )?.plant_name || "Select plant..."
                 }
                 readOnly
@@ -682,150 +745,186 @@ const Departments = () => {
 
       {isLoading ? (
         <div className="flex items-center justify-center h-full bg-primary rounded-lg">
-        <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
-      </div>
-      ) : (
-      <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
-        <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-295px)] table-scrollbar">
-          <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedDepartments?.length > 0 ? "h-auto" : "h-full"} min-w-[800px]`}>
-            <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-              <tr>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Sr No
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Department Name
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Organization Name
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Plant Name
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Department Info
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Created At
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Updated At
-                </th>
-                <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="min-h-[800px]">
-              { handlePaginatedDepartments.length > 0 ? (
-              handlePaginatedDepartments.map((department, index) => (
-              <tr onDoubleClick={() => handleViewDevices(department.department_id, department.organization_id, department.plant_id)} key={index} className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer">
-                <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                  {(currentPage - 1) * rowsPerPage + index + 1}
-                </td>
-                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  {department.department_name}
-                </td>
-                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  {department.organization_name}
-                </td>
-                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  {department.plant_name}
-                </td>
-                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  {department.department_info || "N/A"}
-                </td>
-                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  {fromatDateWithTime(department.created_at)}
-                </td>
-                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  {fromatDateWithTime(department.updated_at)}
-                </td>
-                <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                  <div className="flex items-center justify-center gap-2">
-                    <span title="View devices" aria-label="View devices">
-                      <Eye
-                        onClick={() =>
-                          handleViewDevices(department.department_id, department.organization_id, department.plant_id)
-                        }
-                      className="w-5 h-5 text-fuchsia-500 cursor-pointer" />
-                    </span>
-
-                    <span title="Edit department" aria-label="Edit department">
-                      <Edit
-                        onClick={() =>
-                          handleEditDepartment(department.department_id, department.plant_id)
-                        }
-                       className="w-5 h-5 text-status-info cursor-pointer" />
-                    </span>
-
-                    {admin?.role === "super_admin" && (
-                      <span title="Delete department" aria-label="Delete department">
-                        <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
-                      </span>
-                    )}
-                  </div>
-                  </td>
-                </tr>
-              ))
-              ) : (
-                <tr>
-                  <td colSpan={8} className="text-text-primary text-center font-roboto text-sm h-full">
-                    <NoDataFound
-                      icon={<Dock className="w-16 h-16 text-text-muted mx-auto mb-4" />}
-                      title={
-                        searchTerm || selectedOrganization !== "all"
-                          ? "No departments match your search/filter"
-                          : selectedOrganization === "all"
-                          ? "No departments found"
-                          : `No departments found for ${
-                              organizations.find(
-                                (org) => org.organization_id === selectedOrganization
-                              )?.organization_name ||
-                              `Organization ${selectedOrganization}`
-                            }`
-                      }
-                      description={
-                        searchTerm || selectedOrganization !== "all"
-                          ? "Try adjusting your search terms or filter criteria"
-                          : selectedOrganization === "all"
-                          ? "Add your first department to get started"
-                          : `Add your first department for ${
-                              organizations.find(
-                                (org) => org.organization_id === selectedOrganization
-                              )?.organization_name ||
-                              `Organization ${selectedOrganization}`
-                            } to get started`
-                      }
-                      buttonText={
-                        searchTerm || selectedOrganization !== "all"
-                          ? "Clear Search"
-                          : "Add Department"
-                      }
-                      buttonOnClick={() => {
-                        if (searchTerm || selectedOrganization !== "all") {
-                          setSearchTerm("");
-                          setSelectedOrganization("all");
-                        } else {
-                          setIsAddDepartmentOpen(true);
-                        }
-                      }}
-                    />
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          rowsPerPage={rowsPerPage}
-          totalItems={totalItems}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleRowsPerPageChange}
-        />
-      </div>
+      ) : (
+        <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
+          <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-295px)] table-scrollbar">
+            <table
+              className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                handlePaginatedDepartments?.length > 0 ? "h-auto" : "h-full"
+              } min-w-[800px]`}
+            >
+              <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                <tr>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Sr No
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Department Name
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Organization Name
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Plant Name
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Department Info
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Created At
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Updated At
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="min-h-[800px]">
+                {handlePaginatedDepartments.length > 0 ? (
+                  handlePaginatedDepartments.map((department, index) => (
+                    <tr
+                      onDoubleClick={() =>
+                        handleViewDevices(
+                          department.department_id,
+                          department.organization_id,
+                          department.plant_id
+                        )
+                      }
+                      key={index}
+                      className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer"
+                    >
+                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                        {(currentPage - 1) * rowsPerPage + index + 1}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        {department.department_name}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        {department.organization_name}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        {department.plant_name}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        {department.department_info || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        {fromatDateWithTime(department.created_at)}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        {fromatDateWithTime(department.updated_at)}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-2">
+                          <span title="View devices" aria-label="View devices">
+                            <Eye
+                              onClick={() =>
+                                handleViewDevices(
+                                  department.department_id,
+                                  department.organization_id,
+                                  department.plant_id
+                                )
+                              }
+                              className="w-5 h-5 text-fuchsia-500 cursor-pointer"
+                            />
+                          </span>
+
+                          <span
+                            title="Edit department"
+                            aria-label="Edit department"
+                          >
+                            <Edit
+                              onClick={() =>
+                                handleEditDepartment(
+                                  department.department_id,
+                                  department.plant_id
+                                )
+                              }
+                              className="w-5 h-5 text-status-info cursor-pointer"
+                            />
+                          </span>
+
+                          {admin?.role === "super_admin" && (
+                            <span
+                              title="Delete department"
+                              aria-label="Delete department"
+                            >
+                              <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={8}
+                      className="text-text-primary text-center font-roboto text-sm h-full"
+                    >
+                      <NoDataFound
+                        icon={
+                          <Dock className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                        }
+                        title={
+                          searchTerm || selectedOrganization !== "all"
+                            ? "No departments match your search/filter"
+                            : selectedOrganization === "all"
+                            ? "No departments found"
+                            : `No departments found for ${
+                                organizations.find(
+                                  (org) =>
+                                    org.organization_id === selectedOrganization
+                                )?.organization_name ||
+                                `Organization ${selectedOrganization}`
+                              }`
+                        }
+                        description={
+                          searchTerm || selectedOrganization !== "all"
+                            ? "Try adjusting your search terms or filter criteria"
+                            : selectedOrganization === "all"
+                            ? "Add your first department to get started"
+                            : `Add your first department for ${
+                                organizations.find(
+                                  (org) =>
+                                    org.organization_id === selectedOrganization
+                                )?.organization_name ||
+                                `Organization ${selectedOrganization}`
+                              } to get started`
+                        }
+                        buttonText={
+                          searchTerm || selectedOrganization !== "all"
+                            ? "Clear Search"
+                            : "Add Department"
+                        }
+                        buttonOnClick={() => {
+                          if (searchTerm || selectedOrganization !== "all") {
+                            setSearchTerm("");
+                            setSelectedOrganization("all");
+                          } else {
+                            setIsAddDepartmentOpen(true);
+                          }
+                        }}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            rowsPerPage={rowsPerPage}
+            totalItems={totalItems}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
+        </div>
       )}
 
       {isAddDepartmentOpen && (
