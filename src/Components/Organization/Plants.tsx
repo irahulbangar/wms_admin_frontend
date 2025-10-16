@@ -210,16 +210,12 @@ const Plants = () => {
 
     if (organization_id) {
       setSelectedOrganizationId(organization_id);
-      getPlantByOrganizationId(organization_id);
     } else {
       setSelectedOrganizationId("all");
-      if (plants.length === 0) {
-        fetchPlants();
-      }
+      fetchPlants();
     }
   }, [
     organization_id,
-    getPlantByOrganizationId,
     fetchPlants,
     getAllOrganizations,
   ]);
