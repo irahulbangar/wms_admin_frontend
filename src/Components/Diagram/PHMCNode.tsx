@@ -29,10 +29,10 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
-System Connection : ${systemConnection}
-Department Connection : ${departmentConnection}
-Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
+Plant Connection : ${plantConnection}
+Department Connection : ${departmentConnection}
+System Connection : ${systemConnection}
 Voltage (R) : ${voltageR / 10}V | Current (R) : ${currentR}A
 Voltage (Y) : ${voltageY / 10}V | Current (Y) : ${currentY}A
 Voltage (B) : ${voltageB / 10}V | Current (B) : ${currentB}A

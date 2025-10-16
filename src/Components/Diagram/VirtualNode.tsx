@@ -20,10 +20,10 @@ const VirtualNode: React.FC<VirtualNodeProps> = ({ data }) => {
         title={`
 System Name: ${systemName}
 Device Name: ${data.label}
-System Connection: ${systemConnection}
-Department Connection: ${departmentConnection}
-Plant Connection: ${plantConnection}
 Organization Connection: ${organizationConnection}
+Plant Connection: ${plantConnection}
+Department Connection: ${departmentConnection}
+System Connection: ${systemConnection}
         `}
       >
         <div className="text-white font-roboto font-medium text-center truncate px-1 text-xs">

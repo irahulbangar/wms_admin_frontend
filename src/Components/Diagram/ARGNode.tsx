@@ -26,10 +26,10 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
-System Connection : ${systemConnection}
-Department Connection : ${departmentConnection}
-Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
+Plant Connection : ${plantConnection}
+Department Connection : ${departmentConnection}
+System Connection : ${systemConnection}
       `}
     >
       <div className="text-sm font-medium text-left text-wrap mb-1 px-1 text-purple-800 leading-4">

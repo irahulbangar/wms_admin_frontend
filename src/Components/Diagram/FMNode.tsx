@@ -25,10 +25,10 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
-System Connection : ${systemConnection}
-Department Connection : ${departmentConnection}
-Plant Connection : ${plantConnection}
 Organization Connection : ${organizationConnection}
+Plant Connection : ${plantConnection}
+Department Connection : ${departmentConnection}
+System Connection : ${systemConnection}
 Totalizer Reading : ${totalizerReading} ${unit}
 Flow Rate : ${flowRate} LPM
         `}
