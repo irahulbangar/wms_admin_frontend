@@ -33,13 +33,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 }) => {
   const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
-  const [isInConnectionExpanded, setIsInConnectionExpanded] = useState(true);
-  const [isOutConnectionExpanded, setIsOutConnectionExpanded] = useState(true);
 
   const flowChartRef = useRef<HTMLDivElement>(null);
   const storageChartRef = useRef<HTMLDivElement>(null);
-  const inConnectionChartRef = useRef<HTMLDivElement>(null);
-  const outConnectionChartRef = useRef<HTMLDivElement>(null);
 
   const getFilteredStorageData = () => {
     if (!deviceData || !selectedGroup) {
@@ -49,36 +45,41 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     let filteredDevices: DeviceResult[] = [];
 
     if (selectedGroup.type === "plant") {
-      filteredDevices = deviceData.filter(device => 
-        device.in_plant_id || device.out_plant_id
+      filteredDevices = deviceData.filter(
+        (device) => device.in_plant_id || device.out_plant_id
       );
     } else if (selectedGroup.type === "department") {
       const departmentId = parseInt(selectedGroup.id.replace("dept-", ""));
       const departmentDevices = deviceData.filter(
-        (device) => device.in_department_id === departmentId || device.out_department_id === departmentId
-      );  
-      filteredDevices = departmentDevices.filter(device => 
-        device.in_department_id || device.out_department_id
+        (device) =>
+          device.in_department_id === departmentId ||
+          device.out_department_id === departmentId
+      );
+      filteredDevices = departmentDevices.filter(
+        (device) => device.in_department_id || device.out_department_id
       );
     } else if (selectedGroup.type === "system") {
       const systemId = parseInt(selectedGroup.id.replace("system-", ""));
       const systemDevices = deviceData.filter(
-        (device) => device.in_system_id === systemId || device.out_system_id === systemId
+        (device) =>
+          device.in_system_id === systemId || device.out_system_id === systemId
       );
-      filteredDevices = systemDevices.filter(device => 
-        device.in_system_id || device.out_system_id
+      filteredDevices = systemDevices.filter(
+        (device) => device.in_system_id || device.out_system_id
       );
     }
 
     const tankDevices = filteredDevices.filter(
-      (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
+      (device) =>
+        device.device_family_type === "tank" ||
+        device.device_family?.toLowerCase().includes("tank")
     );
 
     const totals = tankDevices.reduce(
       (acc, device) => {
         const currentLevel = Number(device.last_record?.last_level) || 0;
         const capacity = Number(device?.params?.storageCapacity) || 0;
-        
+
         return {
           totalStock: acc.totalStock + currentLevel,
           totalCapacity: acc.totalCapacity + capacity,
@@ -147,54 +148,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       };
     }
   }, [isStorageExpanded, calculations, isOpen, selectedGroup]);
-
-  useEffect(() => {
-    if (
-      inConnectionChartRef.current &&
-      isInConnectionExpanded &&
-      calculations &&
-      'reportTypeCalculations' in calculations &&
-      calculations.reportTypeCalculations &&
-      isOpen &&
-      selectedGroup
-    ) {
-      const chart = echarts.init(inConnectionChartRef.current);
-      const option = getInConnectionChartOption();
-      chart.setOption(option);
-
-      const handleResize = () => chart.resize();
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        chart.dispose();
-      };
-    }
-  }, [isInConnectionExpanded, calculations, isOpen, selectedGroup]);
-
-  useEffect(() => {
-    if (
-      outConnectionChartRef.current &&
-      isOutConnectionExpanded &&
-      calculations &&
-      'reportTypeCalculations' in calculations &&
-      calculations.reportTypeCalculations &&
-      isOpen &&
-      selectedGroup
-    ) {
-      const chart = echarts.init(outConnectionChartRef.current);
-      const option = getOutConnectionChartOption();
-      chart.setOption(option);
-
-      const handleResize = () => chart.resize();
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        chart.dispose();
-      };
-    }
-  }, [isOutConnectionExpanded, calculations, isOpen, selectedGroup]);
 
   const getFlowSummaryChartOption = () => {
     if (!calculations) return {};
@@ -307,178 +260,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     };
   };
 
-  const getReportTypeColor = (reportType: string): string => {
-    const colorMap: Record<string, string> = {
-      'Flow': '#3B82F6',
-      'Percolation': '#10B981',
-      'Evaporation': '#F59E0B',
-      'Consumption': '#EF4444',
-      'Wastage': '#8B5CF6',
-      'Regeneration': '#06B6D4',
-      'Re-use': '#84CC16',
-    };
-    
-    return colorMap[reportType] || '#3B82F6';
-  };
-
-  const getInConnectionChartOption = () => {
-    if (!calculations || !('reportTypeCalculations' in calculations) || !calculations.reportTypeCalculations) return {};
-
-    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
-    const inData = reportTypeCalculations
-      .filter((rt: any) => rt.totalIn > 0)
-      .map((rt: any) => ({
-        value: rt.totalIn,
-        name: rt.reportType,
-        itemStyle: { color: getReportTypeColor(rt.reportType) },
-      }));
-
-    if (inData.length === 0) {
-      return {
-        title: {
-          text: "No IN Data Available",
-          left: "center",
-          top: "center",
-          textStyle: {
-            color: "#374151",
-            fontSize: 14,
-          },
-        },
-        series: [],
-      };
-    }
-
-    return {
-      tooltip: {
-        trigger: "item",
-        formatter: (params: any) => {
-          const reportType = params.name;
-          const value = params.value;
-          const percentage = params.percent;
-          return `${reportType} ${value.toFixed(1)} Ltr (${percentage}%)`;
-        },
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        borderColor: "#ccc",
-        borderWidth: 1,
-        textStyle: {
-          color: "#fff",
-          fontSize: 12,
-        },
-      },
-      series: [
-        {
-          name: "IN Connection",
-          type: "pie",
-          radius: "70%",
-          center: ["50%", "50%"],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 0,
-            borderColor: "#fff",
-            borderWidth: 1,
-          },
-          label: {
-            show: false,
-          },
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            },
-            label: {
-              show: true,
-              fontSize: 14,
-              fontWeight: "semibold",
-            },
-          },
-          data: inData,
-        },
-      ],
-    };
-  };
-
-  const getOutConnectionChartOption = () => {
-    if (!calculations || !('reportTypeCalculations' in calculations) || !calculations.reportTypeCalculations) return {};
-
-    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
-    const outData = reportTypeCalculations
-      .filter((rt: any) => rt.totalOut > 0)
-      .map((rt: any) => ({
-        value: rt.totalOut,
-        name: rt.reportType,
-        itemStyle: { color: getReportTypeColor(rt.reportType) },
-      }));
-
-    if (outData.length === 0) {
-      return {
-        title: {
-          text: "No OUT Data Available",
-          left: "center",
-          top: "center",
-          textStyle: {
-            color: "#374151",
-            fontSize: 14,
-          },
-        },
-        series: [],
-      };
-    }
-
-    return {
-      tooltip: {
-        trigger: "item",
-        formatter: (params: any) => {
-          const reportType = params.name;
-          const value = params.value;
-          const percentage = params.percent;
-          return `${reportType} ${value.toFixed(1)} Ltr (${percentage}%)`;
-        },
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        borderColor: "#ccc",
-        borderWidth: 1,
-        textStyle: {
-          color: "#fff",
-          fontSize: 12,
-        },
-      },
-      series: [
-        {
-          name: "OUT Connection",
-          type: "pie",
-          radius: "70%",
-          center: ["50%", "50%"],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 0,
-            borderColor: "#fff",
-            borderWidth: 1,
-          },
-          label: {
-            show: false,
-          },
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            },
-            label: {
-              show: true,
-              fontSize: 14,
-              fontWeight: "semibold",
-            },
-          },
-          data: outData,
-        },
-      ],
-    };
-  };
-
   const getStorageChartOption = () => {
     const filteredStorageData = getFilteredStorageData();
-    
-    if (filteredStorageData.totalStock === 0 && filteredStorageData.totalCapacity === 0) {
+
+    if (
+      filteredStorageData.totalStock === 0 &&
+      filteredStorageData.totalCapacity === 0
+    ) {
       return {
         title: {
           text: `${selectedGroup?.name} Storage Data Not Available`,
@@ -493,7 +281,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       };
     }
 
-    const availableStock = filteredStorageData.totalCapacity - filteredStorageData.totalStock;
+    const availableStock =
+      filteredStorageData.totalCapacity - filteredStorageData.totalStock;
     const data = [
       {
         value: filteredStorageData.totalStock,
@@ -715,9 +504,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               onClick={() => setIsFlowSummaryExpanded(!isFlowSummaryExpanded)}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
+                <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2 capitalize">
                   <ChartArea className="w-5 h-5" />
-                  Flow Summary Report
+                 {selectedGroup?.type} Flow Analysis
                 </h3>
                 {isFlowSummaryExpanded ? (
                   <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -748,7 +537,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-base font-roboto">
-                            {calculations.totalIn} <span className="italic text-text-secondary font-roboto">Ltr</span>
+                            {calculations.totalIn}{" "}
+                            <span className="italic text-text-secondary font-roboto">
+                              Ltr
+                            </span>
                           </span>
                         </td>
                       </tr>
@@ -761,8 +553,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-base font-roboto">
-                            {calculations.totalOut} <span className="italic text-text-secondary font-roboto">Ltr</span>
-                          </span>  
+                            {calculations.totalOut}{" "}
+                            <span className="italic text-text-secondary font-roboto">
+                              Ltr
+                            </span>
+                          </span>
                         </td>
                       </tr>
                       <tr className="hover:bg-secondary/10">
@@ -778,7 +573,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-base font-roboto">
-                            {calculations.totalBalance} <span className="italic text-text-secondary font-roboto">Ltr</span>
+                            {calculations.totalBalance}{" "}
+                            <span className="italic text-text-secondary font-roboto">
+                              Ltr
+                            </span>
                           </span>
                         </td>
                       </tr>
@@ -791,240 +589,99 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
           {(() => {
             const filteredStorageData = getFilteredStorageData();
-            return (filteredStorageData.totalStock > 0 || filteredStorageData.totalCapacity > 0) && (
-              <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-                <div
-                  className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
-                  onClick={() => setIsStorageExpanded(!isStorageExpanded)}
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center space-x-2">
-                      <Package className="w-4 h-4" />
-                      <span>Storage Summary Report</span>
-                    </h3>
-                    {isStorageExpanded ? (
-                      <ChevronDown className="w-4 h-4 text-text-secondary" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-text-secondary" />
-                    )}
-                  </div>
-                </div>
-
-                {isStorageExpanded && (
-                  <div className="p-4">
-                    <div className="mb-4">
-                      <div
-                        ref={storageChartRef}
-                        style={{ height: "200px", width: "100%" }}
-                      />
+            return (
+              (filteredStorageData.totalStock > 0 ||
+                filteredStorageData.totalCapacity > 0) && (
+                <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+                  <div
+                    className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+                    onClick={() => setIsStorageExpanded(!isStorageExpanded)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center space-x-2">
+                        <Package className="w-4 h-4" />
+                        <span className="capitalize">{selectedGroup?.type} Storage Analysis</span>
+                      </h3>
+                      {isStorageExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-text-secondary" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-text-secondary" />
+                      )}
                     </div>
+                  </div>
 
-                    <div className="overflow-x-auto border border-border-primary rounded-lg">
-                      <table className="w-full text-sm">
-                        <tbody className="divide-y divide-border-primary">
-                          <tr className="hover:bg-secondary/10">
-                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                              <div className="flex items-center gap-2">
-                                <div className="w-3.5 h-3.5 bg-[#8B5CF6] rounded-full"></div>
-                                Total Stock
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className="text-text-primary text-base font-roboto">
-                                {filteredStorageData.totalStock.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
-                              </span>
-                            </td>
-                          </tr>
-                          <tr className="hover:bg-secondary/10">
-                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                              <div className="flex items-center gap-2">
-                                <div className="w-3.5 h-3.5 bg-[#3B82F6] rounded-full"></div>
-                                Available Capacity
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className="text-text-primary text-base font-roboto">
-                                {(filteredStorageData.totalCapacity - filteredStorageData.totalStock).toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
-                              </span>
-                            </td>
-                          </tr>
-                          <tr className="hover:bg-secondary/10">
-                            <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                              <div className="flex items-center gap-2">
-                                <div className="w-3.5 h-3.5 bg-[#06B6D4] rounded-full"></div>
+                  {isStorageExpanded && (
+                    <div className="p-4">
+                      <div className="mb-4">
+                        <div
+                          ref={storageChartRef}
+                          style={{ height: "200px", width: "100%" }}
+                        />
+                      </div>
+
+                      <div className="overflow-x-auto border border-border-primary rounded-lg">
+                        <table className="w-full text-sm">
+                          <tbody className="divide-y divide-border-primary">
+                            <tr className="hover:bg-secondary/10">
+                              <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3.5 h-3.5 bg-[#8B5CF6] rounded-full"></div>
+                                  Total Stock
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <span className="text-text-primary text-base font-roboto">
+                                  {filteredStorageData.totalStock.toFixed(1)}{" "}
+                                  <span className="italic text-text-secondary font-roboto">
+                                    Ltr
+                                  </span>
+                                </span>
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-secondary/10">
+                              <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3.5 h-3.5 bg-[#3B82F6] rounded-full"></div>
+                                  Available Capacity
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <span className="text-text-primary text-base font-roboto">
+                                  {(
+                                    filteredStorageData.totalCapacity -
+                                    filteredStorageData.totalStock
+                                  ).toFixed(1)}{" "}
+                                  <span className="italic text-text-secondary font-roboto">
+                                    Ltr
+                                  </span>
+                                </span>
+                              </td>
+                            </tr>
+                            <tr className="hover:bg-secondary/10">
+                              <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3.5 h-3.5 bg-[#06B6D4] rounded-full"></div>
                                   Total Capacity
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className="text-text-primary text-base font-roboto">
-                                {filteredStorageData.totalCapacity.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <span className="text-text-primary text-base font-roboto">
+                                  {filteredStorageData.totalCapacity.toFixed(1)}{" "}
+                                  <span className="italic text-text-secondary font-roboto">
+                                    Ltr
+                                  </span>
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )
             );
           })()}
-
-          {calculations && 'reportTypeCalculations' in calculations && calculations.reportTypeCalculations ? (
-            <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-              <div
-                className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
-                onClick={() => setIsInConnectionExpanded(!isInConnectionExpanded)}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
-                    <ChartArea className="w-5 h-5" />
-                    Report Types IN Calculations
-                  </h3>
-                  {isInConnectionExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-text-secondary" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-text-secondary" />
-                  )}
-                </div>
-              </div>
-
-              {isInConnectionExpanded && (
-                <div className="p-4">
-                  <div className="mb-4">
-                    <div
-                      ref={inConnectionChartRef}
-                      style={{ height: "200px", width: "100%" }}
-                    />
-                  </div>
-
-                  {(() => {
-                    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
-                    const hasInData = reportTypeCalculations.some((rt: any) => rt.totalIn > 0);
-                    
-                    if (!hasInData) {
-                      return (
-                        null
-                      );
-                    }
-
-                    return (
-                      <div className="overflow-x-auto border border-border-primary rounded-lg">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-border-primary">
-                              <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
-                              <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-border-primary">
-                            {reportTypeCalculations
-                              .filter((rt: any) => rt.totalIn > 0)
-                              .map((reportType: any) => (
-                              <tr key={reportType.reportType} className="hover:bg-secondary/10">
-                                <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                                  <div className="flex items-center gap-2">
-                                    <div 
-                                      className="w-3.5 h-3.5 rounded-full"
-                                      style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
-                                    ></div>
-                                    {reportType.reportType}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-3 text-right">
-                                  <span className="text-text-primary text-base font-roboto">
-                                    {reportType.totalIn.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-          ) : null}
-
-          {calculations && 'reportTypeCalculations' in calculations && calculations.reportTypeCalculations ? (
-            <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
-              <div
-                className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
-                onClick={() => setIsOutConnectionExpanded(!isOutConnectionExpanded)}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
-                    <ChartArea className="w-5 h-5" />
-                    Report Types OUT Calculations
-                  </h3>
-                  {isOutConnectionExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-text-secondary" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-text-secondary" />
-                  )}
-                </div>
-              </div>
-
-              {isOutConnectionExpanded && (
-                <div className="p-4">
-                  <div className="mb-4">
-                    <div
-                      ref={outConnectionChartRef}
-                      style={{ height: "200px", width: "100%" }}
-                    />
-                  </div>
-
-                  {(() => {
-                    const reportTypeCalculations = calculations.reportTypeCalculations as any[];
-                    const hasOutData = reportTypeCalculations.some((rt: any) => rt.totalOut > 0);
-                    
-                    if (!hasOutData) {
-                      return (
-                        null
-                      );
-                    }
-
-                    return (
-                      <div className="overflow-x-auto border border-border-primary rounded-lg">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-border-primary">
-                              <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
-                              <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-border-primary">
-                            {reportTypeCalculations
-                              .filter((rt: any) => rt.totalOut > 0)
-                              .map((reportType: any) => (
-                              <tr key={reportType.reportType} className="hover:bg-secondary/10">
-                                <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                                  <div className="flex items-center gap-2">
-                                    <div 
-                                      className="w-3.5 h-3.5 rounded-full"
-                                      style={{ backgroundColor: getReportTypeColor(reportType.reportType) }}
-                                    ></div>
-                                    {reportType.reportType}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-3 text-right">
-                                  <span className="text-text-primary text-base font-roboto">
-                                    {reportType.totalOut.toFixed(1)} <span className="italic text-text-secondary font-roboto">Ltr</span>
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-          ) : null}
         </div>
       </div>
     </>
