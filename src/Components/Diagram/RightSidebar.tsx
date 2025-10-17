@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Package, ChevronDown, ChevronRight, ChartArea } from "lucide-react";
-import * as echarts from "echarts";
+import PieChart from "./PieChart";
+import type { PieChartData } from "./PieChart";
 import type {
   PlantCalculations,
   DepartmentCalculations,
@@ -34,10 +35,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
   const [isWaterBalanceExpanded, setIsWaterBalanceExpanded] = useState(true);
-
-  const flowChartRef = useRef<HTMLDivElement>(null);
-  const storageChartRef = useRef<HTMLDivElement>(null);
-  const waterBalanceChartRef = useRef<HTMLDivElement>(null);
 
   const getFilteredStorageData = () => {
     if (!deviceData || !selectedGroup) {
@@ -306,422 +303,51 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     }
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (
-      flowChartRef.current &&
-      isFlowSummaryExpanded &&
-      calculations &&
-      isOpen &&
-      selectedGroup
-    ) {
-      const chart = echarts.init(flowChartRef.current);
-      const option = getFlowSummaryChartOption();
-      chart.setOption(option);
+  const getFlowSummaryChartData = (): PieChartData[] => {
+    if (!calculations) return [];
 
-      const handleResize = () => chart.resize();
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        chart.dispose();
-      };
-    }
-  }, [isFlowSummaryExpanded, calculations, isOpen, selectedGroup]);
-
-  useEffect(() => {
-    if (
-      storageChartRef.current &&
-      isStorageExpanded &&
-      calculations &&
-      "totalStock" in calculations &&
-      isOpen &&
-      selectedGroup
-    ) {
-      const chart = echarts.init(storageChartRef.current);
-      const option = getStorageChartOption();
-      chart.setOption(option);
-
-      const handleResize = () => chart.resize();
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        chart.dispose();
-      };
-    }
-  }, [isStorageExpanded, calculations, isOpen, selectedGroup]);
-
-  useEffect(() => {
-    if (
-      waterBalanceChartRef.current &&
-      isWaterBalanceExpanded &&
-      deviceData &&
-      isOpen &&
-      selectedGroup
-    ) {
-      const chart = echarts.init(waterBalanceChartRef.current);
-      const option = getWaterBalanceChartOption();
-      chart.setOption(option);
-
-      const handleResize = () => chart.resize();
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        chart.dispose();
-      };
-    }
-  }, [isWaterBalanceExpanded, deviceData, isOpen, selectedGroup]);
-
-  const getFlowSummaryChartOption = () => {
-    if (!calculations) return {};
-
-    const data = [
+    return [
       {
-        value: calculations.totalIn,
         name: "Total In",
-        itemStyle: { color: "#3B82F6" },
+        value: calculations.totalIn,
+        color: "#3B82F6",
       },
       {
-        value: calculations.totalOut,
         name: "Total Out",
-        itemStyle: { color: "#10B981" },
+        value: calculations.totalOut,
+        color: "#10B981",
       },
-    ].filter((item) => item.value > 0);
-
-    if (data.length === 0) {
-      return {
-        title: {
-          text: "No Data Available",
-          left: "center",
-          top: "center",
-          textStyle: {
-            color: "#374151",
-            fontSize: 14,
-          },
-        },
-        series: [],
-      };
-    }
-
-    return {
-      title: {
-        text: `${selectedGroup?.name}`,
-        left: "center",
-        top: "10px",
-        textStyle: {
-          fontSize: 16,
-          fontWeight: "semibold",
-          color: "#374151",
-        },
-      },
-      tooltip: {
-        trigger: "item",
-        formatter: (params: any) => {
-          const name = params.name;
-          const value = params.value;
-          const percentage = params.percent;
-          return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
-        },
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        borderColor: "#ccc",
-        borderWidth: 1,
-        textStyle: {
-          color: "#fff",
-          fontSize: 12,
-        },
-      },
-      series: [
-        {
-          name: `${selectedGroup?.name} Flow Analysis`,
-          type: "pie",
-          radius: "70%",
-          center: ["50%", "55%"],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 0,
-            borderColor: "#fff",
-            borderWidth: 1,
-          },
-          label: {
-            show: true,
-            position: "outside",
-            formatter: "{b}",
-            fontSize: 14,
-            color: "#374151",
-            fontWeight: "normal",
-            distance: 15,
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            borderColor: "#ccc",
-            borderWidth: 0,
-            borderRadius: 0,
-            padding: [4, 8],
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: 14,
-              fontWeight: "semibold",
-            },
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            },
-          },
-          labelLine: {
-            show: true,
-            length: 15,
-            length2: 10,
-            lineStyle: {
-              color: "#999",
-              width: 1,
-            },
-          },
-          data: data,
-        },
-      ],
-    };
+    ];
   };
 
-  const getWaterBalanceChartOption = () => {
+  const getWaterBalanceChartData = (): PieChartData[] => {
     const balanceData = getWaterBalanceData();
     
-    const chartData = balanceData
+    return balanceData
       .filter((item) => item.total > 0 && item.reportType !== "Balance")
       .map((item) => ({
         name: item.reportType,
         value: item.total,
         color: getReportTypeColor(item.reportType),
       }));
-
-    if (chartData.length === 0) {
-      return {
-        title: {
-          text: "No Water Balance Data Available",
-          left: "center",
-          top: "center",
-          textStyle: {
-            color: "#374151",
-            fontSize: 14,
-          },
-        },
-        series: [],
-      };
-    }
-
-    return {
-      title: {
-        text: `${selectedGroup?.name}`,
-        left: "center",
-        top: "10px",
-        textStyle: {
-          fontSize: 16,
-          fontWeight: "semibold",
-          color: "#374151",
-        },
-      },
-      tooltip: {
-        trigger: "item",
-        formatter: (params: any) => {
-          const name = params.name;
-          const value = params.value;
-          const percentage = params.percent;
-          return `${name}: ${value.toFixed(1)} Ltr (${percentage}%)`;
-        },
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        borderColor: "#ccc",
-        borderWidth: 1,
-        textStyle: {
-          color: "#fff",
-          fontSize: 12,
-        },
-      },
-      series: [
-        {
-          name: "Water Balance Analysis",
-          type: "pie",
-          radius: "70%",
-          center: ["50%", "55%"],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 0,
-            borderColor: "#fff",
-            borderWidth: 1,
-          },
-          label: {
-            show: true,
-            position: "outside",
-            formatter: "{b}",
-            fontSize: 14,
-            color: "#374151",
-            fontWeight: "normal",
-            distance: 10,
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            borderColor: "#ccc",
-            borderWidth: 0,
-            borderRadius: 0,
-            padding: [4, 8],
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: 14,
-              fontWeight: "semibold",
-            },
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            },
-          },
-          labelLine: {
-            show: true,
-            length: 15,
-            length2: 10,
-            lineStyle: {
-              color: "#999",
-              width: 1,
-            },
-          },
-          data: chartData,
-        },
-      ],
-    };
   };
 
-  const getStorageChartOption = () => {
+  const getStorageChartData = (): PieChartData[] => {
     const filteredStorageData = getFilteredStorageData();
+    const availableStock = filteredStorageData.totalCapacity - filteredStorageData.totalStock;
 
-    if (
-      filteredStorageData.totalStock === 0 &&
-      filteredStorageData.totalCapacity === 0
-    ) {
-      return {
-        title: {
-          text: `${selectedGroup?.name} Storage Data Not Available`,
-          left: "center",
-          top: "center",
-          textStyle: {
-            color: "#6B7280",
-            fontSize: 14,
-          },
-        },
-        series: [],
-      };
-    }
-
-    const availableStock =
-      filteredStorageData.totalCapacity - filteredStorageData.totalStock;
-    const data = [
+    return [
       {
-        value: filteredStorageData.totalStock,
         name: "Current Stock",
-        itemStyle: { color: "#8B5CF6" },
+        value: filteredStorageData.totalStock,
+        color: "#8B5CF6",
       },
       {
-        value: availableStock,
         name: "Available Stock",
-        itemStyle: { color: "#3B82F6" },
+        value: availableStock,
+        color: "#3B82F6",
       },
-    ].filter((item) => item.value > 0);
-
-    if (data.length === 0) {
-      return {
-        title: {
-          text: "No Storage Data",
-          left: "center",
-          top: "center",
-          textStyle: {
-            color: "#6B7280",
-            fontSize: 14,
-          },
-        },
-        series: [],
-      };
-    }
-
-    return {
-      title: {
-        text: `${selectedGroup?.name}`,
-        left: "center",
-        top: "10px",
-        textStyle: {
-          fontSize: 16,
-          fontWeight: "semibold",
-          color: "#374151",
-        },
-      },
-      tooltip: {
-        trigger: "item",
-        formatter: (params: any) => {
-          const name = params.name;
-          const value = params.value;
-          const percentage = params.percent;
-          return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
-        },
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        borderColor: "#ccc",
-        borderWidth: 1,
-        textStyle: {
-          color: "#fff",
-          fontSize: 12,
-        },
-      },
-      series: [
-        {
-          name: `${selectedGroup?.name} Storage`,
-          type: "pie",
-          radius: "70%",
-          center: ["50%", "55%"],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 0,
-            borderColor: "#fff",
-            borderWidth: 1,
-          },
-          label: {
-            show: true,
-            position: "outside",
-            formatter: (params: any) => {
-              const name = params.name;
-              return name;
-            },
-            fontSize: 14,
-            color: "#374151",
-            fontWeight: "normal",
-            distance: 15,
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            borderColor: "#ccc",
-            borderWidth: 0,
-            borderRadius: 0,
-            padding: [4, 8],
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: 14,
-              fontWeight: "semibold",
-            },
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            },
-          },
-          labelLine: {
-            show: true,
-            length: 15,
-            length2: 10,
-            lineStyle: {
-              color: "#999",
-              width: 1,
-            },
-          },
-          data: data,
-        },
-      ],
-    };
+    ];
   };
 
   if (!isOpen || !selectedGroup) {
@@ -849,9 +475,17 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             {isFlowSummaryExpanded && (
               <div className="p-4">
                 <div className="mb-4">
-                  <div
-                    ref={flowChartRef}
-                    style={{ height: "200px", width: "100%" }}
+                  <PieChart
+                    data={getFlowSummaryChartData()}
+                    title={selectedGroup?.name}
+                    height={200}
+                    noDataMessage="No Flow Data Available"
+                    tooltipFormatter={(params: any) => {
+                      const name = params.name;
+                      const value = params.value;
+                      const percentage = params.percent;
+                      return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
+                    }}
                   />
                 </div>
 
@@ -943,9 +577,17 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   {isStorageExpanded && (
                     <div className="p-4">
                       <div className="mb-4">
-                        <div
-                          ref={storageChartRef}
-                          style={{ height: "200px", width: "100%" }}
+                        <PieChart
+                          data={getStorageChartData()}
+                          title={selectedGroup?.name}
+                          height={200}
+                          noDataMessage={`${selectedGroup?.name} Storage Data Not Available`}
+                          tooltipFormatter={(params: any) => {
+                            const name = params.name;
+                            const value = params.value;
+                            const percentage = params.percent;
+                            return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
+                          }}
                         />
                       </div>
 
@@ -1035,9 +677,17 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               {isWaterBalanceExpanded && (
                 <div className="p-4">
                   <div className="mb-4">
-                    <div
-                      ref={waterBalanceChartRef}
-                      style={{ height: "300px", width: "100%" }}
+                    <PieChart
+                      data={getWaterBalanceChartData()}
+                      title={selectedGroup?.name}
+                      height={200}
+                      noDataMessage="No Water Balance Data Available"
+                      tooltipFormatter={(params: any) => {
+                        const name = params.name;
+                        const value = params.value;
+                        const percentage = params.percent;
+                        return `${name}: ${value.toFixed(1)} Ltr (${percentage}%)`;
+                      }}
                     />
                   </div>
 
