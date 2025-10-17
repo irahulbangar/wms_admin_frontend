@@ -358,7 +358,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
       />
 
       <div
-        className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary border border-border-primary rounded-md px-3 py-1 shadow-sm group-header flex items-center gap-2"
+        className="absolute top-1 left-1/2 transform -translate-x-1/2 bg-secondary/70 border border-border-primary rounded-md px-3 py-1 shadow-sm group-header flex items-center gap-2"
         style={{
           pointerEvents: "auto",
           zIndex: 2,

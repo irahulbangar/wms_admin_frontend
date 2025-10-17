@@ -47,18 +47,21 @@ Flow Rate : ${flowRate} LPM
         }`}
       />
 
-      <div className="text-center mb-1">
-        <div className="text-text-primary font-roboto text-xs font-medium">
-          Flow:
+      <div className="flex items-center justify-center gap-1 absolute -bottom-6 left-1/2 transform -translate-x-1/2">
+        <div className="text-text-secondary font-roboto text-sm font-medium whitespace-nowrap">
+          Flow :
         </div>
-        <div className="font-medium text-status-info font-roboto text-[10px] truncate px-1">
+        <div className="text-status-info font-roboto text-sm truncate px-1">
           {flowRate} LPM
         </div>
       </div>
 
-      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div className="truncate text-center font-medium">
-          Totalizer : {totalizerReading} {unit}
+      <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-text-primary font-roboto text-sm flex items-center justify-center gap-1">
+        <div className="text-text-secondary font-roboto text-sm whitespace-nowrap">
+          Totalizer :{" "}
+        </div>
+        <div className="text-text-primary font-roboto text-sm whitespace-nowrap">
+          {totalizerReading} {unit}
         </div>
       </div>
 
