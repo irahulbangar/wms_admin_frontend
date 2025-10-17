@@ -33,9 +33,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 }) => {
   const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
+  const [isWaterBalanceExpanded, setIsWaterBalanceExpanded] = useState(true);
 
   const flowChartRef = useRef<HTMLDivElement>(null);
   const storageChartRef = useRef<HTMLDivElement>(null);
+  const waterBalanceChartRef = useRef<HTMLDivElement>(null);
 
   const getFilteredStorageData = () => {
     if (!deviceData || !selectedGroup) {
@@ -89,6 +91,206 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     );
 
     return totals;
+  };
+
+  const getDeviceValue = (device: DeviceResult) => {
+    let value = 0;
+    switch (device.device_family_type) {
+      case "fm":
+      case "brwhms":
+        value = Number(device.last_record?.max) || 0;
+        break;
+      case "phmc":
+        if (
+          device.device_type === "New phmc" &&
+          device.device_family_type === "phmc"
+        ) {
+          value = Number(device.last_record?.flowrate) || 0;
+        } else {
+          value = 0;
+        }
+        break;
+      case "arg":
+        value = Number(device.last_record?.max_mm) || 0;
+        break;
+      default:
+        value = 0;
+    }
+
+    return value || 0;
+  };
+
+  const getWaterBalanceData = () => {
+    if (!deviceData || !selectedGroup) {
+      return [];
+    }
+
+    const allReportTypes = [
+      "Flow In",
+      "Flow Out",
+      "Percolation",
+      "Evaporation",
+      "Consumption",
+      "Wastage",
+      "Regeneration",
+      "Re-use",
+      "Balance",
+    ];
+
+    const inReportType = ["In", "Evaporation", "Consumption", "Wastage"];
+    const outReportType = ["Out", "Percolation", "Regeneration", "Re-use"];
+
+    const groupId = parseInt(selectedGroup.id.replace(/^(dept-|system-|plant-)/, ""));
+    const groupType = selectedGroup.type as "system" | "department" | "plant";
+
+    const reportTypeTotals = allReportTypes.map((reportType) => {
+      let total = 0;
+
+      if (reportType === "Flow In") {
+        total = deviceData
+          .filter((device) => {
+            let hasInConnection = false;
+            if (device.report_type_name === "Flow") {
+              switch (groupType) {
+                case "system":
+                  hasInConnection = device.in_system_id === groupId;
+                  break;
+                case "department":
+                  hasInConnection = device.in_department_id === groupId;
+                  break;
+                case "plant":
+                  hasInConnection = device.in_plant_id === groupId;
+                  break;
+              }
+            }
+            return hasInConnection;
+          })
+          .reduce((sum, device) => sum + getDeviceValue(device), 0);
+      } else if (reportType === "Flow Out") {
+        total = deviceData
+          .filter((device) => {
+            let hasOutConnection = false;
+            if (device.report_type_name === "Flow") {
+              switch (groupType) {
+                case "system":
+                  hasOutConnection = device.out_system_id === groupId;
+                  break;
+                case "department":
+                  hasOutConnection = device.out_department_id === groupId;
+                  break;
+                case "plant":
+                  hasOutConnection = device.out_plant_id === groupId;
+                  break;
+              }
+            }
+            return hasOutConnection;
+          })
+          .reduce((sum, device) => sum + getDeviceValue(device), 0);
+      } else if (reportType === "Balance") {
+        let inTotal = 0;
+        let outTotal = 0;
+        inTotal = deviceData
+          .filter((device) => {
+            switch (groupType) {
+              case "system":
+                return (
+                  device.in_system_id === groupId &&
+                  (inReportType.includes(device.report_type_name) ||
+                    device.report_type_name === "Flow")
+                );
+              case "department":
+                return (
+                  device.in_department_id === groupId &&
+                  (inReportType.includes(device.report_type_name) ||
+                    device.report_type_name === "Flow")
+                );
+              case "plant":
+                return (
+                  device.in_plant_id === groupId &&
+                  (inReportType.includes(device.report_type_name) ||
+                    device.report_type_name === "Flow")
+                );
+            }
+          })
+          .reduce((sum, device) => sum + getDeviceValue(device), 0);
+        outTotal = deviceData
+          .filter((device) => {
+            switch (groupType) {
+              case "system":
+                return (
+                  device.out_system_id === groupId &&
+                  (outReportType.includes(device.report_type_name) ||
+                    device.report_type_name === "Flow")
+                );
+              case "department":
+                return (
+                  device.out_department_id === groupId &&
+                  (outReportType.includes(device.report_type_name) ||
+                    device.report_type_name === "Flow")
+                );
+              case "plant":
+                return (
+                  device.out_plant_id === groupId &&
+                  (outReportType.includes(device.report_type_name) ||
+                    device.report_type_name === "Flow")
+                );
+            }
+          })
+          .reduce((sum, device) => sum + getDeviceValue(device), 0);
+        total = outTotal - inTotal;
+      } else {
+        total = deviceData
+          .filter((device) => {
+            if (device.report_type_name === reportType) {
+              switch (groupType) {
+                case "system":
+                  return inReportType.includes(reportType)
+                    ? device.in_system_id === groupId
+                    : outReportType.includes(reportType)
+                    ? device.out_system_id === groupId
+                    : false;
+                case "department":
+                  return inReportType.includes(reportType)
+                    ? device.in_department_id === groupId
+                    : outReportType.includes(reportType)
+                    ? device.out_department_id === groupId
+                    : false;
+                case "plant":
+                  return inReportType.includes(reportType)
+                    ? device.in_plant_id === groupId
+                    : outReportType.includes(reportType)
+                    ? device.out_plant_id === groupId
+                    : false;
+              }
+            }
+            return false;
+          })
+          .reduce((sum, device) => sum + getDeviceValue(device), 0);
+      }
+
+      return {
+        reportType,
+        total,
+      };
+    });
+
+    return reportTypeTotals;
+  };
+
+  const getReportTypeColor = (reportType: string) => {
+    const colors: Record<string, string> = {
+      "Flow In": "#3B82F6",
+      "Flow Out": "#10B981",
+      Percolation: "#10B981",
+      Evaporation: "#F59E0B",
+      Consumption: "#EF4444",
+      Wastage: "#8B5CF6",
+      Regeneration: "#06B6D4",
+      "Re-use": "#84CC16",
+      Balance: "#F97316",
+      Unknown: "#6B7280",
+    };
+    return colors[reportType] || "#6B7280";
   };
 
   useEffect(() => {
@@ -148,6 +350,28 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       };
     }
   }, [isStorageExpanded, calculations, isOpen, selectedGroup]);
+
+  useEffect(() => {
+    if (
+      waterBalanceChartRef.current &&
+      isWaterBalanceExpanded &&
+      deviceData &&
+      isOpen &&
+      selectedGroup
+    ) {
+      const chart = echarts.init(waterBalanceChartRef.current);
+      const option = getWaterBalanceChartOption();
+      chart.setOption(option);
+
+      const handleResize = () => chart.resize();
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        chart.dispose();
+      };
+    }
+  }, [isWaterBalanceExpanded, deviceData, isOpen, selectedGroup]);
 
   const getFlowSummaryChartOption = () => {
     if (!calculations) return {};
@@ -209,7 +433,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       },
       series: [
         {
-          name: `${selectedGroup?.name} Flow Summary`,
+          name: `${selectedGroup?.name} Flow Analysis`,
           type: "pie",
           radius: "70%",
           center: ["50%", "55%"],
@@ -255,6 +479,112 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             },
           },
           data: data,
+        },
+      ],
+    };
+  };
+
+  const getWaterBalanceChartOption = () => {
+    const balanceData = getWaterBalanceData();
+    
+    const chartData = balanceData
+      .filter((item) => item.total > 0 && item.reportType !== "Balance")
+      .map((item) => ({
+        name: item.reportType,
+        value: item.total,
+        color: getReportTypeColor(item.reportType),
+      }));
+
+    if (chartData.length === 0) {
+      return {
+        title: {
+          text: "No Water Balance Data Available",
+          left: "center",
+          top: "center",
+          textStyle: {
+            color: "#374151",
+            fontSize: 14,
+          },
+        },
+        series: [],
+      };
+    }
+
+    return {
+      title: {
+        text: `${selectedGroup?.name}`,
+        left: "center",
+        top: "10px",
+        textStyle: {
+          fontSize: 16,
+          fontWeight: "semibold",
+          color: "#374151",
+        },
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: (params: any) => {
+          const name = params.name;
+          const value = params.value;
+          const percentage = params.percent;
+          return `${name}: ${value.toFixed(1)} Ltr (${percentage}%)`;
+        },
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        borderColor: "#ccc",
+        borderWidth: 1,
+        textStyle: {
+          color: "#fff",
+          fontSize: 12,
+        },
+      },
+      series: [
+        {
+          name: "Water Balance Analysis",
+          type: "pie",
+          radius: "70%",
+          center: ["50%", "55%"],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 0,
+            borderColor: "#fff",
+            borderWidth: 1,
+          },
+          label: {
+            show: true,
+            position: "outside",
+            formatter: "{b}",
+            fontSize: 14,
+            color: "#374151",
+            fontWeight: "normal",
+            distance: 10,
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            borderColor: "#ccc",
+            borderWidth: 0,
+            borderRadius: 0,
+            padding: [4, 8],
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: 14,
+              fontWeight: "semibold",
+            },
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)",
+            },
+          },
+          labelLine: {
+            show: true,
+            length: 15,
+            length2: 10,
+            lineStyle: {
+              color: "#999",
+              width: 1,
+            },
+          },
+          data: chartData,
         },
       ],
     };
@@ -537,7 +867,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-base font-roboto">
-                            {calculations.totalIn}{" "}
+                            {calculations?.totalIn?.toFixed(1)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
                             </span>
@@ -553,7 +883,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-base font-roboto">
-                            {calculations.totalOut}{" "}
+                            {calculations?.totalOut?.toFixed(1)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
                             </span>
@@ -573,7 +903,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-base font-roboto">
-                            {calculations.totalBalance}{" "}
+                            {calculations?.totalBalance?.toFixed(1)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
                             </span>
@@ -682,6 +1012,88 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               )
             );
           })()}
+
+          {deviceData && selectedGroup && (
+            <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
+              <div
+                className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
+                onClick={() => setIsWaterBalanceExpanded(!isWaterBalanceExpanded)}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
+                    <ChartArea className="w-5 h-5" />
+                    <span className="capitalize">{selectedGroup?.type} Water Balance Analysis</span>
+                  </h3>
+                  {isWaterBalanceExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-text-secondary" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-text-secondary" />
+                  )}
+                </div>
+              </div>
+
+              {isWaterBalanceExpanded && (
+                <div className="p-4">
+                  <div className="mb-4">
+                    <div
+                      ref={waterBalanceChartRef}
+                      style={{ height: "300px", width: "100%" }}
+                    />
+                  </div>
+
+                  {(() => {
+                    const balanceData = getWaterBalanceData();
+                    
+                    if (balanceData.length === 0) {
+                      return (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-text-secondary">
+                            No water balance data available for this {selectedGroup?.type}.
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="overflow-x-auto border border-border-primary rounded-lg">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-border-primary">
+                              <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
+                              <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border-primary">
+                            {balanceData.map((item, index) => (
+                              <tr key={index} className="hover:bg-secondary/10">
+                                <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                                  <div className="flex items-center gap-2">
+                                    <div 
+                                      className="w-3.5 h-3.5 rounded-full"
+                                      style={{ backgroundColor: getReportTypeColor(item.reportType) }}
+                                    ></div>
+                                    {item.reportType}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <span className="text-text-primary text-base font-roboto">
+                                    {item.total.toFixed(1)}{" "}
+                                    <span className="italic text-text-secondary font-roboto">
+                                      Ltr
+                                    </span>
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>
