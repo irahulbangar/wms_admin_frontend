@@ -376,7 +376,7 @@ const DiagramPage = () => {
   }, [nodes, selectedDepartment, selectedNodeForConnection]);
 
   const transformedEdges = useMemo(() => {
-    return edges.map((edge) => ({
+    return edges?.map((edge) => ({
       ...edge,
       style: {
         ...edge.style,
