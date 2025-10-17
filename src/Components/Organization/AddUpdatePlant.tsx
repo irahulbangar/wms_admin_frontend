@@ -279,7 +279,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
           >
             <option value="Ltr">Ltr</option>
-            <option value="M^3">M^3</option>
+            <option value="M^3">m<sup>3</sup></option>
           </select>
 
           <div className="flex items-center justify-end gap-4 pt-6">
