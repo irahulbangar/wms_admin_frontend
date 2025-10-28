@@ -104,6 +104,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     multiplier: "1",
     shifter: "0",
     maxThreshold: "",
+    lowerLimit: "",
+    upperLimit: "",
   });
 
   const [tankParams, setTankParams] = useState<object>({
@@ -167,6 +169,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       multiplier: "1",
       shifter: "0",
       maxThreshold: "",
+      lowerLimit: "",
+      upperLimit: "",
     });
 
     setTankParams({
@@ -357,12 +361,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               multiplier: deviceData.params?.multiplier || 0,
               shifter: deviceData.params?.shifter || 0,
               maxThreshold: deviceData.params?.maxThreshold || "",
+              lowerLimit: deviceData.params?.lowerLimit || "",
+              upperLimit: deviceData.params?.upperLimit || "",
             };
             setCommonParams(commonData);
             setCommonInputValues({
               multiplier: commonData.multiplier.toString(),
               shifter: commonData.shifter.toString(),
               maxThreshold: commonData.maxThreshold.toString(),
+              lowerLimit: commonData?.lowerLimit?.toString() || "",
+              upperLimit: commonData?.upperLimit?.toString() || "",
             });
 
             if (familyName === "tank") {
@@ -1107,6 +1115,72 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 {errors.maxThreshold && (
                   <p className="text-status-danger text-sm mt-1 font-roboto">
                     {errors.maxThreshold}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Lower Limit
+                </label>
+                <input
+                  type="text"
+                  name="lowerLimit"
+                  value={commonInputValues.lowerLimit}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      lowerLimit: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      lowerLimit: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter lower limit"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.lowerLimit
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+                {errors.lowerLimit && (
+                  <p className="text-status-danger text-sm mt-1 font-roboto">
+                    {errors.lowerLimit}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  Upper Limit
+                </label>
+                <input
+                  type="text"
+                  name="upperLimit"
+                  value={commonInputValues.upperLimit}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      upperLimit: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      upperLimit: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter upper limit"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.upperLimit
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+                {errors.upperLimit && (
+                  <p className="text-status-danger text-sm mt-1 font-roboto">
+                    {errors.upperLimit}
                   </p>
                 )}
               </div>
