@@ -36,10 +36,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         return savedTheme;
       }
 
-      const systemPrefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      return systemPrefersDark ? "dark" : "light";
+      // const systemPrefersDark = window.matchMedia(
+      //   "(prefers-color-scheme: dark)"
+      // ).matches;
+      // return systemPrefersDark ? "dark" : "light";
+
+      // Default to light theme when no saved preference is found
+      return "light";
     }
 
     return "light";
