@@ -51,11 +51,11 @@ const PieChart: React.FC<PieChartProps> = ({
         text: filteredData?.length === 0 ? noDataMessage : title,
         left: "center",
         top: filteredData?.length === 0 ? "center" : "10px",
-        fontFamily: "Roboto, sans-serif",
-        fontSize: 16,
-        fontWeight: "semibold",
         textStyle: {
           color: filteredData?.length === 0 ? "#6B7280" : "#374151",
+          fontFamily: "Roboto, sans-serif",
+          fontSize: 16,
+          fontWeight: "semibold",
         },
       },
       tooltip: showTooltip
@@ -121,7 +121,7 @@ const PieChart: React.FC<PieChartProps> = ({
                 avoidLabelOverlap: false,
                 itemStyle: {
                   borderRadius: 0,
-                  borderColor: "#fff",
+                  borderColor: "#3b82f6",
                   borderWidth: 1,
                 },
                 label: showLabels

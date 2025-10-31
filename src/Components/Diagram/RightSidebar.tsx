@@ -167,7 +167,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       "Wastage",
       "Regeneration",
       "Re-use",
-      "Balance",
+      "Net Balance",
     ];
 
     const inReportType = ["In", "Evaporation", "Consumption", "Wastage"];
@@ -223,7 +223,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             return hasOutConnection;
           })
           .reduce((sum, device) => sum + getDeviceValue(device), 0);
-      } else if (reportType === "Balance") {
+      } else if (reportType === "Net Balance") {
         let inTotal = 0;
         let outTotal = 0;
         inTotal = deviceData
@@ -324,7 +324,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       Wastage: "#8B5CF6",
       Regeneration: "#fe994e",
       "Re-use": "#84CC16",
-      Balance: "#F97316",
+      "Net Balance": "#6B7280",
       Unknown: "#6B7280",
     };
     return colors[reportType] || "#6B7280";
@@ -364,7 +364,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     const balanceData = getWaterBalanceData();
 
     return balanceData
-      .filter((item) => item.total > 0 && item.reportType !== "Balance")
+      .filter((item) => item.total > 0 && item.reportType !== "Net Balance")
       .map((item) => ({
         name: item.reportType,
         value: item.total,
@@ -478,7 +478,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               }`}
             ></div>
             <div>
-              <h2 className="text-lg font-medium text-text-primary truncate max-w-[250px]" title={selectedGroup?.name}>
+              <h2
+                className="text-lg font-medium text-text-primary truncate max-w-[250px]"
+                title={selectedGroup?.name}
+              >
                 {selectedGroup?.name}
               </h2>
               <p className="text-xs text-text-secondary capitalize">
@@ -516,32 +519,52 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             {isFlowSummaryExpanded && (
               <div className="p-4">
                 <div className="mb-4">
-                  <PieChart
-                    data={getFlowSummaryChartData()}
-                    title={selectedGroup?.name}
-                    height={200}
-                    noDataMessage="No Flow Data Available"
-                    tooltipFormatter={(params: any) => {
-                      const name = params.name;
-                      const value = params.value;
-                      const percentage = params.percent;
-                      return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
-                    }}
-                  />
+                  <div className="flex items-center flex-col gap-2">
+                    <PieChart
+                      data={getFlowSummaryChartData()}
+                      title={selectedGroup?.name}
+                      height={200}
+                      noDataMessage="No Flow Data Available"
+                      tooltipFormatter={(params: any) => {
+                        const name = params.name;
+                        const value = params.value;
+                        const percentage = params.percent;
+                        return `${name} ${value.toFixed(
+                          1
+                        )} Ltr (${percentage}%)`;
+                      }}
+                    />
+                    <div className="flex items-center gap-1 w-full flex-wrap">
+                      {getFlowSummaryChartData().map((item: any) => (
+                        <div
+                          key={item.name}
+                          className="flex items-center gap-1"
+                        >
+                          <div
+                            className="w-4 h-2 rounded-sm"
+                            style={{ backgroundColor: item.color }}
+                          ></div>
+                          <span className="text-xs font-roboto text-text-secondary">
+                            {item.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto border border-border-primary rounded-lg">
                   <table className="w-full text-sm">
                     <tbody className="divide-y divide-border-primary">
                       <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                        <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
                             <div className="w-3.5 h-3.5 bg-status-info rounded-full"></div>
                             Total In
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="text-text-primary text-base font-roboto">
+                          <span className="text-text-primary text-sm font-roboto">
                             {calculations?.totalIn?.toFixed(1)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
@@ -550,14 +573,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                       </tr>
                       <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                        <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
                             <div className="w-3.5 h-3.5 bg-status-success rounded-full"></div>
                             Total Out
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="text-text-primary text-base font-roboto">
+                          <span className="text-text-primary text-sm font-roboto">
                             {calculations?.totalOut?.toFixed(1)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
@@ -566,7 +589,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                       </tr>
                       <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                        <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
                             {calculations.totalBalance >= 0 ? (
                               <div className="w-3.5 h-3.5 bg-status-success rounded-full"></div>
@@ -577,7 +600,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="text-text-primary text-base font-roboto">
+                          <span className="text-text-primary text-sm font-roboto">
                             {calculations?.totalBalance?.toFixed(1)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
@@ -620,34 +643,52 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   {isStorageExpanded && (
                     <div className="p-4">
                       <div className="mb-4">
-                        <PieChart
-                          data={getStorageChartData()}
-                          title={selectedGroup?.name}
-                          height={200}
-                          noDataMessage={`${selectedGroup?.name} Storage Data Not Available`}
-                          tooltipFormatter={(params: any) => {
-                            const name = params.name;
-                            const value = params.value;
-                            const percentage = params.percent;
-                            return `${name} ${value.toFixed(
-                              1
-                            )} Ltr (${percentage}%)`;
-                          }}
-                        />
+                        <div className="flex items-center flex-col gap-2">
+                          <PieChart
+                            data={getStorageChartData()}
+                            title={selectedGroup?.name}
+                            height={200}
+                            noDataMessage={`${selectedGroup?.name} Storage Data Not Available`}
+                            tooltipFormatter={(params: any) => {
+                              const name = params.name;
+                              const value = params.value;
+                              const percentage = params.percent;
+                              return `${name} ${value.toFixed(
+                                1
+                              )} Ltr (${percentage}%)`;
+                            }}
+                          />
+                          <div className="flex items-center gap-1 w-full flex-wrap">
+                            {getStorageChartData().map((item: any) => (
+                              <div
+                                key={item.name}
+                                className="flex items-center gap-1"
+                              >
+                                <div
+                                  className="w-4 h-2 rounded-sm"
+                                  style={{ backgroundColor: item.color }}
+                                ></div>
+                                <span className="text-xs font-roboto text-text-secondary">
+                                  {item.name}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
 
                       <div className="overflow-x-auto border border-border-primary rounded-lg">
                         <table className="w-full text-sm">
                           <tbody className="divide-y divide-border-primary">
                             <tr className="hover:bg-secondary/10">
-                              <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
                                   <div className="w-3.5 h-3.5 bg-[#8B5CF6] rounded-full"></div>
                                   Total Stock
                                 </div>
                               </td>
                               <td className="px-4 py-3 text-right">
-                                <span className="text-text-primary text-base font-roboto">
+                                <span className="text-text-primary text-sm font-roboto">
                                   {filteredStorageData.totalStock.toFixed(1)}{" "}
                                   <span className="italic text-text-secondary font-roboto">
                                     Ltr
@@ -656,14 +697,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               </td>
                             </tr>
                             <tr className="hover:bg-secondary/10">
-                              <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
                                   <div className="w-3.5 h-3.5 bg-[#3B82F6] rounded-full"></div>
                                   Available Capacity
                                 </div>
                               </td>
                               <td className="px-4 py-3 text-right">
-                                <span className="text-text-primary text-base font-roboto">
+                                <span className="text-text-primary text-sm font-roboto">
                                   {(
                                     filteredStorageData.totalCapacity -
                                     filteredStorageData.totalStock
@@ -675,14 +716,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               </td>
                             </tr>
                             <tr className="hover:bg-secondary/10">
-                              <td className="px-4 py-3 text-text-secondary text-base font-medium">
+                              <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
                                   <div className="w-3.5 h-3.5 bg-[#06B6D4] rounded-full"></div>
                                   Total Capacity
                                 </div>
                               </td>
                               <td className="px-4 py-3 text-right">
-                                <span className="text-text-primary text-base font-roboto">
+                                <span className="text-text-primary text-sm font-roboto">
                                   {filteredStorageData.totalCapacity.toFixed(1)}{" "}
                                   <span className="italic text-text-secondary font-roboto">
                                     Ltr
@@ -726,20 +767,38 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               {isWaterBalanceExpanded && (
                 <div className="p-4">
                   <div className="mb-4">
-                    <PieChart
-                      data={getWaterBalanceChartData()}
-                      title={selectedGroup?.name}
-                      height={200}
-                      noDataMessage="No Water Balance Data Available"
-                      tooltipFormatter={(params: any) => {
-                        const name = params.name;
-                        const value = params.value;
-                        const percentage = params.percent;
-                        return `${name}: ${value.toFixed(
-                          1
-                        )} Ltr (${percentage}%)`;
-                      }}
-                    />
+                    <div className="flex items-center flex-col gap-2">
+                      <PieChart
+                        data={getWaterBalanceChartData()}
+                        title={selectedGroup?.name}
+                        height={200}
+                        noDataMessage="No Water Balance Data Available"
+                        tooltipFormatter={(params: any) => {
+                          const name = params.name;
+                          const value = params.value;
+                          const percentage = params.percent;
+                          return `${name}: ${value.toFixed(
+                            1
+                          )} Ltr (${percentage}%)`;
+                        }}
+                      />
+                      <div className="flex items-center gap-1 w-full flex-wrap">
+                        {getWaterBalanceChartData().map((item: any) => (
+                          <div
+                            key={item.name}
+                            className="flex items-center gap-1"
+                          >
+                            <div
+                              className="w-4 h-2 rounded-sm"
+                              style={{ backgroundColor: item.color }}
+                            ></div>
+                            <span className="text-xs font-roboto text-text-secondary">
+                              {item.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   {(() => {
@@ -772,27 +831,33 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                           <tbody className="divide-y divide-border-primary">
                             {balanceData.map((item, index) => (
                               <tr key={index} className="hover:bg-secondary/10">
-                                <td className="px-4 py-3 text-text-secondary text-base font-medium">
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      className="w-3.5 h-3.5 rounded-full"
-                                      style={{
-                                        backgroundColor: getReportTypeColor(
-                                          item.reportType
-                                        ),
-                                      }}
-                                    ></div>
-                                    <span className="text-text-secondary text-sm font-roboto">{item.reportType}</span>
-                                  </div>
-                                </td>
-                                <td className="px-2 py-3 text-right">
-                                  <span className="text-text-primary text-sm font-roboto flex items-center gap-1">
-                                    {item.total.toFixed(1)}{" "}
-                                    <span className="italic text-text-secondary font-roboto">
-                                      Ltr
+                                {item.total > 0 ? (
+                                  <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                                    <div className="flex items-center gap-2">
+                                      <div
+                                        className="w-3.5 h-3.5 rounded-full"
+                                        style={{
+                                          backgroundColor: getReportTypeColor(
+                                            item.reportType
+                                          ),
+                                        }}
+                                      ></div>
+                                      <span className="text-text-secondary text-sm font-roboto">
+                                        {item.reportType}
+                                      </span>
+                                    </div>
+                                  </td>
+                                ) : null}
+                                {item.total > 0 ? (
+                                  <td className="px-2 py-3 text-right">
+                                    <span className="text-text-primary text-sm font-roboto flex items-center gap-1">
+                                      {item.total.toFixed(1)}{" "}
+                                      <span className="italic text-text-secondary font-roboto">
+                                        Ltr
+                                      </span>
                                     </span>
-                                  </span>
-                                </td>
+                                  </td>
+                                ) : null}
                               </tr>
                             ))}
                           </tbody>
