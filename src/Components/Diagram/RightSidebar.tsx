@@ -318,11 +318,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     const colors: Record<string, string> = {
       "Flow In": "#3B82F6",
       "Flow Out": "#10B981",
-      Percolation: "#10B981",
-      Evaporation: "#F59E0B",
+      Percolation: "#0ca9df",
+      Evaporation: "#505472",
       Consumption: "#EF4444",
       Wastage: "#8B5CF6",
-      Regeneration: "#06B6D4",
+      Regeneration: "#fe994e",
       "Re-use": "#84CC16",
       Balance: "#F97316",
       Unknown: "#6B7280",
@@ -462,7 +462,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       )}
 
       <div
-        className={`fixed right-0 top-0 h-full w-80 sm:w-96 bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 h-full w-80 sm:w-85 bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -478,7 +478,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               }`}
             ></div>
             <div>
-              <h2 className="text-lg font-medium text-text-primary">
+              <h2 className="text-lg font-medium text-text-primary truncate max-w-[250px]" title={selectedGroup?.name}>
                 {selectedGroup?.name}
               </h2>
               <p className="text-xs text-text-secondary capitalize">
@@ -782,11 +782,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                         ),
                                       }}
                                     ></div>
-                                    {item.reportType}
+                                    <span className="text-text-secondary text-sm font-roboto">{item.reportType}</span>
                                   </div>
                                 </td>
-                                <td className="px-4 py-3 text-right">
-                                  <span className="text-text-primary text-base font-roboto">
+                                <td className="px-2 py-3 text-right">
+                                  <span className="text-text-primary text-sm font-roboto flex items-center gap-1">
                                     {item.total.toFixed(1)}{" "}
                                     <span className="italic text-text-secondary font-roboto">
                                       Ltr
