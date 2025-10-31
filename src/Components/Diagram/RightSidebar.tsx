@@ -36,32 +36,68 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
   const [isWaterBalanceExpanded, setIsWaterBalanceExpanded] = useState(true);
 
+  const getGroupId = (): number | null => {
+    if (!selectedGroup || !deviceData) return null;
+
+    switch (selectedGroup.type) {
+      case "plant": {
+        const plantName = selectedGroup.id.replace("plant-", "");
+        const plantDevice = deviceData.find(
+          (device) =>
+            device.plant_name === plantName ||
+            device.in_plant_name === plantName ||
+            device.out_plant_name === plantName
+        );
+        return (
+          plantDevice?.plant_id ||
+          plantDevice?.in_plant_id ||
+          plantDevice?.out_plant_id ||
+          null
+        );
+      }
+      case "department": {
+        const deptId = parseInt(selectedGroup.id.replace("dept-", ""));
+        return isNaN(deptId) ? null : deptId;
+      }
+      case "system": {
+        const sysId = parseInt(selectedGroup.id.replace("system-", ""));
+        return isNaN(sysId) ? null : sysId;
+      }
+      default:
+        return null;
+    }
+  };
+
   const getFilteredStorageData = () => {
     if (!deviceData || !selectedGroup) {
       return { totalStock: 0, totalCapacity: 0 };
     }
 
     let filteredDevices: DeviceResult[] = [];
+    const groupId = getGroupId();
+
+    if (!groupId) {
+      return { totalStock: 0, totalCapacity: 0 };
+    }
 
     if (selectedGroup.type === "plant") {
       filteredDevices = deviceData.filter(
-        (device) => device.in_plant_id || device.out_plant_id
+        (device) =>
+          device.in_plant_id === groupId || device.out_plant_id === groupId
       );
     } else if (selectedGroup.type === "department") {
-      const departmentId = parseInt(selectedGroup.id.replace("dept-", ""));
       const departmentDevices = deviceData.filter(
         (device) =>
-          device.in_department_id === departmentId ||
-          device.out_department_id === departmentId
+          device.in_department_id === groupId ||
+          device.out_department_id === groupId
       );
       filteredDevices = departmentDevices.filter(
         (device) => device.in_department_id || device.out_department_id
       );
     } else if (selectedGroup.type === "system") {
-      const systemId = parseInt(selectedGroup.id.replace("system-", ""));
       const systemDevices = deviceData.filter(
         (device) =>
-          device.in_system_id === systemId || device.out_system_id === systemId
+          device.in_system_id === groupId || device.out_system_id === groupId
       );
       filteredDevices = systemDevices.filter(
         (device) => device.in_system_id || device.out_system_id
@@ -137,7 +173,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     const inReportType = ["In", "Evaporation", "Consumption", "Wastage"];
     const outReportType = ["Out", "Percolation", "Regeneration", "Re-use"];
 
-    const groupId = parseInt(selectedGroup.id.replace(/^(dept-|system-|plant-)/, ""));
+    const groupId = getGroupId();
+    if (!groupId) {
+      return [];
+    }
+
     const groupType = selectedGroup.type as "system" | "department" | "plant";
 
     const reportTypeTotals = allReportTypes.map((reportType) => {
@@ -322,7 +362,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
   const getWaterBalanceChartData = (): PieChartData[] => {
     const balanceData = getWaterBalanceData();
-    
+
     return balanceData
       .filter((item) => item.total > 0 && item.reportType !== "Balance")
       .map((item) => ({
@@ -334,7 +374,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
   const getStorageChartData = (): PieChartData[] => {
     const filteredStorageData = getFilteredStorageData();
-    const availableStock = filteredStorageData.totalCapacity - filteredStorageData.totalStock;
+    const availableStock =
+      filteredStorageData.totalCapacity - filteredStorageData.totalStock;
 
     return [
       {
@@ -462,7 +503,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2 capitalize">
                   <ChartArea className="w-5 h-5" />
-                 {selectedGroup?.type} Flow Analysis
+                  {selectedGroup?.type} Flow Analysis
                 </h3>
                 {isFlowSummaryExpanded ? (
                   <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -564,7 +605,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center space-x-2">
                         <Package className="w-4 h-4" />
-                        <span className="capitalize">{selectedGroup?.type} Storage Analysis</span>
+                        <span className="capitalize">
+                          {selectedGroup?.type} Storage Analysis
+                        </span>
                       </h3>
                       {isStorageExpanded ? (
                         <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -586,7 +629,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             const name = params.name;
                             const value = params.value;
                             const percentage = params.percent;
-                            return `${name} ${value.toFixed(1)} Ltr (${percentage}%)`;
+                            return `${name} ${value.toFixed(
+                              1
+                            )} Ltr (${percentage}%)`;
                           }}
                         />
                       </div>
@@ -659,12 +704,16 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             <div className="bg-primary border border-border-primary rounded-lg overflow-hidden">
               <div
                 className="bg-secondary/20 px-4 py-2 border-b border-border-primary cursor-pointer hover:bg-secondary/30 transition-colors"
-                onClick={() => setIsWaterBalanceExpanded(!isWaterBalanceExpanded)}
+                onClick={() =>
+                  setIsWaterBalanceExpanded(!isWaterBalanceExpanded)
+                }
               >
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
                     <ChartArea className="w-5 h-5" />
-                    <span className="capitalize">{selectedGroup?.type} Water Balance Analysis</span>
+                    <span className="capitalize">
+                      {selectedGroup?.type} Water Balance Analysis
+                    </span>
                   </h3>
                   {isWaterBalanceExpanded ? (
                     <ChevronDown className="w-4 h-4 text-text-secondary" />
@@ -686,19 +735,22 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         const name = params.name;
                         const value = params.value;
                         const percentage = params.percent;
-                        return `${name}: ${value.toFixed(1)} Ltr (${percentage}%)`;
+                        return `${name}: ${value.toFixed(
+                          1
+                        )} Ltr (${percentage}%)`;
                       }}
                     />
                   </div>
 
                   {(() => {
                     const balanceData = getWaterBalanceData();
-                    
+
                     if (balanceData.length === 0) {
                       return (
                         <div className="text-center py-4">
                           <p className="text-sm text-text-secondary">
-                            No water balance data available for this {selectedGroup?.type}.
+                            No water balance data available for this{" "}
+                            {selectedGroup?.type}.
                           </p>
                         </div>
                       );
@@ -709,8 +761,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b border-border-primary">
-                              <th className="px-4 py-2 text-left text-text-secondary font-medium">Report Type</th>
-                              <th className="px-4 py-2 text-right text-text-secondary font-medium">Value</th>
+                              <th className="px-4 py-2 text-left text-text-secondary font-medium">
+                                Report Type
+                              </th>
+                              <th className="px-4 py-2 text-right text-text-secondary font-medium">
+                                Value
+                              </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border-primary">
@@ -718,9 +774,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               <tr key={index} className="hover:bg-secondary/10">
                                 <td className="px-4 py-3 text-text-secondary text-base font-medium">
                                   <div className="flex items-center gap-2">
-                                    <div 
+                                    <div
                                       className="w-3.5 h-3.5 rounded-full"
-                                      style={{ backgroundColor: getReportTypeColor(item.reportType) }}
+                                      style={{
+                                        backgroundColor: getReportTypeColor(
+                                          item.reportType
+                                        ),
+                                      }}
                                     ></div>
                                     {item.reportType}
                                   </div>
