@@ -122,7 +122,7 @@ const PieChart: React.FC<PieChartProps> = ({
                 itemStyle: {
                   borderRadius: 0,
                   borderColor: "#3b82f6",
-                  borderWidth: 1,
+                  borderWidth: 0,
                 },
                 label: showLabels
                   ? {
