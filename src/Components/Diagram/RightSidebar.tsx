@@ -829,9 +829,23 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border-primary">
-                            {balanceData.map((item, index) => (
-                              <tr key={index} className="hover:bg-secondary/10">
-                                {item.total > 0 ? (
+                            {balanceData
+                              .filter((item) => {
+                                if (item.reportType === "Net Balance") {
+                                  const hasOtherData = balanceData.some(
+                                    (other) =>
+                                      other.reportType !== "Net Balance" &&
+                                      other.total > 0
+                                  );
+                                  return hasOtherData;
+                                }
+                                return item.total > 0;
+                              })
+                              .map((item, index) => (
+                                <tr
+                                  key={index}
+                                  className="hover:bg-secondary/10"
+                                >
                                   <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                     <div className="flex items-center gap-2">
                                       <div
@@ -847,8 +861,6 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                       </span>
                                     </div>
                                   </td>
-                                ) : null}
-                                {item.total > 0 ? (
                                   <td className="px-2 py-3 text-right">
                                     <span className="text-text-primary text-sm font-roboto flex items-center gap-1">
                                       {item.total.toFixed(1)}{" "}
@@ -857,9 +869,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                       </span>
                                     </span>
                                   </td>
-                                ) : null}
-                              </tr>
-                            ))}
+                                </tr>
+                              ))}
                           </tbody>
                         </table>
                       </div>
