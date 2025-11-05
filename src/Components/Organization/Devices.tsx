@@ -849,8 +849,8 @@ const Devices = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
-        <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
+      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between w-full md:gap-3 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
+        <div className="flex items-center gap-3 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
             ref={organizationDropdownRef}
@@ -1093,15 +1093,15 @@ const Devices = () => {
             )}
           </div>
         </div>
-        <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
-          <div className="flex-shrink-0 relative md:w-60 lg:w-92 w-full">
+        <div className="flex items-center flex-col md:flex-row gap-3 w-full md:w-auto">
+          <div className="flex-shrink-0 relative md:w-auto w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
               placeholder="Search devices by name, HWID, status, type, family name, or family ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="md:w-60 lg:w-92 w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+              className="md:w-auto w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
             />
             {searchTerm && (
               <button
