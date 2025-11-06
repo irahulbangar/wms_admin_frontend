@@ -112,6 +112,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     height: "",
     storageCapacity: "",
     sensorPostion: "",
+    crossSectionArea: "",
   });
 
   const [brwhmsParams, setBrwhmsParams] = useState<object>({
@@ -126,6 +127,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     height: "",
     storageCapacity: "",
     sensorPostion: "",
+    crossSectionArea: "",
   });
 
   const [brwhmsInputValues, setBrwhmsInputValues] = useState({
@@ -177,11 +179,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       height: "",
       storageCapacity: "",
       sensorPostion: "",
+      crossSectionArea: "",
     });
     setTankInputValues({
       height: "",
       storageCapacity: "",
       sensorPostion: "",
+      crossSectionArea: "",
     });
     setBrwhmsParams({
       sg: "",
@@ -378,12 +382,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 height: deviceData.params?.height || 0,
                 storageCapacity: deviceData.params?.storageCapacity || 0,
                 sensorPostion: deviceData.params?.sensorPostion || 0,
+                crossSectionArea: deviceData.params?.crossSectionArea || 0,
               };
               setTankParams(tankData);
               setTankInputValues({
                 height: tankData.height.toString(),
                 storageCapacity: tankData.storageCapacity.toString(),
                 sensorPostion: tankData.sensorPostion.toString(),
+                crossSectionArea: tankData.crossSectionArea.toString(),
               });
             } else if (familyName === "brwhms") {
               const brwhmsData = {
@@ -1282,6 +1288,36 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       placeholder="Enter sensor position"
                       className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                         errors.sensorPostion
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                      Cross Section Area
+                    </label>
+                    <input
+                      type="text"
+                      name="crossSectionArea"
+                      value={tankInputValues.crossSectionArea}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setTankInputValues((prev) => ({
+                          ...prev,
+                          crossSectionArea: inputValue,
+                        }));
+
+                        const numericValue =
+                          inputValue === "" ? 0 : parseFloat(inputValue) || 0;
+                        setTankParams((prev) => ({
+                          ...prev,
+                          crossSectionArea: numericValue,
+                        }));
+                      }}
+                      placeholder="Enter cross section area"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.crossSectionArea
                           ? "border-status-danger"
                           : "border-border-primary"
                       }`}

@@ -1136,11 +1136,12 @@ const Devices = () => {
           {Object.keys(groupedDevices).length > 0 ? (
             Object.entries(groupedDevices).map(([systemId, systemDevices]) => {
               const system = systems?.find(
-                (system: any) => system.system_id.toString() === systemId
+                (system: any) => system?.system_id?.toString() === systemId
               );
-
+              // console.log("system", system);
               const systemName =
                 system?.system_name?.trim() ||
+                system?.system_name ||
                 `${systemId === "0" ? "Extra System" : `System ${systemId}`}`;
 
               return (

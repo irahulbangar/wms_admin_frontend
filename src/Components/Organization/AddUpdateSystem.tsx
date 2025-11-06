@@ -44,6 +44,10 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log("departmentId", departmentId);
+  console.log("organizationId", organizationId);
+  console.log("plantId", plantId);
+
   const getSystemData = async () => {
     setIsLoading(true);
     await dispatch(getSystemById(systemId || 0))
