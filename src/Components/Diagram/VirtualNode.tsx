@@ -16,7 +16,7 @@ const VirtualNode: React.FC<VirtualNodeProps> = ({ data }) => {
   return (
     <>
       <div
-        className={`relative w-24 h-10 border border-status-warning bg-status-warning rounded-lg p-2 z-10 flex items-center justify-center`}
+        className="relative w-auto h-10 border border-status-warning bg-status-warning rounded-lg py-2 px-4 z-10 flex items-center justify-center"
         title={`
 System Name: ${systemName}
 Device Name: ${data.label}
@@ -26,7 +26,7 @@ Department Connection: ${departmentConnection}
 System Connection: ${systemConnection}
         `}
       >
-        <div className="text-white font-roboto font-medium text-center truncate px-1 text-xs">
+        <div className="text-text-primary font-roboto font-medium text-center truncate px-1 text-xs">
           {data.label}
         </div>
 

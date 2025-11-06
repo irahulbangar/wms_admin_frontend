@@ -8,11 +8,11 @@ interface TankNodeProps {
 }
 
 const TankNode: React.FC<TankNodeProps> = ({ data }) => {
-  const currentLevel = Number(data.currentLevel) || 0;
+  const currentLevel =
+    (Number(data.height) - Number(data.currentLevel)) *
+      Number(data.crossSectionArea) || 0;
   const capacity = Number(data.capacity) || 0;
-  const height = Number(data.height) || 0;
-
-  const percentage = capacity > 0 ? (currentLevel * 100) / height : 0;
+  const percentage = (currentLevel / capacity) * 100;
   const fillHeight = Math.min(percentage, 100);
   const unit = data.unit || "Ltr";
   const departmentConnection = data.departmentConnection || "";
@@ -57,7 +57,7 @@ Capacity : ${capacity} ${unit}
 
         <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-30">
           <span className="text-xs font-medium text-text-primary bg-secondary/90 px-1 rounded">
-            {percentage.toFixed(1)}%
+            {percentage.toFixed(2)}%
           </span>
         </div>
 
@@ -75,10 +75,10 @@ Capacity : ${capacity} ${unit}
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-1 font-roboto">
         <div className="text-center font-medium font-roboto text-text-secondary text-sm whitespace-nowrap">
-          Capacity : {" "}
+          Capacity :{" "}
         </div>
         <div className="text-center font-medium font-roboto text-text-primary text-sm whitespace-nowrap">
-          {currentLevel}/{capacity} {unit}
+          {currentLevel.toFixed(0)}/{capacity.toFixed(0)} {unit}
         </div>
       </div>
     </div>

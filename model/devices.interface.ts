@@ -107,4 +107,5 @@ export interface Params {
   sg?: number
   hmax?: number
   hmin?: number
+  crossSectionArea?: number
 }

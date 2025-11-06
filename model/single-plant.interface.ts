@@ -47,6 +47,7 @@ export interface NodeData {
   capacity?: number;
   currentLevel?: number | string;
   height?: number;
+  crossSectionArea?: number;
   departmentConnection?: string;
   plantConnection?: string;
   organizationConnection?: string;

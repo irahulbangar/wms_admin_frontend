@@ -235,6 +235,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
+                crossSectionArea: Number(matchingDevice?.params?.crossSectionArea) || 0,
               },
             };
           }

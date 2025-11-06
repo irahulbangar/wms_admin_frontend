@@ -12,11 +12,11 @@ import { ApiError } from "../../utils/errorHandler";
 interface AddUpdateSystemProps {
   setShowAddSystemPopup: (show: boolean) => void;
   type: "add" | "update";
-  plantId?: number;
+  plantId: number;
   systemId?: number;
   onUpdateSuccess: () => void;
-  organizationId?: number;
-  departmentId?: number;
+  organizationId: number;
+  departmentId: number;
 }
 
 const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
@@ -43,10 +43,6 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
     department_id: departmentId || 0,
   });
   const [isLoading, setIsLoading] = useState(false);
-
-  console.log("departmentId", departmentId);
-  console.log("organizationId", organizationId);
-  console.log("plantId", plantId);
 
   const getSystemData = async () => {
     setIsLoading(true);
@@ -88,7 +84,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
         department_id: departmentId || 0,
       });
     }
-  }, [type, systemId, plantId, organizationId]);
+  }, [type, systemId, plantId, organizationId, departmentId]);
 
   const handleAddSystem = async () => {
     setErrors({ system_name: "", system_info: "", status: "" });
@@ -138,9 +134,9 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             system_name: systemData.system_name,
             system_description: systemData?.system_info,
             status: systemData.status || "active",
-            plant_id: plantId || 0,
-            department_id: departmentId || 0,
-            organization_id: organizationId || 0,
+            plant_id: systemData.plant_id || plantId || 0,
+            department_id: systemData.department_id || departmentId || 0,
+            organization_id: systemData.organization_id || organizationId || 0,
           })
         )
           .unwrap()

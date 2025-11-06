@@ -732,7 +732,15 @@ const Devices = () => {
     navigate("/");
   };
 
-  const handleEditSystem = (systemId: string) => {
+  const handleEditSystem = (
+    systemId: string,
+    departmentId: number,
+    organizationId: number,
+    plantId: number
+  ) => {
+    setDepartmentId(departmentId);
+    setOrganizationId(organizationId);
+    setPlantId(plantId);
     if (selectedPlant === "all") {
       Warning(
         "Please select a plant from the dropdown before updating the device"
@@ -1198,7 +1206,14 @@ const Devices = () => {
                       <div className="flex items-center gap-2">
                         {systemId !== "0" && (
                           <Edit
-                            onClick={() => handleEditSystem(systemId)}
+                            onClick={() =>
+                              handleEditSystem(
+                                systemId,
+                                parseInt(selectedDepartment),
+                                parseInt(selectedOrganization),
+                                parseInt(selectedPlant)
+                              )
+                            }
                             className="w-5 h-5 text-status-info cursor-pointer"
                           />
                         )}
@@ -1474,6 +1489,8 @@ const Devices = () => {
           systemId={systemId}
           plantId={plantId}
           onUpdateSuccess={handleSystemUpdate}
+          organizationId={organizationId}
+          departmentId={departmentId}
         />
       )}
     </div>
