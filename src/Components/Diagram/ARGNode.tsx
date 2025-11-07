@@ -22,7 +22,9 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
 
   return (
     <div
-      className="relative w-25 h-fit bg-gradient-to-br from-purple-50 to-purple-100 border border-border-primary rounded-lg p-1 z-0"
+      className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-0 ${
+        isActive ? "border-status-success" : "border-status-danger"
+      }`}
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}

@@ -18,7 +18,9 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
 
   return (
     <div
-      className="relative w-25 h-fit bg-primary/50 border border-border-primary rounded-lg p-1 z-10"
+      className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${
+        isActive ? "border-status-success" : "border-status-danger"
+      }`}
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
@@ -48,21 +50,23 @@ Flow Rate : ${data?.avg} LPM
         }`}
       />
 
-      <div className="flex items-center justify-center gap-1 absolute -bottom-6 left-1/2 transform -translate-x-1/2">
-        <div className="text-text-secondary font-roboto text-sm font-medium whitespace-nowrap">
-          Flow :
+      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col">
+        <div className="flex items-center justify-center gap-1">
+          <div className="text-text-secondary font-roboto text-sm font-medium whitespace-nowrap">
+            Flow :
+          </div>
+          <div className="text-status-info font-roboto text-sm truncate px-1">
+            {data?.avg} LPM
+          </div>
         </div>
-        <div className="text-status-info font-roboto text-sm truncate px-1">
-          {data?.avg} LPM
-        </div>
-      </div>
 
-      <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-text-primary font-roboto text-sm flex items-center justify-center gap-1">
-        <div className="text-text-secondary font-roboto text-sm whitespace-nowrap">
-          Totalizer :{" "}
-        </div>
-        <div className="text-text-primary font-roboto text-sm whitespace-nowrap">
-          {data?.max} Ltr
+        <div className="flex items-center justify-center gap-1">
+          <div className="text-text-secondary font-roboto text-sm whitespace-nowrap">
+            Totalizer :{" "}
+          </div>
+          <div className="text-text-primary font-roboto text-sm whitespace-nowrap">
+            {data?.max} Ltr
+          </div>
         </div>
       </div>
 

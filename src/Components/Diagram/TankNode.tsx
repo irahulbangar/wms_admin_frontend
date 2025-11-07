@@ -15,6 +15,7 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   const percentage = (currentLevel / capacity) * 100;
   const fillHeight = Math.min(percentage, 100);
   const unit = data.unit || "Ltr";
+  const isActive = data.isActive !== false;
   const departmentConnection = data.departmentConnection || "";
   const plantConnection = data.plantConnection || "";
   const organizationConnection = data.organizationConnection || "";
@@ -25,7 +26,9 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   return (
     <div className="relative">
       <div
-        className="relative w-25 h-35 bg-primary/50 border border-status-info rounded-md overflow-hidden"
+        className={`relative w-25 h-35 bg-primary/20 border border-border-primary rounded-md overflow-hidden ${
+          isActive ? "border-status-info" : "border-status-danger"
+        }`}
         title={`
 System Name : ${systemName}
 Device Name : ${deviceName}

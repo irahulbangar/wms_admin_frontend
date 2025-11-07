@@ -25,7 +25,9 @@ const PHMCNode: React.FC<PHMCNodeProps> = ({ data }) => {
 
   return (
     <div
-      className="relative w-30 h-52 bg-primary/50 border border-border-primary rounded-lg p-1 z-10"
+      className={`relative w-30 h-52 bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${
+        isActive ? "border-status-success" : "border-status-danger"
+      }`}
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
