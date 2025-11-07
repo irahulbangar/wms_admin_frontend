@@ -50,7 +50,7 @@ Flow Rate : ${data?.avg} LPM
         }`}
       />
 
-      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col">
+      <div className="absolute -bottom-11 left-1/2 transform -translate-x-1/2 flex flex-col">
         <div className="flex items-center justify-center gap-1">
           <div className="text-text-secondary font-roboto text-sm font-medium whitespace-nowrap">
             Flow :
