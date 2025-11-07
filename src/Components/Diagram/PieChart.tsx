@@ -30,7 +30,7 @@ const PieChart: React.FC<PieChartProps> = ({
   showTooltip = true,
   tooltipFormatter,
   showLabels = true,
-  labelFormatter = "{b}",
+  labelFormatter = "{d}%",
   radius = "70%",
   center = ["50%", "55%"],
   noDataMessage = "No Data Available",
@@ -45,6 +45,7 @@ const PieChart: React.FC<PieChartProps> = ({
 
     // Filter out zero values
     const filteredData = data?.filter((item) => item?.value > 0);
+    const isSingleValue = filteredData?.length === 1;
 
     const option = {
       title: {
@@ -125,28 +126,33 @@ const PieChart: React.FC<PieChartProps> = ({
                   borderWidth: 0,
                 },
                 label: showLabels
-                  ? {
-                      show: false,
-                      position: "outside",
-                      formatter: labelFormatter,
-                      fontSize: 14,
-                      color: "#374151",
-                      fontWeight: "normal",
-                      distance: 15,
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      borderColor: "#ccc",
-                      borderWidth: 0,
-                      borderRadius: 0,
-                      padding: [4, 8],
-                    }
+                  ? isSingleValue
+                    ? {
+                        show: true,
+                        position: "center",
+                        formatter: labelFormatter || "{d}%",
+                        fontSize: 14,
+                        color: "#fff",
+                        fontWeight: "bold",
+                      }
+                    : {
+                        show: true,
+                        position: "inside",
+                        formatter: labelFormatter || "{d}%",
+                        fontSize: 12,
+                        color: "#fff",
+                        fontWeight: "normal",
+                        distance: 0,
+                      }
                   : {
                       show: false,
                     },
                 emphasis: {
                   label: {
-                    show: false,
-                    fontSize: 14,
-                    fontWeight: "semibold",
+                    show: true,
+                    fontSize: isSingleValue ? 18 : 16,
+                    fontWeight: "bold",
+                    formatter: labelFormatter || "{d}%",
                   },
                   itemStyle: {
                     shadowBlur: 10,

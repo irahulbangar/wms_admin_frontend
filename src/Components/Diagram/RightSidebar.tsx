@@ -316,14 +316,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
   const getReportTypeColor = (reportType: string) => {
     const colors: Record<string, string> = {
-      "Flow In": "#3B82F6",
-      "Flow Out": "#10B981",
-      Percolation: "#0ca9df",
-      Evaporation: "#505472",
-      Consumption: "#EF4444",
-      Wastage: "#8B5CF6",
-      Regeneration: "#fe994e",
-      "Re-use": "#84CC16",
+      "Flow In": "#87CEEB",
+      "Flow Out": "#FFD580",
+      Percolation: "#006400",
+      Evaporation: "#FFFFC5",
+      Consumption: "#00008B",
+      Wastage: "#FF0000",
+      Regeneration: "#66FF00",
+      "Re-use": "#00BCA1",
       "Net Balance": "#6B7280",
       Unknown: "#6B7280",
     };
@@ -534,7 +534,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         )} Ltr (${percentage}%)`;
                       }}
                     />
-                    <div className="flex items-center gap-1 w-full flex-wrap">
+                    <div className="flex items-center justify-center gap-1 w-full flex-wrap">
                       {getFlowSummaryChartData().map((item: any) => (
                         <div
                           key={item.name}
@@ -658,7 +658,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               )} Ltr (${percentage}%)`;
                             }}
                           />
-                          <div className="flex items-center gap-1 w-full flex-wrap">
+                          <div className="flex items-center justify-center gap-1 w-full flex-wrap">
                             {getStorageChartData().map((item: any) => (
                               <div
                                 key={item.name}
@@ -782,7 +782,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                           )} Ltr (${percentage}%)`;
                         }}
                       />
-                      <div className="flex items-center gap-1 w-full flex-wrap">
+                      <div className="flex items-center justify-center gap-1 w-full flex-wrap">
                         {getWaterBalanceChartData().map((item: any) => (
                           <div
                             key={item.name}
