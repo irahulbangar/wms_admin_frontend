@@ -337,7 +337,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            required
             className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.name ? "border-status-danger" : "border-border-primary"
             }`}
@@ -398,7 +397,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            required
             className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.email ? "border-status-danger" : "border-border-primary"
             }`}
