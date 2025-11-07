@@ -24,7 +24,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   setShowAddModal,
   type,
   organizationId,
-  onUpdateSuccess,
   refreshOrganizations,
 }) => {
   const dispatch = useAppDispatch();
@@ -227,9 +226,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             Error(err.message || "Failed to add organization");
           })
           .finally(() => {
-            if (!onUpdateSuccess) {
-              setShowAddModal(false);
-            }
+            setIsLoading(false);
           });
       } else {
         await dispatch(
@@ -251,9 +248,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             Error(err.message || "Failed to update organization");
           })
           .finally(() => {
-            if (!onUpdateSuccess) {
-              setShowAddModal(false);
-            }
+            setIsLoading(false);
           });
       }
     } catch (error) {
@@ -361,11 +356,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             }`}
             placeholder="Enter contact person"
           />
-          {errors.contactPerson && (
-            <p className="text-status-danger text-sm mt-1">
-              {errors.contactPerson}
-            </p>
-          )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Contact Number
@@ -375,7 +365,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="contactNumber"
             value={formData.contactNumber}
             onChange={handleInputChange}
-            maxLength={10}
             className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.contactNumber
                 ? "border-status-danger"
@@ -383,11 +372,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             }`}
             placeholder="Enter 10 digit contact number"
           />
-          {errors.contactNumber && (
-            <p className="text-status-danger text-sm mt-1">
-              {errors.contactNumber}
-            </p>
-          )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Email
