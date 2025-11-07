@@ -36,6 +36,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     email: "",
     notes: "",
     status: "",
+    introduction: "",
+    governance: "",
+    logo: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -114,6 +117,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       email: formData.email,
       note: formData.notes,
       status: formData.status || "active",
+      introduction: formData.introduction,
+      governance: formData.governance,
+      logo: formData.logo,
     };
 
     if (type === "add") {
@@ -131,6 +137,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               email: "",
               notes: "",
               status: "active",
+              introduction: "",
+              governance: "",
+              logo: "",
             });
             setErrors({});
             if (refreshOrganizations) {
@@ -187,6 +196,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               email: res.data.email,
               notes: res.data.note,
               status: res.data.status || "active",
+              introduction: res.data.introduction || "",
+              governance: res.data.governance || "",
+              logo: res.data.logo || "",
             });
           } else {
             Error(res.message || "Failed to get organization");
@@ -204,6 +216,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         email: "",
         notes: "",
         status: "active",
+        introduction: "",
+        governance: "",
+        logo: "",
       });
     }
   }, [type, organizationId, dispatch]);
@@ -233,7 +248,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             value={formData.name}
             onChange={handleInputChange}
             required
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.name ? "border-status-danger" : "border-border-primary"
             }`}
             placeholder="Enter organization name"
@@ -250,7 +265,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="contactPerson"
             value={formData.contactPerson}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.contactPerson
                 ? "border-status-danger"
                 : "border-border-primary"
@@ -272,7 +287,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             value={formData.contactNumber}
             onChange={handleInputChange}
             maxLength={10}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.contactNumber
                 ? "border-status-danger"
                 : "border-border-primary"
@@ -311,7 +326,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="address"
             value={formData.address}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.address ? "border-status-danger" : "border-border-primary"
             }`}
             placeholder="Enter organization address"
@@ -321,13 +336,62 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           )}
 
           <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            Introduction
+          </label>
+          <textarea
+            name="introduction"
+            value={formData.introduction}
+            onChange={handleInputChange}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
+              errors.introduction
+                ? "border-status-danger"
+                : "border-border-primary"
+            }`}
+            placeholder="Enter organization introduction"
+          />
+          {errors.introduction && (
+            <p className="text-status-danger text-sm mt-1">
+              {errors.introduction}
+            </p>
+          )}
+
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            Governance
+          </label>
+          <textarea
+            name="governance"
+            value={formData.governance}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info"
+            placeholder="Enter organization governance"
+          />
+          {errors.governance && (
+            <p className="text-status-danger text-sm mt-1">
+              {errors.governance}
+            </p>
+          )}
+
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            Logo
+          </label>
+          <input
+            type="file"
+            name="logo"
+            value={formData.logo}
+            onChange={handleInputChange}
+          />
+          {errors.logo && (
+            <p className="text-status-danger text-sm mt-1">{errors.logo}</p>
+          )}
+
+          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
             Status
           </label>
           <select
             name="status"
             value={formData.status}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info ${
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.status ? "border-status-danger" : "border-border-primary"
             }`}
           >
@@ -345,7 +409,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="notes"
             value={formData.notes}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info"
             placeholder="Enter notes"
           />
 

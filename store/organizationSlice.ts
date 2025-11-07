@@ -83,6 +83,9 @@ interface AddOrganizationPayload {
   contact_number: string;
   email: string;
   note: string;
+  introduction: string;
+  governance: string;
+  logo: string;
 }
 
 interface UpdateOrganizationPayload extends AddOrganizationPayload {
