@@ -91,27 +91,10 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   ) => {
     const { name, value } = e.target;
 
-    const fieldMappings: Record<string, string> = {
-      contactPerson: "contact_person",
-      contactNumber: "contact_number",
-      email: "email",
-      address: "address",
-      introduction: "introduction",
-      governance: "governance",
-      logo: "logo",
-      status: "status",
-      notes: "note",
-    };
-    const actualFieldName = fieldMappings[name] || name;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    setFormData((prev) => ({ ...prev, [actualFieldName]: value }));
-
-    if (errors[actualFieldName]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[actualFieldName];
-        return newErrors;
-      });
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -365,6 +348,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             name="contactNumber"
             value={formData.contactNumber}
             onChange={handleInputChange}
+            maxLength={10}
             className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
               errors.contactNumber
                 ? "border-status-danger"
