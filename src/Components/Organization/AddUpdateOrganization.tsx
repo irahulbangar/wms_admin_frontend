@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAppDispatch } from "../../../store/store";
 import {
   addOrganization,
@@ -27,6 +27,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   refreshOrganizations,
 }) => {
   const dispatch = useAppDispatch();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -43,45 +44,45 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+  // const validateForm = (): boolean => {
+  //   const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Organization name is required";
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = "Organization name must be at least 2 characters";
-    }
+  //   if (!formData.name.trim()) {
+  //     newErrors.name = "Organization name is required";
+  //   } else if (formData.name.trim().length < 2) {
+  //     newErrors.name = "Organization name must be at least 2 characters";
+  //   }
 
-    if (!formData.address.trim()) {
-      newErrors.address = "Address is required";
-    } else if (formData.address.trim().length < 3) {
-      newErrors.address = "Address must be at least 3 characters";
-    }
+  //   if (!formData.address.trim()) {
+  //     newErrors.address = "Address is required";
+  //   } else if (formData.address.trim().length < 3) {
+  //     newErrors.address = "Address must be at least 3 characters";
+  //   }
 
-    if (!formData.contactPerson.trim()) {
-      newErrors.contactPerson = "Contact person is required";
-    } else if (!/^[a-zA-Z\s]+$/.test(formData.contactPerson.toString())) {
-      newErrors.contactPerson = "Contact person must be a valid name";
-    }
+  //   if (!formData.contactPerson.trim()) {
+  //     newErrors.contactPerson = "Contact person is required";
+  //   } else if (!/^[a-zA-Z\s]+$/.test(formData.contactPerson.toString())) {
+  //     newErrors.contactPerson = "Contact person must be a valid name";
+  //   }
 
-    if (!formData.contactNumber.trim()) {
-      newErrors.contactNumber = "Contact number is required";
-    } else if (
-      !/^[0-9]{10}$/.test(formData.contactNumber.toString().trim()) ||
-      formData.contactNumber.toString().trim().length !== 10
-    ) {
-      newErrors.contactNumber = "Please enter exactly 10 digits";
-    }
+  //   if (!formData.contactNumber.trim()) {
+  //     newErrors.contactNumber = "Contact number is required";
+  //   } else if (
+  //     !/^[0-9]{10}$/.test(formData.contactNumber.toString().trim()) ||
+  //     formData.contactNumber.toString().trim().length !== 10
+  //   ) {
+  //     newErrors.contactNumber = "Please enter exactly 10 digits";
+  //   }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      newErrors.email = "Please enter a valid email address";
-    }
+  //   if (!formData.email.trim()) {
+  //     newErrors.email = "Email is required";
+  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+  //     newErrors.email = "Please enter a valid email address";
+  //   }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -102,12 +103,68 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      setFormData((prev) => ({
+        ...prev,
+        logo: "",
+      }));
+      return;
+    }
+
+    const validImageTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+    ];
+    if (!validImageTypes.includes(file.type)) {
+      Error("Please select a valid image file (JPEG, PNG, GIF, WebP, or SVG)");
+      e.target.value = "";
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      Error("Image size should be less than 5MB");
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setFormData((prev) => ({
+        ...prev,
+        logo: base64String,
+      }));
+
+      if (errors.logo) {
+        setErrors((prev) => ({
+          ...prev,
+          logo: "",
+        }));
+      }
+    };
+
+    reader.onerror = () => {
+      Error("Failed to read the file");
+      e.target.value = "";
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //   return;
+    // }
 
     const organizationData = {
       organization_name: formData.name,
@@ -142,6 +199,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
               logo: "",
             });
             setErrors({});
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
             if (refreshOrganizations) {
               refreshOrganizations();
             }
@@ -220,6 +280,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         governance: "",
         logo: "",
       });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   }, [type, organizationId, dispatch]);
 
@@ -377,9 +440,25 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           <input
             type="file"
             name="logo"
-            value={formData.logo}
-            onChange={handleInputChange}
+            ref={fileInputRef}
+            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
+            onChange={handleFileChange}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
+              errors.logo ? "border-status-danger" : "border-border-primary"
+            }`}
           />
+          {formData.logo && (
+            <div className="mt-2">
+              <p className="text-sm text-text-secondary font-roboto">
+                Image selected and converted to base64
+              </p>
+              <img
+                src={formData.logo}
+                alt="Logo preview"
+                className="mt-2 max-w-full h-32 object-contain rounded-md border border-border-primary"
+              />
+            </div>
+          )}
           {errors.logo && (
             <p className="text-status-danger text-sm mt-1">{errors.logo}</p>
           )}
