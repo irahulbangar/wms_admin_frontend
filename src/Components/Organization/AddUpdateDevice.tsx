@@ -226,7 +226,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         [actualFieldName]: parseInt(value) || 0,
       }));
     } else if (fieldMappings[name]) {
-      // Handle connection fields - convert to integer, but handle "null" as -1 to distinguish from default
       const numericValue = value === "null" ? -1 : parseInt(value) || 0;
       setFormData((prev) => ({ ...prev, [actualFieldName]: numericValue }));
     } else {

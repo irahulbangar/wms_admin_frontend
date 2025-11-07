@@ -34,6 +34,15 @@ export const organizationSlice = createSlice({
       state.success = action.payload.success;
       state.message = action.payload.message;
     },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    setMessage: (state, action) => {
+      state.message = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getOrganizations.pending, (state) => {
@@ -172,6 +181,6 @@ export const deleteOrganization = createAsyncThunk(
   }
 );
 
-export const { setOrganizations } = organizationSlice.actions;
+export const { setOrganizations, setLoading, setError, setMessage } = organizationSlice.actions;
 
 export default organizationSlice.reducer;
