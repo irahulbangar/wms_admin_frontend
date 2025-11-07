@@ -567,11 +567,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     ))}
                   </select>
                 </div>
-                {errors.device_family_id && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.device_family_id}
-                  </p>
-                )}
               </div>
 
               <div>
@@ -621,11 +616,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                         ))}
                   </select>
                 </div>
-                {errors.device_type_id && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.device_type_id}
-                  </p>
-                )}
               </div>
 
               <div>
@@ -644,11 +634,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : "border-border-primary"
                   }`}
                 />
-                {errors.device_name && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.device_name}
-                  </p>
-                )}
               </div>
 
               <div>
@@ -684,11 +669,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : "border-border-primary"
                   }`}
                 />
-                {errors.hwid && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.hwid}
-                  </p>
-                )}
               </div>
 
               <div>
@@ -1118,11 +1098,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : "border-border-primary"
                   }`}
                 />
-                {errors.maxThreshold && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.maxThreshold}
-                  </p>
-                )}
               </div>
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
@@ -1151,11 +1126,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : "border-border-primary"
                   }`}
                 />
-                {errors.lowerLimit && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.lowerLimit}
-                  </p>
-                )}
               </div>
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
@@ -1184,11 +1154,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : "border-border-primary"
                   }`}
                 />
-                {errors.upperLimit && (
-                  <p className="text-status-danger text-sm mt-1 font-roboto">
-                    {errors.upperLimit}
-                  </p>
-                )}
               </div>
             </div>
 
