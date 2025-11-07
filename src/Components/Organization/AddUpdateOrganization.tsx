@@ -7,6 +7,7 @@ import {
   updateOrganization,
 } from "../../../store/organizationSlice";
 import { Error, Success } from "../../utils/toast";
+import { ApiError } from "../../utils/errorHandler";
 
 interface AddUpdateOrganizationProps {
   setShowAddModal: (show: boolean) => void;
@@ -28,7 +29,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -90,16 +91,28 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
 
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
+    const fieldMappings: Record<string, string> = {
+      contactPerson: "contact_person",
+      contactNumber: "contact_number",
+      email: "email",
+      address: "address",
+      introduction: "introduction",
+      governance: "governance",
+      logo: "logo",
+      status: "status",
+      notes: "note",
+    };
+    const actualFieldName = fieldMappings[name] || name;
+
+    setFormData((prev) => ({ ...prev, [actualFieldName]: value }));
+
+    if (errors[actualFieldName]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[actualFieldName];
+        return newErrors;
+      });
     }
   };
 
@@ -159,86 +172,98 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // if (!validateForm()) {
     //   return;
     // }
+    setIsLoading(true);
+    try {
+      const organizationData = {
+        organization_name: formData.name,
+        address: formData.address,
+        contact_person: formData.contactPerson,
+        contact_number: formData.contactNumber,
+        email: formData.email,
+        note: formData.notes,
+        status: formData.status || "active",
+        introduction: formData.introduction,
+        governance: formData.governance,
+        logo: formData.logo,
+      };
 
-    const organizationData = {
-      organization_name: formData.name,
-      address: formData.address,
-      contact_person: formData.contactPerson,
-      contact_number: formData.contactNumber,
-      email: formData.email,
-      note: formData.notes,
-      status: formData.status || "active",
-      introduction: formData.introduction,
-      governance: formData.governance,
-      logo: formData.logo,
-    };
-
-    if (type === "add") {
-      dispatch(addOrganization(organizationData))
-        .unwrap()
-        .then((res) => {
-          if (res.success || res.status === 200) {
-            Success("Organization added successfully");
-            setShowAddModal(false);
-            setFormData({
-              name: "",
-              address: "",
-              contactPerson: "",
-              contactNumber: "",
-              email: "",
-              notes: "",
-              status: "active",
-              introduction: "",
-              governance: "",
-              logo: "",
-            });
-            setErrors({});
-            if (fileInputRef.current) {
-              fileInputRef.current.value = "";
+      if (type === "add") {
+        await dispatch(addOrganization(organizationData))
+          .unwrap()
+          .then((res) => {
+            if (res.success || res.status === 200) {
+              Success(res.message || "Organization added successfully");
+              setShowAddModal(false);
+              setFormData({
+                name: "",
+                address: "",
+                contactPerson: "",
+                contactNumber: "",
+                email: "",
+                notes: "",
+                status: "active",
+                introduction: "",
+                governance: "",
+                logo: "",
+              });
+              setErrors({});
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+              }
+              if (refreshOrganizations) {
+                refreshOrganizations();
+              }
+            } else {
+              Error(res.message || "Failed to add organization");
             }
-            if (refreshOrganizations) {
-              refreshOrganizations();
+          })
+          .catch((err) => {
+            Error(err.message || "Failed to add organization");
+          })
+          .finally(() => {
+            if (!onUpdateSuccess) {
+              setShowAddModal(false);
             }
-          } else {
-            Error(res.message || "Failed to add organization");
-          }
-        })
-        .catch((err) => {
-          Error(err.message || "Failed to add organization");
-        })
-        .finally(() => {
-          if (!onUpdateSuccess) {
-            setShowAddModal(false);
-          }
-        });
-    } else {
-      dispatch(updateOrganization({ id: organizationId, ...organizationData }))
-        .unwrap()
-        .then((res) => {
-          if (res.success || res.status === 200) {
-            Success("Organization updated successfully");
-            setShowAddModal(false);
-            if (refreshOrganizations) {
-              refreshOrganizations();
+          });
+      } else {
+        await dispatch(
+          updateOrganization({ id: organizationId, ...organizationData })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success || res.status === 200) {
+              Success(res.message || "Organization updated successfully");
+              setShowAddModal(false);
+              if (refreshOrganizations) {
+                refreshOrganizations();
+              }
+            } else {
+              Error(res.message || "Failed to update organization");
             }
-          } else {
-            Error(res.message || "Failed to update organization");
-          }
-        })
-        .catch((err) => {
-          Error(err.message || "Failed to update organization");
-        })
-        .finally(() => {
-          if (!onUpdateSuccess) {
-            setShowAddModal(false);
-          }
-        });
+          })
+          .catch((err) => {
+            Error(err.message || "Failed to update organization");
+          })
+          .finally(() => {
+            if (!onUpdateSuccess) {
+              setShowAddModal(false);
+            }
+          });
+      }
+    } catch (error) {
+      Error(
+        error instanceof ApiError
+          ? error.message
+          : "Failed to submit organization"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -265,7 +290,9 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           }
         })
         .catch((err) => {
-          Error(err.message || "Failed to get organization");
+          Error(
+            err instanceof ApiError ? err.message : "Failed to get organization"
+          );
         });
     } else if (type === "add") {
       setFormData({
@@ -503,8 +530,13 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <button
               type="submit"
               className="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-roboto"
+              disabled={isLoading}
             >
-              {type === "add" ? "Add Organization" : "Update Organization"}
+              {isLoading
+                ? "Adding..."
+                : type === "add"
+                ? "Add Organization"
+                : "Update Organization"}
             </button>
           </div>
         </form>
