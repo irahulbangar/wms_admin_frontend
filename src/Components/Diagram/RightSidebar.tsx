@@ -355,16 +355,16 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
   const getReportTypeColor = (reportType: string) => {
     const colors: Record<string, string> = {
-      "Flow In": "#87CEEB",
-      "Flow Out": "#FFD580",
-      Percolation: "#006400",
-      Evaporation: "#FFFFC5",
-      Consumption: "#00008B",
-      Wastage: "#FF0000",
-      Regeneration: "#66FF00",
-      "Re-use": "#00BCA1",
+      "Flow In": "#5470c6",
+      "Flow Out": "#91cc75",
+      Percolation: "#fac858",
+      Evaporation: "#ee6666",
+      Consumption: "#73c0de",
+      Wastage: "#3ba272",
+      Regeneration: "#fc8452",
+      "Re-use": "#9a60b4",
       "Net Balance": "#6B7280",
-      Unknown: "#6B7280",
+      Unknown: "#ff9f7f",
     };
     return colors[reportType] || "#6B7280";
   };
@@ -389,12 +389,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       {
         name: "Total In",
         value: calculations.totalIn,
-        color: "#3B82F6",
+        color: "#5470c6",
       },
       {
         name: "Total Out",
         value: calculations.totalOut,
-        color: "#10B981",
+        color: "#91cc75",
       },
     ];
   };
@@ -420,12 +420,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       {
         name: "Current Stock",
         value: filteredStorageData.totalStock,
-        color: "#8B5CF6",
+        color: "#ea7ccc",
       },
       {
         name: "Available Stock",
         value: availableStock,
-        color: "#3B82F6",
+        color: "#ff9f7f",
       },
     ];
   };
@@ -598,7 +598,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                       <tr className="hover:bg-secondary/10">
                         <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
-                            <div className="w-3.5 h-3.5 bg-status-info rounded-full"></div>
+                            <div className="w-3.5 h-3.5 bg-[#5470c6] rounded-full"></div>
                             Total In
                           </div>
                         </td>
@@ -614,7 +614,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                       <tr className="hover:bg-secondary/10">
                         <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
-                            <div className="w-3.5 h-3.5 bg-status-success rounded-full"></div>
+                            <div className="w-3.5 h-3.5 bg-[#91cc75] rounded-full"></div>
                             Total Out
                           </div>
                         </td>
@@ -631,9 +631,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
                             {calculations.totalBalance >= 0 ? (
-                              <div className="w-3.5 h-3.5 bg-status-success rounded-full"></div>
+                              <div className="w-3.5 h-3.5 bg-[#6B7280] rounded-full"></div>
                             ) : (
-                              <div className="w-3.5 h-3.5 bg-status-danger rounded-full"></div>
+                              <div className="w-3.5 h-3.5 bg-[#ee6666] rounded-full"></div>
                             )}
                             Balance
                           </div>
@@ -722,7 +722,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             <tr className="hover:bg-secondary/10">
                               <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-3.5 h-3.5 bg-[#8B5CF6] rounded-full"></div>
+                                  <div className="w-3.5 h-3.5 bg-[#ea7ccc] rounded-full"></div>
                                   Total Stock
                                 </div>
                               </td>
@@ -738,7 +738,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             <tr className="hover:bg-secondary/10">
                               <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-3.5 h-3.5 bg-[#3B82F6] rounded-full"></div>
+                                  <div className="w-3.5 h-3.5 bg-[#ff9f7f] rounded-full"></div>
                                   Available Capacity
                                 </div>
                               </td>
@@ -757,7 +757,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             <tr className="hover:bg-secondary/10">
                               <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-3.5 h-3.5 bg-[#06B6D4] rounded-full"></div>
+                                  <div className="w-3.5 h-3.5 bg-[#73c0de] rounded-full"></div>
                                   Total Capacity
                                 </div>
                               </td>
