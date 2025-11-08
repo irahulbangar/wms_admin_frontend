@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { X, Package, ChevronDown, ChevronRight, ChartArea } from "lucide-react";
 import PieChart from "./PieChart";
 import type { PieChartData } from "./PieChart";
@@ -44,16 +44,19 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         const plantName = selectedGroup.id.replace("plant-", "");
         const plantDevice = deviceData.find(
           (device) =>
-            device.plant_name === plantName ||
-            device.in_plant_name === plantName ||
-            device.out_plant_name === plantName
+            (device.plant_name === plantName && device.plant_id) ||
+            (device.in_plant_name === plantName && device.in_plant_id) ||
+            (device.out_plant_name === plantName && device.out_plant_id)
         );
-        return (
-          plantDevice?.plant_id ||
-          plantDevice?.in_plant_id ||
-          plantDevice?.out_plant_id ||
-          null
-        );
+        if (plantDevice) {
+          return (
+            plantDevice.plant_id ||
+            plantDevice.in_plant_id ||
+            plantDevice.out_plant_id ||
+            null
+          );
+        }
+        return null;
       }
       case "department": {
         const deptId = parseInt(selectedGroup.id.replace("dept-", ""));
@@ -68,43 +71,81 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     }
   };
 
-  const getFilteredStorageData = () => {
+  const filteredDeviceData = useMemo(() => {
     if (!deviceData || !selectedGroup) {
-      return { totalStock: 0, totalCapacity: 0 };
+      return [];
     }
 
-    let filteredDevices: DeviceResult[] = [];
-    const groupId = getGroupId();
+    let groupId: number | null = null;
+
+    switch (selectedGroup.type) {
+      case "plant": {
+        const plantName = selectedGroup.id.replace("plant-", "");
+        const plantDevice = deviceData.find(
+          (device) =>
+            (device.plant_name === plantName && device.plant_id) ||
+            (device.in_plant_name === plantName && device.in_plant_id) ||
+            (device.out_plant_name === plantName && device.out_plant_id)
+        );
+        if (plantDevice) {
+          groupId =
+            plantDevice.plant_id ||
+            plantDevice.in_plant_id ||
+            plantDevice.out_plant_id ||
+            null;
+        }
+        break;
+      }
+      case "department": {
+        const deptId = parseInt(selectedGroup.id.replace("dept-", ""));
+        groupId = isNaN(deptId) ? null : deptId;
+        break;
+      }
+      case "system": {
+        const sysId = parseInt(selectedGroup.id.replace("system-", ""));
+        groupId = isNaN(sysId) ? null : sysId;
+        break;
+      }
+    }
 
     if (!groupId) {
-      return { totalStock: 0, totalCapacity: 0 };
+      return [];
     }
 
+    let filtered: DeviceResult[] = [];
+
     if (selectedGroup.type === "plant") {
-      filteredDevices = deviceData.filter(
+      filtered = deviceData.filter(
         (device) =>
-          device.in_plant_id === groupId || device.out_plant_id === groupId
+          device.plant_id === groupId ||
+          device.in_plant_id === groupId ||
+          device.out_plant_id === groupId
       );
     } else if (selectedGroup.type === "department") {
-      const departmentDevices = deviceData.filter(
+      filtered = deviceData.filter(
         (device) =>
+          device.department_id === groupId ||
           device.in_department_id === groupId ||
           device.out_department_id === groupId
       );
-      filteredDevices = departmentDevices.filter(
-        (device) => device.in_department_id || device.out_department_id
-      );
     } else if (selectedGroup.type === "system") {
-      const systemDevices = deviceData.filter(
+      filtered = deviceData.filter(
         (device) =>
-          device.in_system_id === groupId || device.out_system_id === groupId
-      );
-      filteredDevices = systemDevices.filter(
-        (device) => device.in_system_id || device.out_system_id
+          device.system_id === groupId ||
+          device.in_system_id === groupId ||
+          device.out_system_id === groupId
       );
     }
 
-    const tankDevices = filteredDevices.filter(
+    return filtered;
+  }, [deviceData, selectedGroup]);
+
+  const getFilteredStorageData = () => {
+    if (!filteredDeviceData || filteredDeviceData.length === 0) {
+      return { totalStock: 0, totalCapacity: 0 };
+    }
+
+    const tankDevices = filteredDeviceData.filter(
       (device) =>
         device.device_family_type === "tank" ||
         device.device_family?.toLowerCase().includes("tank")
@@ -154,7 +195,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   };
 
   const getWaterBalanceData = () => {
-    if (!deviceData || !selectedGroup) {
+    if (
+      !filteredDeviceData ||
+      filteredDeviceData.length === 0 ||
+      !selectedGroup
+    ) {
       return [];
     }
 
@@ -184,123 +229,117 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       let total = 0;
 
       if (reportType === "Flow In") {
-        total = deviceData
+        total = filteredDeviceData
           .filter((device) => {
-            let hasInConnection = false;
-            if (device.report_type_name === "Flow") {
-              switch (groupType) {
-                case "system":
-                  hasInConnection = device.in_system_id === groupId;
-                  break;
-                case "department":
-                  hasInConnection = device.in_department_id === groupId;
-                  break;
-                case "plant":
-                  hasInConnection = device.in_plant_id === groupId;
-                  break;
-              }
+            if (device.report_type_name !== "Flow") return false;
+
+            switch (groupType) {
+              case "system":
+                return device.in_system_id === groupId;
+              case "department":
+                return device.in_department_id === groupId;
+              case "plant":
+                return device.in_plant_id === groupId;
+              default:
+                return false;
             }
-            return hasInConnection;
           })
           .reduce((sum, device) => sum + getDeviceValue(device), 0);
       } else if (reportType === "Flow Out") {
-        total = deviceData
+        total = filteredDeviceData
           .filter((device) => {
-            let hasOutConnection = false;
-            if (device.report_type_name === "Flow") {
-              switch (groupType) {
-                case "system":
-                  hasOutConnection = device.out_system_id === groupId;
-                  break;
-                case "department":
-                  hasOutConnection = device.out_department_id === groupId;
-                  break;
-                case "plant":
-                  hasOutConnection = device.out_plant_id === groupId;
-                  break;
-              }
+            if (device.report_type_name !== "Flow") return false;
+
+            switch (groupType) {
+              case "system":
+                return device.out_system_id === groupId;
+              case "department":
+                return device.out_department_id === groupId;
+              case "plant":
+                return device.out_plant_id === groupId;
+              default:
+                return false;
             }
-            return hasOutConnection;
           })
           .reduce((sum, device) => sum + getDeviceValue(device), 0);
       } else if (reportType === "Net Balance") {
         let inTotal = 0;
         let outTotal = 0;
-        inTotal = deviceData
+
+        inTotal = filteredDeviceData
           .filter((device) => {
+            const isInReportType =
+              inReportType.includes(device.report_type_name) ||
+              device.report_type_name === "Flow";
+            if (!isInReportType) return false;
+
             switch (groupType) {
               case "system":
-                return (
-                  device.in_system_id === groupId &&
-                  (inReportType.includes(device.report_type_name) ||
-                    device.report_type_name === "Flow")
-                );
+                return device.in_system_id === groupId;
               case "department":
-                return (
-                  device.in_department_id === groupId &&
-                  (inReportType.includes(device.report_type_name) ||
-                    device.report_type_name === "Flow")
-                );
+                return device.in_department_id === groupId;
               case "plant":
-                return (
-                  device.in_plant_id === groupId &&
-                  (inReportType.includes(device.report_type_name) ||
-                    device.report_type_name === "Flow")
-                );
+                return device.in_plant_id === groupId;
+              default:
+                return false;
             }
           })
           .reduce((sum, device) => sum + getDeviceValue(device), 0);
-        outTotal = deviceData
+
+        outTotal = filteredDeviceData
           .filter((device) => {
+            const isOutReportType =
+              outReportType.includes(device.report_type_name) ||
+              device.report_type_name === "Flow";
+            if (!isOutReportType) return false;
+
             switch (groupType) {
               case "system":
-                return (
-                  device.out_system_id === groupId &&
-                  (outReportType.includes(device.report_type_name) ||
-                    device.report_type_name === "Flow")
-                );
+                return device.out_system_id === groupId;
               case "department":
-                return (
-                  device.out_department_id === groupId &&
-                  (outReportType.includes(device.report_type_name) ||
-                    device.report_type_name === "Flow")
-                );
+                return device.out_department_id === groupId;
               case "plant":
-                return (
-                  device.out_plant_id === groupId &&
-                  (outReportType.includes(device.report_type_name) ||
-                    device.report_type_name === "Flow")
-                );
+                return device.out_plant_id === groupId;
+              default:
+                return false;
             }
           })
           .reduce((sum, device) => sum + getDeviceValue(device), 0);
+
         total = outTotal - inTotal;
       } else {
-        total = deviceData
+        total = filteredDeviceData
           .filter((device) => {
-            if (device.report_type_name === reportType) {
-              switch (groupType) {
-                case "system":
-                  return inReportType.includes(reportType)
-                    ? device.in_system_id === groupId
-                    : outReportType.includes(reportType)
-                    ? device.out_system_id === groupId
-                    : false;
-                case "department":
-                  return inReportType.includes(reportType)
-                    ? device.in_department_id === groupId
-                    : outReportType.includes(reportType)
-                    ? device.out_department_id === groupId
-                    : false;
-                case "plant":
-                  return inReportType.includes(reportType)
-                    ? device.in_plant_id === groupId
-                    : outReportType.includes(reportType)
-                    ? device.out_plant_id === groupId
-                    : false;
-              }
+            if (device.report_type_name !== reportType) return false;
+
+            const isInType = inReportType.includes(reportType);
+            const isOutType = outReportType.includes(reportType);
+
+            switch (groupType) {
+              case "system":
+                if (isInType) {
+                  return device.in_system_id === groupId;
+                } else if (isOutType) {
+                  return device.out_system_id === groupId;
+                }
+                return false;
+              case "department":
+                if (isInType) {
+                  return device.in_department_id === groupId;
+                } else if (isOutType) {
+                  return device.out_department_id === groupId;
+                }
+                return false;
+              case "plant":
+                if (isInType) {
+                  return device.in_plant_id === groupId;
+                } else if (isOutType) {
+                  return device.out_plant_id === groupId;
+                }
+                return false;
+              default:
+                return false;
             }
-            return false;
           })
           .reduce((sum, device) => sum + getDeviceValue(device), 0);
       }
