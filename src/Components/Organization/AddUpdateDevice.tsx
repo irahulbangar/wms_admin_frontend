@@ -137,6 +137,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     A: "",
     B: "",
   });
+  const inReportType = ["Evaporation", "Consumption", "Wastage"];
+  const outReportType = ["Percolation", "Regeneration", "Re-use"];
+
+  const selectedReportType = reportTypes.find(
+    (rt) => rt.report_type_id === formData.report_type_id
+  );
+
+  const isInReportType = selectedReportType
+    ? inReportType.includes(selectedReportType.report_type_name)
+    : false;
+  const isOutReportType = selectedReportType
+    ? outReportType.includes(selectedReportType.report_type_name)
+    : false;
 
   const resetForm = () => {
     setFormData({
@@ -228,6 +241,37 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     } else if (fieldMappings[name]) {
       const numericValue = value === "null" ? -1 : parseInt(value) || 0;
       setFormData((prev) => ({ ...prev, [actualFieldName]: numericValue }));
+    } else if (name === "report_type_id") {
+      const reportTypeId = parseInt(value) || 0;
+      const selectedReportType = reportTypes.find(
+        (rt) => rt.report_type_id === reportTypeId
+      );
+
+      const isInType = selectedReportType
+        ? inReportType.includes(selectedReportType.report_type_name)
+        : false;
+      const isOutType = selectedReportType
+        ? outReportType.includes(selectedReportType.report_type_name)
+        : false;
+
+      setFormData((prev) => {
+        const updatedData = {
+          ...prev,
+          [actualFieldName]: reportTypeId,
+        };
+
+        if (isInType) {
+          updatedData.out_plant_id = -1;
+          updatedData.out_department_id = -1;
+          updatedData.out_system_id = -1;
+        } else if (isOutType) {
+          updatedData.in_plant_id = -1;
+          updatedData.in_department_id = -1;
+          updatedData.in_system_id = -1;
+        }
+
+        return updatedData;
+      });
     } else {
       setFormData((prev) => ({ ...prev, [actualFieldName]: value }));
     }
@@ -813,7 +857,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : formData.in_plant_id || "0"
                   }
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  disabled={isOutReportType}
+                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    isOutReportType ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="0">Select Plant</option>
                   <option value="null">None</option>
@@ -840,7 +887,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : formData.out_plant_id || "0"
                   }
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  disabled={isInReportType}
+                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    isInReportType ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="0">Select Plant</option>
                   <option value="null">None</option>
@@ -874,7 +924,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : formData.in_department_id || "0"
                   }
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  disabled={isOutReportType}
+                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    isOutReportType ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="0">Select Department</option>
                   <option value="null">None</option>
@@ -909,7 +962,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : formData.out_department_id || "0"
                   }
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  disabled={isInReportType}
+                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    isInReportType ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="0">Select Department</option>
                   <option value="null">None</option>
@@ -951,7 +1007,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : formData.in_system_id || "0"
                   }
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  disabled={isOutReportType}
+                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    isOutReportType ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="0">Select System</option>
                   <option value="null">None</option>
@@ -982,7 +1041,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       : formData.out_system_id || "0"
                   }
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+                  disabled={isInReportType}
+                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    isInReportType ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="0">Select System</option>
                   <option value="null">None</option>
