@@ -43,7 +43,6 @@ const PieChart: React.FC<PieChartProps> = ({
 
     const chart = echarts.init(chartRef.current);
 
-    // Filter out zero values
     const filteredData = data?.filter((item) => item?.value > 0);
     const isSingleValue = filteredData?.length === 1;
 
