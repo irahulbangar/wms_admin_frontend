@@ -64,7 +64,9 @@ export const convertDevicesToDiagram = (
   const nodes: DiagramNode[] = [];
   const edges: DiagramEdge[] = [];
 
-  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
+  const visibleDevices = devices.filter(
+    (device) => device.visibility !== "hidden"
+  );
 
   const plantGroups = visibleDevices.reduce((acc, device) => {
     const plantId = device.plant_id?.toString() || "unknown";
@@ -80,7 +82,8 @@ export const convertDevicesToDiagram = (
     if (!acc[plantId].departments[deptId]) {
       acc[plantId].departments[deptId] = {
         department_id: device.department_id,
-        department_name: device.department_name || `Department ${device.department_id}`,
+        department_name:
+          device.department_name || `Department ${device.department_id}`,
         systems: {},
       };
     }
@@ -107,80 +110,119 @@ export const convertDevicesToDiagram = (
     const minDepartmentWidth = 1400;
     const minDepartmentHeight = 1000;
 
-    const departmentRequirements = Object.values(plant.departments).map((department) => {
-      const totalSystemsInDept = Object.values(department.systems).length;
-      
-      const systemSpacing = 30;
-      const systemPadding = 40;
-      const systemWidth = 1200;
-      const systemHeight = 800;
-      const systemHeaderHeight = 20;
-      const systemFooterHeight = 40;
-      
-      if (totalSystemsInDept === 0) {
-        return {
-          width: minDepartmentWidth,
-          height: minDepartmentHeight,
-          systemCount: totalSystemsInDept,
-          systemsPerRow: 0,
-          totalSystemRows: 0
-        };
-      } else if (totalSystemsInDept === 1) {
-        return {
-          width: Math.max(minDepartmentWidth, 2 * systemPadding),
-          height: Math.max(minDepartmentHeight, systemHeaderHeight + systemFooterHeight + systemHeight),
-          systemCount: totalSystemsInDept,
-          systemsPerRow: 1,
-          totalSystemRows: 1
-        };
-      } else {
-        const systemsPerRowWithMinWidth = Math.max(1, Math.floor((minDepartmentWidth - 2 * systemPadding) / (systemWidth + systemSpacing)));
-        
-        if (totalSystemsInDept <= systemsPerRowWithMinWidth) {
-          const systemsPerRow = totalSystemsInDept;
-          const totalSystemRows = 1;
-          const requiredWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * systemWidth + (systemsPerRow - 1) * systemSpacing);
-          const requiredHeight = Math.max(minDepartmentHeight, systemHeaderHeight + systemFooterHeight + systemHeight);
-          
+    const departmentRequirements = Object.values(plant.departments).map(
+      (department) => {
+        const totalSystemsInDept = Object.values(department.systems).length;
+
+        const systemSpacing = 30;
+        const systemPadding = 40;
+        const systemWidth = 1200;
+        const systemHeight = 800;
+        const systemHeaderHeight = 20;
+        const systemFooterHeight = 40;
+
+        if (totalSystemsInDept === 0) {
           return {
-            width: requiredWidth,
-            height: requiredHeight,
+            width: minDepartmentWidth,
+            height: minDepartmentHeight,
             systemCount: totalSystemsInDept,
-            systemsPerRow,
-            totalSystemRows
+            systemsPerRow: 0,
+            totalSystemRows: 0,
+          };
+        } else if (totalSystemsInDept === 1) {
+          return {
+            width: Math.max(minDepartmentWidth, 2 * systemPadding),
+            height: Math.max(
+              minDepartmentHeight,
+              systemHeaderHeight + systemFooterHeight + systemHeight
+            ),
+            systemCount: totalSystemsInDept,
+            systemsPerRow: 1,
+            totalSystemRows: 1,
           };
         } else {
-          const systemsPerRow = systemsPerRowWithMinWidth;
-          const totalSystemRows = Math.ceil(totalSystemsInDept / systemsPerRow);
-          
-          const requiredWidth = Math.max(minDepartmentWidth, 2 * systemPadding + systemsPerRow * systemWidth + (systemsPerRow - 1) * systemSpacing);
-          
-          const requiredHeight = Math.max(minDepartmentHeight, systemHeaderHeight + systemFooterHeight + totalSystemRows * systemHeight + (totalSystemRows - 1) * systemSpacing);
-          
-          return {
-            width: requiredWidth,
-            height: requiredHeight,
-            systemCount: totalSystemsInDept,
-            systemsPerRow,
-            totalSystemRows
-          };
+          const systemsPerRowWithMinWidth = Math.max(
+            1,
+            Math.floor(
+              (minDepartmentWidth - 2 * systemPadding) /
+                (systemWidth + systemSpacing)
+            )
+          );
+
+          if (totalSystemsInDept <= systemsPerRowWithMinWidth) {
+            const systemsPerRow = totalSystemsInDept;
+            const totalSystemRows = 1;
+            const requiredWidth = Math.max(
+              minDepartmentWidth,
+              2 * systemPadding +
+                systemsPerRow * systemWidth +
+                (systemsPerRow - 1) * systemSpacing
+            );
+            const requiredHeight = Math.max(
+              minDepartmentHeight,
+              systemHeaderHeight + systemFooterHeight + systemHeight
+            );
+
+            return {
+              width: requiredWidth,
+              height: requiredHeight,
+              systemCount: totalSystemsInDept,
+              systemsPerRow,
+              totalSystemRows,
+            };
+          } else {
+            const systemsPerRow = systemsPerRowWithMinWidth;
+            const totalSystemRows = Math.ceil(
+              totalSystemsInDept / systemsPerRow
+            );
+
+            const requiredWidth = Math.max(
+              minDepartmentWidth,
+              2 * systemPadding +
+                systemsPerRow * systemWidth +
+                (systemsPerRow - 1) * systemSpacing
+            );
+
+            const requiredHeight = Math.max(
+              minDepartmentHeight,
+              systemHeaderHeight +
+                systemFooterHeight +
+                totalSystemRows * systemHeight +
+                (totalSystemRows - 1) * systemSpacing
+            );
+
+            return {
+              width: requiredWidth,
+              height: requiredHeight,
+              systemCount: totalSystemsInDept,
+              systemsPerRow,
+              totalSystemRows,
+            };
+          }
         }
       }
-    });
+    );
 
-    const totalDeptWidth = departmentRequirements.reduce((sum, dept) => sum + dept.width, 0) + (departmentCount - 1) * departmentSpacing;
-    const maxDeptHeight = Math.max(...departmentRequirements.map(d => d.height));
-    
+    const totalDeptWidth =
+      departmentRequirements.reduce((sum, dept) => sum + dept.width, 0) +
+      (departmentCount - 1) * departmentSpacing;
+    const maxDeptHeight = Math.max(
+      ...departmentRequirements.map((d) => d.height)
+    );
+
     const sourceSinkPadding = 400;
-    
-    const requiredPlantWidth = plantPadding * 2 + totalDeptWidth + sourceSinkPadding;
+
+    const requiredPlantWidth =
+      plantPadding * 2 + totalDeptWidth + sourceSinkPadding;
     const requiredPlantHeight = plantPadding * 2 + 80 + maxDeptHeight;
 
     const plantWidth = Math.max(2000, requiredPlantWidth);
     const plantHeight = Math.max(1200, requiredPlantHeight);
-    
+
     const plantSpacing = 100;
-    const totalDiagramWidth = Object.values(plantGroups).length * (plantWidth + plantSpacing) - plantSpacing;
+    const totalDiagramWidth =
+      Object.values(plantGroups).length * (plantWidth + plantSpacing) -
+      plantSpacing;
     const centerOffset = Math.max(0, (totalDiagramWidth - plantWidth) / 2);
     const plantX = plantIndex * (plantWidth + plantSpacing) - centerOffset;
     const plantY = 50;
@@ -215,7 +257,7 @@ export const convertDevicesToDiagram = (
     const sourceNodeId = `source-${plant.plant_id}`;
     const sourceX = plantX - 200;
     const sourceY = plantY + plantHeight / 2 - 40;
-    
+
     nodes.push({
       id: sourceNodeId,
       data: {
@@ -236,7 +278,7 @@ export const convertDevicesToDiagram = (
     const sinkNodeId = `sink-${plant.plant_id}`;
     const sinkX = plantX + plantWidth + 50;
     const sinkY = plantY + plantHeight / 2 - 40;
-    
+
     nodes.push({
       id: sinkNodeId,
       data: {
@@ -255,7 +297,7 @@ export const convertDevicesToDiagram = (
     });
 
     let cumulativeX = plantX + plantPadding + 200;
-    
+
     Object.values(plant.departments).forEach((department, deptIndex) => {
       const deptId = `dept-${department.department_id}`;
 
@@ -265,12 +307,12 @@ export const convertDevicesToDiagram = (
 
       const deptX = cumulativeX;
       const deptY = plantY + 80;
-      
+
       const maxDeptX = plantX + plantWidth - deptWidth - plantPadding;
       const maxDeptY = plantY + plantHeight - deptHeight - plantPadding;
       const finalDeptX = Math.min(deptX, maxDeptX);
       const finalDeptY = Math.min(deptY, maxDeptY);
-      
+
       cumulativeX = finalDeptX + deptWidth + departmentSpacing;
 
       nodes.push({
@@ -305,29 +347,40 @@ export const convertDevicesToDiagram = (
       const systemPadding = 40;
       const systemHeaderHeight = 20;
       const systemFooterHeight = 40;
-      
+
       const systemWidth = 1200;
       const systemHeight = 800;
-      
-      
+
       Object.values(department.systems).forEach((system, systemIndex) => {
         const systemId = `system-${system.system_id}`;
-        
+
         const deptRequirement = departmentRequirements[deptIndex];
         const systemsPerRow = deptRequirement.systemsPerRow;
         const systemCol = systemIndex % systemsPerRow;
         const systemRow = Math.floor(systemIndex / systemsPerRow);
-        
+
         const totalSystemsInDept = Object.values(department.systems).length;
-        const systemsInCurrentRow = Math.min(systemsPerRow, totalSystemsInDept - systemRow * systemsPerRow);
-        const rowWidth = systemsInCurrentRow * systemWidth + (systemsInCurrentRow - 1) * systemSpacing;
-        const rowStartX = finalDeptX + systemPadding + (deptWidth - 2 * systemPadding - rowWidth) / 2;
-        
+        const systemsInCurrentRow = Math.min(
+          systemsPerRow,
+          totalSystemsInDept - systemRow * systemsPerRow
+        );
+        const rowWidth =
+          systemsInCurrentRow * systemWidth +
+          (systemsInCurrentRow - 1) * systemSpacing;
+        const rowStartX =
+          finalDeptX +
+          systemPadding +
+          (deptWidth - 2 * systemPadding - rowWidth) / 2;
+
         const systemX = rowStartX + systemCol * (systemWidth + systemSpacing);
-        const systemY = finalDeptY + systemHeaderHeight + systemRow * (systemHeight + systemSpacing);
-        
+        const systemY =
+          finalDeptY +
+          systemHeaderHeight +
+          systemRow * (systemHeight + systemSpacing);
+
         const maxSystemX = finalDeptX + deptWidth - systemWidth - systemPadding;
-        const maxSystemY = finalDeptY + deptHeight - systemHeight - systemFooterHeight;
+        const maxSystemY =
+          finalDeptY + deptHeight - systemHeight - systemFooterHeight;
         const finalSystemX = Math.min(systemX, maxSystemX);
         const finalSystemY = Math.min(systemY, maxSystemY);
 
@@ -360,13 +413,17 @@ export const convertDevicesToDiagram = (
         });
 
         system.devices.sort((a: DeviceResult, b: DeviceResult) => {
-          const aIsTank = a.device_family_type === "tank" || a.device_family?.toLowerCase().includes("tank");
-          const bIsTank = b.device_family_type === "tank" || b.device_family?.toLowerCase().includes("tank");
+          const aIsTank =
+            a.device_family_type === "tank" ||
+            a.device_family?.toLowerCase().includes("tank");
+          const bIsTank =
+            b.device_family_type === "tank" ||
+            b.device_family?.toLowerCase().includes("tank");
           if (aIsTank && !bIsTank) return -1;
           if (!aIsTank && bIsTank) return 1;
           return a.device_id - b.device_id;
         });
-    
+
         const tanks = system.devices.filter(
           (device: DeviceResult) =>
             device.device_family_type === "tank" ||
@@ -487,7 +544,11 @@ export const convertDevicesToDiagram = (
             systemHeight,
             virtualIndex,
             virtuals.length,
-            tanks.length + fms.length + brwhms.length + phmcs.length + args.length
+            tanks.length +
+              fms.length +
+              brwhms.length +
+              phmcs.length +
+              args.length
           );
           nodes.push(virtualNode);
         });
@@ -615,10 +676,10 @@ const createFMNode = (
   const tankAreaHeight =
     totalTanks > 0
       ? headerHeight +
-      30 +
-      totalTankRows * 120 +
-      Math.max(0, totalTankRows - 1) * 50 +
-      100
+        30 +
+        totalTankRows * 120 +
+        Math.max(0, totalTankRows - 1) * 50 +
+        100
       : headerHeight + 30;
 
   const maxFMsPerRow = Math.max(
@@ -638,12 +699,12 @@ const createFMNode = (
   const fmVerticalSpacing =
     totalFMRows > 1
       ? Math.max(
-        50,
-        Math.min(
-          80,
-          (fmSectionHeight - totalFMRows * fmHeight) / (totalFMRows - 1)
+          50,
+          Math.min(
+            80,
+            (fmSectionHeight - totalFMRows * fmHeight) / (totalFMRows - 1)
+          )
         )
-      )
       : 0;
 
   const row = Math.floor(fmIndex / maxFMsPerRow);
@@ -726,23 +787,28 @@ const createBRWHMSNode = (
   const brwhmsVerticalSpacing =
     totalRows > 1
       ? Math.max(
-        50,
-        Math.min(
-          80,
-          (brwhmsSectionHeight - totalRows * brwhmsHeight) / (totalRows - 1)
+          50,
+          Math.min(
+            80,
+            (brwhmsSectionHeight - totalRows * brwhmsHeight) / (totalRows - 1)
+          )
         )
-      )
       : 0;
 
   const row = Math.floor(brwhmsIndex / maxDevicesPerRow);
   const col = brwhmsIndex % maxDevicesPerRow;
 
-  const totalDevicesInRow = Math.min(maxDevicesPerRow, totalBRWHMS - row * maxDevicesPerRow);
-  const rowWidth = totalDevicesInRow * brwhmsWidth + (totalDevicesInRow - 1) * brwhmsSpacing;
+  const totalDevicesInRow = Math.min(
+    maxDevicesPerRow,
+    totalBRWHMS - row * maxDevicesPerRow
+  );
+  const rowWidth =
+    totalDevicesInRow * brwhmsWidth + (totalDevicesInRow - 1) * brwhmsSpacing;
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (brwhmsWidth + brwhmsSpacing);
-  const deviceY = brwhmsStartY + 40 + row * (brwhmsHeight + brwhmsVerticalSpacing);
+  const deviceY =
+    brwhmsStartY + 40 + row * (brwhmsHeight + brwhmsVerticalSpacing);
 
   const maxX = groupWidth - brwhmsWidth - sideMargin;
   const maxY = groupHeight - brwhmsHeight - footerHeight;
@@ -816,19 +882,23 @@ const createPHMCNode = (
   const phmcVerticalSpacing =
     totalRows > 1
       ? Math.max(
-        50,
-        Math.min(
-          80,
-          (phmcSectionHeight - totalRows * phmcHeight) / (totalRows - 1)
+          50,
+          Math.min(
+            80,
+            (phmcSectionHeight - totalRows * phmcHeight) / (totalRows - 1)
+          )
         )
-      )
       : 0;
 
   const row = Math.floor(phmcIndex / maxDevicesPerRow);
   const col = phmcIndex % maxDevicesPerRow;
 
-  const totalDevicesInRow = Math.min(maxDevicesPerRow, totalPHMCs - row * maxDevicesPerRow);
-  const rowWidth = totalDevicesInRow * phmcWidth + (totalDevicesInRow - 1) * phmcSpacing;
+  const totalDevicesInRow = Math.min(
+    maxDevicesPerRow,
+    totalPHMCs - row * maxDevicesPerRow
+  );
+  const rowWidth =
+    totalDevicesInRow * phmcWidth + (totalDevicesInRow - 1) * phmcSpacing;
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (phmcWidth + phmcSpacing);
@@ -911,19 +981,23 @@ const createARGNode = (
   const argVerticalSpacing =
     totalRows > 1
       ? Math.max(
-        40,
-        Math.min(
-          70,
-          (argSectionHeight - totalRows * argHeight) / (totalRows - 1)
+          40,
+          Math.min(
+            70,
+            (argSectionHeight - totalRows * argHeight) / (totalRows - 1)
+          )
         )
-      )
       : 0;
 
   const row = Math.floor(argIndex / maxDevicesPerRow);
   const col = argIndex % maxDevicesPerRow;
 
-  const totalDevicesInRow = Math.min(maxDevicesPerRow, totalARGs - row * maxDevicesPerRow);
-  const rowWidth = totalDevicesInRow * argWidth + (totalDevicesInRow - 1) * argSpacing;
+  const totalDevicesInRow = Math.min(
+    maxDevicesPerRow,
+    totalARGs - row * maxDevicesPerRow
+  );
+  const rowWidth =
+    totalDevicesInRow * argWidth + (totalDevicesInRow - 1) * argSpacing;
   const startX = sideMargin + (availableWidth - rowWidth) / 2;
 
   const deviceX = startX + col * (argWidth + argSpacing);
@@ -985,7 +1059,8 @@ const createVirtualNode = (
   const col = virtualIndex % maxVirtualsPerRow;
 
   const deviceX = sideMargin + col * (virtualWidth + virtualSpacing);
-  const deviceY = 50 + previousDevicesCount * 30 + row * (virtualHeight + virtualSpacing);
+  const deviceY =
+    50 + previousDevicesCount * 30 + row * (virtualHeight + virtualSpacing);
 
   const maxX = groupWidth - virtualWidth - sideMargin;
   const maxY = groupHeight - virtualHeight - footerHeight;
@@ -996,11 +1071,22 @@ const createVirtualNode = (
     label: device.device_name,
     type: "virtual",
     unit: device.unit || "Ltr",
-    departmentConnection: device.in_department_id === null ? "None" : device.in_department_id ? "In" : "Out",
-    plantConnection: device.in_plant_id === null ? "None" : device.in_plant_id ? "In" : "Out",
+    departmentConnection:
+      device.in_department_id === null
+        ? "None"
+        : device.in_department_id
+        ? "In"
+        : "Out",
+    plantConnection:
+      device.in_plant_id === null ? "None" : device.in_plant_id ? "In" : "Out",
     organizationConnection: device.organization_connection || "none",
     systemName: device.system_name || "",
-    systemConnection: device.in_system_id === null ? "None" : device.in_system_id ? "In" : "Out",
+    systemConnection:
+      device.in_system_id === null
+        ? "None"
+        : device.in_system_id
+        ? "In"
+        : "Out",
   };
 
   const result = {
@@ -1014,7 +1100,7 @@ const createVirtualNode = (
     width: virtualWidth,
     height: virtualHeight,
   };
-  
+
   return result;
 };
 
@@ -1118,7 +1204,6 @@ export const cleanNodesForAPI = (
   });
 };
 
-
 const getDeviceFlowValue = (device: DeviceResult): number => {
   const { device_family_type, device_type, last_record } = device;
 
@@ -1152,15 +1237,18 @@ const shouldIncludeDevice = (device: DeviceResult): boolean => {
 const calculateReportTypeWiseFlow = (
   devices: DeviceResult[],
   groupId: number,
-  groupType: 'plant' | 'department' | 'system'
+  groupType: "plant" | "department" | "system"
 ): ReportTypeCalculations[] => {
-  const reportTypeMap = new Map<string, { totalIn: number; totalOut: number }>();
+  const reportTypeMap = new Map<
+    string,
+    { totalIn: number; totalOut: number }
+  >();
 
   devices.forEach((device) => {
     if (!shouldIncludeDevice(device)) return;
 
     const flowValue = getDeviceFlowValue(device);
-    const reportType = device.report_type_name || 'Unknown';
+    const reportType = device.report_type_name || "Unknown";
 
     if (!reportTypeMap.has(reportType)) {
       reportTypeMap.set(reportType, { totalIn: 0, totalOut: 0 });
@@ -1168,19 +1256,25 @@ const calculateReportTypeWiseFlow = (
 
     const reportTypeData = reportTypeMap.get(reportType)!;
 
-    if (groupType === 'plant' && device.in_plant_id === groupId) {
+    if (groupType === "plant" && device.in_plant_id === groupId) {
       reportTypeData.totalIn += flowValue;
-    } else if (groupType === 'department' && device.in_department_id === groupId) {
+    } else if (
+      groupType === "department" &&
+      device.in_department_id === groupId
+    ) {
       reportTypeData.totalIn += flowValue;
-    } else if (groupType === 'system' && device.in_system_id === groupId) {
+    } else if (groupType === "system" && device.in_system_id === groupId) {
       reportTypeData.totalIn += flowValue;
     }
 
-    if (groupType === 'plant' && device.out_plant_id === groupId) {
+    if (groupType === "plant" && device.out_plant_id === groupId) {
       reportTypeData.totalOut += flowValue;
-    } else if (groupType === 'department' && device.out_department_id === groupId) {
+    } else if (
+      groupType === "department" &&
+      device.out_department_id === groupId
+    ) {
       reportTypeData.totalOut += flowValue;
-    } else if (groupType === 'system' && device.out_system_id === groupId) {
+    } else if (groupType === "system" && device.out_system_id === groupId) {
       reportTypeData.totalOut += flowValue;
     }
   });
@@ -1196,7 +1290,9 @@ const calculateReportTypeWiseFlow = (
 export const calculateDepartmentFlowBalances = (
   devices: DeviceResult[]
 ): DepartmentCalculations[] => {
-  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
+  const visibleDevices = devices.filter(
+    (device) => device.visibility !== "hidden"
+  );
 
   const departmentGroups = visibleDevices.reduce((acc, device) => {
     const deptId = device.department_id;
@@ -1243,7 +1339,9 @@ export const calculateDepartmentFlowBalances = (
       });
 
       const tankDevices = system.devices.filter(
-        (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
+        (device) =>
+          device.device_family_type === "tank" ||
+          device.device_family?.toLowerCase().includes("tank")
       );
 
       tankDevices.forEach((device) => {
@@ -1256,7 +1354,11 @@ export const calculateDepartmentFlowBalances = (
     });
 
     const totalBalance = totalOut - totalIn;
-    const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, group.department_id, 'department');
+    const reportTypeCalculations = calculateReportTypeWiseFlow(
+      visibleDevices,
+      group.department_id,
+      "department"
+    );
 
     return {
       department_id: group.department_id,
@@ -1275,18 +1377,23 @@ export const calculateDepartmentFlowBalance = (
   devices: DeviceResult[],
   departmentId: number
 ): DepartmentCalculations | null => {
-  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  
-  const departmentDevices = visibleDevices.filter(device => 
-    device.department_id === departmentId || 
-    device.in_department_id === departmentId || 
-    device.out_department_id === departmentId
+  const visibleDevices = devices.filter(
+    (device) => device.visibility !== "hidden"
+  );
+
+  const departmentDevices = visibleDevices.filter(
+    (device) =>
+      device.department_id === departmentId ||
+      device.in_department_id === departmentId ||
+      device.out_department_id === departmentId
   );
 
   if (departmentDevices.length === 0) return null;
 
   const tankDevices = departmentDevices.filter(
-    (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
+    (device) =>
+      device.device_family_type === "tank" ||
+      device.device_family?.toLowerCase().includes("tank")
   );
 
   let totalIn = 0;
@@ -1318,11 +1425,19 @@ export const calculateDepartmentFlowBalance = (
   });
 
   const totalBalance = totalOut - totalIn;
-  const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, departmentId, 'department');
+  const reportTypeCalculations = calculateReportTypeWiseFlow(
+    visibleDevices,
+    departmentId,
+    "department"
+  );
 
   return {
     department_id: departmentId,
-    department_name: departmentDevices[0]?.in_department_name || departmentDevices[0]?.out_department_name || departmentDevices[0]?.department_name || `Department ${departmentId}`,
+    department_name:
+      departmentDevices[0]?.in_department_name ||
+      departmentDevices[0]?.out_department_name ||
+      departmentDevices[0]?.department_name ||
+      `Department ${departmentId}`,
     totalIn,
     totalOut,
     totalBalance,
@@ -1347,18 +1462,23 @@ export const calculatePlantFlowBalance = (
   devices: DeviceResult[],
   plantId: number
 ): PlantCalculations | null => {
-  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  
-  const plantDevices = visibleDevices.filter(device => 
-    device.plant_id === plantId || 
-    device.in_plant_id === plantId || 
-    device.out_plant_id === plantId
+  const visibleDevices = devices.filter(
+    (device) => device.visibility !== "hidden"
+  );
+
+  const plantDevices = visibleDevices.filter(
+    (device) =>
+      device.plant_id === plantId ||
+      device.in_plant_id === plantId ||
+      device.out_plant_id === plantId
   );
 
   if (plantDevices.length === 0) return null;
 
   const tankDevices = plantDevices.filter(
-    (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
+    (device) =>
+      device.device_family_type === "tank" ||
+      device.device_family?.toLowerCase().includes("tank")
   );
 
   let totalIn = 0;
@@ -1390,11 +1510,19 @@ export const calculatePlantFlowBalance = (
   });
 
   const totalBalance = totalOut - totalIn;
-  const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, plantId, 'plant');
+  const reportTypeCalculations = calculateReportTypeWiseFlow(
+    visibleDevices,
+    plantId,
+    "plant"
+  );
 
   return {
     plant_id: plantId,
-    plant_name: plantDevices[0]?.in_plant_name || plantDevices[0]?.out_plant_name || plantDevices[0]?.plant_name || `Plant ${plantId}`,
+    plant_name:
+      plantDevices[0]?.in_plant_name ||
+      plantDevices[0]?.out_plant_name ||
+      plantDevices[0]?.plant_name ||
+      `Plant ${plantId}`,
     totalIn,
     totalOut,
     totalBalance,
@@ -1419,18 +1547,23 @@ export const calculateSystemFlowBalance = (
   devices: DeviceResult[],
   systemId: number
 ): SystemCalculations | null => {
-  const visibleDevices = devices.filter(device => device.visibility !== "hidden");
-  
-  const systemDevices = visibleDevices.filter(device => 
-    device.system_id === systemId || 
-    device.in_system_id === systemId || 
-    device.out_system_id === systemId
+  const visibleDevices = devices.filter(
+    (device) => device.visibility !== "hidden"
+  );
+
+  const systemDevices = visibleDevices.filter(
+    (device) =>
+      device.system_id === systemId ||
+      device.in_system_id === systemId ||
+      device.out_system_id === systemId
   );
 
   if (systemDevices.length === 0) return null;
 
   const tankDevices = systemDevices.filter(
-    (device) => device.device_family_type === "tank" || device.device_family?.toLowerCase().includes("tank")
+    (device) =>
+      device.device_family_type === "tank" ||
+      device.device_family?.toLowerCase().includes("tank")
   );
 
   let totalIn = 0;
@@ -1462,11 +1595,19 @@ export const calculateSystemFlowBalance = (
   });
 
   const totalBalance = totalOut - totalIn;
-  const reportTypeCalculations = calculateReportTypeWiseFlow(visibleDevices, systemId, 'system');
+  const reportTypeCalculations = calculateReportTypeWiseFlow(
+    visibleDevices,
+    systemId,
+    "system"
+  );
 
   return {
     system_id: systemId,
-    system_name: systemDevices[0]?.in_system_name || systemDevices[0]?.out_system_name || systemDevices[0]?.system_name || `System ${systemId}`,
+    system_name:
+      systemDevices[0]?.in_system_name ||
+      systemDevices[0]?.out_system_name ||
+      systemDevices[0]?.system_name ||
+      `System ${systemId}`,
     totalIn,
     totalOut,
     totalBalance,
