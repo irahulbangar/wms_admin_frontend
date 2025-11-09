@@ -832,7 +832,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               <th className="px-4 py-2 text-left text-text-secondary font-medium">
                                 Report Type
                               </th>
-                              <th className="px-4 py-2 text-right text-text-secondary font-medium">
+                              <th className="px-4 py-2 text-center text-text-secondary font-medium">
                                 Value
                               </th>
                             </tr>
@@ -870,8 +870,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                       </span>
                                     </div>
                                   </td>
-                                  <td className="px-2 py-3 text-right">
-                                    <span className="text-text-primary text-sm font-roboto flex items-center gap-1">
+                                  <td className="px-2 py-3 text-center">
+                                    <span className="text-text-primary text-sm font-roboto flex items-center gap-1 justify-center">
                                       {item.total.toFixed(1)}{" "}
                                       <span className="italic text-text-secondary font-roboto">
                                         Ltr

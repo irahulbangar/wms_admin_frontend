@@ -943,8 +943,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     .filter(
                       (department) =>
                         department.plant_id === plant_id &&
-                        department.organization_id === organizationId &&
-                        department.department_id === departmentId
+                        department.organization_id === organizationId
                     )
                     .map((department) => (
                       <option
@@ -982,8 +981,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       .filter(
                         (department) =>
                           department.plant_id === plant_id &&
-                          department.organization_id === organizationId &&
-                          department.department_id === departmentId
+                          department.organization_id === organizationId
                       )
                       .map((department) => (
                         <option
