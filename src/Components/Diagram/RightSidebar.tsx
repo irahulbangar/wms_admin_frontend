@@ -35,6 +35,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   const [isFlowSummaryExpanded, setIsFlowSummaryExpanded] = useState(true);
   const [isStorageExpanded, setIsStorageExpanded] = useState(true);
   const [isWaterBalanceExpanded, setIsWaterBalanceExpanded] = useState(true);
+  const totalBalance = useMemo(() => {
+    if (!calculations) return 0;
+    return calculations.totalIn - calculations.totalOut;
+  }, [calculations]);
 
   const getGroupId = (): number | null => {
     if (!selectedGroup || !deviceData) return null;
@@ -306,7 +310,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
           })
           .reduce((sum, device) => sum + getDeviceValue(device), 0);
 
-        total = outTotal - inTotal;
+        total = inTotal - outTotal;
       } else {
         total = filteredDeviceData
           .filter((device) => {
@@ -355,16 +359,16 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
 
   const getReportTypeColor = (reportType: string) => {
     const colors: Record<string, string> = {
-      "Flow In": "#5470c6",
-      "Flow Out": "#91cc75",
-      Percolation: "#fac858",
-      Evaporation: "#ee6666",
-      Consumption: "#73c0de",
-      Wastage: "#3ba272",
-      Regeneration: "#fc8452",
-      "Re-use": "#9a60b4",
+      "Flow In": "#5070de",
+      "Flow Out": "#b6d733",
+      Percolation: "#505472",
+      Evaporation: "#fe994e",
+      Consumption: "#0ca9df",
+      Wastage: "#ffd209",
+      Regeneration: "#fa6488",
+      "Re-use": "#7a5db0",
       "Net Balance": "#6B7280",
-      Unknown: "#ff9f7f",
+      Unknown: "#7da6d2",
     };
     return colors[reportType] || "#6B7280";
   };
@@ -389,12 +393,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       {
         name: "Total In",
         value: calculations.totalIn,
-        color: "#5470c6",
+        color: "#5070de",
       },
       {
         name: "Total Out",
         value: calculations.totalOut,
-        color: "#91cc75",
+        color: "#b6d733",
       },
     ];
   };
@@ -420,12 +424,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       {
         name: "Current Stock",
         value: filteredStorageData.totalStock,
-        color: "#ea7ccc",
+        color: "#5070de",
       },
       {
         name: "Available Stock",
         value: availableStock,
-        color: "#ff9f7f",
+        color: "#7da6d2",
       },
     ];
   };
@@ -501,7 +505,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       )}
 
       <div
-        className={`fixed right-0 top-0 h-full w-80 sm:w-85 bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 h-full w-fit bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -598,13 +602,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                       <tr className="hover:bg-secondary/10">
                         <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
-                            <div className="w-3.5 h-3.5 bg-[#5470c6] rounded-full"></div>
+                            <div className="w-3.5 h-3.5 bg-[#5070de] rounded-full"></div>
                             Total In
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-sm font-roboto">
-                            {calculations?.totalIn?.toFixed(1)}{" "}
+                            {calculations?.totalIn?.toFixed(2)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
                             </span>
@@ -614,13 +618,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                       <tr className="hover:bg-secondary/10">
                         <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
-                            <div className="w-3.5 h-3.5 bg-[#91cc75] rounded-full"></div>
+                            <div className="w-3.5 h-3.5 bg-[#b6d733] rounded-full"></div>
                             Total Out
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-sm font-roboto">
-                            {calculations?.totalOut?.toFixed(1)}{" "}
+                            {calculations?.totalOut?.toFixed(2)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
                             </span>
@@ -630,7 +634,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                       <tr className="hover:bg-secondary/10">
                         <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                           <div className="flex items-center gap-2">
-                            {calculations.totalBalance >= 0 ? (
+                            {totalBalance >= 0 ? (
                               <div className="w-3.5 h-3.5 bg-[#6B7280] rounded-full"></div>
                             ) : (
                               <div className="w-3.5 h-3.5 bg-[#ee6666] rounded-full"></div>
@@ -640,7 +644,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-text-primary text-sm font-roboto">
-                            {calculations?.totalBalance?.toFixed(1)}{" "}
+                            {totalBalance.toFixed(2)}{" "}
                             <span className="italic text-text-secondary font-roboto">
                               Ltr
                             </span>
@@ -722,7 +726,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             <tr className="hover:bg-secondary/10">
                               <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-3.5 h-3.5 bg-[#ea7ccc] rounded-full"></div>
+                                  <div className="w-3.5 h-3.5 bg-[#5070de] rounded-full"></div>
                                   Total Stock
                                 </div>
                               </td>
@@ -738,7 +742,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                             <tr className="hover:bg-secondary/10">
                               <td className="px-4 py-3 text-text-secondary text-sm font-medium">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-3.5 h-3.5 bg-[#ff9f7f] rounded-full"></div>
+                                  <div className="w-3.5 h-3.5 bg-[#7da6d2] rounded-full"></div>
                                   Available Capacity
                                 </div>
                               </td>

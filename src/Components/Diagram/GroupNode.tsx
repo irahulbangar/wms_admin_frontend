@@ -110,11 +110,11 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   const calculateTotalStock = () => {
     if (data.type === "plant" && deviceData && deviceData.length > 0) {
       const plantId = deviceData[0]?.plant_id;
-      
-      const connectedDevices = deviceData.filter(device => 
-        device.in_plant_id || device.out_plant_id
+
+      const connectedDevices = deviceData.filter(
+        (device) => device.in_plant_id || device.out_plant_id
       );
-      
+
       const plantBalance = calculatePlantFlowBalance(connectedDevices, plantId);
 
       if (plantBalance) {
@@ -128,11 +128,13 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     if (data.type === "department" && deviceData && deviceData.length > 0) {
       const departmentId = parseInt(id.replace("dept-", ""));
       const departmentDevices = deviceData.filter(
-        (device) => device.in_department_id === departmentId || device.out_department_id === departmentId
+        (device) =>
+          device.in_department_id === departmentId ||
+          device.out_department_id === departmentId
       );
 
-      const connectedDepartmentDevices = departmentDevices.filter(device => 
-        device.in_department_id || device.out_department_id
+      const connectedDepartmentDevices = departmentDevices.filter(
+        (device) => device.in_department_id || device.out_department_id
       );
 
       const departmentTanks = connectedDepartmentDevices.filter(
@@ -145,7 +147,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
         (acc, device) => {
           const currentLevel = Number(device.last_record?.last_level) || 0;
           const capacity = Number(device?.params?.storageCapacity) || 0;
-          
+
           return {
             current: acc.current + currentLevel,
             capacity: acc.capacity + capacity,
@@ -160,11 +162,12 @@ const GroupNode: React.FC<GroupNodeProps> = ({
     if (data.type === "system" && deviceData && deviceData.length > 0) {
       const systemId = parseInt(id.replace("system-", ""));
       const systemDevices = deviceData.filter(
-        (device) => device.in_system_id === systemId || device.out_system_id === systemId
+        (device) =>
+          device.in_system_id === systemId || device.out_system_id === systemId
       );
 
-      const connectedSystemDevices = systemDevices.filter(device => 
-        device.in_system_id || device.out_system_id
+      const connectedSystemDevices = systemDevices.filter(
+        (device) => device.in_system_id || device.out_system_id
       );
 
       const systemTanks = connectedSystemDevices.filter(
@@ -213,11 +216,11 @@ const GroupNode: React.FC<GroupNodeProps> = ({
   const calculateTotalInOut = () => {
     if (data.type === "department" && deviceData && deviceData.length > 0) {
       const departmentId = parseInt(id.replace("dept-", ""));
-      
-      const connectedDevices = deviceData.filter(device => 
-        device.in_department_id || device.out_department_id
+
+      const connectedDevices = deviceData.filter(
+        (device) => device.in_department_id || device.out_department_id
       );
-      
+
       const flowBalance = calculateDepartmentFlowBalance(
         connectedDevices,
         departmentId
@@ -233,11 +236,11 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
     if (data.type === "plant" && deviceData && deviceData.length > 0) {
       const plantId = deviceData[0]?.plant_id;
-      
-      const connectedDevices = deviceData.filter(device => 
-        device.in_plant_id || device.out_plant_id
+
+      const connectedDevices = deviceData.filter(
+        (device) => device.in_plant_id || device.out_plant_id
       );
-      
+
       const plantBalance = calculatePlantFlowBalance(connectedDevices, plantId);
 
       if (plantBalance) {
@@ -250,12 +253,15 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
     if (data.type === "system" && deviceData && deviceData.length > 0) {
       const systemId = parseInt(id.replace("system-", ""));
-      
-      const connectedDevices = deviceData.filter(device => 
-        device.in_system_id || device.out_system_id
+
+      const connectedDevices = deviceData.filter(
+        (device) => device.in_system_id || device.out_system_id
       );
-      
-      const systemBalance = calculateSystemFlowBalance(connectedDevices, systemId);
+
+      const systemBalance = calculateSystemFlowBalance(
+        connectedDevices,
+        systemId
+      );
 
       if (systemBalance) {
         return {
@@ -281,11 +287,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
           const fmData = fm.data as NodeData;
           const totalVolume = fmData?.totalizerReading || 0;
 
-          const isInput = determineFMFlowDirection(
-            fm.id,
-            childTanks,
-            allEdges
-          );
+          const isInput = determineFMFlowDirection(fm.id, childTanks, allEdges);
 
           if (isInput) {
             acc.totalIn += totalVolume;
@@ -304,7 +306,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
 
   const stockData = calculateTotalStock();
   const inOutData = calculateTotalInOut();
-  const totalBalance = inOutData.totalOut - inOutData.totalIn;
+  const totalBalance = inOutData.totalIn - inOutData.totalOut;
 
   return (
     <div
@@ -351,7 +353,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             return;
           }
 
-          if (target.closest('button')) {
+          if (target.closest("button")) {
             e.stopPropagation();
           }
         }}
@@ -404,26 +406,26 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             </div>
           </div>
         </div>
-        
+
         {data.type === "department" && (
           <div className="flex items-center gap-2">
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total In :</div>
                 <div className="font-medium text-text-primary">
-                  {inOutData.totalIn.toFixed(1)} {unit}
+                  {inOutData.totalIn.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Out :</div>
                 <div className="font-medium text-text-primary">
-                  {inOutData.totalOut.toFixed(1)} {unit}
+                  {inOutData.totalOut.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Balance :</div>
                 <div className="font-medium text-text-primary">
-                  {totalBalance.toFixed(1)} {unit}
+                  {totalBalance.toFixed(2)} {unit}
                 </div>
               </div>
             </div>
@@ -436,19 +438,19 @@ const GroupNode: React.FC<GroupNodeProps> = ({
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total In :</div>
                 <div className="font-medium text-text-primary">
-                  {inOutData.totalIn.toFixed(1)} {unit}
+                  {inOutData.totalIn.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Out :</div>
                 <div className="font-medium text-text-primary">
-                  {inOutData.totalOut.toFixed(1)} {unit}
+                  {inOutData.totalOut.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Balance :</div>
                 <div className="font-medium text-text-primary">
-                  {totalBalance.toFixed(1)} {unit}
+                  {totalBalance.toFixed(2)} {unit}
                 </div>
               </div>
             </div>
@@ -461,19 +463,19 @@ const GroupNode: React.FC<GroupNodeProps> = ({
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total In :</div>
                 <div className="font-medium text-text-primary">
-                  {inOutData.totalIn.toFixed(1)} {unit}
+                  {inOutData.totalIn.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Out :</div>
                 <div className="font-medium text-text-primary">
-                  {inOutData.totalOut.toFixed(1)} {unit}
+                  {inOutData.totalOut.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Balance :</div>
                 <div className="font-medium text-text-primary">
-                  {totalBalance.toFixed(1)} {unit}
+                  {totalBalance.toFixed(2)} {unit}
                 </div>
               </div>
             </div>
