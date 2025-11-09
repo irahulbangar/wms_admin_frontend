@@ -139,6 +139,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
   const inReportType = ["Evaporation", "Consumption", "Wastage"];
   const outReportType = ["Percolation", "Regeneration", "Re-use"];
+  const flowReportType = "Storage";
 
   const selectedReportType = reportTypes.find(
     (rt) => rt.report_type_id === formData.report_type_id
@@ -149,6 +150,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     : false;
   const isOutReportType = selectedReportType
     ? outReportType.includes(selectedReportType.report_type_name)
+    : false;
+  const isStorageReportType = selectedReportType
+    ? selectedReportType.report_type_name === flowReportType
     : false;
 
   const resetForm = () => {
@@ -847,7 +851,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Plant In
+                  {isStorageReportType ? "Select Plant" : "Plant In"}
                 </label>
                 <select
                   name="plant_in"
@@ -874,35 +878,39 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Plant Out
-                </label>
-                <select
-                  name="plant_out"
-                  value={
-                    formData.out_plant_id === null ||
-                    formData.out_plant_id === -1
-                      ? "null"
-                      : formData.out_plant_id || "0"
-                  }
-                  onChange={handleInputChange}
-                  disabled={isInReportType}
-                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    isInReportType ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <option value="0">Select Plant</option>
-                  <option value="null">None</option>
-                  {plantData
-                    .filter((plant) => plant.organization_id === organizationId)
-                    .map((plant) => (
-                      <option key={plant.plant_id} value={plant.plant_id}>
-                        {plant.plant_name}
-                      </option>
-                    ))}
-                </select>
-              </div>
+              {!isStorageReportType && (
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Plant Out
+                  </label>
+                  <select
+                    name="plant_out"
+                    value={
+                      formData.out_plant_id === null ||
+                      formData.out_plant_id === -1
+                        ? "null"
+                        : formData.out_plant_id || "0"
+                    }
+                    onChange={handleInputChange}
+                    disabled={isInReportType}
+                    className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      isInReportType ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <option value="0">Select Plant</option>
+                    <option value="null">None</option>
+                    {plantData
+                      .filter(
+                        (plant) => plant.organization_id === organizationId
+                      )
+                      .map((plant) => (
+                        <option key={plant.plant_id} value={plant.plant_id}>
+                          {plant.plant_name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div>
@@ -913,7 +921,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Department In
+                  {isStorageReportType ? "Select Department" : "Department In"}
                 </label>
                 <select
                   name="department_in"
@@ -949,43 +957,45 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  Department Out
-                </label>
-                <select
-                  name="department_out"
-                  value={
-                    formData.out_department_id === null ||
-                    formData.out_department_id === -1
-                      ? "null"
-                      : formData.out_department_id || "0"
-                  }
-                  onChange={handleInputChange}
-                  disabled={isInReportType}
-                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    isInReportType ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <option value="0">Select Department</option>
-                  <option value="null">None</option>
-                  {departmentData
-                    .filter(
-                      (department) =>
-                        department.plant_id === plant_id &&
-                        department.organization_id === organizationId &&
-                        department.department_id === departmentId
-                    )
-                    .map((department) => (
-                      <option
-                        key={department.department_id}
-                        value={department.department_id}
-                      >
-                        {department.department_name}
-                      </option>
-                    ))}
-                </select>
-              </div>
+              {!isStorageReportType && (
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    Department Out
+                  </label>
+                  <select
+                    name="department_out"
+                    value={
+                      formData.out_department_id === null ||
+                      formData.out_department_id === -1
+                        ? "null"
+                        : formData.out_department_id || "0"
+                    }
+                    onChange={handleInputChange}
+                    disabled={isInReportType}
+                    className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      isInReportType ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <option value="0">Select Department</option>
+                    <option value="null">None</option>
+                    {departmentData
+                      .filter(
+                        (department) =>
+                          department.plant_id === plant_id &&
+                          department.organization_id === organizationId &&
+                          department.department_id === departmentId
+                      )
+                      .map((department) => (
+                        <option
+                          key={department.department_id}
+                          value={department.department_id}
+                        >
+                          {department.department_name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div>
@@ -996,7 +1006,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
                 <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  System In
+                  {isStorageReportType ? "Select System" : "System In"}
                 </label>
                 <select
                   name="system_in"
@@ -1028,39 +1038,41 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
-                  System Out
-                </label>
-                <select
-                  name="system_out"
-                  value={
-                    formData.out_system_id === null ||
-                    formData.out_system_id === -1
-                      ? "null"
-                      : formData.out_system_id || "0"
-                  }
-                  onChange={handleInputChange}
-                  disabled={isInReportType}
-                  className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    isInReportType ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <option value="0">Select System</option>
-                  <option value="null">None</option>
-                  {systemData
-                    .filter(
-                      (system) =>
-                        system.plant_id === plant_id &&
-                        system.organization_id === organizationId
-                    )
-                    .map((system) => (
-                      <option key={system.system_id} value={system.system_id}>
-                        {system.system_name}
-                      </option>
-                    ))}
-                </select>
-              </div>
+              {!isStorageReportType && (
+                <div>
+                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    System Out
+                  </label>
+                  <select
+                    name="system_out"
+                    value={
+                      formData.out_system_id === null ||
+                      formData.out_system_id === -1
+                        ? "null"
+                        : formData.out_system_id || "0"
+                    }
+                    onChange={handleInputChange}
+                    disabled={isInReportType}
+                    className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      isInReportType ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <option value="0">Select System</option>
+                    <option value="null">None</option>
+                    {systemData
+                      .filter(
+                        (system) =>
+                          system.plant_id === plant_id &&
+                          system.organization_id === organizationId
+                      )
+                      .map((system) => (
+                        <option key={system.system_id} value={system.system_id}>
+                          {system.system_name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Common Parameters */}
