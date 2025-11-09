@@ -98,25 +98,20 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     if (selectedGroup.type === "plant") {
       storageDevices = deviceData.filter(
         (device) =>
-          Number(
-            device.plant_id || device.in_plant_id || device.out_plant_id
-          ) === groupId
+          Number(device.in_plant_id) === groupId ||
+          Number(device.out_plant_id) === groupId
       );
     } else if (selectedGroup.type === "department") {
       storageDevices = deviceData.filter(
         (device) =>
-          Number(
-            device.department_id ||
-              device.in_department_id ||
-              device.out_department_id
-          ) === groupId
+          Number(device.in_department_id) === groupId ||
+          Number(device.out_department_id) === groupId
       );
     } else if (selectedGroup.type === "system") {
       storageDevices = deviceData.filter(
         (device) =>
-          Number(
-            device.system_id || device.in_system_id || device.out_system_id
-          ) === groupId
+          Number(device.in_system_id) === groupId ||
+          Number(device.out_system_id) === groupId
       );
     }
 
