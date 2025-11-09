@@ -41,78 +41,17 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   }, [calculations]);
 
   const getGroupId = (): number | null => {
-    if (!selectedGroup || !deviceData) return null;
-
-    switch (selectedGroup.type) {
-      case "plant": {
-        const plantName = selectedGroup.id.replace("plant-", "");
-        const plantDevice = deviceData.find(
-          (device) =>
-            (device.plant_name === plantName && device.plant_id) ||
-            (device.in_plant_name === plantName && device.in_plant_id) ||
-            (device.out_plant_name === plantName && device.out_plant_id)
-        );
-        if (plantDevice) {
-          return (
-            plantDevice.plant_id ||
-            plantDevice.in_plant_id ||
-            plantDevice.out_plant_id ||
-            null
-          );
-        }
-        return null;
-      }
-      case "department": {
-        const deptId = parseInt(selectedGroup.id.replace("dept-", ""));
-        return isNaN(deptId) ? null : deptId;
-      }
-      case "system": {
-        const sysId = parseInt(selectedGroup.id.replace("system-", ""));
-        return isNaN(sysId) ? null : sysId;
-      }
-      default:
-        return null;
-    }
+    if (!selectedGroup) return null;
+    const groupId = parseInt(selectedGroup.id, 10);
+    return isNaN(groupId) ? null : groupId;
   };
-
   const filteredDeviceData = useMemo(() => {
     if (!deviceData || !selectedGroup) {
       return [];
     }
 
-    let groupId: number | null = null;
-
-    switch (selectedGroup.type) {
-      case "plant": {
-        const plantName = selectedGroup.id.replace("plant-", "");
-        const plantDevice = deviceData.find(
-          (device) =>
-            (device.plant_name === plantName && device.plant_id) ||
-            (device.in_plant_name === plantName && device.in_plant_id) ||
-            (device.out_plant_name === plantName && device.out_plant_id)
-        );
-        if (plantDevice) {
-          groupId =
-            plantDevice.plant_id ||
-            plantDevice.in_plant_id ||
-            plantDevice.out_plant_id ||
-            null;
-        }
-        break;
-      }
-      case "department": {
-        const deptId = parseInt(selectedGroup.id.replace("dept-", ""));
-        groupId = isNaN(deptId) ? null : deptId;
-        break;
-      }
-      case "system": {
-        const sysId = parseInt(selectedGroup.id.replace("system-", ""));
-        groupId = isNaN(sysId) ? null : sysId;
-        break;
-      }
-    }
-
-    if (!groupId) {
+    const groupId = parseInt(selectedGroup.id, 10);
+    if (isNaN(groupId)) {
       return [];
     }
 
@@ -121,23 +60,23 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     if (selectedGroup.type === "plant") {
       filtered = deviceData.filter(
         (device) =>
-          device.plant_id === groupId ||
-          device.in_plant_id === groupId ||
-          device.out_plant_id === groupId
+          Number(device.plant_id) === groupId ||
+          Number(device.in_plant_id) === groupId ||
+          Number(device.out_plant_id) === groupId
       );
     } else if (selectedGroup.type === "department") {
       filtered = deviceData.filter(
         (device) =>
-          device.department_id === groupId ||
-          device.in_department_id === groupId ||
-          device.out_department_id === groupId
+          Number(device.department_id) === groupId ||
+          Number(device.in_department_id) === groupId ||
+          Number(device.out_department_id) === groupId
       );
     } else if (selectedGroup.type === "system") {
       filtered = deviceData.filter(
         (device) =>
-          device.system_id === groupId ||
-          device.in_system_id === groupId ||
-          device.out_system_id === groupId
+          Number(device.system_id) === groupId ||
+          Number(device.in_system_id) === groupId ||
+          Number(device.out_system_id) === groupId
       );
     }
 
@@ -145,11 +84,43 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   }, [deviceData, selectedGroup]);
 
   const getFilteredStorageData = () => {
-    if (!filteredDeviceData || filteredDeviceData.length === 0) {
+    if (!deviceData || !selectedGroup) {
       return { totalStock: 0, totalCapacity: 0 };
     }
 
-    const tankDevices = filteredDeviceData.filter(
+    const groupId = parseInt(selectedGroup.id, 10);
+    if (isNaN(groupId)) {
+      return { totalStock: 0, totalCapacity: 0 };
+    }
+
+    let storageDevices: DeviceResult[] = [];
+
+    if (selectedGroup.type === "plant") {
+      storageDevices = deviceData.filter(
+        (device) =>
+          Number(
+            device.plant_id || device.in_plant_id || device.out_plant_id
+          ) === groupId
+      );
+    } else if (selectedGroup.type === "department") {
+      storageDevices = deviceData.filter(
+        (device) =>
+          Number(
+            device.department_id ||
+              device.in_department_id ||
+              device.out_department_id
+          ) === groupId
+      );
+    } else if (selectedGroup.type === "system") {
+      storageDevices = deviceData.filter(
+        (device) =>
+          Number(
+            device.system_id || device.in_system_id || device.out_system_id
+          ) === groupId
+      );
+    }
+
+    const tankDevices = storageDevices.filter(
       (device) =>
         device.device_family_type === "tank" ||
         device.device_family?.toLowerCase().includes("tank")
