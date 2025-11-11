@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
 // import tankIcon from "../../assets/images/tank-logo.svg";
@@ -22,13 +22,31 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   const systemName = data.systemName || "";
   const systemConnection = data.systemConnection || "";
   const deviceName = data.label || "";
+  const lastRecordTime = data.lastRecordTime || "";
+
+  const isRecordTimeOld = useMemo(() => {
+    if (!lastRecordTime || lastRecordTime === "N/A") return false;
+    try {
+      const recordDate = new Date(lastRecordTime);
+      const now = new Date();
+      const diffInMs = now.getTime() - recordDate.getTime();
+      const hours24InMs = 24 * 60 * 60 * 1000;
+      return diffInMs > hours24InMs;
+    } catch {
+      return false;
+    }
+  }, [lastRecordTime]);
+
+  const borderColor = isRecordTimeOld
+    ? "border-status-danger"
+    : isActive
+    ? "border-status-info"
+    : "border-status-danger";
 
   return (
     <div className="relative">
       <div
-        className={`relative w-25 h-35 bg-primary/20 border border-border-primary rounded-md overflow-hidden ${
-          isActive ? "border-status-info" : "border-status-danger"
-        }`}
+        className={`relative w-25 h-35 bg-primary/20 border border-border-primary rounded-md overflow-hidden ${borderColor}`}
         title={`
 System Name : ${systemName}
 Device Name : ${deviceName}

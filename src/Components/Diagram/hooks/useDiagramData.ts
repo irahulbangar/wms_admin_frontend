@@ -235,7 +235,9 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                crossSectionArea: Number(matchingDevice?.params?.crossSectionArea) || 0,
+                crossSectionArea:
+                  Number(matchingDevice?.params?.crossSectionArea) || 0,
+                lastRecordTime: matchingDevice?.last_record?.time || "",
               },
             };
           }
@@ -260,6 +262,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
               },
             };
           }
@@ -286,6 +289,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
               },
             };
           }
@@ -316,6 +320,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
               },
             };
           }
@@ -363,6 +368,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
               },
             };
           }

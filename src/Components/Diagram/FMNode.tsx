@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
 import fmIcon from "../../assets/images/fm-logo.svg";
@@ -18,12 +18,30 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
   const systemName = data.systemName || "";
   const systemConnection = data.systemConnection || "none";
   const deviceName = data.label || "";
+  const lastRecordTime = data.lastRecordTime || "";
+
+  const isRecordTimeOld = useMemo(() => {
+    if (!lastRecordTime || lastRecordTime === "N/A") return false;
+    try {
+      const recordDate = new Date(lastRecordTime);
+      const now = new Date();
+      const diffInMs = now.getTime() - recordDate.getTime();
+      const hours24InMs = 24 * 60 * 60 * 1000;
+      return diffInMs > hours24InMs;
+    } catch {
+      return false;
+    }
+  }, [lastRecordTime]);
+
+  const borderColor = isRecordTimeOld
+    ? "border-status-danger"
+    : isActive
+    ? "border-status-success"
+    : "border-status-danger";
 
   return (
     <div
-      className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${
-        isActive ? "border-status-success" : "border-status-danger"
-      }`}
+      className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${borderColor}`}
       title={`
 System Name : ${systemName}
 Device Name : ${deviceName}
@@ -45,7 +63,11 @@ Flow Rate : ${flowRate} LPM
 
       <div
         className={`absolute top-1 right-1 w-2 h-2 rounded-full ${
-          isActive ? "bg-status-success animate-pulse" : "bg-status-danger"
+          isRecordTimeOld
+            ? "bg-status-danger animate-pulse"
+            : isActive
+            ? "bg-status-success animate-pulse"
+            : "bg-status-danger"
         }`}
       />
 
