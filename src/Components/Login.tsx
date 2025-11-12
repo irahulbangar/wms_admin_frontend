@@ -184,14 +184,14 @@ const Login: React.FC = () => {
               </label>
             </div> */}
 
-            <div className="text-sm">
+            {/* <div className="text-sm">
               <a
                 href="#"
                 className="font-normal text-status-info hover:text-status-info/80 font-roboto"
               >
                 Forgot your password?
               </a>
-            </div>
+            </div> */}
           </div>
 
           <button
