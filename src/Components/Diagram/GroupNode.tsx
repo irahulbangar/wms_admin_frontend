@@ -366,7 +366,7 @@ const GroupNode: React.FC<GroupNodeProps> = ({
           zIndex: 2,
         }}
       >
-        <span className="text-sm font-medium text-text-primary font-roboto">
+        <span className="text-sm font-normal text-text-primary font-roboto">
           {data.label}
         </span>
         <button
@@ -395,13 +395,13 @@ const GroupNode: React.FC<GroupNodeProps> = ({
         <div className="text-center flex items-start flex-col">
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Stock :</div>
-            <div className="font-medium text-text-primary">
+            <div className="font-normal font-roboto text-text-primary">
               {stockData.current.toFixed(1)} {unit}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-text-primary">Total Capacity :</div>
-            <div className="font-medium text-text-primary">
+            <div className="font-normal font-roboto text-text-primary">
               {stockData.capacity.toFixed(0)} {unit}
             </div>
           </div>
@@ -412,19 +412,19 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total In :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {inOutData.totalIn.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Out :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {inOutData.totalOut.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Balance :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {totalBalance.toFixed(2)} {unit}
                 </div>
               </div>
@@ -437,19 +437,19 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total In :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {inOutData.totalIn.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Out :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {inOutData.totalOut.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Balance :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {totalBalance.toFixed(2)} {unit}
                 </div>
               </div>
@@ -462,19 +462,19 @@ const GroupNode: React.FC<GroupNodeProps> = ({
             <div className="flex flex-col">
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total In :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {inOutData.totalIn.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Out :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {inOutData.totalOut.toFixed(2)} {unit}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2">
                 <div className="text-text-primary">Total Balance :</div>
-                <div className="font-medium text-text-primary">
+                <div className="font-normal font-roboto text-text-primary">
                   {totalBalance.toFixed(2)} {unit}
                 </div>
               </div>

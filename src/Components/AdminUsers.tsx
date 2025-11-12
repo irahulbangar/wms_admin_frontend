@@ -188,32 +188,32 @@ const Users = () => {
             <table className="w-full text-sm text-left rtl:text-right text-text-primary">
               <thead className="text-xs text-text-primary uppercase border-b border-border-primary sticky top-0 z-20 shadow-sm">
                 <tr>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Sr No
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Email
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Phone
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Role
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Status
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Created At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Updated At
                   </th>
                   {admin?.role === "super_admin" && (
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                       Action
                     </th>
                   )}
@@ -243,7 +243,7 @@ const Users = () => {
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
                         <span
-                          className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                          className={`px-2 py-1 rounded-full text-sm font-normal font-roboto capitalize ${handleStatus(
                             user?.status
                           )}`}
                         >

@@ -82,7 +82,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
       });
   };
 
-
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -104,7 +103,6 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
 
     if (type === "add" && !organizationId) {
       Error("Organization ID is required to add a plant");
@@ -184,7 +182,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide">
         <div className="flex items-center justify-between px-6 py-4 sticky top-0 bg-primary pb-4 border-b border-border-primary z-10">
-          <h2 className="text-xl font-medium text-text-primary font-roboto">
+          <h2 className="text-xl font-normal text-text-primary font-roboto">
             {type === "add" ? "Add New Plant" : "Update Plant"}
           </h2>
           <button
@@ -196,7 +194,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Plant Name
           </label>
           <input
@@ -212,7 +210,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             placeholder="Enter plant name"
           />
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Latitude
           </label>
           <input
@@ -226,7 +224,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             }`}
           />
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Longitude
           </label>
           <input
@@ -242,7 +240,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             }`}
           />
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Address
           </label>
           <input
@@ -256,7 +254,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             placeholder="Enter address"
           />
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Status
           </label>
           <select
@@ -269,7 +267,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             <option value="inactive">Inactive</option>
           </select>
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Unit
           </label>
           <select
@@ -279,7 +277,9 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
           >
             <option value="Ltr">Ltr</option>
-            <option value="M^3">m<sup>3</sup></option>
+            <option value="M^3">
+              m<sup>3</sup>
+            </option>
           </select>
 
           <div className="flex items-center justify-end gap-4 pt-6">

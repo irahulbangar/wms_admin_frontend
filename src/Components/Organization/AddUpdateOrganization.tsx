@@ -295,7 +295,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto scrollbar-hide">
         <div className="flex items-center justify-between sticky top-0 bg-primary px-6 py-4 border-b border-border-primary z-10">
-          <h2 className="text-xl font-medium text-text-primary font-roboto">
+          <h2 className="text-xl font-normal text-text-primary font-roboto">
             {type === "add" ? "Add New Organization" : "Update Organization"}
           </h2>
           <button
@@ -307,7 +307,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         </div>
 
         <form className="space-y-4 p-6" onSubmit={handleSubmit}>
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Organization Name
           </label>
           <input
@@ -324,7 +324,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.name}</p>
           )}
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Contact Person
           </label>
           <input
@@ -340,7 +340,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             placeholder="Enter contact person"
           />
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Contact Number
           </label>
           <input
@@ -357,7 +357,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             placeholder="Enter 10 digit contact number"
           />
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Email
           </label>
           <input
@@ -374,7 +374,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.email}</p>
           )}
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Address
           </label>
           <input
@@ -391,7 +391,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.address}</p>
           )}
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Introduction
           </label>
           <textarea
@@ -411,7 +411,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             </p>
           )}
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Governance
           </label>
           <textarea
@@ -427,7 +427,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             </p>
           )}
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Logo
           </label>
           <input
@@ -456,7 +456,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.logo}</p>
           )}
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Status
           </label>
           <select
@@ -474,7 +474,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
             <p className="text-status-danger text-sm mt-1">{errors.status}</p>
           )}
 
-          <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Notes
           </label>
           <textarea

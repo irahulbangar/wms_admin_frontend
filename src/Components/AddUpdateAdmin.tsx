@@ -106,7 +106,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
       Error("Phone number must be exactly 10 digits");
       return false;
     }
-    
+
     if (!formData.location.trim()) {
       Error("Location is required");
       return false;
@@ -199,7 +199,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-card border border-border-primary rounded-xl shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto h-full">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary">
-          <h2 className="text-xl font-medium text-text-primary font-roboto">
+          <h2 className="text-xl font-normal text-text-primary font-roboto">
             {type === "update" ? "Update Admin" : "Add Admin"}
           </h2>
           <button
@@ -212,7 +212,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Full Name
             </label>
             <input
@@ -226,7 +226,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Email
             </label>
             <input
@@ -240,7 +240,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Phone Number
             </label>
             <input
@@ -254,7 +254,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Password
             </label>
             <input
@@ -268,7 +268,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Address
             </label>
             <input
@@ -282,7 +282,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Department
             </label>
             <input
@@ -296,7 +296,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Role
             </label>
             <select
@@ -312,7 +312,7 @@ const AddUpdateAdmin: React.FC<AddUpdateAdminProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+            <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
               Status
             </label>
             <select

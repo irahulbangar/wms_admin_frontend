@@ -49,7 +49,7 @@ Totalizer Reading : ${data?.totalizerReading} Ltr
 Flow Rate : ${data?.avg} LPM
       `}
     >
-      <div className="text-sm font-medium text-left text-wrap mb-1 px-1 text-text-primary leading-4">
+      <div className="text-sm font-normal text-left font-roboto text-wrap mb-1 px-1 text-text-primary leading-4">
         {deviceName}
       </div>
 
@@ -73,7 +73,7 @@ Flow Rate : ${data?.avg} LPM
 
       <div className="absolute -bottom-11 left-1/2 transform -translate-x-1/2 flex flex-col">
         <div className="flex items-center justify-center gap-1">
-          <div className="text-text-secondary font-roboto text-sm font-medium whitespace-nowrap">
+          <div className="text-text-secondary font-roboto text-sm font-normal whitespace-nowrap">
             Flow :
           </div>
           <div className="text-status-info font-roboto text-sm truncate px-1">

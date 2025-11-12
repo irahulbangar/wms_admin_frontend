@@ -18,13 +18,17 @@ const DepartmentPopup: React.FC<DepartmentPopupProps> = ({
   onClose,
   onDimensionsChange,
 }) => {
-  const currentDimensions = departmentDimensions[selectedDepartment || ''] || {
+  const currentDimensions = departmentDimensions[selectedDepartment || ""] || {
     width: 625,
     height: 350,
   };
 
-  const [widthInput, setWidthInput] = useState(currentDimensions.width.toString());
-  const [heightInput, setHeightInput] = useState(currentDimensions.height.toString());
+  const [widthInput, setWidthInput] = useState(
+    currentDimensions.width.toString()
+  );
+  const [heightInput, setHeightInput] = useState(
+    currentDimensions.height.toString()
+  );
 
   useEffect(() => {
     setWidthInput(currentDimensions.width.toString());
@@ -33,31 +37,32 @@ const DepartmentPopup: React.FC<DepartmentPopupProps> = ({
 
   const updateDimensions = (newWidth?: number, newHeight?: number) => {
     const width = newWidth !== undefined ? newWidth : currentDimensions.width;
-    const height = newHeight !== undefined ? newHeight : currentDimensions.height;
+    const height =
+      newHeight !== undefined ? newHeight : currentDimensions.height;
     onDimensionsChange(width, height);
   };
 
   const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setWidthInput(inputValue);
-    
-    if (inputValue === '') return;
-    
+
+    if (inputValue === "") return;
+
     const value = parseInt(inputValue);
     if (isNaN(value) || value < 300 || value > 8000) return;
-    
+
     updateDimensions(value);
   };
 
   const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setHeightInput(inputValue);
-    
-    if (inputValue === '') return;
-    
+
+    if (inputValue === "") return;
+
     const value = parseInt(inputValue);
     if (isNaN(value) || value < 200 || value > 3000) return;
-    
+
     updateDimensions(undefined, value);
   };
 
@@ -73,7 +78,7 @@ const DepartmentPopup: React.FC<DepartmentPopupProps> = ({
     <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-secondary border border-border-primary rounded-lg p-6 w-96 max-w-md mx-4">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-text-primary">
+          <h3 className="text-lg font-normal text-text-primary">
             Edit Department Dimensions
           </h3>
           <button
@@ -86,7 +91,7 @@ const DepartmentPopup: React.FC<DepartmentPopupProps> = ({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-text-primary font-roboto">
+            <label className="block text-sm font-normal text-text-primary font-roboto">
               Department Name:{" "}
               {nodes.find((n) => n.id === selectedDepartment)?.data.label}
             </label>
@@ -102,7 +107,7 @@ const DepartmentPopup: React.FC<DepartmentPopupProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+              <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
                 Width (px)
               </label>
               <input
@@ -118,7 +123,7 @@ const DepartmentPopup: React.FC<DepartmentPopupProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+              <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
                 Height (px)
               </label>
               <input
@@ -138,7 +143,7 @@ const DepartmentPopup: React.FC<DepartmentPopupProps> = ({
             <p>• Minimum width: 300px, Maximum width: 8000px</p>
             <p>• Minimum height: 200px, Maximum height: 3000px</p>
             <p>• Changes will reposition devices automatically</p>
-            <p className="text-status-info font-roboto font-medium">
+            <p className="text-status-info font-roboto font-normal">
               • Group will resize immediately as you type
             </p>
           </div>

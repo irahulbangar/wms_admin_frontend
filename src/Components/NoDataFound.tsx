@@ -18,10 +18,10 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({
   return (
     <div className="text-center py-12 bg-primary rounded-lg h-full flex flex-col items-center justify-center">
       {icon}
-      <h3 className="text-lg font-medium text-text-primary mb-2 font-roboto">
+      <h3 className="text-lg font-normal text-text-primary mb-2 font-roboto">
         {title}
       </h3>
-      <p className="text-text-secondary mb-4 font-roboto">{description}</p>
+      <p className="text-text-secondary mb-4 font-roboto text-sm">{description}</p>
       <button
         className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
         onClick={buttonOnClick}

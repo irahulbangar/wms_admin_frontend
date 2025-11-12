@@ -310,7 +310,7 @@ const OrganizationUsers = () => {
               <div
                 className={`flex items-center space-x-2 transition-colors cursor-pointer px-2 py-1 rounded ${
                   index === breadcrumbs.length - 1
-                    ? "text-text-primary font-medium"
+                    ? "text-text-primary font-normal"
                     : "text-text-secondary hover:text-text-primary hover:bg-overlay/20"
                 }`}
                 onClick={() => handleBreadcrumbClick(breadcrumb.path)}
@@ -462,31 +462,31 @@ const OrganizationUsers = () => {
             >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Sr No
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Phone
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Organization
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Created At
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Updated At
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Action
                   </th>
                 </tr>
@@ -527,7 +527,7 @@ const OrganizationUsers = () => {
                       </td>
                       <td className="px-6 py-4 font-roboto text-text-primary text-base capitalize">
                         <span
-                          className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                          className={`px-2 py-1 rounded-full text-sm font-normal capitalize ${handleStatus(
                             user?.status
                           )}`}
                         >

@@ -847,7 +847,7 @@ const Devices = () => {
         {selectedDepartment !== "all" && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
+            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
               {departments.find(
                 (department) =>
                   department.department_id.toString() === selectedDepartment
@@ -1172,7 +1172,7 @@ const Devices = () => {
                         )}
                       </button>
                       <div>
-                        <h3 className="text-lg font-medium text-text-primary font-roboto">
+                        <h3 className="text-lg font-normal text-text-primary font-roboto">
                           {systemName}
                         </h3>
                         <p className="text-sm text-text-secondary font-roboto">
@@ -1229,40 +1229,40 @@ const Devices = () => {
                       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
                         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                           <tr>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Sr No
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Device Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Organization Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Plant Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Department Name
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Device Family
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Device Type
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Device Status
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               HWID Number
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Created At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Updated At
                             </th>
-                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                               Actions
                             </th>
                           </tr>
@@ -1328,7 +1328,7 @@ const Devices = () => {
                               </td>
                               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                                 <span
-                                  className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${deviceStatus(
+                                  className={`px-2 py-1 rounded-full text-sm font-normal capitalize ${deviceStatus(
                                     device?.device_status
                                   )}`}
                                 >

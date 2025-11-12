@@ -59,7 +59,7 @@ Voltage (B) : ${voltageB / 10}V | Current (B) : ${currentB}A
 Frequency : ${frequency}Hz
       `}
     >
-      <div className="text-sm text-left font-medium font-roboto text-text-primary text-wrap z-10 px-1 leading-4">
+      <div className="text-sm text-left font-normal font-roboto text-text-primary text-wrap z-10 px-1 leading-4">
         {deviceName}
       </div>
 
@@ -79,62 +79,62 @@ Frequency : ${frequency}Hz
 
       <div className="flex flex-col gap-0.5 text-center">
         <div className="flex flex-col gap-0.5">
-          <div className="text-text-primary font-roboto text-[9px] font-medium text-center">
+          <div className="text-text-primary font-roboto text-[9px] font-normal text-center">
             Voltage
           </div>
           <div className="flex items-center justify-around gap-3">
             <div className="flex flex-col gap-0.5">
-              <div className="text-text-primary font-roboto text-[9px] font-medium">
+              <div className="text-text-primary font-roboto text-[9px] font-normal">
                 R
               </div>
-              <div className="font-medium font-roboto text-[9px] text-status-danger text-xs">
+              <div className="font-normal font-roboto text-[9px] text-status-danger text-xs">
                 {voltageR / 10} V
               </div>
             </div>
             <div className="flex flex-col gap-0.5 text-center">
-              <div className="text-text-primary font-roboto text-[9px] font-medium">
+              <div className="text-text-primary font-roboto text-[9px] font-normal">
                 Y
               </div>
-              <div className="font-medium text-status-warning font-roboto text-[9px]">
+              <div className="font-normal text-status-warning font-roboto text-[9px]">
                 {voltageY / 10} V
               </div>
             </div>
             <div className="flex flex-col gap-0.5">
-              <div className="text-text-primary font-roboto text-[9px] font-medium">
+              <div className="text-text-primary font-roboto text-[9px] font-normal">
                 B
               </div>
-              <div className="font-medium text-status-info font-roboto text-[9px]">
+              <div className="font-normal text-status-info font-roboto text-[9px]">
                 {voltageB / 10} V
               </div>
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-0.5">
-          <div className="text-text-primary font-roboto text-[9px] font-medium text-center">
+          <div className="text-text-primary font-roboto text-[9px] font-normal text-center">
             Current
           </div>
           <div className="flex items-center justify-around gap-3">
             <div className="flex flex-col gap-0.5">
-              <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+              <div className="text-text-primary font-roboto text-[9px] font-normal whitespace-nowrap">
                 R
               </div>
-              <div className="font-medium text-status-danger font-roboto text-[9px]">
+              <div className="font-normal text-status-danger font-roboto text-[9px]">
                 {currentR}A
               </div>
             </div>
             <div className="flex flex-col gap-0.5">
-              <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+              <div className="text-text-primary font-roboto text-[9px] font-normal whitespace-nowrap">
                 Y
               </div>
-              <div className="font-medium text-status-warning font-roboto text-[9px]">
+              <div className="font-normal text-status-warning font-roboto text-[9px]">
                 {currentY}A
               </div>
             </div>
             <div className="flex flex-col gap-0.5">
-              <div className="text-text-primary font-roboto text-[9px] font-medium whitespace-nowrap">
+              <div className="text-text-primary font-roboto text-[9px] font-normal whitespace-nowrap">
                 B
               </div>
-              <div className="font-medium text-status-info font-roboto text-[9px]">
+              <div className="font-normal text-status-info font-roboto text-[9px]">
                 {currentB}A
               </div>
             </div>

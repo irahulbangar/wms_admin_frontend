@@ -98,17 +98,19 @@ const Organization = () => {
       return;
     }
 
-    const filtered = organizations.filter((organization: OrganizationResult) => {
-      const searchLower = searchTerm.toLowerCase();
+    const filtered = organizations.filter(
+      (organization: OrganizationResult) => {
+        const searchLower = searchTerm.toLowerCase();
 
-      return (
-        organization.organization_name?.toLowerCase().includes(searchLower) ||
-        organization.contact_person?.toLowerCase().includes(searchLower) ||
-        organization.contact_number?.toLowerCase().includes(searchLower) ||
-        organization.email?.toLowerCase().includes(searchLower) ||
-        organization.note?.toLowerCase().includes(searchLower)
-      );
-    });
+        return (
+          organization.organization_name?.toLowerCase().includes(searchLower) ||
+          organization.contact_person?.toLowerCase().includes(searchLower) ||
+          organization.contact_number?.toLowerCase().includes(searchLower) ||
+          organization.email?.toLowerCase().includes(searchLower) ||
+          organization.note?.toLowerCase().includes(searchLower)
+        );
+      }
+    );
 
     setFilteredOrganizations(filtered);
   };
@@ -268,37 +270,41 @@ const Organization = () => {
       ) : (
         <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
           <div className="overflow-auto h-[calc(100vh-245px)] table-scrollbar">
-            <table className={`w-full text-sm text-left rtl:text-right text-text-primary ${handlePaginatedOrganizations?.length > 0 ? "h-auto" : "h-full"}`}>
+            <table
+              className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                handlePaginatedOrganizations?.length > 0 ? "h-auto" : "h-full"
+              }`}
+            >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Sr No
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Organization Name
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto whitespace-nowrap">
+                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto whitespace-nowrap">
                     Contact Person
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto whitespace-nowrap">
+                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto whitespace-nowrap">
                     Contact Number
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
                     Email
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
                     Address
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
                     Notes
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
                     Created At
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-medium font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
                     Actions
                   </th>
                 </tr>
@@ -338,7 +344,7 @@ const Organization = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         <span
-                          className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                          className={`px-2 py-1 rounded-full text-sm font-normal capitalize ${handleStatus(
                             organization?.status
                           )}`}
                         >

@@ -8,7 +8,7 @@ const Profile: React.FC = () => {
   return (
     <div className="max-w-full">
       <div className="mb-4">
-        <span className="text-2xl font-medium text-text-primary font-roboto">
+        <span className="text-2xl font-normal text-text-primary font-roboto">
           Profile Settings
         </span>
         <p className="text-text-secondary font-roboto">
@@ -23,7 +23,7 @@ const Profile: React.FC = () => {
               <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-12 h-12 text-white" />
               </div>
-              <h2 className="text-xl font-medium text-text-primary font-roboto">
+              <h2 className="text-xl font-normal text-text-primary font-roboto">
                 {admin?.name}
               </h2>
               <p className="text-text-secondary font-roboto">{admin?.role}</p>
@@ -57,14 +57,14 @@ const Profile: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-card border border-border-primary rounded-xl p-6 shadow-sm font-roboto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-medium text-text-primary font-roboto">
+              <h3 className="text-lg font-normal text-text-primary font-roboto">
                 Personal Information
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+                <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
                   Full Name
                 </label>
                 <input
@@ -76,7 +76,7 @@ const Profile: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+                <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
                   Email
                 </label>
                 <input
@@ -88,7 +88,7 @@ const Profile: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+                <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
                   Phone
                 </label>
                 <input
@@ -100,7 +100,7 @@ const Profile: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+                <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
                   Location
                 </label>
                 <input
@@ -112,7 +112,7 @@ const Profile: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+                <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
                   Department
                 </label>
                 <input
@@ -124,7 +124,7 @@ const Profile: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2 font-roboto">
+                <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
                   Role
                 </label>
                 <input

@@ -352,7 +352,7 @@ const Plants = () => {
         {selectedOrganizationId !== "all" && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
+            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
               {organizations.find(
                 (org) =>
                   org.organization_id.toString() === selectedOrganizationId
@@ -479,34 +479,34 @@ const Plants = () => {
             >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Sr No
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Plant Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Organization Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Latitude
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Longitude
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Address
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Status
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Created At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Updated At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Action
                   </th>
                 </tr>
@@ -550,7 +550,7 @@ const Plants = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         <span
-                          className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                          className={`px-2 py-1 rounded-full text-sm font-normal capitalize ${handleStatus(
                             plant?.status
                           )}`}
                         >
@@ -710,7 +710,7 @@ const Plants = () => {
           />
           <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full transform transition-all">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
-              <h3 className="text-xl font-medium text-text-primary font-roboto">
+              <h3 className="text-xl font-normal text-text-primary font-roboto">
                 Delete Plant
               </h3>
               <button
@@ -723,7 +723,7 @@ const Plants = () => {
             <div className="p-6">
               <p className="text-text-secondary mb-4 font-roboto">
                 Are you sure you want to delete this plant{" "}
-                <span className="font-medium font-roboto">
+                <span className="font-normal font-roboto">
                   {plantTitle || "N/A"}
                 </span>
                 ?

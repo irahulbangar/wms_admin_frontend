@@ -162,11 +162,15 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
               if (onUpdateSuccess) {
                 let updatedUser;
                 if (res.data) {
-                  updatedUser = Array.isArray(res.data) ? res.data[0] : res.data;
+                  updatedUser = Array.isArray(res.data)
+                    ? res.data[0]
+                    : res.data;
                 } else {
                   const selectedOrgId = formData.organization_id;
-                  const selectedOrg = organizationData.find(org => org.organization_id === selectedOrgId);
-                  
+                  const selectedOrg = organizationData.find(
+                    (org) => org.organization_id === selectedOrgId
+                  );
+
                   updatedUser = {
                     client_id: clientId,
                     client_name: formData.client_name,
@@ -177,7 +181,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
                     organization_id: selectedOrgId,
                     created_at: "",
                     updated_at: new Date().toISOString(),
-                    organization_name: selectedOrg?.organization_name || ""
+                    organization_name: selectedOrg?.organization_name || "",
                   };
                 }
                 onUpdateSuccess(updatedUser);
@@ -241,7 +245,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
-          <h2 className="text-xl font-medium text-text-primary font-roboto">
+          <h2 className="text-xl font-normal text-text-primary font-roboto">
             {type === "update" ? "Update User" : "Add New User"}
             {isFetching && type === "update" && (
               <span className="ml-2 text-sm text-text-muted">
@@ -260,9 +264,8 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-
           <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
               Client Name
             </label>
             <input
@@ -286,7 +289,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           </div>
 
           <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
               Client Email
             </label>
             <input
@@ -309,7 +312,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
             )}
           </div>
           <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
               Client Phone
             </label>
             <input
@@ -335,7 +338,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
 
           {type === "add" && (
             <div>
-              <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+              <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                 Client Password
               </label>
               <div className="relative">
@@ -378,7 +381,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           )}
 
           <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
               Organization
             </label>
             <select
@@ -410,7 +413,7 @@ const AddUpdateUser: React.FC<AddUpdateUserProps> = ({
           </div>
 
           <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
               Status
             </label>
             <select

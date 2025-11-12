@@ -131,7 +131,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           >
             <User className="w-5 h-5 text-text-primary" />
             <div className="hidden md:block">
-              <p className="text-base font-medium text-text-primary font-roboto">
+              <p className="text-base font-normal text-text-primary font-roboto">
                 {admin?.name}
               </p>
               <p className="text-sm text-text-secondary font-roboto">
@@ -153,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   className="w-full flex items-center px-4 py-3 text-text-primary hover:bg-hover-bg-primary transition-colors cursor-pointer"
                 >
                   <UserIcon className="w-4 h-4 mr-3" />
-                  <span className="text-base font-medium font-roboto">
+                  <span className="text-base font-normal font-roboto">
                     Profile
                   </span>
                 </button>
@@ -165,7 +165,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   className="w-full flex items-center px-4 py-3 text-status-danger hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 mr-3" />
-                  <span className="text-base font-medium font-roboto">
+                  <span className="text-base font-normal font-roboto">
                     Logout
                   </span>
                 </button>

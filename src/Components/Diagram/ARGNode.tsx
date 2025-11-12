@@ -52,7 +52,7 @@ Department Connection : ${departmentConnection}
 System Connection : ${systemConnection}
       `}
     >
-      <div className="text-sm font-medium text-left text-wrap mb-1 px-1 text-purple-800 leading-4">
+      <div className="text-sm font-normal text-left font-roboto text-wrap mb-1 px-1 text-purple-800 leading-4">
         {deviceName}
       </div>
 
@@ -71,16 +71,16 @@ System Connection : ${systemConnection}
       />
 
       <div className="text-center mb-1">
-        <div className="text-text-primary font-roboto text-xs font-medium">
+        <div className="text-text-primary font-roboto text-xs font-normal">
           Rain:
         </div>
-        <div className="font-medium text-purple-600 font-roboto text-[10px] truncate px-1">
+        <div className="font-normal text-purple-600 font-roboto text-[10px] truncate px-1">
           {lastMm} mm
         </div>
       </div>
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-text-primary font-roboto max-w-32">
-        <div className="truncate text-center font-medium font-roboto text-xs">
+        <div className="truncate text-center font-normal font-roboto text-xs">
           Max: {maxMm}mm | Min: {minMm}mm
         </div>
       </div>

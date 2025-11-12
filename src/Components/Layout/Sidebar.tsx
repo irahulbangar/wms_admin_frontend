@@ -221,7 +221,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center space-x-3">
                     {item.icon}
-                    <span className="font-medium ml-2 font-roboto text-lg">
+                    <span className="font-normal ml-2 font-roboto text-lg">
                       {item.label}
                     </span>
                   </div>
@@ -249,7 +249,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           }}
                         >
                           {submenu.icon}
-                          <span className="font-medium ml-2 font-roboto text-base">
+                          <span className="font-normal ml-2 font-roboto text-base">
                             {submenu.label}
                           </span>
                         </button>
@@ -268,10 +268,10 @@ const Sidebar: React.FC<SidebarProps> = ({
               <User className="w-10 h-10 text-text-primary rounded-full bg-primary p-2" />
               <div className="flex-1 min-w-0">
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-medium text-text-primary truncate">
+                  <p className="text-base font-normal font-roboto text-text-primary truncate">
                     {admin?.name}
                   </p>
-                  <p className="text-sm text-text-secondary truncate">
+                  <p className="text-sm text-text-secondary truncate font-roboto">
                     {admin?.role}
                   </p>
                 </div>

@@ -28,7 +28,10 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [newDepartmentName, setNewDepartmentName] = useState("");
-  const [errors, setErrors] = useState({ department_name: "", department_info: "" });
+  const [errors, setErrors] = useState({
+    department_name: "",
+    department_info: "",
+  });
   const [departmentData, setDepartmentData] = useState({
     department_name: "",
     department_info: "",
@@ -137,7 +140,11 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
       }
     } catch (error) {
       console.error("Error creating department:", error);
-      Error(error instanceof ApiError ? error.message : "Failed to create department");
+      Error(
+        error instanceof ApiError
+          ? error.message
+          : "Failed to create department"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -147,7 +154,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-100">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
-          <h2 className="text-xl font-medium text-text-primary font-roboto">
+          <h2 className="text-xl font-normal text-text-primary font-roboto">
             {type === "add" ? "Add New Department" : "Update Department"}
           </h2>
           <button
@@ -160,7 +167,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
 
         <form className="p-6 space-y-4">
           <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
               Department Name
             </label>
             <input
@@ -183,14 +190,19 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
           </div>
 
           <div>
-            <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
               Department Info
             </label>
             <textarea
               name="department_info"
               placeholder="Enter department info"
               value={departmentData?.department_info}
-              onChange={(e) => setDepartmentData((prev) => ({ ...prev, department_info: e.target.value }))}
+              onChange={(e) =>
+                setDepartmentData((prev) => ({
+                  ...prev,
+                  department_info: e.target.value,
+                }))
+              }
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                 errors.department_info
                   ? "border-status-danger"

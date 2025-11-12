@@ -536,11 +536,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-medium text-text-primary font-roboto">
+            <h2 className="text-2xl font-normal text-text-primary font-roboto">
               {type === "update" ? "Update Device" : "Add New Device"}
             </h2>
             <div className="flex items-center gap-2 mt-1 text-sm text-text-secondary">
-              <span className="font-medium font-roboto">
+              <span className="font-normal font-roboto">
                 {(() => {
                   const plant = plantData.find((p) => p.plant_id === plant_id);
                   const plantName = plant?.plant_name || "Unknown Plant";
@@ -575,13 +575,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2">
+              <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2">
                 Device Details
               </label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Family
                 </label>
                 <div className="relative">
@@ -617,7 +617,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Type
                 </label>
                 <div className="relative">
@@ -666,7 +666,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Name
                 </label>
                 <input
@@ -684,7 +684,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Status
                 </label>
                 <select
@@ -700,7 +700,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               {/* IMEI Number */}
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   HWID Number
                 </label>
                 <input
@@ -719,7 +719,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   System
                 </label>
                 <select
@@ -754,7 +754,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     ))}
                   <option
                     value="add_new"
-                    className="text-status-info font-medium cursor-pointer bg-overlay/10 rounded-lg p-2.5"
+                    className="text-status-info font-normal font-roboto cursor-pointer bg-overlay/10 rounded-lg p-2.5"
                   >
                     + Add New
                   </option>
@@ -763,14 +763,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
 
             <div>
-              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 Device Connection
               </label>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Visibility
                 </label>
                 <select
@@ -786,7 +786,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Report Type
                 </label>
                 <select
@@ -808,7 +808,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Organization Connection
                 </label>
                 <select
@@ -825,7 +825,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Flow Direction
                 </label>
                 <select
@@ -843,14 +843,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
 
             <div>
-              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 Plant Connection
               </label>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   {isStorageReportType ? "Select Plant" : "Plant In"}
                 </label>
                 <select
@@ -880,7 +880,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               {!isStorageReportType && (
                 <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                     Plant Out
                   </label>
                   <select
@@ -914,13 +914,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
 
             <div>
-              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 Department Connection
               </label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   {isStorageReportType ? "Select Department" : "Department In"}
                 </label>
                 <select
@@ -958,7 +958,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               {!isStorageReportType && (
                 <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                     Department Out
                   </label>
                   <select
@@ -997,13 +997,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             </div>
 
             <div>
-              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 System Connection
               </label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   {isStorageReportType ? "Select System" : "System In"}
                 </label>
                 <select
@@ -1038,7 +1038,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               {!isStorageReportType && (
                 <div>
-                  <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                     System Out
                   </label>
                   <select
@@ -1075,13 +1075,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
             {/* Common Parameters */}
             <div>
-              <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+              <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                 Common Parameters
               </label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Multiplier
                 </label>
                 <input
@@ -1112,7 +1112,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Shifter
                 </label>
                 <input
@@ -1143,7 +1143,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </div>
 
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Max Threshold
                 </label>
                 <input
@@ -1171,7 +1171,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Lower Limit
                 </label>
                 <input
@@ -1199,7 +1199,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Upper Limit
                 </label>
                 <input
@@ -1232,13 +1232,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             {getSelectedDeviceFamilyName() === "tank" && (
               <>
                 <div>
-                  <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                  <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                     Tank Parameters
                   </label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       Height
                     </label>
                     <input
@@ -1269,7 +1269,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       Storage Capacity
                     </label>
                     <input
@@ -1300,7 +1300,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       Sensor Position
                     </label>
                     <input
@@ -1330,7 +1330,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       Cross Section Area
                     </label>
                     <input
@@ -1367,13 +1367,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             {getSelectedDeviceFamilyName() === "brwhms" && (
               <>
                 <div>
-                  <label className="block text-xl font-medium text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                  <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
                     BRWHMS Parameters
                   </label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       SG
                     </label>
                     <input
@@ -1404,7 +1404,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       HMax
                     </label>
                     <input
@@ -1435,7 +1435,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       HMin
                     </label>
                     <input
@@ -1466,7 +1466,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       A
                     </label>
                     <input
@@ -1497,7 +1497,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-base font-medium text-text-primary mb-2 font-roboto">
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       B
                     </label>
                     <input

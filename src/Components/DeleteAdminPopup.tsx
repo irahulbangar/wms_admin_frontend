@@ -29,7 +29,7 @@ const DeleteAdminPopup: React.FC<DeleteAdminPopupProps> = ({
       <div className="relative bg-primary rounded-lg shadow-xl max-w-md w-full transform transition-all">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
           <div className="flex items-center gap-3">
-            <h3 className="text-xl font-medium text-text-primary font-roboto">
+            <h3 className="text-xl font-normal text-text-primary font-roboto">
               Delete Admin User
             </h3>
           </div>
@@ -51,19 +51,19 @@ const DeleteAdminPopup: React.FC<DeleteAdminPopupProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-text-secondary font-roboto">Name :</span>
-                <span className="text-text-primary font-roboto font-medium capitalize">
+                <span className="text-text-primary font-roboto font-normal capitalize">
                   {adminUser.name}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-secondary font-roboto">Email :</span>
-                <span className="text-text-primary font-roboto font-medium">
+                <span className="text-text-primary font-roboto font-normal">
                   {adminUser.email}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-secondary font-roboto">Role :</span>
-                <span className="text-text-primary font-roboto font-medium capitalize">
+                <span className="text-text-primary font-roboto font-normal capitalize">
                   {adminUser.role === "admin" ? "Admin" : "Super Admin"}
                 </span>
               </div>

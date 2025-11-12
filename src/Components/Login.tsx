@@ -91,7 +91,7 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full relative z-10 bg-primary rounded-lg shadow-xl p-8">
         <div className="flex items-center justify-between">
           <div className="flex flex-col mb-6">
-            <h2 className="text-3xl font-semibold text-text-primary mb-1 font-roboto">
+            <h2 className="text-3xl font-medium text-text-primary mb-1 font-roboto">
               Welcome Back
             </h2>
             <p className="text-text-secondary font-roboto">
@@ -114,7 +114,7 @@ const Login: React.FC = () => {
         <form className="space-y-4" onSubmit={handleLogin}>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-text-secondary mb-2 font-roboto"
+            className="block text-sm font-normal text-text-secondary mb-2 font-roboto"
           >
             Email
           </label>
@@ -135,7 +135,7 @@ const Login: React.FC = () => {
 
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-text-secondary mb-2 font-roboto"
+            className="block text-sm font-normal text-text-secondary mb-2 font-roboto"
           >
             Password
           </label>
@@ -187,7 +187,7 @@ const Login: React.FC = () => {
             <div className="text-sm">
               <a
                 href="#"
-                className="font-medium text-status-info hover:text-status-info/80 font-roboto"
+                className="font-normal text-status-info hover:text-status-info/80 font-roboto"
               >
                 Forgot your password?
               </a>
@@ -197,7 +197,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="relative w-full flex justify-center py-2 px-4 text-sm font-medium rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
+            className="relative w-full flex justify-center py-2 px-4 text-sm font-normal rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto"
           >
             {isLoading ? (
               <div className="flex items-center justify-center gap-2 font-roboto">

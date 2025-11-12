@@ -87,7 +87,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
         });
     } catch (error) {
       console.error("Error fetching plants:", error);
-      Error(error instanceof ApiError ? error.message : "Failed to fetch plants");
+      Error(
+        error instanceof ApiError ? error.message : "Failed to fetch plants"
+      );
     }
   }, [dispatch, organizationId]);
 
@@ -184,7 +186,9 @@ const UserPlants: React.FC<UserPlantsProps> = ({
       await fetchUserPlants();
     } catch (error) {
       console.error("Operation error:", error);
-      Error(error instanceof ApiError ? error.message : "Failed to assign plants");
+      Error(
+        error instanceof ApiError ? error.message : "Failed to assign plants"
+      );
     } finally {
       setLoading(false);
     }
@@ -209,7 +213,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
-          <h2 className="text-xl font-medium text-text-primary font-roboto">
+          <h2 className="text-xl font-normal text-text-primary font-roboto">
             {editingUserPlantId ? "Edit User Plant" : "Add User Plants"}
           </h2>
           <button
@@ -221,7 +225,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
         </div>
 
         <form className="p-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
             Plant
           </label>
           <select
@@ -243,7 +247,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
           </select>
 
           {/* Role Dropdown */}
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
             Role
           </label>
           <select
@@ -261,7 +265,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
             ))}
           </select>
 
-          <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+          <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
             Status
           </label>
           <select
@@ -308,22 +312,22 @@ const UserPlants: React.FC<UserPlantsProps> = ({
               <table className="w-full text-sm text-left rtl:text-right text-text-primary">
                 <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                   <tr>
-                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                       Sr No
                     </th>
-                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                       Plant Name
                     </th>
-                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                       Client Name
                     </th>
-                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                    <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                       Action
                     </th>
                   </tr>
@@ -349,7 +353,7 @@ const UserPlants: React.FC<UserPlantsProps> = ({
                         </td>
                         <td className="px-6 py-4 font-roboto text-center text-text-primary text-base">
                           <span
-                            className={`px-2 py-1 rounded-full text-sm font-medium capitalize ${handleStatus(
+                            className={`px-2 py-1 rounded-full text-sm font-normal capitalize ${handleStatus(
                               plant.status
                             )}`}
                           >

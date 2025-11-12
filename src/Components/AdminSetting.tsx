@@ -147,7 +147,7 @@ const AdminSetting = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Settings className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-medium text-text-primary font-roboto">
+              <h2 className="text-xl font-normal text-text-primary font-roboto">
                 Theme Settings
               </h2>
             </div>
@@ -155,7 +155,7 @@ const AdminSetting = () => {
             <div className="rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-text-primary font-roboto">
+                  <h3 className="font-normal text-text-primary font-roboto">
                     Current Theme
                   </h3>
                   <p className="text-sm text-text-secondary font-roboto">
@@ -191,13 +191,13 @@ const AdminSetting = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Shield className="w-6 h-6 text-text-primary" />
-              <h2 className="text-xl font-medium text-text-primary font-roboto">
+              <h2 className="text-xl font-normal text-text-primary font-roboto">
                 Change Password
               </h2>
             </div>
 
             <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
-              <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+              <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
                 Current Password
               </label>
               <div className="relative">
@@ -223,7 +223,7 @@ const AdminSetting = () => {
                 </button>
               </div>
 
-              <label className="block text-sm font-medium text-text-primary mb-2 font-roboto">
+              <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
                 New Password
               </label>
               <div className="relative">
@@ -249,7 +249,7 @@ const AdminSetting = () => {
                 </button>
               </div>
 
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label className="block text-sm font-normal text-text-primary mb-2 font-roboto">
                 Confirm New Password
               </label>
               <div className="relative">

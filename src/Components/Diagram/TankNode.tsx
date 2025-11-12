@@ -68,7 +68,7 @@ Capacity : ${capacity} ${unit}
           />
         </div>
 
-        <div className="text-left font-roboto text-sm text-wrap py-1 px-2 font-medium text-text-primary leading-4 z-10 relative">
+        <div className="text-left font-roboto text-sm text-wrap py-1 px-2 font-normal text-text-primary leading-4 z-10 relative">
           {deviceName}
         </div>
 
@@ -77,7 +77,7 @@ Capacity : ${capacity} ${unit}
         </div> */}
 
         <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-30">
-          <span className="text-xs font-medium text-text-primary bg-secondary/90 px-1 rounded">
+          <span className="text-xs font-normal font-roboto text-text-primary bg-secondary/90 px-1 rounded">
             {percentage.toFixed(2)}%
           </span>
         </div>
@@ -95,10 +95,10 @@ Capacity : ${capacity} ${unit}
       </div>
 
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-1 font-roboto">
-        <div className="text-center font-medium font-roboto text-text-secondary text-sm whitespace-nowrap">
+        <div className="text-center font-normal font-roboto text-text-secondary text-sm whitespace-nowrap">
           Capacity :{" "}
         </div>
-        <div className="text-center font-medium font-roboto text-text-primary text-sm whitespace-nowrap">
+        <div className="text-center font-normal font-roboto text-text-primary text-sm whitespace-nowrap">
           {currentLevel.toFixed(0)}/{capacity.toFixed(0)} {unit}
         </div>
       </div>

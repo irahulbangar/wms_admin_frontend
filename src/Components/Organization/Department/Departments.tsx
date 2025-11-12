@@ -539,7 +539,7 @@ const Departments = () => {
         {(plant_id || selectedPlant !== "all") && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-medium bg-secondary/30 px-2 py-1 rounded capitalize">
+            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
               {plants.find(
                 (plant) =>
                   plant.plant_id.toString() === (plant_id || selectedPlant)
@@ -762,28 +762,28 @@ const Departments = () => {
             >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Sr No
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Department Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Organization Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Plant Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Department Info
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Created At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Updated At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-medium">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Action
                   </th>
                 </tr>

@@ -170,7 +170,13 @@ const Dashboard = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [fetchOrganizations, fetchPlants, fetchUsers, fetchDevices, fetchDepartments]);
+  }, [
+    fetchOrganizations,
+    fetchPlants,
+    fetchUsers,
+    fetchDevices,
+    fetchDepartments,
+  ]);
 
   const stats = [
     {
@@ -244,7 +250,7 @@ const Dashboard = () => {
           <div className="flex items-center md:justify-end justify-center space-x-3">
             <div className="flex items-center space-x-2 text-text-primary">
               <Calendar className="w-5 h-5 text-text-secondary" />
-              <span className="font-roboto font-medium text-base">
+              <span className="font-roboto font-normal text-base">
                 {currentTime.toLocaleDateString("en-IN", {
                   weekday: "short",
                   day: "numeric",
@@ -255,7 +261,7 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center space-x-2 text-text-primary">
               <Clock className="w-5 h-5 text-text-secondary" />
-              <span className="font-roboto font-medium text-base">
+              <span className="font-roboto font-normal text-base">
                 {currentTime.toLocaleTimeString("en-IN", {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -274,10 +280,10 @@ const Dashboard = () => {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-base font-medium text-white font-roboto">
+                    <p className="text-base font-normal text-white font-roboto">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-medium text-white mt-1 font-roboto">
+                    <p className="text-2xl font-normal text-white mt-1 font-roboto">
                       {stat.value}
                     </p>
                   </div>

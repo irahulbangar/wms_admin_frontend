@@ -431,10 +431,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 }`}
               ></div>
               <div>
-                <h2 className="text-lg font-medium font-roboto text-text-primary">
+                <h2 className="text-lg font-normal font-roboto text-text-primary">
                   {selectedGroup?.name}
                 </h2>
-                <p className="text-xs text-text-secondary capitalize">
+                <p className="text-xs text-text-secondary capitalize font-roboto">
                   {selectedGroup?.type}
                 </p>
               </div>
@@ -488,12 +488,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             ></div>
             <div>
               <h2
-                className="text-lg font-medium text-text-primary truncate max-w-[250px]"
+                className="text-lg font-normal font-roboto text-text-primary truncate max-w-[250px]"
                 title={selectedGroup?.name}
               >
                 {selectedGroup?.name}
               </h2>
-              <p className="text-xs text-text-secondary capitalize">
+              <p className="text-xs text-text-secondary capitalize font-roboto">
                 {selectedGroup?.type}
               </p>
             </div>
@@ -513,7 +513,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
               onClick={() => setIsFlowSummaryExpanded(!isFlowSummaryExpanded)}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2 capitalize">
+                <h3 className="text-lg font-normal font-roboto text-text-primary flex items-center gap-2 capitalize">
                   <ChartArea className="w-5 h-5" />
                   {selectedGroup?.type} Flow Analysis
                 </h3>
@@ -566,7 +566,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                   <table className="w-full text-sm">
                     <tbody className="divide-y divide-border-primary">
                       <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                        <td className="px-4 py-3 text-text-secondary text-sm font-normal font-roboto">
                           <div className="flex items-center gap-2">
                             <div className="w-3.5 h-3.5 bg-[#5070de] rounded-full"></div>
                             Total In
@@ -582,7 +582,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                       </tr>
                       <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                        <td className="px-4 py-3 text-text-secondary text-sm font-normal font-roboto">
                           <div className="flex items-center gap-2">
                             <div className="w-3.5 h-3.5 bg-[#b6d733] rounded-full"></div>
                             Total Out
@@ -598,7 +598,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         </td>
                       </tr>
                       <tr className="hover:bg-secondary/10">
-                        <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                        <td className="px-4 py-3 text-text-secondary text-sm font-normal font-roboto">
                           <div className="flex items-center gap-2">
                             {totalBalance >= 0 ? (
                               <div className="w-3.5 h-3.5 bg-[#6B7280] rounded-full"></div>
@@ -635,7 +635,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                     onClick={() => setIsStorageExpanded(!isStorageExpanded)}
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center space-x-2">
+                      <h3 className="text-lg font-normal font-roboto text-text-primary flex items-center space-x-2">
                         <Package className="w-4 h-4" />
                         <span className="capitalize">
                           {selectedGroup?.type} Storage Analysis
@@ -690,7 +690,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         <table className="w-full text-sm">
                           <tbody className="divide-y divide-border-primary">
                             <tr className="hover:bg-secondary/10">
-                              <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                              <td className="px-4 py-3 text-text-secondary text-sm font-normal font-roboto">
                                 <div className="flex items-center gap-2">
                                   <div className="w-3.5 h-3.5 bg-[#5070de] rounded-full"></div>
                                   Total Stock
@@ -706,7 +706,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               </td>
                             </tr>
                             <tr className="hover:bg-secondary/10">
-                              <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                              <td className="px-4 py-3 text-text-secondary text-sm font-normal font-roboto">
                                 <div className="flex items-center gap-2">
                                   <div className="w-3.5 h-3.5 bg-[#7da6d2] rounded-full"></div>
                                   Available Capacity
@@ -725,7 +725,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                               </td>
                             </tr>
                             <tr className="hover:bg-secondary/10">
-                              <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                              <td className="px-4 py-3 text-text-secondary text-sm font-normal font-roboto">
                                 <div className="flex items-center gap-2">
                                   <div className="w-3.5 h-3.5 bg-[#73c0de] rounded-full"></div>
                                   Total Capacity
@@ -759,7 +759,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                 }
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium font-roboto text-text-primary flex items-center gap-2">
+                  <h3 className="text-lg font-normal font-roboto text-text-primary flex items-center gap-2">
                     <ChartArea className="w-5 h-5" />
                     <span className="capitalize">
                       {selectedGroup?.type} Water Balance Analysis
@@ -829,10 +829,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b border-border-primary">
-                              <th className="px-4 py-2 text-left text-text-secondary font-medium">
+                              <th className="px-4 py-2 text-left text-text-secondary font-normal font-roboto">
                                 Report Type
                               </th>
-                              <th className="px-4 py-2 text-center text-text-secondary font-medium">
+                              <th className="px-4 py-2 text-center text-text-secondary font-normal font-roboto">
                                 Value
                               </th>
                             </tr>
@@ -855,7 +855,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
                                   key={index}
                                   className="hover:bg-secondary/10"
                                 >
-                                  <td className="px-4 py-3 text-text-secondary text-sm font-medium">
+                                  <td className="px-4 py-3 text-text-secondary text-sm font-normal font-roboto">
                                     <div className="flex items-center gap-2">
                                       <div
                                         className="w-3.5 h-3.5 rounded-full"

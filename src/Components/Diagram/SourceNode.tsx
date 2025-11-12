@@ -29,12 +29,12 @@ Type: Source Node
     >
 
       {/* Device Name */}
-      <div className="text-white font-roboto font-medium text-center mb-1 truncate px-1 text-sm">
+      <div className="text-white font-roboto font-normal text-center mb-1 truncate px-1 text-sm">
         {deviceName}
       </div>
 
       {/* Flow Information */}
-      <div className="text-white font-roboto font-medium text-sm mb-0.5 text-center">
+      <div className="text-white font-roboto font-normal text-sm mb-0.5 text-center">
         Source
       </div>
 
@@ -52,7 +52,7 @@ Type: Source Node
       />
 
       {/* Label */}
-      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-status-success font-medium bg-white px-2 py-1 rounded shadow">
+      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-status-success font-normal font-roboto bg-white px-2 py-1 rounded shadow">
         SOURCE
       </div>
     </div>
