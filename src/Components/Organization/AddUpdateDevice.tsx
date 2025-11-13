@@ -95,17 +95,23 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   };
 
   const [commonParams, setCommonParams] = useState<object>({
-    multiplier: "1",
-    shifter: "0",
-    maxThreshold: "",
-  });
-
-  const [commonInputValues, setCommonInputValues] = useState({
-    multiplier: "1",
-    shifter: "0",
     maxThreshold: "",
     lowerLimit: "",
     upperLimit: "",
+    A: "0",
+    B: "0",
+    C: "1",
+    D: "0",
+  });
+
+  const [commonInputValues, setCommonInputValues] = useState({
+    maxThreshold: "",
+    lowerLimit: "",
+    upperLimit: "",
+    A: "0",
+    B: "0",
+    C: "1",
+    D: "0",
   });
 
   const [tankParams, setTankParams] = useState<object>({
@@ -180,16 +186,22 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     });
 
     setCommonParams({
-      multiplier: "1",
-      shifter: "0",
-      maxThreshold: "",
-    });
-    setCommonInputValues({
-      multiplier: "1",
-      shifter: "0",
       maxThreshold: "",
       lowerLimit: "",
       upperLimit: "",
+      A: "0",
+      B: "0",
+      C: "1",
+      D: "0",
+    });
+    setCommonInputValues({
+      maxThreshold: "",
+      lowerLimit: "",
+      upperLimit: "",
+      A: "",
+      B: "",
+      C: "",
+      D: "",
     });
 
     setTankParams({
@@ -409,19 +421,23 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               "";
 
             const commonData = {
-              multiplier: deviceData.params?.multiplier || 0,
-              shifter: deviceData.params?.shifter || 0,
               maxThreshold: deviceData.params?.maxThreshold || "",
               lowerLimit: deviceData.params?.lowerLimit || "",
               upperLimit: deviceData.params?.upperLimit || "",
+              A: deviceData.params?.A || "",
+              B: deviceData.params?.B || "",
+              C: deviceData.params?.C || "",
+              D: deviceData.params?.D || "",
             };
             setCommonParams(commonData);
             setCommonInputValues({
-              multiplier: commonData.multiplier.toString(),
-              shifter: commonData.shifter.toString(),
-              maxThreshold: commonData.maxThreshold.toString(),
+              maxThreshold: commonData?.maxThreshold?.toString() || "",
               lowerLimit: commonData?.lowerLimit?.toString() || "",
               upperLimit: commonData?.upperLimit?.toString() || "",
+              A: commonData?.A?.toString() || "",
+              B: commonData?.B?.toString() || "",
+              C: commonData?.C?.toString() || "",
+              D: commonData?.D?.toString() || "",
             });
 
             if (familyName === "tank") {
@@ -433,26 +449,26 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               };
               setTankParams(tankData);
               setTankInputValues({
-                height: tankData.height.toString(),
-                storageCapacity: tankData.storageCapacity.toString(),
-                sensorPostion: tankData.sensorPostion.toString(),
-                crossSectionArea: tankData.crossSectionArea.toString(),
+                height: tankData?.height?.toString() || "",
+                storageCapacity: tankData?.storageCapacity?.toString() || "",
+                sensorPostion: tankData?.sensorPostion?.toString() || "",
+                crossSectionArea: tankData?.crossSectionArea?.toString() || "",
               });
             } else if (familyName === "brwhms") {
               const brwhmsData = {
-                sg: deviceData.params?.sg || 0,
-                hmax: deviceData.params?.hmax || 0,
-                hmin: deviceData.params?.hmin || 0,
-                A: deviceData.params?.A || 0,
-                B: deviceData.params?.B || 0,
+                sg: deviceData?.params?.sg || 0,
+                hmax: deviceData?.params?.hmax || 0,
+                hmin: deviceData?.params?.hmin || 0,
+                A: deviceData?.params?.A || 0,
+                B: deviceData?.params?.B || 0,
               };
               setBrwhmsParams(brwhmsData);
               setBrwhmsInputValues({
-                sg: brwhmsData.sg.toString(),
-                hmax: brwhmsData.hmax.toString(),
-                hmin: brwhmsData.hmin.toString(),
-                A: brwhmsData.A.toString(),
-                B: brwhmsData.B.toString(),
+                sg: brwhmsData?.sg?.toString() || "",
+                hmax: brwhmsData?.hmax?.toString() || "",
+                hmin: brwhmsData?.hmin?.toString() || "",
+                A: brwhmsData?.A?.toString() || "",
+                B: brwhmsData?.B?.toString() || "",
               });
             }
           } else {
@@ -1082,68 +1098,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Multiplier
-                </label>
-                <input
-                  type="text"
-                  name="multiplier"
-                  value={commonInputValues.multiplier}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      multiplier: inputValue,
-                    }));
-
-                    const numericValue =
-                      inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      multiplier: numericValue,
-                    }));
-                  }}
-                  placeholder="Enter multiplier"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.multiplier
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Shifter
-                </label>
-                <input
-                  type="text"
-                  name="shifter"
-                  value={commonInputValues.shifter}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      shifter: inputValue,
-                    }));
-
-                    const numericValue =
-                      inputValue === "" ? 0 : parseFloat(inputValue) || 0;
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      shifter: numericValue,
-                    }));
-                  }}
-                  placeholder="Enter shifter"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.shifter
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Max Threshold
                 </label>
                 <input
@@ -1223,6 +1177,110 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     errors.upperLimit
                       ? "border-status-danger"
                       : "border-border-primary"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  A
+                </label>
+                <input
+                  type="text"
+                  name="A"
+                  value={commonInputValues.A}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      A: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      A: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter A"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.A ? "border-status-danger" : "border-border-primary"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  B
+                </label>
+                <input
+                  type="text"
+                  name="B"
+                  value={commonInputValues.B}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      B: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      B: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter B"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.B ? "border-status-danger" : "border-border-primary"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  C
+                </label>
+                <input
+                  type="text"
+                  name="C"
+                  value={commonInputValues.C}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      C: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      C: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter C"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.C ? "border-status-danger" : "border-border-primary"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  D
+                </label>
+                <input
+                  type="text"
+                  name="D"
+                  value={commonInputValues.D}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      D: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      D: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter D"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.D ? "border-status-danger" : "border-border-primary"
                   }`}
                 />
               </div>
