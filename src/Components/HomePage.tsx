@@ -38,6 +38,8 @@ const HomePage = () => {
       setCurrentPage("plants");
     } else if (location.pathname.startsWith("/organization/departments")) {
       setCurrentPage("departments");
+    } else if (location.pathname === "/organization/systems") {
+      setCurrentPage("systems");
     } else if (location.pathname.startsWith("/organization/systems/")) {
       setCurrentPage("systems");
     } else if (location.pathname === "/organization/devices") {
