@@ -16,7 +16,7 @@ import type { DeviceResult } from "../../../model/devices.interface";
 import {
   deleteDevice,
   getAllDevices,
-  getDeviceByOrganizationIdAndPlantIdAndDepartmentId,
+  getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId,
   setDevices,
 } from "../../../store/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -43,10 +43,11 @@ import AddUpdateSystem from "./AddUpdateSystem";
 
 const Devices = () => {
   const navigate = useNavigate();
-  const { organization_id, plant_id, department_id } = useParams<{
+  const { organization_id, plant_id, department_id, system_id } = useParams<{
     organization_id: string;
     plant_id: string;
     department_id: string;
+    system_id: string;
   }>();
 
   const [filteredDevices, setFilteredDevices] = useState<DeviceResult[]>([]);
@@ -61,10 +62,12 @@ const Devices = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(
     department_id || "all"
   );
+  const [selectedSystem, setSelectedSystem] = useState(system_id || "all");
   const { organizations } = useAppSelector((state) => state.organization);
   const { plants } = useAppSelector((state) => state.plant);
   const { departments } = useAppSelector((state) => state.department);
   const { devices } = useAppSelector((state) => state.device);
+  const { systems } = useAppSelector((state) => state.system);
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [plantId, setPlantId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,20 +84,22 @@ const Devices = () => {
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
   const [isDepartmentDropdownOpen, setIsDepartmentDropdownOpen] =
     useState(false);
+  const [isSystemDropdownOpen, setIsSystemDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [plantSearchTerm, setPlantSearchTerm] = useState("");
   const [departmentSearchTerm, setDepartmentSearchTerm] = useState("");
+  const [systemSearchTerm, setSystemSearchTerm] = useState("");
   const [organizationId, setOrganizationId] = useState<number>(0);
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
   const plantDropdownRef = useRef<HTMLDivElement>(null);
   const departmentDropdownRef = useRef<HTMLDivElement>(null);
+  const systemDropdownRef = useRef<HTMLDivElement>(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deviceName, setDeviceName] = useState<string | null>(null);
   const [deviceToDelete, setDeviceToDelete] = useState<DeviceResult | null>(
     null
   );
   const { admin } = useAppSelector((state) => state.admin);
-  const { systems } = useAppSelector((state) => state.system);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -118,6 +123,13 @@ const Devices = () => {
       ) {
         setIsDepartmentDropdownOpen(false);
         setDepartmentSearchTerm("");
+      }
+      if (
+        systemDropdownRef.current &&
+        !systemDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSystemDropdownOpen(false);
+        setSystemSearchTerm("");
       }
     };
 
@@ -267,10 +279,11 @@ const Devices = () => {
       setSelectedDepartment(department_id);
 
       dispatch(
-        getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
+        getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId({
           plantId: parseInt(plant_id),
           organizationId: parseInt(organization_id),
           departmentId: parseInt(department_id || "0"),
+          systemId: parseInt(system_id || "0"),
         })
       )
         .unwrap()
@@ -331,27 +344,30 @@ const Devices = () => {
   }, [dispatch, setFilteredDevices, setDevices]);
 
   useEffect(() => {
-    if (organization_id && plant_id) {
+    if (organization_id && plant_id && department_id && system_id) {
       return;
     }
 
     if (
       selectedOrganization === "all" &&
       selectedPlant === "all" &&
-      selectedDepartment === "all"
+      selectedDepartment === "all" &&
+      selectedSystem === "all"
     ) {
       refreshDevices();
     } else if (
       selectedOrganization !== "all" &&
       selectedPlant !== "all" &&
-      selectedDepartment !== "all"
+      selectedDepartment !== "all" &&
+      selectedSystem !== "all"
     ) {
       setIsLoading(true);
       dispatch(
-        getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
+        getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId({
           plantId: parseInt(selectedPlant),
           organizationId: parseInt(selectedOrganization),
           departmentId: parseInt(selectedDepartment || "0"),
+          systemId: parseInt(selectedSystem || "0"),
         })
       )
         .unwrap()
@@ -465,8 +481,21 @@ const Devices = () => {
       return matchesSearch;
     }
 
-    const matchesOrganization = department.plant_id === parseInt(selectedPlant);
-    return matchesSearch && matchesOrganization;
+    const matchesPlant = department.plant_id === parseInt(selectedPlant);
+    return matchesSearch && matchesPlant;
+  });
+
+  const filteredSystems = systems.filter((system) => {
+    const matchesSearch = system.system_name
+      .toLowerCase()
+      .includes(systemSearchTerm.toLowerCase());
+    if (selectedDepartment === "all") {
+      return matchesSearch;
+    }
+
+    const matchesDepartment =
+      system.department_id === parseInt(selectedDepartment);
+    return matchesSearch && matchesDepartment;
   });
 
   useEffect(() => {
@@ -509,7 +538,7 @@ const Devices = () => {
       selectedDepartment === "all"
     ) {
       Warning(
-        "Please select both organization, plant and department before adding a device"
+        "Please select both organization, plant, department and system before adding a device"
       );
       return;
     }
@@ -529,16 +558,23 @@ const Devices = () => {
       return;
     }
 
+    if (selectedSystem === "all") {
+      Warning("Please select a system before adding a device");
+      return;
+    }
+
     setIsAddDeviceOpen(true);
     setPlantId(parseInt(selectedPlant));
     setOrganizationId(parseInt(selectedOrganization));
     setDepartmentId(parseInt(selectedDepartment));
+    setSystemId(parseInt(selectedSystem));
   };
 
   const handleEditDevice = (
     deviceId: number,
     plantId: number,
     departmentId: number,
+    systemId: number,
     organizationId?: number
   ) => {
     const derivedOrganizationId: number =
@@ -556,6 +592,7 @@ const Devices = () => {
       );
     }
     setOrganizationId(derivedOrganizationId);
+    setSystemId(systemId);
   };
 
   const handleDeviceUpdate = useCallback(
@@ -603,12 +640,13 @@ const Devices = () => {
 
       setIsLoading(true);
 
-      if (organization_id && plant_id && department_id) {
+      if (organization_id && plant_id && department_id && system_id) {
         dispatch(
-          getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
+          getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId({
             organizationId: parseInt(organization_id),
             plantId: parseInt(plant_id),
             departmentId: parseInt(department_id || "0"),
+            systemId: parseInt(system_id),
           })
         )
           .unwrap()
@@ -630,13 +668,15 @@ const Devices = () => {
       } else if (
         selectedOrganization !== "all" &&
         selectedPlant !== "all" &&
-        selectedDepartment !== "all"
+        selectedDepartment !== "all" &&
+        selectedSystem !== "all"
       ) {
         dispatch(
-          getDeviceByOrganizationIdAndPlantIdAndDepartmentId({
+          getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId({
             plantId: parseInt(selectedPlant),
             organizationId: parseInt(selectedOrganization),
             departmentId: parseInt(selectedDepartment || "0"),
+            systemId: parseInt(selectedSystem),
           })
         )
           .unwrap()
@@ -667,6 +707,7 @@ const Devices = () => {
       plant_id,
       refreshDevices,
       selectedDepartment,
+      selectedSystem,
     ]
   );
 
@@ -979,6 +1020,7 @@ const Devices = () => {
               </div>
             )}
           </div>
+
           <div
             className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
             ref={plantDropdownRef}
@@ -1054,6 +1096,7 @@ const Devices = () => {
               </div>
             )}
           </div>
+
           <div
             className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
             ref={departmentDropdownRef}
@@ -1135,6 +1178,83 @@ const Devices = () => {
               </div>
             )}
           </div>
+
+          <div
+            className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
+            ref={systemDropdownRef}
+          >
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Select system..."
+                value={
+                  selectedSystem === "all"
+                    ? "All System"
+                    : systems.find(
+                        (system) =>
+                          system.system_id.toString() === selectedSystem
+                      )?.system_name || "Select system..."
+                }
+                readOnly
+                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                onClick={() => setIsSystemDropdownOpen(!isSystemDropdownOpen)}
+              />
+              <ChevronDown
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
+                  isSystemDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+
+            {isSystemDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                    <input
+                      type="text"
+                      placeholder="Search systems..."
+                      value={systemSearchTerm}
+                      onChange={(e) => setSystemSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="px-3 py-1.5 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                  onClick={() => {
+                    setSelectedSystem("all");
+                    setIsSystemDropdownOpen(false);
+                    setSystemSearchTerm("");
+                  }}
+                >
+                  All System
+                </div>
+
+                {filteredSystems.length > 0 ? (
+                  filteredSystems.map((system) => (
+                    <div
+                      key={system.system_id}
+                      className="px-3 py-1.5 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                      onClick={() => {
+                        setSelectedSystem(system.system_id.toString());
+                        setIsSystemDropdownOpen(false);
+                        setSystemSearchTerm(system.system_name);
+                      }}
+                    >
+                      {system.system_name}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-text-secondary text-sm">
+                    No systems found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1149,7 +1269,6 @@ const Devices = () => {
               const system = systems?.find(
                 (system: any) => system?.system_id?.toString() === systemId
               );
-              // console.log("system", system);
               const systemName =
                 system?.system_name?.trim() ||
                 system?.system_name ||

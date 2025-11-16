@@ -186,24 +186,30 @@ export const getDeviceByPlantId = createAsyncThunk(
   }
 );
 
-interface GetPlantByOrganizationId {
+interface GetDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId {
   organizationId: number;
   plantId: number;
   departmentId: number;
+  systemId: number;
 }
 
 // Get device by organizationId and plantId
-export const getDeviceByOrganizationIdAndPlantIdAndDepartmentId =
+export const getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId =
   createAsyncThunk(
-    "device/getDeviceByOrganizationIdAndPlantIdAndDepartmentId",
+    "device/getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId",
     async (
-      { organizationId, plantId, departmentId }: GetPlantByOrganizationId,
+      {
+        organizationId,
+        plantId,
+        departmentId,
+        systemId,
+      }: GetDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId,
       thunkAPI
     ) => {
       const { rejectWithValue } = thunkAPI;
       try {
         const response = await api().get<DeviceResponse>(
-          `/device/admin/organization-plant-department/${organizationId}/${plantId}/${departmentId}`,
+          `/device/admin/organization-plant-department-system/${organizationId}/${plantId}/${departmentId}/${systemId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -224,11 +230,14 @@ export const deleteDevice = createAsyncThunk(
   async (id: string, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().delete<DeviceResponse>(`/device/admin/delete-device/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await api().delete<DeviceResponse>(
+        `/device/admin/delete-device/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const apiError = handleApiError(error);

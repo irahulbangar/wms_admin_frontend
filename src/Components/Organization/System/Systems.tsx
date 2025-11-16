@@ -62,7 +62,6 @@ const Systems = () => {
   const { admin } = useAppSelector((state) => state.admin);
   const { systems } = useAppSelector((state) => state.system);
   const { departments } = useAppSelector((state) => state.department);
-  console.log(systems);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
   const [filteredSystems, setFilteredSystems] = useState<SystemResult[]>([]);
