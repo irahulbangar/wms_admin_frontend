@@ -16,4 +16,5 @@ export interface PlantResult {
   unit: string;
   created_at: string;
   updated_at: string;
+  plant_reporting: object;
 }

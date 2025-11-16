@@ -7,7 +7,7 @@ import {
   updatePlantById,
   getPlantById,
 } from "../../../store/plantSlice";
-import type { PlantResult } from "../../../model/plant.interface";
+import type { SinglePlantResult } from "../../../model/single-plant.interface";
 
 interface PlantFormData {
   plant_name: string;
@@ -16,6 +16,13 @@ interface PlantFormData {
   address: string;
   status: string;
   unit: string;
+}
+
+interface ReportData {
+  report_name: string;
+  report_unit: string;
+  report_formula: string;
+  neutrality_formula: string;
 }
 
 interface AddUpdatePlantProps {
@@ -48,6 +55,13 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
     unit: "ltr",
   });
 
+  const [reportData, setReportData] = useState<ReportData>({
+    report_name: "",
+    report_unit: "",
+    report_formula: "",
+    neutrality_formula: "",
+  });
+
   const [errors, setErrors] = useState<Partial<PlantFormData>>({});
 
   useEffect(() => {
@@ -63,7 +77,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
       .unwrap()
       .then((res) => {
         if (res.success || res.status === 200) {
-          const plant = res.data as unknown as PlantResult;
+          const plant = res.data as SinglePlantResult;
           const newFormData = {
             plant_name: plant.plant_name || "",
             latitude: plant.latitude || "",
@@ -73,6 +87,16 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             unit: plant.unit || "ltr",
           };
           setFormData(newFormData);
+
+          if (plant.plant_reporting) {
+            setReportData({
+              report_name: plant.plant_reporting.report_name || "",
+              report_unit: plant.plant_reporting.report_unit || "",
+              report_formula: plant.plant_reporting.report_formula || "",
+              neutrality_formula:
+                plant.plant_reporting.neutrality_formula || "",
+            });
+          }
         } else {
           Error(res.message || "Failed to load plant data");
         }
@@ -113,6 +137,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
       const plantPayload = {
         ...formData,
         organization_id: organizationId,
+        plant_reporting: reportData,
       };
 
       await dispatch(addPlant(plantPayload))
@@ -147,6 +172,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
         ...formData,
         id: plantId,
         organization_id: organizationId,
+        plant_reporting: reportData,
       };
 
       await dispatch(updatePlantById(plantPayload))
@@ -281,6 +307,85 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
               m<sup>3</sup>
             </option>
           </select>
+
+          <div>
+            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+              Plant Reporting
+            </label>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div>
+              <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                Report Name
+              </label>
+              <input
+                type="text"
+                name="report_name"
+                value={reportData.report_name}
+                onChange={(e) =>
+                  setReportData((prev) => ({
+                    ...prev,
+                    report_name: e.target.value,
+                  }))
+                }
+                className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                placeholder="Enter report name"
+              />
+            </div>
+            <div>
+              <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                Report Unit
+              </label>
+              <select
+                name="report_unit"
+                value={reportData.report_unit}
+                onChange={(e) =>
+                  setReportData((prev) => ({
+                    ...prev,
+                    report_unit: e.target.value,
+                  }))
+                }
+                className="w-full px-3 py-2.5 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+              >
+                <option value="Ltr">Ltr</option>
+                <option value="M^3">
+                  m<sup>3</sup>
+                </option>
+              </select>
+            </div>
+          </div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Report Formula
+          </label>
+          <input
+            type="text"
+            name="report_formula"
+            value={reportData.report_formula}
+            onChange={(e) =>
+              setReportData((prev) => ({
+                ...prev,
+                report_formula: e.target.value,
+              }))
+            }
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+            placeholder="Enter report formula"
+          />
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Report Neutrality Formula
+          </label>
+          <input
+            type="text"
+            name="report_neutrality_formula"
+            value={reportData.neutrality_formula}
+            onChange={(e) =>
+              setReportData((prev) => ({
+                ...prev,
+                neutrality_formula: e.target.value,
+              }))
+            }
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+            placeholder="Enter report neutrality formula"
+          />
 
           <div className="flex items-center justify-end gap-4 pt-6">
             <button

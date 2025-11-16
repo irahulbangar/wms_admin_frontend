@@ -3,7 +3,7 @@ import { api } from "../api.service";
 import type { NodesResult } from "../model/nodes.interface";
 import type { EdgesResult } from "../model/edges.interface";
 import type { GetPlantsResponse, PlantResult } from "../model/plant.interface";
-import type { SinglePlantResponse } from "../model/single-plant.interface";
+import type { PlantReporting, SinglePlantResponse } from "../model/single-plant.interface";
 import { handleApiError } from "../src/utils/errorHandler";
 
 interface PlantResponse {
@@ -127,6 +127,7 @@ interface PlantPayload {
   status: string;
   organization_id?: string;
   unit: string;
+  plant_reporting: PlantReporting;
 }
 
 // Add plant

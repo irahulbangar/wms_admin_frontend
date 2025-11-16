@@ -15,8 +15,17 @@ export interface SinglePlantResult {
   status: string;
   created_at: string;
   updated_at: string;
+  unit: string;
   nodes: Node[];
   edges: Edge[];
+  plant_reporting: PlantReporting;
+}
+
+export interface PlantReporting {
+  report_name: string;
+  report_unit: string;
+  report_formula: string;
+  neutrality_formula: string;
 }
 
 export interface Node {
