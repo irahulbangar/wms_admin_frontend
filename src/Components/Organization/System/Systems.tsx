@@ -259,6 +259,13 @@ const Systems = () => {
         setIsPlantDropdownOpen(false);
         setPlantSearchTerm("");
       }
+      if (
+        departmentDropdownRef.current &&
+        !departmentDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDepartmentDropdownOpen(false);
+        setDepartmentSearchTerm("");
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -338,7 +345,7 @@ const Systems = () => {
   const refreshSystems = useCallback(() => {
     if (isLoading) return;
 
-    if (organization_id && plant_id) {
+    if (organization_id && plant_id && department_id) {
       setIsLoading(true);
     }
 
