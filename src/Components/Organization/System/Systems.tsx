@@ -929,7 +929,7 @@ const Systems = () => {
                     <tr
                       onDoubleClick={() =>
                         handleViewDevices(
-                          system.system_id,
+                          system.department_id,
                           system.organization_id,
                           system.plant_id,
                           system.system_id
@@ -968,7 +968,7 @@ const Systems = () => {
                             <Eye
                               onClick={() =>
                                 handleViewDevices(
-                                  system.system_id,
+                                  system.department_id,
                                   system.organization_id,
                                   system.plant_id,
                                   system.system_id

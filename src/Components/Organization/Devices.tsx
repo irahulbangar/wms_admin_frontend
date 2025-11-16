@@ -39,7 +39,6 @@ import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../store/deviceTypeSlice";
 import DeletePopup from "./DeletePopup";
 import { getAllSystems, setSystems } from "../../../store/systemSlice";
-import AddUpdateSystem from "./AddUpdateSystem";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -78,7 +77,6 @@ const Devices = () => {
   const [collapsedSystems, setCollapsedSystems] = useState<Set<string>>(
     new Set()
   );
-  const [isEditSystemOpen, setIsEditSystemOpen] = useState(false);
   const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
     useState(false);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
@@ -272,18 +270,19 @@ const Devices = () => {
     getDeviceType();
     getSystem();
 
-    if (organization_id && plant_id && department_id) {
+    if (organization_id && plant_id && department_id && system_id) {
       setIsLoading(true);
       setSelectedOrganization(organization_id);
       setSelectedPlant(plant_id);
       setSelectedDepartment(department_id);
+      setSelectedSystem(system_id);
 
       dispatch(
         getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId({
           plantId: parseInt(plant_id),
           organizationId: parseInt(organization_id),
-          departmentId: parseInt(department_id || "0"),
-          systemId: parseInt(system_id || "0"),
+          departmentId: parseInt(department_id),
+          systemId: parseInt(system_id),
         })
       )
         .unwrap()
@@ -302,15 +301,22 @@ const Devices = () => {
         .finally(() => {
           setIsLoading(false);
         });
+    } else if (organization_id && plant_id && department_id) {
+      setSelectedOrganization(organization_id);
+      setSelectedPlant(plant_id);
+      setSelectedDepartment(department_id);
+      setSelectedSystem("all");
     } else {
       setSelectedOrganization("all");
       setSelectedPlant("all");
       setSelectedDepartment("all");
+      setSelectedSystem("all");
     }
   }, [
     organization_id,
     plant_id,
     department_id,
+    system_id,
     dispatch,
     getOrganization,
     fetchPlants,
@@ -366,8 +372,8 @@ const Devices = () => {
         getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId({
           plantId: parseInt(selectedPlant),
           organizationId: parseInt(selectedOrganization),
-          departmentId: parseInt(selectedDepartment || "0"),
-          systemId: parseInt(selectedSystem || "0"),
+          departmentId: parseInt(selectedDepartment),
+          systemId: parseInt(selectedSystem),
         })
       )
         .unwrap()
@@ -391,9 +397,12 @@ const Devices = () => {
     selectedOrganization,
     selectedPlant,
     selectedDepartment,
+    selectedSystem,
     dispatch,
     organization_id,
     plant_id,
+    department_id,
+    system_id,
     refreshDevices,
   ]);
 
@@ -769,42 +778,18 @@ const Devices = () => {
     }
   };
 
+  const handleBackToSystems = () => {
+    if (organization_id && plant_id && department_id) {
+      navigate(
+        `/organization/systems/${organization_id}/${plant_id}/${department_id}`
+      );
+    } else {
+      navigate("/organization/systems");
+    }
+  };
+
   const handleBackToHome = () => {
     navigate("/");
-  };
-
-  const handleEditSystem = (
-    systemId: string,
-    departmentId: number,
-    organizationId: number,
-    plantId: number
-  ) => {
-    setDepartmentId(departmentId);
-    setOrganizationId(organizationId);
-    setPlantId(plantId);
-    if (selectedPlant === "all") {
-      Warning(
-        "Please select a plant from the dropdown before updating the device"
-      );
-      return;
-    }
-
-    const systemDevices = groupedDevices[systemId] || [];
-    const firstDevice = systemDevices[0];
-
-    if (firstDevice && firstDevice.plant_id) {
-      setIsEditSystemOpen(true);
-      setSystemId(parseInt(systemId));
-      setPlantId(parseInt(selectedPlant));
-    } else {
-      Warning(
-        "No plant found for this system. Please ensure devices are assigned to this system."
-      );
-    }
-  };
-
-  const handleSystemUpdate = () => {
-    getSystem();
   };
 
   const handleDeleteDevice = (deviceId: number) => {
@@ -850,7 +835,7 @@ const Devices = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto overflow-x-hidden">
       <div className="flex items-center justify-between gap-2 md:flex-row flex-col">
         <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
           <button
@@ -886,14 +871,21 @@ const Devices = () => {
             <span>Departments</span>
           </button>
 
-          {selectedDepartment !== "all" && (
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToSystems}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Systems</span>
+          </button>
+
+          {selectedSystem !== "all" && (
             <>
               <ChevronRight className="w-4 h-4 text-text-muted" />
               <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-                {departments.find(
-                  (department) =>
-                    department.department_id.toString() === selectedDepartment
-                )?.department_name || "Department"}
+                {systems.find(
+                  (system) => system.system_id.toString() === selectedSystem
+                )?.system_name || "System"}
               </span>
             </>
           )}
@@ -1263,7 +1255,7 @@ const Devices = () => {
           <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
         </div>
       ) : (
-        <div className="relative overflow-x-auto pb-0 flex-1">
+        <>
           {Object.keys(groupedDevices).length > 0 ? (
             Object.entries(groupedDevices).map(([systemId, systemDevices]) => {
               const system = systems?.find(
@@ -1325,24 +1317,6 @@ const Devices = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {systemId !== "0" && (
-                          <Edit
-                            onClick={() =>
-                              handleEditSystem(
-                                systemId,
-                                parseInt(selectedDepartment),
-                                parseInt(selectedOrganization),
-                                parseInt(selectedPlant)
-                              )
-                            }
-                            className="w-5 h-5 text-status-info cursor-pointer"
-                          />
-                        )}
-                        {systemDevices?.length < 1 && (
-                          <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
-                        )}
-                      </div>
                     </div>
                   </div>
 
@@ -1397,6 +1371,7 @@ const Devices = () => {
                                   device?.device_id,
                                   device?.plant_id,
                                   device?.department_id,
+                                  device?.system_id || 0,
                                   device?.organization_id
                                 )
                               }
@@ -1478,6 +1453,7 @@ const Devices = () => {
                                           device?.device_id,
                                           device?.plant_id,
                                           device?.department_id,
+                                          device?.system_id || 0,
                                           device?.organization_id
                                         )
                                       }
@@ -1555,7 +1531,7 @@ const Devices = () => {
               />
             </div>
           )}
-        </div>
+        </>
       )}
 
       {showDeletePopup && deviceToDelete && (
@@ -1580,7 +1556,10 @@ const Devices = () => {
           systemData={systems}
           departmentId={departmentId}
           organizationId={organizationId}
-          systemId={0}
+          systemId={
+            systemId ||
+            (selectedSystem !== "all" ? parseInt(selectedSystem) : 0)
+          }
           plantData={plants}
           departmentData={departments}
         />
@@ -1598,21 +1577,12 @@ const Devices = () => {
           systemData={systems}
           departmentId={departmentId}
           organizationId={organizationId}
-          systemId={0}
+          systemId={
+            systemId ||
+            (selectedSystem !== "all" ? parseInt(selectedSystem) : 0)
+          }
           plantData={plants}
           departmentData={departments}
-        />
-      )}
-
-      {isEditSystemOpen && plantId && (
-        <AddUpdateSystem
-          setShowAddSystemPopup={setIsEditSystemOpen}
-          type="update"
-          systemId={systemId}
-          plantId={plantId}
-          onUpdateSuccess={handleSystemUpdate}
-          organizationId={organizationId}
-          departmentId={departmentId}
         />
       )}
     </div>
