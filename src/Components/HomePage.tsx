@@ -14,6 +14,7 @@ import Loader from "./Loader";
 import Plants from "./Organization/Plants";
 import AdminUsers from "./AdminUsers";
 import Departments from "./Organization/Department/Departments";
+import Systems from "./Organization/System/Systems";
 
 const HomePage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,6 +38,8 @@ const HomePage = () => {
       setCurrentPage("plants");
     } else if (location.pathname.startsWith("/organization/departments")) {
       setCurrentPage("departments");
+    } else if (location.pathname.startsWith("/organization/systems/")) {
+      setCurrentPage("systems");
     } else if (location.pathname === "/organization/devices") {
       setCurrentPage("devices");
     } else if (location.pathname.startsWith("/organization/devices/")) {
@@ -72,6 +75,9 @@ const HomePage = () => {
         break;
       case "departments":
         navigate("/organization/departments");
+        break;
+      case "systems":
+        navigate("/organization/systems");
         break;
       case "devices":
         navigate("/organization/devices");
@@ -109,6 +115,8 @@ const HomePage = () => {
         return <Plants />;
       case "departments":
         return <Departments />;
+      case "systems":
+        return <Systems />;
       case "devices":
         return <Devices />;
       case "users":

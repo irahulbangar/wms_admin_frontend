@@ -4,6 +4,7 @@ import {
   ChevronDown,
   Dock,
   FileText,
+  FolderGit,
   LayoutDashboard,
   Monitor,
   Settings,
@@ -51,6 +52,12 @@ const menuItems = [
         label: "Departments",
         icon: <Dock className="w-5 h-5" />,
         href: "/organization/departments",
+      },
+      {
+        id: "systems",
+        label: "Systems",
+        icon: <FolderGit className="w-5 h-5" />,
+        href: "/organization/systems/:organization_id/:plant_id/:department_id",
       },
       {
         id: "devices",

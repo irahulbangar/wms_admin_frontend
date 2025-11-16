@@ -19,56 +19,65 @@ import {
   setOrganizations,
 } from "../../../../store/organizationSlice";
 import { getAllPlants, setPlants } from "../../../../store/plantSlice";
-import type { DepartmentResult } from "../../../../model/department.interface";
 import { Error, Warning } from "../../../utils/toast";
-import {
-  getAllDepartments,
-  getDepartmentByOrganizationIdAndPlantId,
-  setDepartments,
-} from "../../../../store/departmentSlice";
-import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
 import Pagination from "../../Pagination";
+import AddUpdateSystem from "../AddUpdateSystem";
+import {
+  getAllSystems,
+  getSystemByOrganizationIdPlantIdAndDepartmentId,
+  setSystems,
+} from "../../../../store/systemSlice";
+import type { SystemResult } from "../../../../model/system.interface";
 
-const Departments = () => {
-  const { organization_id, plant_id } = useParams<{
+const Systems = () => {
+  const { organization_id, plant_id, department_id } = useParams<{
     organization_id: string;
     plant_id: string;
+    department_id: string;
   }>();
   const navigate = useNavigate();
   const [selectedOrganization, setSelectedOrganization] = useState<string>(
     organization_id || "all"
   );
   const [selectedPlant, setSelectedPlant] = useState<string>(plant_id || "all");
+  const [selectedDepartment, setSelectedDepartment] = useState<string>(
+    department_id || "all"
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [plantSearchTerm, setPlantSearchTerm] = useState("");
   const organizationDropdownRef = useRef<HTMLDivElement>(null);
   const plantDropdownRef = useRef<HTMLDivElement>(null);
+  const departmentDropdownRef = useRef<HTMLDivElement>(null);
   const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
     useState(false);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
+  const [isDepartmentDropdownOpen, setIsDepartmentDropdownOpen] =
+    useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
+  const [departmentSearchTerm, setDepartmentSearchTerm] = useState("");
   const { organizations } = useAppSelector((state) => state.organization);
   const { plants } = useAppSelector((state) => state.plant);
   const { admin } = useAppSelector((state) => state.admin);
+  const { systems } = useAppSelector((state) => state.system);
   const { departments } = useAppSelector((state) => state.department);
+  console.log(systems);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
-  const [filteredDepartments, setFilteredDepartments] = useState<
-    DepartmentResult[]
-  >([]);
-  const [isAddDepartmentOpen, setIsAddDepartmentOpen] = useState(false);
+  const [filteredSystems, setFilteredSystems] = useState<SystemResult[]>([]);
+  const [isAddSystemOpen, setIsAddSystemOpen] = useState(false);
   const [plantId, setPlantId] = useState<number | null>(null);
   const [organizationId, setOrganizationId] = useState<number | null>(null);
-  const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
+  const [isEditSystemOpen, setIsEditSystemOpen] = useState(false);
   const [departmentId, setDepartmentId] = useState<number | null>(null);
+  const [systemId, setSystemId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const totalItems = useMemo(() => {
-    return filteredDepartments.length;
-  }, [filteredDepartments]);
+    return filteredSystems.length;
+  }, [filteredSystems]);
 
   const totalPages = useMemo(() => {
     return Math.ceil(totalItems / rowsPerPage);
@@ -144,18 +153,16 @@ const Departments = () => {
     if (!organization_id && !plant_id) {
       setOrganizationSearchTerm("");
       setPlantSearchTerm("");
-      refreshDepartments();
+      refreshSystems();
     }
   }, [organization_id, plant_id]);
 
   useEffect(() => {
-    let filtered = departments;
+    let filtered = systems;
 
     if (searchTerm) {
-      filtered = filtered.filter((department: DepartmentResult) =>
-        department.department_name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
+      filtered = filtered.filter((system: SystemResult) =>
+        system.system_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -166,21 +173,20 @@ const Departments = () => {
       const orgPlantIds = plants
         .filter((p) => p.organization_id === parseInt(currentOrganization))
         .map((p) => p.plant_id);
-      filtered = filtered.filter((department: DepartmentResult) =>
-        orgPlantIds.includes(department.plant_id)
+      filtered = filtered.filter((system: SystemResult) =>
+        orgPlantIds.includes(system.plant_id)
       );
     }
 
     if (currentPlant !== "all") {
       filtered = filtered.filter(
-        (department: DepartmentResult) =>
-          department.plant_id === parseInt(currentPlant)
+        (system: SystemResult) => system.plant_id === parseInt(currentPlant)
       );
     }
 
-    setFilteredDepartments(filtered);
+    setFilteredSystems(filtered);
   }, [
-    departments,
+    systems,
     selectedOrganization,
     selectedPlant,
     plants,
@@ -207,6 +213,19 @@ const Departments = () => {
     const matchesOrganization =
       plant.organization_id === parseInt(selectedOrganization);
     return matchesSearch && matchesOrganization;
+  });
+
+  const filteredDepartments = departments.filter((department) => {
+    const matchesDepartment = department.department_name
+      .toLowerCase()
+      .includes(departmentSearchTerm.toLowerCase());
+
+    if (selectedPlant === "all") {
+      return matchesDepartment;
+    }
+
+    const matchesPlant = department.plant_id === parseInt(selectedPlant);
+    return matchesDepartment && matchesPlant;
   });
 
   useEffect(() => {
@@ -266,59 +285,61 @@ const Departments = () => {
     }
   }, [selectedOrganization, selectedPlant, plants]);
 
-  const handleAddDepartment = () => {
+  const handleAddSystem = () => {
     const currentOrganization = organization_id || selectedOrganization;
     const currentPlant = plant_id || selectedPlant;
+    const currentDepartment = department_id || selectedDepartment;
 
     if (currentOrganization === "all" || currentPlant === "all") {
       Warning(
-        "Please select both organization and plant before adding a department"
+        "Please select both organization, plant and department before adding a system"
       );
       return;
     }
 
-    setIsAddDepartmentOpen(true);
+    setIsAddSystemOpen(true);
     setPlantId(parseInt(currentPlant));
     setOrganizationId(parseInt(currentOrganization));
+    setDepartmentId(parseInt(currentDepartment));
   };
 
-  const handleEditDepartment = (departmentId: number, plantId: number) => {
+  const handleEditSystem = (systemId: number, plantId: number) => {
     const derivedOrganizationId: number =
       plants.find((p) => p.plant_id === plantId)?.organization_id ||
       (selectedOrganization !== "all" ? parseInt(selectedOrganization) : 0);
 
-    setDepartmentId(departmentId);
-    setIsEditDepartmentOpen(true);
+    setSystemId(systemId);
+    setIsEditSystemOpen(true);
     setPlantId(plantId);
     setOrganizationId(derivedOrganizationId);
 
     if (!derivedOrganizationId) {
       Warning(
-        "Organization not found for this department. Please select an organization first."
+        "Organization not found for this system. Please select an organization first."
       );
     }
   };
 
-  const refreshDepartments = useCallback(() => {
+  const refreshSystems = useCallback(() => {
     if (isLoading) return;
 
     if (organization_id && plant_id) {
       setIsLoading(true);
     }
 
-    dispatch(getAllDepartments())
+    dispatch(getAllSystems())
       .unwrap()
       .then((res) => {
         if (res.success || res.status === 200) {
-          dispatch(setDepartments(res?.data));
-          setFilteredDepartments(res?.data);
+          dispatch(setSystems(res?.data));
+          setFilteredSystems(res?.data);
         } else {
-          Error(res.message || "Failed to get departments");
+          Error(res.message || "Failed to get systems");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error(err.message || "Failed to get departments");
+        Error(err.message || "Failed to get systems");
       })
       .finally(() => {
         setIsLoading(false);
@@ -326,26 +347,27 @@ const Departments = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (organization_id && plant_id) {
+    if (organization_id && plant_id && department_id) {
       setIsLoading(true);
       dispatch(
-        getDepartmentByOrganizationIdAndPlantId({
-          plant_id: parseInt(plant_id),
-          organization_id: parseInt(organization_id),
+        getSystemByOrganizationIdPlantIdAndDepartmentId({
+          plantId: parseInt(plant_id),
+          departmentId: parseInt(department_id),
+          organizationId: parseInt(organization_id),
         })
       )
         .unwrap()
         .then((res) => {
           if (res.success || res.status === 200) {
-            dispatch(setDepartments(res?.data));
-            setFilteredDepartments(res?.data);
+            dispatch(setSystems(res?.data));
+            setFilteredSystems(res?.data);
           } else {
-            Error(res.message || "Failed to get departments");
+            Error(res.message || "Failed to get systems");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error(err.message || "Failed to get departments");
+          Error(err.message || "Failed to get systems");
         })
         .finally(() => {
           setIsLoading(false);
@@ -354,33 +376,34 @@ const Departments = () => {
     }
 
     if (selectedOrganization === "all" && selectedPlant === "all") {
-      refreshDepartments();
+      refreshSystems();
     } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
       setIsLoading(true);
       dispatch(
-        getDepartmentByOrganizationIdAndPlantId({
-          plant_id: parseInt(selectedPlant),
-          organization_id: parseInt(selectedOrganization),
+        getSystemByOrganizationIdPlantIdAndDepartmentId({
+          plantId: parseInt(selectedPlant),
+          departmentId: parseInt(selectedDepartment),
+          organizationId: parseInt(selectedOrganization),
         })
       )
         .unwrap()
         .then((res) => {
           if (res.success || res.status === 200) {
-            dispatch(setDepartments(res?.data));
-            setFilteredDepartments(res?.data);
+            dispatch(setSystems(res?.data));
+            setFilteredSystems(res?.data);
           } else {
-            Error(res.message || "Failed to get departments");
+            Error(res.message || "Failed to get systems");
           }
         })
         .catch((err) => {
           console.log(err);
-          Error(err.message || "Failed to get departments");
+          Error(err.message || "Failed to get systems");
         })
         .finally(() => {
           setIsLoading(false);
         });
     } else {
-      refreshDepartments();
+      refreshSystems();
     }
   }, [
     organization_id,
@@ -388,10 +411,10 @@ const Departments = () => {
     selectedOrganization,
     selectedPlant,
     dispatch,
-    refreshDepartments,
+    refreshSystems,
   ]);
 
-  const handleDepartmentUpdate = useCallback(
+  const handleSystemUpdate = useCallback(
     (result?: {
       data?: {
         refreshPlants?: boolean;
@@ -412,41 +435,43 @@ const Departments = () => {
 
       setIsLoading(true);
 
-      if (organization_id && plant_id) {
+      if (organization_id && plant_id && department_id) {
         dispatch(
-          getDepartmentByOrganizationIdAndPlantId({
-            plant_id: parseInt(plant_id),
-            organization_id: parseInt(organization_id),
+          getSystemByOrganizationIdPlantIdAndDepartmentId({
+            plantId: parseInt(plant_id),
+            departmentId: parseInt(department_id),
+            organizationId: parseInt(organization_id),
           })
         )
           .unwrap()
           .then((res) => {
             if (res.success || res.status === 200) {
-              dispatch(setDepartments(res?.data));
-              setFilteredDepartments(res?.data);
+              dispatch(setSystems(res?.data));
+              setFilteredSystems(res?.data);
             } else {
-              Error(res.message || "Failed to refresh departments");
+              Error(res.message || "Failed to refresh systems");
             }
           })
           .catch((err) => {
             console.log(err);
-            Error(err.message || "Failed to refresh departments");
+            Error(err.message || "Failed to refresh systems");
           })
           .finally(() => {
             setIsLoading(false);
           });
       } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
         dispatch(
-          getDepartmentByOrganizationIdAndPlantId({
-            plant_id: parseInt(selectedPlant),
-            organization_id: parseInt(selectedOrganization),
+          getSystemByOrganizationIdPlantIdAndDepartmentId({
+            plantId: parseInt(selectedPlant),
+            departmentId: parseInt(selectedDepartment),
+            organizationId: parseInt(selectedOrganization),
           })
         )
           .unwrap()
           .then((res) => {
             if (res.success || res.status === 200) {
-              dispatch(setDepartments(res?.data));
-              setFilteredDepartments(res?.data);
+              dispatch(setSystems(res?.data));
+              setFilteredSystems(res?.data);
             } else {
               Error(res.message || "Failed to refresh departments");
             }
@@ -459,7 +484,7 @@ const Departments = () => {
             setIsLoading(false);
           });
       } else {
-        refreshDepartments();
+        refreshSystems();
       }
     },
     [
@@ -468,7 +493,7 @@ const Departments = () => {
       selectedPlant,
       organization_id,
       plant_id,
-      refreshDepartments,
+      refreshSystems,
       fetchPlants,
       getOrganization,
     ]
@@ -491,22 +516,31 @@ const Departments = () => {
     }
   };
 
+  const handleBackToDepartments = () => {
+    const currentPlant = plant_id || selectedPlant;
+    if (currentPlant && currentPlant !== "all") {
+      navigate(`/organization/departments/${currentPlant}`);
+    } else {
+      navigate("/organization/departments");
+    }
+  };
+
   const handleViewDevices = (
     departmentId: number,
     organizationId: number,
-    plantId: number,
+    plantId: number
   ) => {
     navigate(
-      `/organization/systems/${organizationId}/${plantId}/${departmentId}`
+      `/organization/devices/${organizationId}/${plantId}/${departmentId}`
     );
   };
 
-  const handlePaginatedDepartments = useMemo(() => {
-    return filteredDepartments.slice(
+  const handlePaginatedSystems = useMemo(() => {
+    return filteredSystems.slice(
       (currentPage - 1) * rowsPerPage,
       currentPage * rowsPerPage
     );
-  }, [filteredDepartments, currentPage, rowsPerPage]);
+  }, [filteredSystems, currentPage, rowsPerPage]);
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -536,14 +570,22 @@ const Departments = () => {
           <span>Plants</span>
         </button>
 
-        {(plant_id || selectedPlant !== "all") && (
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+        <button
+          onClick={handleBackToDepartments}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Departments</span>
+        </button>
+
+        {selectedDepartment !== "all" && (
           <>
             <ChevronRight className="w-4 h-4 text-text-muted" />
             <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-              {plants.find(
-                (plant) =>
-                  plant.plant_id.toString() === (plant_id || selectedPlant)
-              )?.plant_name || "Plant"}
+              {departments.find(
+                (department) =>
+                  department.department_id.toString() === selectedDepartment
+              )?.department_name || "Department"}
             </span>
           </>
         )}
@@ -713,13 +755,94 @@ const Departments = () => {
               </div>
             )}
           </div>
+          <div
+            className="flex-shrink-0 md:w-54 w-full relative department-dropdown"
+            ref={departmentDropdownRef}
+          >
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Select department..."
+                value={
+                  (department_id || selectedDepartment) === "all"
+                    ? "All Department"
+                    : departments.find(
+                        (department) =>
+                          department.department_id.toString() ===
+                          (department_id || selectedDepartment)
+                      )?.department_name || "Select department..."
+                }
+                readOnly
+                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
+                onClick={() =>
+                  setIsDepartmentDropdownOpen(!isDepartmentDropdownOpen)
+                }
+              />
+              <ChevronDown
+                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
+                  isDepartmentDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+
+            {isDepartmentDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                    <input
+                      type="text"
+                      placeholder="Search departments..."
+                      value={departmentSearchTerm || ""}
+                      onChange={(e) => setDepartmentSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                  onClick={() => {
+                    setSelectedDepartment("all");
+                    setIsDepartmentDropdownOpen(false);
+                    setDepartmentSearchTerm("");
+                  }}
+                >
+                  All Department
+                </div>
+
+                {filteredDepartments.length > 0 ? (
+                  filteredDepartments.map((department) => (
+                    <div
+                      key={department.department_id}
+                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                      onClick={() => {
+                        setSelectedDepartment(
+                          department.department_id.toString()
+                        );
+                        setIsDepartmentDropdownOpen(false);
+                        setDepartmentSearchTerm(department.department_name);
+                      }}
+                    >
+                      {department.department_name}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-text-secondary text-sm">
+                    No departments found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
           <div className="flex-shrink-0 relative md:w-60 lg:w-80 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input
               type="text"
-              placeholder="Search departments..."
+              placeholder="Search systems..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="md:w-60 lg:w-80 w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
@@ -728,7 +851,7 @@ const Departments = () => {
               <button
                 onClick={() => {
                   setSearchTerm("");
-                  setFilteredDepartments(departments);
+                  setFilteredSystems(systems);
                 }}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 title="Clear search"
@@ -739,11 +862,11 @@ const Departments = () => {
           </div>
 
           <button
-            onClick={handleAddDepartment}
+            onClick={handleAddSystem}
             className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
-            Add Department
+            Add System
           </button>
         </div>
       </div>
@@ -757,7 +880,7 @@ const Departments = () => {
           <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-295px)] table-scrollbar">
             <table
               className={`w-full text-sm text-left rtl:text-right text-text-primary ${
-                handlePaginatedDepartments?.length > 0 ? "h-auto" : "h-full"
+                handlePaginatedSystems?.length > 0 ? "h-auto" : "h-full"
               } min-w-[800px]`}
             >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
@@ -766,7 +889,7 @@ const Departments = () => {
                     Sr No
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                    Department Name
+                    System Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Organization Name
@@ -775,7 +898,10 @@ const Departments = () => {
                     Plant Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                    Department Info
+                    Department Name
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                    System Info
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Created At
@@ -789,14 +915,14 @@ const Departments = () => {
                 </tr>
               </thead>
               <tbody className="min-h-[800px]">
-                {handlePaginatedDepartments.length > 0 ? (
-                  handlePaginatedDepartments.map((department, index) => (
+                {handlePaginatedSystems.length > 0 ? (
+                  handlePaginatedSystems.map((system, index) => (
                     <tr
                       onDoubleClick={() =>
                         handleViewDevices(
-                          department.department_id,
-                          department.organization_id,
-                          department.plant_id
+                          system.system_id,
+                          system.organization_id,
+                          system.plant_id
                         )
                       }
                       key={index}
@@ -806,22 +932,25 @@ const Departments = () => {
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {department.department_name}
+                        {system.system_name}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {department.organization_name}
+                        {system.organization_name}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {department.plant_name}
+                        {system.plant_name}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {department.department_info || "N/A"}
+                        {system.department_name}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {fromatDateWithTime(department.created_at)}
+                        {system.system_info || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {fromatDateWithTime(department.updated_at)}
+                        {fromatDateWithTime(system.created_at)}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                        {fromatDateWithTime(system.updated_at)}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">
@@ -829,24 +958,21 @@ const Departments = () => {
                             <Eye
                               onClick={() =>
                                 handleViewDevices(
-                                  department.department_id,
-                                  department.organization_id,
-                                  department.plant_id
+                                  system.system_id,
+                                  system.organization_id,
+                                  system.plant_id
                                 )
                               }
                               className="w-5 h-5 text-fuchsia-500 cursor-pointer"
                             />
                           </span>
 
-                          <span
-                            title="Edit department"
-                            aria-label="Edit department"
-                          >
+                          <span title="Edit system" aria-label="Edit system">
                             <Edit
                               onClick={() =>
-                                handleEditDepartment(
-                                  department.department_id,
-                                  department.plant_id
+                                handleEditSystem(
+                                  system.system_id,
+                                  system.plant_id
                                 )
                               }
                               className="w-5 h-5 text-status-info cursor-pointer"
@@ -855,8 +981,8 @@ const Departments = () => {
 
                           {admin?.role === "super_admin" && (
                             <span
-                              title="Delete department"
-                              aria-label="Delete department"
+                              title="Delete system"
+                              aria-label="Delete system"
                             >
                               <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
                             </span>
@@ -877,10 +1003,10 @@ const Departments = () => {
                         }
                         title={
                           searchTerm || selectedOrganization !== "all"
-                            ? "No departments match your search/filter"
+                            ? "No systems match your search/filter"
                             : selectedOrganization === "all"
-                            ? "No departments found"
-                            : `No departments found for ${
+                            ? "No systems found"
+                            : `No systems found for ${
                                 organizations.find(
                                   (org) =>
                                     org.organization_id === selectedOrganization
@@ -904,14 +1030,14 @@ const Departments = () => {
                         buttonText={
                           searchTerm || selectedOrganization !== "all"
                             ? "Clear Search"
-                            : "Add Department"
+                            : "Add System"
                         }
                         buttonOnClick={() => {
                           if (searchTerm || selectedOrganization !== "all") {
                             setSearchTerm("");
                             setSelectedOrganization("all");
                           } else {
-                            setIsAddDepartmentOpen(true);
+                            setIsAddSystemOpen(true);
                           }
                         }}
                       />
@@ -932,24 +1058,26 @@ const Departments = () => {
         </div>
       )}
 
-      {isAddDepartmentOpen && (
-        <AddUpdateDepartment
-          setShowAddDepartmentPopup={setIsAddDepartmentOpen}
+      {isAddSystemOpen && (
+        <AddUpdateSystem
+          setShowAddSystemPopup={setIsAddSystemOpen}
           type="add"
+          systemId={systemId || 0}
           departmentId={departmentId || 0}
           plantId={plantId || 0}
-          onUpdateSuccess={handleDepartmentUpdate}
+          onUpdateSuccess={handleSystemUpdate}
           organizationId={organizationId || 0}
         />
       )}
 
-      {isEditDepartmentOpen && (
-        <AddUpdateDepartment
-          setShowAddDepartmentPopup={setIsEditDepartmentOpen}
+      {isEditSystemOpen && (
+        <AddUpdateSystem
+          setShowAddSystemPopup={setIsEditSystemOpen}
           type="update"
+          systemId={systemId || 0}
           departmentId={departmentId || 0}
           plantId={plantId || 0}
-          onUpdateSuccess={handleDepartmentUpdate}
+          onUpdateSuccess={handleSystemUpdate}
           organizationId={organizationId || 0}
         />
       )}
@@ -957,4 +1085,4 @@ const Departments = () => {
   );
 };
 
-export default Departments;
+export default Systems;

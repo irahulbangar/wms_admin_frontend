@@ -59,11 +59,14 @@ export const getAllSystems = createAsyncThunk(
   async (_, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get<SystemResponse>("/system/admin/all-systems", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await api().get<SystemResponse>(
+        "/system/admin/all-systems",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const apiError = handleApiError(error);
@@ -133,11 +136,49 @@ export const getSystemById = createAsyncThunk(
   async (id: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get<SingleSystemResponse>(`/system/admin/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await api().get<SingleSystemResponse>(
+        `/system/admin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface SystemByOrganizationIdPlantIdAndDepartmentId {
+  organizationId: number;
+  plantId: number;
+  departmentId: number;
+}
+
+// Get system by organizationId and plantId and departmentId
+export const getSystemByOrganizationIdPlantIdAndDepartmentId = createAsyncThunk(
+  "system/getSystemByOrganizationIdPlantIdAndDepartmentId",
+  async (
+    {
+      organizationId,
+      plantId,
+      departmentId,
+    }: SystemByOrganizationIdPlantIdAndDepartmentId,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().get<SystemResponse>(
+        `/system/admin/organization-plant-department/${organizationId}/${plantId}/${departmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const apiError = handleApiError(error);

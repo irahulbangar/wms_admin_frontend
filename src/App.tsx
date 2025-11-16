@@ -91,6 +91,22 @@ function App() {
                   }
                 />
                 <Route
+                  path="/organization/systems"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/organization/systems/:organization_id/:plant_id/:department_id"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/organization/devices"
                   element={
                     <ProtectedRoute>
