@@ -309,7 +309,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
           </select>
 
           <div>
-            <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            <label className="block text-lg font-normal text-text-primary mb-2 font-roboto">
               Plant Reporting
             </label>
           </div>

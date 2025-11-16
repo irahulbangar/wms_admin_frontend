@@ -16,4 +16,12 @@ export interface DepartmentResult {
   updated_at: string;
   organization_name: string;
   plant_name: string;
+  department_reporting: DepartmentReporting | null;
+}
+
+export interface DepartmentReporting {
+  report_name: string;
+  report_unit: string;
+  report_formula: string;
+  neutrality_formula: string;
 }

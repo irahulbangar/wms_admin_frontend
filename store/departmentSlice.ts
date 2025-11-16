@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { DepartmentResponse, DepartmentResult } from "../model/department.interface";
+import type { DepartmentReporting, DepartmentResponse, DepartmentResult } from "../model/department.interface";
 import { handleApiError } from "../src/utils/errorHandler";
 
 interface DepartmentState {
@@ -65,6 +65,7 @@ export interface DepartmentPayload {
   department_info: string;
   plant_id: number;
   organization_id: number;
+  department_reporting: DepartmentReporting;
 }
 
 // Create department
@@ -144,7 +145,7 @@ export const getDepartmentById = createAsyncThunk(
   async (department_id: number, thunkAPI) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().get(`/department/admin/${department_id}`, {
+      const response = await api().get<DepartmentResponse>(`/department/admin/${department_id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

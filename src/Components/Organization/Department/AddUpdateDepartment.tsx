@@ -8,6 +8,7 @@ import {
 } from "../../../../store/departmentSlice";
 import { Error, Success } from "../../../utils/toast";
 import { ApiError } from "../../../utils/errorHandler";
+import type { DepartmentResult } from "../../../../model/department.interface";
 
 interface UpdateDepartmentProps {
   setShowAddDepartmentPopup: (show: boolean) => void;
@@ -16,6 +17,13 @@ interface UpdateDepartmentProps {
   departmentId?: number;
   onUpdateSuccess: () => void;
   organizationId?: number;
+}
+
+interface DepartmentReporting {
+  report_name: string;
+  report_unit: string;
+  report_formula: string;
+  neutrality_formula: string;
 }
 
 const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
@@ -38,6 +46,12 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
     plant_id: plantId || 0,
     organization_id: organizationId || 0,
   });
+  const [reportData, setReportData] = useState<DepartmentReporting>({
+    report_name: "",
+    report_unit: "",
+    report_formula: "",
+    neutrality_formula: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const getDepartmentData = async () => {
@@ -46,8 +60,23 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
       .unwrap()
       .then((res) => {
         if (res.success || res.status === 200) {
-          setDepartmentData(res.data);
-          setNewDepartmentName(res.data.department_name);
+          const department = res.data[0] as DepartmentResult;
+          setDepartmentData({
+            department_name: department.department_name,
+            department_info: department.department_info,
+            plant_id: department.plant_id,
+            organization_id: department.organization_id,
+          });
+          setNewDepartmentName(department.department_name);
+          if (department.department_reporting) {
+            setReportData({
+              report_name: department.department_reporting.report_name,
+              report_unit: department.department_reporting.report_unit,
+              report_formula: department.department_reporting.report_formula,
+              neutrality_formula:
+                department.department_reporting.neutrality_formula,
+            });
+          }
         } else {
           Error(res.message || "Failed to get department data");
         }
@@ -96,6 +125,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
             department_info: departmentData?.department_info,
             plant_id: plantId || 0,
             organization_id: organizationId || 0,
+            department_reporting: reportData,
           })
         )
           .unwrap()
@@ -120,6 +150,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
             plant_id: plantId || 0,
             department_id: departmentId || 0,
             organization_id: organizationId || 0,
+            department_reporting: reportData,
           })
         )
           .unwrap()
@@ -215,6 +246,85 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
               </p>
             )}
           </div>
+
+          <div>
+            <label className="block text-lg font-normal text-text-primary mb-2 font-roboto">
+              Department Reporting
+            </label>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div>
+              <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                Report Name
+              </label>
+              <input
+                type="text"
+                name="report_name"
+                value={reportData.report_name}
+                onChange={(e) =>
+                  setReportData((prev) => ({
+                    ...prev,
+                    report_name: e.target.value,
+                  }))
+                }
+                className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                placeholder="Enter report name"
+              />
+            </div>
+            <div>
+              <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                Report Unit
+              </label>
+              <select
+                name="report_unit"
+                value={reportData.report_unit}
+                onChange={(e) =>
+                  setReportData((prev) => ({
+                    ...prev,
+                    report_unit: e.target.value,
+                  }))
+                }
+                className="w-full px-3 py-2.5 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+              >
+                <option value="Ltr">Ltr</option>
+                <option value="M^3">
+                  m<sup>3</sup>
+                </option>
+              </select>
+            </div>
+          </div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Report Formula
+          </label>
+          <input
+            type="text"
+            name="report_formula"
+            value={reportData.report_formula}
+            onChange={(e) =>
+              setReportData((prev) => ({
+                ...prev,
+                report_formula: e.target.value,
+              }))
+            }
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+            placeholder="Enter report formula"
+          />
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Report Neutrality Formula
+          </label>
+          <input
+            type="text"
+            name="report_neutrality_formula"
+            value={reportData.neutrality_formula}
+            onChange={(e) =>
+              setReportData((prev) => ({
+                ...prev,
+                neutrality_formula: e.target.value,
+              }))
+            }
+            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+            placeholder="Enter report neutrality formula"
+          />
 
           <div className="flex items-center justify-end gap-4 pt-4">
             <button
