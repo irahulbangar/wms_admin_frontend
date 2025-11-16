@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAppDispatch } from "../../../../store/store";
 import {
   createDepartment,
@@ -54,41 +54,65 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const getDepartmentData = async () => {
+  const getDepartmentData = useCallback(async () => {
+    if (!departmentId) return;
+
     setIsLoading(true);
-    await dispatch(getDepartmentById(departmentId || 0))
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          const department = res.data[0] as DepartmentResult;
+    try {
+      const res = await dispatch(getDepartmentById(departmentId)).unwrap();
+
+      if (res.success || res.status === 200) {
+        let department: DepartmentResult | null = null;
+
+        if (Array.isArray(res.data)) {
+          if (res.data.length > 0) {
+            department = res.data[0] as DepartmentResult;
+          }
+        } else if (res.data && typeof res.data === "object") {
+          department = res.data as DepartmentResult;
+        }
+
+        if (department) {
           setDepartmentData({
-            department_name: department.department_name,
-            department_info: department.department_info,
-            plant_id: department.plant_id,
-            organization_id: department.organization_id,
+            department_name: department.department_name || "",
+            department_info: department.department_info || "",
+            plant_id: department.plant_id || plantId || 0,
+            organization_id: department.organization_id || organizationId || 0,
           });
-          setNewDepartmentName(department.department_name);
+
+          setNewDepartmentName(department.department_name || "");
+
           if (department.department_reporting) {
             setReportData({
-              report_name: department.department_reporting.report_name,
-              report_unit: department.department_reporting.report_unit,
-              report_formula: department.department_reporting.report_formula,
+              report_name: department.department_reporting.report_name || "",
+              report_unit: department.department_reporting.report_unit || "",
+              report_formula:
+                department.department_reporting.report_formula || "",
               neutrality_formula:
-                department.department_reporting.neutrality_formula,
+                department.department_reporting.neutrality_formula || "",
+            });
+          } else {
+            setReportData({
+              report_name: "",
+              report_unit: "",
+              report_formula: "",
+              neutrality_formula: "",
             });
           }
         } else {
-          Error(res.message || "Failed to get department data");
+          console.error("Department data not found in response:", res);
+          Error("Department data not found");
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to get department data");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
+      } else {
+        Error(res.message || "Failed to get department data");
+      }
+    } catch (err: any) {
+      console.error("Error fetching department:", err);
+      Error(err?.message || "Failed to get department data");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [departmentId, dispatch, plantId, organizationId]);
 
   useEffect(() => {
     if (type === "update" && departmentId) {
@@ -101,8 +125,14 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
         plant_id: plantId || 0,
         organization_id: organizationId || 0,
       });
+      setReportData({
+        report_name: "",
+        report_unit: "",
+        report_formula: "",
+        neutrality_formula: "",
+      });
     }
-  }, [type, departmentId, plantId, organizationId]);
+  }, [type, departmentId]);
 
   const handleAddDepartment = async () => {
     if (!newDepartmentName.trim()) {
