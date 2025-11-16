@@ -148,6 +148,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             plant_id: plantId || 0,
             organization_id: organizationId || 0,
             department_id: departmentId || 0,
+            system_reporting: reportData,
           })
         )
           .unwrap()
@@ -174,6 +175,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             plant_id: systemData.plant_id || plantId || 0,
             department_id: systemData.department_id || departmentId || 0,
             organization_id: systemData.organization_id || organizationId || 0,
+            system_reporting: reportData,
           })
         )
           .unwrap()
@@ -205,8 +207,8 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-100">
-      <div className="bg-primary rounded-lg shadow-xl w-full max-w-md mx-4">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
+      <div className="bg-primary rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
           <h2 className="text-xl font-normal text-text-primary font-roboto">
             {type === "add" ? "Add New System" : "Update System"}
           </h2>
@@ -338,9 +340,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
                 className="w-full px-3 py-2.5 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
               >
                 <option value="Ltr">Ltr</option>
-                <option value="M^3">
-                  m<sup>3</sup>
-                </option>
+                <option value="M^3">m³</option>
               </select>
             </div>
           </div>

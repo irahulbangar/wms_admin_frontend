@@ -494,7 +494,7 @@ const Departments = () => {
   const handleViewDevices = (
     departmentId: number,
     organizationId: number,
-    plantId: number,
+    plantId: number
   ) => {
     navigate(
       `/organization/systems/${organizationId}/${plantId}/${departmentId}`
@@ -775,9 +775,6 @@ const Departments = () => {
                     Plant Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                    Department Info
-                  </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Created At
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
@@ -813,9 +810,6 @@ const Departments = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {department.plant_name}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {department.department_info || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {fromatDateWithTime(department.created_at)}

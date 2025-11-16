@@ -943,9 +943,6 @@ const Systems = () => {
                     Department Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                    System Info
-                  </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                     Created At
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
@@ -985,9 +982,6 @@ const Systems = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {system.department_name}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {system.system_info || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {fromatDateWithTime(system.created_at)}

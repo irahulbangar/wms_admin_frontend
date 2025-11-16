@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { SystemResponse, SystemResult } from "../model/system.interface";
+import type { SystemReporting, SystemResponse, SystemResult } from "../model/system.interface";
 import { handleApiError } from "../src/utils/errorHandler";
 import type { SingleSystemResponse } from "../model/single-interface";
 
@@ -82,6 +82,7 @@ export interface SystemPayload {
   plant_id: number;
   organization_id: number;
   department_id: number;
+  system_reporting: SystemReporting | null;
 }
 
 // Create system
