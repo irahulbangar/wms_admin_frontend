@@ -733,49 +733,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   }`}
                 />
               </div>
-
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  System
-                </label>
-                <select
-                  name="system_id"
-                  value={formData.system_id || ""}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === "add_new") {
-                      setShowAddSystemPopup(true);
-                      setFormData((prev) => ({ ...prev, system_id: 0 }));
-                    } else {
-                      setShowAddSystemPopup(false);
-                      setFormData((prev) => ({
-                        ...prev,
-                        system_id: parseInt(value) || 0,
-                      }));
-                    }
-                  }}
-                  className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
-                >
-                  <option value="0">None</option>
-                  {systemData
-                    .filter(
-                      (system) =>
-                        system.plant_id === plant_id &&
-                        system.organization_id === organizationId
-                    )
-                    .map((system) => (
-                      <option key={system.system_id} value={system.system_id}>
-                        {system.system_name}
-                      </option>
-                    ))}
-                  <option
-                    value="add_new"
-                    className="text-status-info font-normal font-roboto cursor-pointer bg-overlay/10 rounded-lg p-2.5"
-                  >
-                    + Add New
-                  </option>
-                </select>
-              </div>
             </div>
 
             <div>

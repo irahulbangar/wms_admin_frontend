@@ -1276,7 +1276,7 @@ const Devices = () => {
               return (
                 <div
                   className={`${
-                    collapsedSystems?.has(systemId) ? "mb-4" : "mb-0"
+                    collapsedSystems?.has(systemId) ? "mb-0" : "mb-0"
                   }`}
                   key={systemId}
                 >

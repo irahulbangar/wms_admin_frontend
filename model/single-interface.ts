@@ -1,3 +1,5 @@
+import type { SystemReporting } from "./system.interface"
+
 export interface SingleSystemResponse {
     success: boolean
     message: string
@@ -19,5 +21,6 @@ export interface SingleSystemResponse {
     plant_name: string
     department_name: string
     organization_name: string
+    system_reporting: SystemReporting
   }
   
