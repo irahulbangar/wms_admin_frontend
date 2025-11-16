@@ -810,54 +810,89 @@ const Devices = () => {
 
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto">
-      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
-        <button
-          onClick={handleBackToHome}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <Home className="w-4 h-4" />
-          <span>Home</span>
-        </button>
+      <div className="flex items-center justify-between gap-2 md:flex-row flex-col">
+        <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <Home className="w-4 h-4" />
+            <span>Home</span>
+          </button>
 
-        <ChevronRight className="w-4 h-4 text-text-muted" />
+          <ChevronRight className="w-4 h-4 text-text-muted" />
 
-        <button
-          onClick={handleBackToOrganizations}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <span>Organization</span>
-        </button>
+          <button
+            onClick={handleBackToOrganizations}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Organization</span>
+          </button>
 
-        <ChevronRight className="w-4 h-4 text-text-muted" />
-        <button
-          onClick={handleBackToPlants}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <span>Plants</span>
-        </button>
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToPlants}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Plants</span>
+          </button>
 
-        <ChevronRight className="w-4 h-4 text-text-muted" />
-        <button
-          onClick={handleBackToDepartments}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <span>Departments</span>
-        </button>
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToDepartments}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Departments</span>
+          </button>
 
-        {selectedDepartment !== "all" && (
-          <>
-            <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-              {departments.find(
-                (department) =>
-                  department.department_id.toString() === selectedDepartment
-              )?.department_name || "Department"}
-            </span>
-          </>
-        )}
+          {selectedDepartment !== "all" && (
+            <>
+              <ChevronRight className="w-4 h-4 text-text-muted" />
+              <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
+                {departments.find(
+                  (department) =>
+                    department.department_id.toString() === selectedDepartment
+                )?.department_name || "Department"}
+              </span>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex-shrink-0 relative sm:w-auto w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
+            <input
+              type="text"
+              placeholder="Search devices by name, HWID, status, type, family name, or family ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="sm:w-auto w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilteredDevices(devices);
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={handleAddDevice}
+            className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto whitespace-nowrap"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Add Device
+          </button>
+        </div>
       </div>
 
-      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between w-full md:gap-3 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
+      <div className="flex items-start md:items-center justify-start w-full md:gap-3 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
         <div className="flex items-center gap-3 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
@@ -1100,38 +1135,6 @@ const Devices = () => {
               </div>
             )}
           </div>
-        </div>
-        <div className="flex items-center flex-col md:flex-row gap-3 w-full md:w-auto">
-          <div className="flex-shrink-0 relative md:w-auto w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
-            <input
-              type="text"
-              placeholder="Search devices by name, HWID, status, type, family name, or family ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="md:w-auto w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilteredDevices(devices);
-                }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
-                title="Clear search"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-
-          <button
-            onClick={handleAddDevice}
-            className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto whitespace-nowrap"
-          >
-            <PlusCircle className="w-4 h-4" />
-            Add Device
-          </button>
         </div>
       </div>
 
