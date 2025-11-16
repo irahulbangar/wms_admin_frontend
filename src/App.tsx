@@ -115,7 +115,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/organization/devices/:organization_id/:plant_id/:department_id"
+                  path="/organization/devices/:organization_id/:plant_id/:department_id/:system_id"
                   element={
                     <ProtectedRoute>
                       <HomePage />

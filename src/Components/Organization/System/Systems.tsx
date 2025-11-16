@@ -517,9 +517,18 @@ const Systems = () => {
   };
 
   const handleBackToDepartments = () => {
+    const currentOrganization = organization_id || selectedOrganization;
     const currentPlant = plant_id || selectedPlant;
-    if (currentPlant && currentPlant !== "all") {
-      navigate(`/organization/departments/${currentPlant}`);
+
+    if (
+      currentOrganization &&
+      currentOrganization !== "all" &&
+      currentPlant &&
+      currentPlant !== "all"
+    ) {
+      navigate(
+        `/organization/departments/${currentOrganization}/${currentPlant}`
+      );
     } else {
       navigate("/organization/departments");
     }
@@ -528,10 +537,11 @@ const Systems = () => {
   const handleViewDevices = (
     departmentId: number,
     organizationId: number,
-    plantId: number
+    plantId: number,
+    systemId: number
   ) => {
     navigate(
-      `/organization/devices/${organizationId}/${plantId}/${departmentId}`
+      `/organization/devices/${organizationId}/${plantId}/${departmentId}/${systemId}`
     );
   };
 
@@ -922,7 +932,8 @@ const Systems = () => {
                         handleViewDevices(
                           system.system_id,
                           system.organization_id,
-                          system.plant_id
+                          system.plant_id,
+                          system.system_id
                         )
                       }
                       key={index}
@@ -960,7 +971,8 @@ const Systems = () => {
                                 handleViewDevices(
                                   system.system_id,
                                   system.organization_id,
-                                  system.plant_id
+                                  system.plant_id,
+                                  system.system_id
                                 )
                               }
                               className="w-5 h-5 text-fuchsia-500 cursor-pointer"
