@@ -52,7 +52,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
     longitude: "",
     address: "",
     status: "active",
-    unit: "ltr",
+    unit: "Ltr",
   });
 
   const [reportData, setReportData] = useState<ReportData>({
@@ -84,7 +84,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             longitude: plant.longitude || "",
             address: plant.address || "",
             status: plant.status || "active",
-            unit: plant.unit || "ltr",
+            unit: plant.unit || "Ltr",
           };
           setFormData(newFormData);
 
