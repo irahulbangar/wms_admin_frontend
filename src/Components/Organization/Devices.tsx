@@ -450,6 +450,12 @@ const Devices = () => {
       );
     }
 
+    if (selectedSystem !== "all") {
+      filtered = filtered.filter(
+        (device: DeviceResult) => device.system_id === parseInt(selectedSystem)
+      );
+    }
+
     setFilteredDevices(filtered);
   }, [
     devices,
@@ -457,6 +463,7 @@ const Devices = () => {
     selectedOrganization,
     selectedPlant,
     selectedDepartment,
+    selectedSystem,
     plants,
     deviceFamily,
   ]);

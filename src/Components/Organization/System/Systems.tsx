@@ -149,12 +149,18 @@ const Systems = () => {
       setSelectedPlant("all");
     }
 
-    if (!organization_id && !plant_id) {
+    if (department_id) {
+      setSelectedDepartment(department_id);
+    } else {
+      setSelectedDepartment("all");
+    }
+
+    if (!organization_id && !plant_id && !department_id) {
       setOrganizationSearchTerm("");
       setPlantSearchTerm("");
-      refreshSystems();
+      setDepartmentSearchTerm("");
     }
-  }, [organization_id, plant_id]);
+  }, [organization_id, plant_id, department_id]);
 
   useEffect(() => {
     let filtered = systems;
@@ -167,6 +173,7 @@ const Systems = () => {
 
     const currentOrganization = organization_id || selectedOrganization;
     const currentPlant = plant_id || selectedPlant;
+    const currentDepartment = department_id || selectedDepartment;
 
     if (currentOrganization !== "all") {
       const orgPlantIds = plants
@@ -183,15 +190,24 @@ const Systems = () => {
       );
     }
 
+    if (currentDepartment !== "all") {
+      filtered = filtered.filter(
+        (system: SystemResult) =>
+          system.department_id === parseInt(currentDepartment)
+      );
+    }
+
     setFilteredSystems(filtered);
   }, [
     systems,
     selectedOrganization,
     selectedPlant,
+    selectedDepartment,
     plants,
     searchTerm,
     organization_id,
     plant_id,
+    department_id,
   ]);
 
   const filteredOrganizations = organizations.filter((org) =>
@@ -374,9 +390,17 @@ const Systems = () => {
       return;
     }
 
-    if (selectedOrganization === "all" && selectedPlant === "all") {
+    if (
+      selectedOrganization === "all" &&
+      selectedPlant === "all" &&
+      selectedDepartment === "all"
+    ) {
       refreshSystems();
-    } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
+    } else if (
+      selectedOrganization !== "all" &&
+      selectedPlant !== "all" &&
+      selectedDepartment !== "all"
+    ) {
       setIsLoading(true);
       dispatch(
         getSystemByOrganizationIdPlantIdAndDepartmentId({
@@ -407,8 +431,10 @@ const Systems = () => {
   }, [
     organization_id,
     plant_id,
+    department_id,
     selectedOrganization,
     selectedPlant,
+    selectedDepartment,
     dispatch,
     refreshSystems,
   ]);
