@@ -1,13 +1,13 @@
 import { X } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
-import { useAppDispatch } from "../../../store/store";
-import { Error, Success } from "../../utils/toast";
+import { useAppDispatch } from "../../../../store/store";
+import { Error, Success } from "../../../utils/toast";
 import {
   createSystem,
   getSystemById,
   updateSystem,
-} from "../../../store/systemSlice";
-import { ApiError } from "../../utils/errorHandler";
+} from "../../../../store/systemSlice";
+import { ApiError } from "../../../utils/errorHandler";
 
 interface AddUpdateSystemProps {
   setShowAddSystemPopup: (show: boolean) => void;

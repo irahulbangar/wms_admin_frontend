@@ -6,11 +6,11 @@ import {
   updateClient,
   type CreateClientPayload,
   type UpdateClientPayload,
-} from "../../../store/clientSlice";
-import { useAppDispatch } from "../../../store/store";
-import { Error, Success } from "../../utils/toast";
-import type { OrganizationResult } from "../../../model/organizations.interface";
-import { ApiError } from "../../utils/errorHandler";
+} from "../../../../store/clientSlice";
+import { useAppDispatch } from "../../../../store/store";
+import { Error, Success } from "../../../utils/toast";
+import type { OrganizationResult } from "../../../../model/organizations.interface";
+import { ApiError } from "../../../utils/errorHandler";
 
 interface AddUpdateUserProps {
   setShowAddModal: (show: boolean) => void;

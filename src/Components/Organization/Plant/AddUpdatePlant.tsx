@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { Success, Error } from "../../utils/toast";
-import { useAppDispatch } from "../../../store/store";
+import { Success, Error } from "../../../utils/toast";
+import { useAppDispatch } from "../../../../store/store";
 import {
   addPlant,
   updatePlantById,
   getPlantById,
-} from "../../../store/plantSlice";
-import type { SinglePlantResult } from "../../../model/single-plant.interface";
+} from "../../../../store/plantSlice";
+import type { SinglePlantResult } from "../../../../model/single-plant.interface";
 
 interface PlantFormData {
   plant_name: string;

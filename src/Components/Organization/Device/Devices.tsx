@@ -12,33 +12,33 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import type { DeviceResult } from "../../../model/devices.interface";
+import type { DeviceResult } from "../../../../model/devices.interface";
 import {
   deleteDevice,
   getAllDevices,
   getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId,
   setDevices,
-} from "../../../store/deviceSlice";
-import { useAppDispatch, useAppSelector } from "../../../store/store";
+} from "../../../../store/deviceSlice";
+import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import {
   getOrganizations,
   setOrganizations,
-} from "../../../store/organizationSlice";
-import { getAllPlants, setPlants } from "../../../store/plantSlice";
-import type { DeviceFamilyResult } from "../../../model/device-family.interface";
-import { fromatDateWithTime } from "../../utils/utils";
+} from "../../../../store/organizationSlice";
+import { getAllPlants, setPlants } from "../../../../store/plantSlice";
+import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
+import { fromatDateWithTime } from "../../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
-import { Error, Success, Warning } from "../../utils/toast";
-import NoDataFound from "../NoDataFound";
-import type { DeviceTypeResult } from "../../../model/device-type.interface";
+import { Error, Success, Warning } from "../../../utils/toast";
+import NoDataFound from "../../NoDataFound";
+import type { DeviceTypeResult } from "../../../../model/device-type.interface";
 import {
   getAllDepartments,
   setDepartments,
-} from "../../../store/departmentSlice";
-import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
-import { getDeviceTypes } from "../../../store/deviceTypeSlice";
-import DeletePopup from "./DeletePopup";
-import { getAllSystems, setSystems } from "../../../store/systemSlice";
+} from "../../../../store/departmentSlice";
+import { getDeviceFamiliy } from "../../../../store/deviceFamilySlice";
+import { getDeviceTypes } from "../../../../store/deviceTypeSlice";
+import DeletePopup from "../DeletePopup";
+import { getAllSystems, setSystems } from "../../../../store/systemSlice";
 
 const Devices = () => {
   const navigate = useNavigate();

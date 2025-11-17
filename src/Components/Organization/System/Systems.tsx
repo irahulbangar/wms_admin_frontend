@@ -23,7 +23,7 @@ import { Error, Warning } from "../../../utils/toast";
 import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
 import Pagination from "../../Pagination";
-import AddUpdateSystem from "../AddUpdateSystem";
+import AddUpdateSystem from "./AddUpdateSystem";
 import {
   getAllSystems,
   getSystemByOrganizationIdPlantIdAndDepartmentId,

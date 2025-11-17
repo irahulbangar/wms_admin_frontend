@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../../../store/store";
-import type { DeviceFamilyResult } from "../../../model/device-family.interface";
-import type { DeviceTypeResult } from "../../../model/device-type.interface";
+import { useAppDispatch, useAppSelector } from "../../../../store/store";
+import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
+import type { DeviceTypeResult } from "../../../../model/device-type.interface";
 import {
   createDevice,
   getDeviceById,
   updateDevice,
   type CreateDevicePayload,
-} from "../../../store/deviceSlice";
+} from "../../../../store/deviceSlice";
 
-import { Error, Success } from "../../utils/toast";
-import { getAllSystems } from "../../../store/systemSlice";
-import AddUpdateSystem from "./AddUpdateSystem";
-import type { SystemResult } from "../../../model/system.interface";
-import type { ReportTypeResult } from "../../../model/report-type.interface";
-import { getAllReportTypes } from "../../../store/reportTypeSlice";
-import type { PlantResult } from "../../../model/plant.interface";
-import type { DepartmentResult } from "../../../model/department.interface";
-import { ApiError } from "../../utils/errorHandler";
+import { Error, Success } from "../../../utils/toast";
+import { getAllSystems } from "../../../../store/systemSlice";
+import AddUpdateSystem from "../System/AddUpdateSystem";
+import type { SystemResult } from "../../../../model/system.interface";
+import type { ReportTypeResult } from "../../../../model/report-type.interface";
+import { getAllReportTypes } from "../../../../store/reportTypeSlice";
+import type { PlantResult } from "../../../../model/plant.interface";
+import type { DepartmentResult } from "../../../../model/department.interface";
+import { ApiError } from "../../../utils/errorHandler";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
