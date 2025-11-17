@@ -53,6 +53,7 @@ export interface DeviceResult {
   out_system_name: string
   system_name: any
   report_type_name: string
+  virtual_reporting: DeviceReporting;
 }
 
 export interface LastRecord {
@@ -93,6 +94,13 @@ export interface LastRecord {
   min_mm?: number
   last_mm?: number
   first_mm?: number
+}
+
+export interface DeviceReporting {
+  report_name: string;
+  report_unit: string;
+  report_formula: string;
+  neutrality_formula: string;
 }
 
 export interface Params {

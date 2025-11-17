@@ -39,6 +39,13 @@ interface AddUpdateDeviceProps {
   departmentData: DepartmentResult[];
 }
 
+interface VirtualReporting {
+  report_name: string;
+  report_unit: string;
+  report_formula: string;
+  neutrality_formula: string;
+}
+
 const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   setShowAddModal,
   type,
@@ -78,6 +85,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     params: {},
     plant_id: plant_id,
     department_id: departmentId,
+    virtual_reporting: null,
+  });
+  const [reportData, setReportData] = useState<VirtualReporting>({
+    report_name: "",
+    report_unit: "",
+    report_formula: "",
+    neutrality_formula: "",
   });
   const [showAddSystemPopup, setShowAddSystemPopup] = useState(false);
   const [reportTypes, setReportTypes] = useState<ReportTypeResult[]>([]);
@@ -151,6 +165,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     "Percolation",
   ];
   const flowReportType = "Storage";
+  const virtualReporting = "System Report";
 
   const selectedReportType = reportTypes.find(
     (rt) => rt.report_type_id === formData.report_type_id
@@ -165,7 +180,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const isStorageReportType = selectedReportType
     ? selectedReportType.report_type_name === flowReportType
     : false;
-
+  const isVirtualReporting =
+    formData.virtual_reporting?.report_name === virtualReporting;
   const resetForm = () => {
     setFormData({
       device_family_id: 0,
@@ -188,6 +204,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       device_flow_direction: "",
       plant_id: plant_id,
       department_id: departmentId,
+      virtual_reporting: null,
     });
 
     setCommonParams({
@@ -234,6 +251,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hmin: "",
       A: "",
       B: "",
+    });
+    setReportData({
+      report_name: "",
+      report_unit: "",
+      report_formula: "",
+      neutrality_formula: "",
     });
     setErrors({});
   };
@@ -333,6 +356,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_connection: formData.organization_connection,
         plant_id: formData.plant_id,
         department_id: formData.department_id,
+        virtual_reporting: reportData,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {
@@ -415,6 +439,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_flow_direction: deviceData.device_flow_direction,
               plant_id: deviceData.plant_id,
               department_id: deviceData.department_id,
+              virtual_reporting: deviceData.virtual_reporting,
             });
 
             const selectedFamily = familyData.find(
@@ -506,6 +531,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_flow_direction: "",
         plant_id: plant_id,
         department_id: departmentId,
+        virtual_reporting: null,
       });
     }
   }, [type, deviceId, dispatch, familyData, organizationId]);
@@ -1050,6 +1076,88 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Virtual device reporting parameters */}
+            {isVirtualReporting && (
+              <>
+                <div>
+                  <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                    Virtual Reporting
+                  </label>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Report Name
+                    </label>
+                    <input
+                      type="text"
+                      name="report_name"
+                      value={reportData.report_name}
+                      onChange={(e) =>
+                        setReportData((prev) => ({
+                          ...prev,
+                          report_name: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                      placeholder="Enter report name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Report Unit
+                    </label>
+                    <select
+                      name="report_unit"
+                      value={reportData.report_unit}
+                      onChange={(e) =>
+                        setReportData((prev) => ({
+                          ...prev,
+                          report_unit: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2.5 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                    >
+                      <option value="Ltr">Ltr</option>
+                      <option value="M^3">m³</option>
+                    </select>
+                  </div>
+                </div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  Report Formula
+                </label>
+                <input
+                  type="text"
+                  name="report_formula"
+                  value={reportData.report_formula}
+                  onChange={(e) =>
+                    setReportData((prev) => ({
+                      ...prev,
+                      report_formula: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                  placeholder="Enter report formula"
+                />
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  Report Neutrality Formula
+                </label>
+                <input
+                  type="text"
+                  name="report_neutrality_formula"
+                  value={reportData.neutrality_formula}
+                  onChange={(e) =>
+                    setReportData((prev) => ({
+                      ...prev,
+                      neutrality_formula: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                  placeholder="Enter report neutrality formula"
+                />
+              </>
+            )}
 
             {/* Common Parameters */}
             <div>

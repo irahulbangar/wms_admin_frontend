@@ -1,6 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type { DeviceResponse, DeviceResult } from "../model/devices.interface";
+import type {
+  DeviceReporting,
+  DeviceResponse,
+  DeviceResult,
+} from "../model/devices.interface";
 import { handleApiError } from "../src/utils/errorHandler";
 
 interface DeviceState {
@@ -75,6 +79,7 @@ export interface CreateDevicePayload {
   out_plant_id: number | null;
   plant_id: number | null;
   department_id: number | null;
+  virtual_reporting: DeviceReporting | null;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {
