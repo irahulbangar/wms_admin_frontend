@@ -85,7 +85,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     params: {},
     plant_id: plant_id,
     department_id: departmentId,
-    virtual_reporting: null,
+    device_reporting: null,
   });
   const [reportData, setReportData] = useState<VirtualReporting>({
     report_name: "",
@@ -211,7 +211,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       device_flow_direction: "",
       plant_id: plant_id,
       department_id: departmentId,
-      virtual_reporting: null,
+      device_reporting: null,
     });
 
     setCommonParams({
@@ -363,7 +363,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_connection: formData.organization_connection,
         plant_id: formData.plant_id,
         department_id: formData.department_id,
-        virtual_reporting: isVirtualReporting ? reportData : null,
+        device_reporting: isVirtualReporting ? reportData : null,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {
@@ -446,7 +446,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_flow_direction: deviceData.device_flow_direction,
               plant_id: deviceData.plant_id,
               department_id: deviceData.department_id,
-              virtual_reporting: deviceData.virtual_reporting,
+              device_reporting: deviceData.device_reporting,
             });
 
             const selectedFamily = familyData.find(
@@ -509,14 +509,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               });
             }
 
-            if (deviceData.virtual_reporting) {
+            if (deviceData.device_reporting) {
               setReportData({
-                report_name: deviceData.virtual_reporting?.report_name || "",
-                report_unit: deviceData.virtual_reporting?.report_unit || "",
+                report_name: deviceData.device_reporting?.report_name || "",
+                report_unit: deviceData.device_reporting?.report_unit || "",
                 report_formula:
-                  deviceData.virtual_reporting?.report_formula || "",
+                  deviceData.device_reporting?.report_formula || "",
                 neutrality_formula:
-                  deviceData.virtual_reporting?.neutrality_formula || "",
+                  deviceData.device_reporting?.neutrality_formula || "",
               });
             }
           } else {
@@ -549,7 +549,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         device_flow_direction: "",
         plant_id: plant_id,
         department_id: departmentId,
-        virtual_reporting: null,
+        device_reporting: null,
       });
     }
   }, [type, deviceId, dispatch, familyData, organizationId]);

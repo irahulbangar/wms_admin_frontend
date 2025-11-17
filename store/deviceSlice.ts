@@ -79,7 +79,7 @@ export interface CreateDevicePayload {
   out_plant_id: number | null;
   plant_id: number | null;
   department_id: number | null;
-  virtual_reporting: DeviceReporting | null;
+  device_reporting: DeviceReporting | null;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {
