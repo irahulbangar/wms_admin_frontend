@@ -143,8 +143,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     A: "",
     B: "",
   });
-  const inReportType = ["Evaporation", "Consumption", "Wastage"];
-  const outReportType = ["Percolation", "Regeneration", "Re-use"];
+  const inReportType = ["Rainfall", "Regeneration", "Re-use"];
+  const outReportType = [
+    "Evaporation",
+    "Consumption",
+    "Wastage",
+    "Percolation",
+  ];
   const flowReportType = "Storage";
 
   const selectedReportType = reportTypes.find(

@@ -181,12 +181,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       "Consumption",
       "Wastage",
       "Regeneration",
+      "Rainfall",
       "Re-use",
       "Net Balance",
     ];
 
-    const inReportType = ["In", "Evaporation", "Consumption", "Wastage"];
-    const outReportType = ["Out", "Percolation", "Regeneration", "Re-use"];
+    const inReportType = ["In", "Rainfall", "Regeneration", "Re-use"];
+    const outReportType = ["Out", "Evaporation", "Consumption", "Wastage", "Percolation"];
 
     const groupId = getGroupId();
     if (!groupId) {
@@ -333,6 +334,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       Wastage: "#ffd209",
       Regeneration: "#fa6488",
       "Re-use": "#7a5db0",
+      Rainfall: "#40bf96",
       "Net Balance": "#6B7280",
       Unknown: "#7da6d2",
     };
