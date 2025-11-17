@@ -633,8 +633,8 @@ const Systems = () => {
         )}
       </div>
 
-      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between lg:flex-nowrap w-full md:gap-4 gap-2 md:flex-row flex-col flex-nowrap md:flex-wrap">
-        <div className="flex items-center gap-4 pl-1 md:flex-row flex-col w-full md:w-auto">
+      <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between w-full gap-3 md:flex-row flex-col flex-wrap">
+        <div className="flex items-center gap-3 pl-1 md:flex-row flex-col w-full md:w-auto">
           <div
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
             ref={organizationDropdownRef}
@@ -879,7 +879,7 @@ const Systems = () => {
             )}
           </div>
         </div>
-        <div className="flex items-center flex-col md:flex-row gap-4 w-full md:w-auto">
+        <div className="flex items-center flex-col md:flex-row gap-3 w-full md:w-auto">
           <div className="flex-shrink-0 relative md:w-60 lg:w-80 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
             <input

@@ -843,7 +843,7 @@ const Devices = () => {
 
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto overflow-x-hidden">
-      <div className="flex items-center justify-between gap-2 md:flex-row flex-col">
+      <div className="flex items-center justify-between gap-2 md:flex-row flex-col flex-wrap">
         <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
           <button
             onClick={handleBackToHome}

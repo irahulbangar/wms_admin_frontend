@@ -108,6 +108,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     );
   };
 
+  const getSelectedDeviceTypeName = () => {
+    const selectedType = typeData.find(
+      (type) => type.device_type_id === formData.device_type_id
+    );
+    return selectedType?.device_type_name || "";
+  };
+
   const [commonParams, setCommonParams] = useState<object>({
     maxThreshold: "",
     lowerLimit: "",
@@ -165,7 +172,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     "Percolation",
   ];
   const flowReportType = "Storage";
-  const virtualReporting = "System Report";
 
   const selectedReportType = reportTypes.find(
     (rt) => rt.report_type_id === formData.report_type_id
@@ -181,7 +187,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     ? selectedReportType.report_type_name === flowReportType
     : false;
   const isVirtualReporting =
-    formData.virtual_reporting?.report_name === virtualReporting;
+    getSelectedDeviceFamilyName() === "virtual" &&
+    getSelectedDeviceTypeName() === "System Report";
   const resetForm = () => {
     setFormData({
       device_family_id: 0,
@@ -356,7 +363,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_connection: formData.organization_connection,
         plant_id: formData.plant_id,
         department_id: formData.department_id,
-        virtual_reporting: reportData,
+        virtual_reporting: isVirtualReporting ? reportData : null,
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {
@@ -501,6 +508,17 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 B: brwhmsData?.B?.toString() || "",
               });
             }
+
+            if (deviceData.virtual_reporting) {
+              setReportData({
+                report_name: deviceData.virtual_reporting?.report_name || "",
+                report_unit: deviceData.virtual_reporting?.report_unit || "",
+                report_formula:
+                  deviceData.virtual_reporting?.report_formula || "",
+                neutrality_formula:
+                  deviceData.virtual_reporting?.neutrality_formula || "",
+              });
+            }
           } else {
             Error(res.message || "Failed to get device data");
           }
@@ -580,7 +598,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-primary rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-primary rounded-lg shadow-xl w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
           <div className="flex flex-col">
             <h2 className="text-2xl font-normal text-text-primary font-roboto">
@@ -603,7 +621,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       (o) => o.organization_id === organizationId
                     )?.organization_name || "Unknown Organization";
 
-                  return `${organizationName} > ${plantName} > ${departmentName}`;
+                  const system = systemData.find(
+                    (s) => s.system_id === systemId
+                  );
+                  const systemName = system?.system_name || "Unknown System";
+
+                  return `${organizationName} > ${plantName} > ${departmentName} > ${systemName}`;
                 })()}
               </span>
             </div>
@@ -626,7 +649,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 Device Details
               </label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Family
@@ -772,7 +795,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </label>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Device Visibility
@@ -852,7 +875,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               </label>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   {isStorageReportType ? "Select Plant" : "Plant In"}
@@ -922,7 +945,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 Department Connection
               </label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   {isStorageReportType ? "Select Department" : "Department In"}
@@ -1005,7 +1028,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 System Connection
               </label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   {isStorageReportType ? "Select System" : "System In"}
@@ -1085,7 +1108,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     Virtual Reporting
                   </label>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
                     <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       Report Name
@@ -1124,38 +1147,44 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     </select>
                   </div>
                 </div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Report Formula
-                </label>
-                <input
-                  type="text"
-                  name="report_formula"
-                  value={reportData.report_formula}
-                  onChange={(e) =>
-                    setReportData((prev) => ({
-                      ...prev,
-                      report_formula: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-                  placeholder="Enter report formula"
-                />
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Report Neutrality Formula
-                </label>
-                <input
-                  type="text"
-                  name="report_neutrality_formula"
-                  value={reportData.neutrality_formula}
-                  onChange={(e) =>
-                    setReportData((prev) => ({
-                      ...prev,
-                      neutrality_formula: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-                  placeholder="Enter report neutrality formula"
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Report Formula
+                    </label>
+                    <input
+                      type="text"
+                      name="report_formula"
+                      value={reportData.report_formula}
+                      onChange={(e) =>
+                        setReportData((prev) => ({
+                          ...prev,
+                          report_formula: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                      placeholder="Enter report formula"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Report Neutrality Formula
+                    </label>
+                    <input
+                      type="text"
+                      name="report_neutrality_formula"
+                      value={reportData.neutrality_formula}
+                      onChange={(e) =>
+                        setReportData((prev) => ({
+                          ...prev,
+                          neutrality_formula: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                      placeholder="Enter report neutrality formula"
+                    />
+                  </div>
+                </div>
               </>
             )}
 
@@ -1165,35 +1194,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 Common Parameters
               </label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Max Threshold
-                </label>
-                <input
-                  type="text"
-                  name="maxThreshold"
-                  value={commonInputValues.maxThreshold}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      maxThreshold: inputValue,
-                    }));
-
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      maxThreshold: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter max threshold"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.maxThreshold
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                   Lower Limit
@@ -1245,6 +1246,34 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   placeholder="Enter upper limit"
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                     errors.upperLimit
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  Max Threshold
+                </label>
+                <input
+                  type="text"
+                  name="maxThreshold"
+                  value={commonInputValues.maxThreshold}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      maxThreshold: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      maxThreshold: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter max threshold"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.maxThreshold
                       ? "border-status-danger"
                       : "border-border-primary"
                   }`}
@@ -1364,7 +1393,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     Tank Parameters
                   </label>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
                     <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       Height
@@ -1499,7 +1528,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     BRWHMS Parameters
                   </label>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
                     <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                       SG
