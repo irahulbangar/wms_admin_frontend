@@ -12,29 +12,29 @@ import {
   ChevronDown,
   User2,
 } from "lucide-react";
-import NoDataFound from "../NoDataFound";
-import { fromatDateWithTime, handleStatus } from "../../utils/utils";
+import NoDataFound from "../../NoDataFound";
+import { fromatDateWithTime, handleStatus } from "../../../utils/utils";
 import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   ClientUsersResponse,
   ClientUsersResult,
-} from "../../../model/client-users.interface";
+} from "../../../../model/client-users.interface";
 import {
   getAllClients,
   getClientsByOrganizationId,
   setClients,
-} from "../../../store/clientSlice";
-import { useAppDispatch, useAppSelector } from "../../../store/store";
+} from "../../../../store/clientSlice";
+import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import AddUpdateUser from "./AddUpdateUser";
-import { Error } from "../../utils/toast";
+import { Error } from "../../../utils/toast";
 import {
   getOrganizations,
   setOrganizations,
-} from "../../../store/organizationSlice";
-import UserPlants from "./UserPlants";
-import Pagination from "../Pagination";
-import { ApiError } from "../../utils/errorHandler";
+} from "../../../../store/organizationSlice";
+import UserPlants from "../UserPlants";
+import Pagination from "../../Pagination";
+import { ApiError } from "../../../utils/errorHandler";
 
 const OrganizationUsers = () => {
   const navigate = useNavigate();

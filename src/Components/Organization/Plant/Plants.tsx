@@ -14,24 +14,24 @@ import {
   ChartNetwork,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import NoDataFound from "../NoDataFound";
-import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { Error, Success, Warning } from "../../utils/toast";
-import { fromatDateWithTime, handleStatus } from "../../utils/utils";
+import NoDataFound from "../../NoDataFound";
+import { useAppDispatch, useAppSelector } from "../../../../store/store";
+import { Error, Success, Warning } from "../../../utils/toast";
+import { fromatDateWithTime, handleStatus } from "../../../utils/utils";
 import {
   getOrganizations,
   setOrganizations,
-} from "../../../store/organizationSlice";
+} from "../../../../store/organizationSlice";
 import AddUpdatePlant from "./AddUpdatePlant";
-import Pagination from "../Pagination";
-import type { PlantResult } from "../../../model/plant.interface";
+import Pagination from "../../Pagination";
+import type { PlantResult } from "../../../../model/plant.interface";
 import {
   deletePlantById,
   getAllPlants,
   getPlantsByOrganizationId,
   setPlants,
-} from "../../../store/plantSlice";
-import { ApiError } from "../../utils/errorHandler";
+} from "../../../../store/plantSlice";
+import { ApiError } from "../../../utils/errorHandler";
 
 const Plants = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
