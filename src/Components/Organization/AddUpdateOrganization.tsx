@@ -40,49 +40,10 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
     introduction: "",
     governance: "",
     logo: "",
+    subdomain: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // const validateForm = (): boolean => {
-  //   const newErrors: Record<string, string> = {};
-
-  //   if (!formData.name.trim()) {
-  //     newErrors.name = "Organization name is required";
-  //   } else if (formData.name.trim().length < 2) {
-  //     newErrors.name = "Organization name must be at least 2 characters";
-  //   }
-
-  //   if (!formData.address.trim()) {
-  //     newErrors.address = "Address is required";
-  //   } else if (formData.address.trim().length < 3) {
-  //     newErrors.address = "Address must be at least 3 characters";
-  //   }
-
-  //   if (!formData.contactPerson.trim()) {
-  //     newErrors.contactPerson = "Contact person is required";
-  //   } else if (!/^[a-zA-Z\s]+$/.test(formData.contactPerson.toString())) {
-  //     newErrors.contactPerson = "Contact person must be a valid name";
-  //   }
-
-  //   if (!formData.contactNumber.trim()) {
-  //     newErrors.contactNumber = "Contact number is required";
-  //   } else if (
-  //     !/^[0-9]{10}$/.test(formData.contactNumber.toString().trim()) ||
-  //     formData.contactNumber.toString().trim().length !== 10
-  //   ) {
-  //     newErrors.contactNumber = "Please enter exactly 10 digits";
-  //   }
-
-  //   if (!formData.email.trim()) {
-  //     newErrors.email = "Email is required";
-  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-  //     newErrors.email = "Please enter a valid email address";
-  //   }
-
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -157,9 +118,6 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // if (!validateForm()) {
-    //   return;
-    // }
     setIsLoading(true);
     try {
       const organizationData = {
@@ -173,6 +131,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         introduction: formData.introduction,
         governance: formData.governance,
         logo: formData.logo,
+        subdomain: formData.subdomain,
       };
 
       if (type === "add") {
@@ -193,6 +152,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
                 introduction: "",
                 governance: "",
                 logo: "",
+                subdomain: "",
               });
               setErrors({});
               if (fileInputRef.current) {
@@ -250,18 +210,19 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
       dispatch(getOrganizationById(organizationId))
         .unwrap()
         .then((res) => {
-          if (res.success || res.status === 200) {
+          if (res.success) {
             setFormData({
-              name: res.data.organization_name,
-              address: res.data.address,
-              contactPerson: res.data.contact_person,
-              contactNumber: res.data.contact_number,
-              email: res.data.email,
-              notes: res.data.note,
-              status: res.data.status || "active",
-              introduction: res.data.introduction || "",
-              governance: res.data.governance || "",
-              logo: res.data.logo || "",
+              name: res.data?.organization_name || "",
+              address: res.data?.address || "",
+              contactPerson: res.data?.contact_person || "",
+              contactNumber: res.data?.contact_number || "",
+              email: res.data?.email || "",
+              notes: res.data?.note || "",
+              status: res.data?.status || "active",
+              introduction: res.data?.introduction || "",
+              governance: res.data?.governance || "",
+              logo: res.data?.logo || "",
+              subdomain: res.data?.subdomain || "",
             });
           } else {
             Error(res.message || "Failed to get organization");
@@ -284,6 +245,7 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
         introduction: "",
         governance: "",
         logo: "",
+        subdomain: "",
       });
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -454,6 +416,23 @@ const AddUpdateOrganization: React.FC<AddUpdateOrganizationProps> = ({
           )}
           {errors.logo && (
             <p className="text-status-danger text-sm mt-1">{errors.logo}</p>
+          )}
+
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Subdomain
+          </label>
+          <input
+            type="text"
+            name="subdomain"
+            value={formData.subdomain}
+            onChange={handleInputChange}
+            className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-md focus:outline-none focus:ring-1 focus:ring-status-info ${
+              errors.subdomain ? "border-status-danger" : "border-border-primary"
+            }`}
+            placeholder="Enter organization subdomain"
+          />
+          {errors.subdomain && (
+            <p className="text-status-danger text-sm mt-1">{errors.subdomain}</p>
           )}
 
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">

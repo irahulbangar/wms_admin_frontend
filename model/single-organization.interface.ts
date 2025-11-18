@@ -16,7 +16,9 @@ export interface SingleOrganizationResult {
   edges: Edges[]
   status: string
   logo: any
-  subdomain: any
+  introduction: string
+  governance: string
+  subdomain: string
   is_deleted: boolean
   created_at: string
   updated_at: string

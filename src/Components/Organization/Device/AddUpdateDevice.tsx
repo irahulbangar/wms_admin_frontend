@@ -363,7 +363,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_connection: formData.organization_connection,
         plant_id: formData.plant_id,
         department_id: formData.department_id,
-        device_reporting: isVirtualReporting ? reportData : null,
+        device_reporting: isVirtualReporting ? reportData : {
+          report_name: "",
+          report_unit: "",
+          report_formula: "",
+          neutrality_formula: "",
+        },
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {

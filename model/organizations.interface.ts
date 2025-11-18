@@ -13,6 +13,7 @@ export interface OrganizationResult {
   contact_number: string;
   email: string;
   note: string;
+  subdomain: string;
   status: string;
   created_at: string;
   updated_at: string;

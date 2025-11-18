@@ -5,6 +5,7 @@ import type {
   OrganizationResult,
 } from "../model/organizations.interface";
 import { handleApiError } from "../src/utils/errorHandler";
+import type { SingleOrganizationResponse } from "../model/single-organization.interface";
 
 interface OrganizationState {
   organizations: OrganizationResult[];
@@ -95,6 +96,8 @@ interface AddOrganizationPayload {
   introduction: string;
   governance: string;
   logo: string;
+  subdomain: string;
+  status: string;
 }
 
 interface UpdateOrganizationPayload extends AddOrganizationPayload {
@@ -148,7 +151,7 @@ export const getOrganizationById = createAsyncThunk(
   "organization/getOrganizationById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get(`/organization/admin/${id}`, {
+      const response = await api().get<SingleOrganizationResponse>(`/organization/admin/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
