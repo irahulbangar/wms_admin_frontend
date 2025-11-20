@@ -78,6 +78,7 @@ const DataSync = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [rowErrors, setRowErrors] = useState<Record<number, string>>({});
+  const [isSyncCompleted, setIsSyncCompleted] = useState(false);
   const [deviceSearchTerm, setDeviceSearchTerm] = useState("");
   const [isDeviceDropdownOpen, setIsDeviceDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +118,7 @@ const DataSync = () => {
     setJsonData({});
     setSelectedFile(null);
     setRowErrors({});
+    setIsSyncCompleted(false);
     setDeviceSearchTerm("");
     setIsDeviceDropdownOpen(false);
     if (fileInputRef.current) {
@@ -198,6 +200,7 @@ const DataSync = () => {
       setCsvData(data);
       setJsonData(data);
       setRowErrors({});
+      setIsSyncCompleted(false);
       Success(`CSV file loaded successfully. ${data.length} rows found.`);
     };
 
@@ -255,6 +258,8 @@ const DataSync = () => {
               );
             }
             const errorCount = Object.keys(errors).length;
+            setIsSyncCompleted(true);
+            
             if (errorCount > 0) {
               const updateCount = res?.data?.updateCount || 0;
               const insertCount = res?.data?.insertCount || 0;
@@ -272,6 +277,7 @@ const DataSync = () => {
               setJsonData({});
               setSelectedFile(null);
               setRowErrors({});
+              setIsSyncCompleted(false);
               if (fileInputRef.current) {
                 fileInputRef.current.value = "";
               }
@@ -296,6 +302,7 @@ const DataSync = () => {
     setJsonData({});
     setSelectedFile(null);
     setRowErrors({});
+    setIsSyncCompleted(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -515,7 +522,7 @@ const DataSync = () => {
           <div className="overflow-x-auto">
             <div className="h-[calc(100vh-335px)] table-scrollbar">
               <table className="w-full text-sm text-left rtl:text-right text-text-primary min-w-full">
-                <thead className="text-xs text-text-primary uppercase bg-secondary border-b border-border-primary sticky top-0 z-10">
+                <thead className="text-xs text-text-primary capitalize bg-secondary border-b border-border-primary sticky top-0 z-10">
                   <tr>
                     <th className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto font-normal">
                       Sr No
@@ -538,14 +545,20 @@ const DataSync = () => {
                 <tbody>
                   {csvData.slice(0, 3000).map((row, rowIndex) => {
                     const hasError = rowErrors[rowIndex] !== undefined;
+                    const getRowBackgroundClass = () => {
+                      if (!isSyncCompleted) {
+                        return "bg-secondary";
+                      }
+                      if (hasError) {
+                        return "bg-status-danger/5";
+                      }
+                      return "bg-status-success/5";
+                    };
+                    
                     return (
                       <tr
                         key={rowIndex}
-                        className={`border-b border-border-primary bg-secondary hover:bg-secondary transition-colors ${
-                          hasError
-                            ? "bg-status-danger/5"
-                            : "bg-status-success/5"
-                        }`}
+                        className={`border-b border-border-primary hover:bg-secondary transition-colors ${getRowBackgroundClass()}`}
                       >
                         <td className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto">
                           {rowIndex + 1}
