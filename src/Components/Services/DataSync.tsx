@@ -1,4 +1,12 @@
-import { Database, Upload, Loader2, FileText, X } from "lucide-react";
+import {
+  Database,
+  Upload,
+  Loader2,
+  FileText,
+  X,
+  Search,
+  ChevronDown,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
@@ -70,7 +78,10 @@ const DataSync = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [rowErrors, setRowErrors] = useState<Record<number, string>>({});
+  const [deviceSearchTerm, setDeviceSearchTerm] = useState("");
+  const [isDeviceDropdownOpen, setIsDeviceDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const deviceDropdownRef = useRef<HTMLDivElement>(null);
 
   const flowMeterFamilies = deviceFamily.filter(
     (family) =>
@@ -85,8 +96,18 @@ const DataSync = () => {
       )
     : [];
 
+  const searchedDevices = deviceSearchTerm
+    ? filteredDevices.filter(
+        (device) =>
+          device.device_name
+            .toLowerCase()
+            .includes(deviceSearchTerm.toLowerCase()) ||
+          device.hwid.toLowerCase().includes(deviceSearchTerm.toLowerCase())
+      )
+    : filteredDevices;
+
   const selectedDevice = filteredDevices.find(
-    (device) => device.device_id.toString() === deviceId.toString()
+    (device) => String(device.device_id) === String(deviceId)
   );
 
   useEffect(() => {
@@ -96,10 +117,29 @@ const DataSync = () => {
     setJsonData({});
     setSelectedFile(null);
     setRowErrors({});
+    setDeviceSearchTerm("");
+    setIsDeviceDropdownOpen(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   }, [deviceFamilyId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        deviceDropdownRef.current &&
+        !deviceDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDeviceDropdownOpen(false);
+        setDeviceSearchTerm("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const parseCSV = (
     csvText: string
@@ -318,26 +358,96 @@ const DataSync = () => {
           >
             Device Name
           </label>
-          <select
-            id="deviceId"
-            value={deviceId}
-            onChange={(e) => setDeviceId(e.target.value)}
-            disabled={!deviceFamilyId}
-            className="w-60 md:w-48 px-3 py-1.5 border border-border-primary bg-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <option value="">
-              {deviceFamilyId
-                ? filteredDevices.length === 0
-                  ? "No devices found"
-                  : "Select Device"
-                : "Select Device Family first"}
-            </option>
-            {filteredDevices.map((device) => (
-              <option key={device.device_id} value={device.device_id}>
-                {device.device_name}
-              </option>
-            ))}
-          </select>
+          <div className="relative w-60 md:w-48" ref={deviceDropdownRef}>
+            <button
+              type="button"
+              onClick={() => {
+                if (deviceFamilyId) {
+                  setIsDeviceDropdownOpen(!isDeviceDropdownOpen);
+                }
+              }}
+              disabled={!deviceFamilyId}
+              className="w-full px-3 py-1.5 border border-border-primary bg-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between font-roboto text-left"
+            >
+              <span className="truncate">
+                {deviceId && deviceFamilyId
+                  ? (() => {
+                      const selected = filteredDevices.find(
+                        (d) => String(d.device_id) === String(deviceId)
+                      );
+                      return selected
+                        ? `${selected.device_name}`
+                        : "Select Device";
+                    })()
+                  : deviceFamilyId
+                  ? filteredDevices.length === 0
+                    ? "No devices found"
+                    : "Select Device"
+                  : "Select Device Family first"}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 flex-shrink-0 transition-transform ${
+                  isDeviceDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {isDeviceDropdownOpen && deviceFamilyId && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                    <input
+                      type="text"
+                      placeholder="Search by name or HWID..."
+                      value={deviceSearchTerm}
+                      onChange={(e) => setDeviceSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
+                      onClick={(e) => e.stopPropagation()}
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                {searchedDevices.length > 0 ? (
+                  searchedDevices.map((device) => {
+                    const deviceIdStr = String(device.device_id);
+                    const isSelected = deviceIdStr === String(deviceId);
+
+                    return (
+                      <div
+                        key={device.device_id}
+                        className={`px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary ${
+                          isSelected ? "bg-secondary" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDeviceId(deviceIdStr);
+                          setIsDeviceDropdownOpen(false);
+                          setDeviceSearchTerm("");
+                        }}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <div className="font-medium text-sm font-roboto">
+                          {device.device_name}
+                        </div>
+                        <div className="text-xs text-text-secondary font-roboto">
+                          HWID: {device.hwid}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="px-3 py-2 text-text-secondary text-sm text-center font-roboto">
+                    No devices found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex flex-col gap-1">
           <label
@@ -432,7 +542,9 @@ const DataSync = () => {
                       <tr
                         key={rowIndex}
                         className={`border-b border-border-primary hover:bg-secondary transition-colors ${
-                          hasError ? "bg-status-danger/5" : "bg-status-success/5"
+                          hasError
+                            ? "bg-status-danger/5"
+                            : "bg-status-success/5"
                         }`}
                       >
                         <td className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto">
