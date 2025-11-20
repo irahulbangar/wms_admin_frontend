@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Handle, Position as HandlePosition } from "reactflow";
 import type { NodeData } from "../../../model/single-plant.interface";
 import fmIcon from "../../assets/images/fm-logo.svg";
+import { isRecordTimeOld } from "../../utils/utils";
 
 interface FMNodeProps {
   data: NodeData;
@@ -20,20 +21,9 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
 
-  const isRecordTimeOld = useMemo(() => {
-    if (!lastRecordTime || lastRecordTime === "N/A") return false;
-    try {
-      const recordDate = new Date(lastRecordTime);
-      const now = new Date();
-      const diffInMs = now.getTime() - recordDate.getTime();
-      const hours24InMs = 24 * 60 * 60 * 1000;
-      return diffInMs > hours24InMs;
-    } catch {
-      return false;
-    }
-  }, [lastRecordTime]);
+  const recordTimeOld = isRecordTimeOld(lastRecordTime);
 
-  const borderColor = isRecordTimeOld
+  const borderColor = recordTimeOld
     ? "border-status-danger"
     : isActive
     ? "border-status-success"
@@ -63,7 +53,7 @@ Flow Rate : ${flowRate} LPM
 
       <div
         className={`absolute top-1 right-1 w-2 h-2 rounded-full ${
-          isRecordTimeOld
+          recordTimeOld
             ? "bg-status-danger animate-pulse"
             : isActive
             ? "bg-status-success animate-pulse"
