@@ -40,11 +40,6 @@ const DataSync = () => {
       });
   }, [dispatch]);
 
-  useEffect(() => {
-    if (devices.length === 0) {
-      refreshDevices();
-    }
-  }, [refreshDevices]);
 
   const getDeviceFamily = useCallback(async () => {
     await dispatch(getDeviceFamiliy())
@@ -63,8 +58,11 @@ const DataSync = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (devices.length === 0) {
+      refreshDevices();
+    }
     getDeviceFamily();
-  }, [getDeviceFamily]);
+  }, [getDeviceFamily, refreshDevices, devices]);
 
   const [deviceId, setDeviceId] = useState("");
   const [csvData, setCsvData] = useState<Record<string, string>[]>([]);
@@ -73,6 +71,12 @@ const DataSync = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const flowMeterFamilies = deviceFamily.filter(
+    (family) =>
+      family.name.toLowerCase().includes("flow") ||
+      family.type?.toLowerCase() === "fm"
+  );
 
   const filteredDevices = deviceFamilyId
     ? devices.filter(
@@ -272,7 +276,7 @@ const DataSync = () => {
             className="w-60 md:w-48 px-3 py-1.5 border border-border-primary bg-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info"
           >
             <option value="">Select Device Family</option>
-            {deviceFamily.map((family) => (
+            {flowMeterFamilies.map((family) => (
               <option
                 key={family.device_family_id}
                 value={family.device_family_id}
