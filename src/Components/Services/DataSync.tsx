@@ -541,7 +541,7 @@ const DataSync = () => {
                     return (
                       <tr
                         key={rowIndex}
-                        className={`border-b border-border-primary hover:bg-secondary transition-colors ${
+                        className={`border-b border-border-primary bg-secondary hover:bg-secondary transition-colors ${
                           hasError
                             ? "bg-status-danger/5"
                             : "bg-status-success/5"
