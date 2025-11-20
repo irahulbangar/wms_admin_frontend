@@ -166,7 +166,6 @@ const DataSync = () => {
     reader.readAsText(file);
   };
 
-  // Handle upload/sync
   const handleUpload = async () => {
     if (!selectedDevice) {
       Error("Please select a device");
