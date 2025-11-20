@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
+import { Error } from "../../utils/toast";
 
 const DataSync = () => {
   const getCurrentMonthYear = () => {
@@ -39,6 +40,16 @@ const DataSync = () => {
   }, [getDeviceFamily]);
 
   const [deviceId, setDeviceId] = useState("");
+  const filteredDevices = deviceFamilyId
+    ? devices.filter(
+        (device) =>
+          device.device_family_id.toString() === deviceFamilyId.toString()
+      )
+    : [];
+
+  useEffect(() => {
+    setDeviceId("");
+  }, [deviceFamilyId]);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
@@ -75,7 +86,7 @@ const DataSync = () => {
               id="deviceFamilyId"
               value={deviceFamilyId}
               onChange={(e) => setDeviceFamilyId(e.target.value)}
-              className="w-full px-3 py-1.5 border border-border-primary bg-primary text-text-primary rounded-md focus:outline-none"
+              className="w-full px-3 py-1.5 border border-border-primary bg-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info"
             >
               <option value="">Select Device Family</option>
               {deviceFamily.map((family) => (
@@ -94,16 +105,23 @@ const DataSync = () => {
               htmlFor="deviceId"
               className="text-sm font-medium text-text-secondary font-roboto"
             >
-              Device ID
+              Device Name
             </label>
             <select
               id="deviceId"
               value={deviceId}
               onChange={(e) => setDeviceId(e.target.value)}
-              className="w-full px-3 py-1.5 border border-border-primary bg-primary text-text-primary rounded-md focus:outline-none"
+              disabled={!deviceFamilyId}
+              className="w-full px-3 py-1.5 border border-border-primary bg-primary text-text-primary rounded-md focus:outline-none focus:ring-1 focus:ring-status-info disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="">Select Device</option>
-              {devices.map((device) => (
+              <option value="">
+                {deviceFamilyId
+                  ? filteredDevices.length === 0
+                    ? "No devices found"
+                    : "Select Device"
+                  : "Select Device Family first"}
+              </option>
+              {filteredDevices.map((device) => (
                 <option key={device.device_id} value={device.device_id}>
                   {device.device_name}
                 </option>
