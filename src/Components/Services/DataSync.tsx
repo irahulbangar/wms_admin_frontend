@@ -3,7 +3,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
-import { dataSyncForFMDevices } from "../../../store/deviceSlice";
+import {
+  dataSyncForFMDevices,
+  getAllDevices,
+  setDevices,
+} from "../../../store/deviceSlice";
 import { Error, Success } from "../../utils/toast";
 
 const DataSync = () => {
@@ -19,6 +23,28 @@ const DataSync = () => {
   const [deviceFamily, setDeviceFamily] = useState<DeviceFamilyResult[]>([]);
   const [deviceFamilyId, setDeviceFamilyId] = useState("");
   const dispatch = useAppDispatch();
+
+  const refreshDevices = useCallback(async () => {
+    dispatch(getAllDevices())
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          dispatch(setDevices(res?.data));
+        } else {
+          Error(res.message || "Failed to get devices");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error(err.message || "Failed to get devices");
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (devices.length === 0) {
+      refreshDevices();
+    }
+  }, [refreshDevices]);
 
   const getDeviceFamily = useCallback(async () => {
     await dispatch(getDeviceFamiliy())
