@@ -205,20 +205,20 @@ const DataSync = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success) {
+          if (res?.success) {
             const errors: Record<number, string> = {};
-            if (res.data?.errors && Array.isArray(res.data.errors)) {
-              res.data.errors.forEach(
+            if (res?.data?.errors && Array.isArray(res?.data?.errors)) {
+              res?.data?.errors?.forEach(
                 (error: { index: number; message: string }) => {
-                  errors[error.index] = error.message;
+                  errors[error?.index] = error?.message;
                 }
               );
             }
             const errorCount = Object.keys(errors).length;
             if (errorCount > 0) {
-              const updateCount = res.data?.updateCount || 0;
-              const insertCount = res.data?.insertCount || 0;
-              const skipCount = res.data?.skipCount || 0;
+              const updateCount = res?.data?.updateCount || 0;
+              const insertCount = res?.data?.insertCount || 0;
+              const skipCount = res?.data?.skipCount || 0;
 
               Success(
                 `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
@@ -226,7 +226,7 @@ const DataSync = () => {
 
               setRowErrors(errors);
             } else {
-              Success(res.message || "Data synced successfully!");
+              Success(res?.message || "Data synced successfully!");
               setCsvData([]);
               setCsvHeaders([]);
               setJsonData({});
@@ -237,11 +237,11 @@ const DataSync = () => {
               }
             }
           } else {
-            Error(res.message || "Failed to sync data");
+            Error(res?.message || "Failed to sync data");
           }
         })
         .catch((err) => {
-          Error(err.message || "Failed to sync data");
+          Error(err?.message || "Failed to sync data");
         });
     } catch {
       Error("An error occurred while syncing data");
@@ -426,13 +426,13 @@ const DataSync = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {csvData.slice(0, 100).map((row, rowIndex) => {
+                  {csvData.slice(0, 3000).map((row, rowIndex) => {
                     const hasError = rowErrors[rowIndex] !== undefined;
                     return (
                       <tr
                         key={rowIndex}
                         className={`border-b border-border-primary hover:bg-secondary transition-colors ${
-                          hasError ? "bg-status-danger/5" : "bg-primary"
+                          hasError ? "bg-status-danger/5" : "bg-status-success/5"
                         }`}
                       >
                         <td className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto">
@@ -456,9 +456,9 @@ const DataSync = () => {
                   })}
                 </tbody>
               </table>
-              {csvData.length > 100 && (
+              {csvData.length > 3000 && (
                 <div className="mt-2 text-sm text-text-secondary text-center font-roboto">
-                  Showing first 100 rows of {csvData.length} total rows
+                  Showing first 3000 rows of {csvData.length} total rows
                 </div>
               )}
             </div>
