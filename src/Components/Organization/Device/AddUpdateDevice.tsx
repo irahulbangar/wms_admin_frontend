@@ -119,6 +119,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     maxThreshold: "",
     lowerLimit: "",
     upperLimit: "",
+    multiplier: "",
     A: "0",
     B: "0",
     C: "1",
@@ -129,6 +130,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     maxThreshold: "",
     lowerLimit: "",
     upperLimit: "",
+    multiplier: "",
     A: "0",
     B: "0",
     C: "1",
@@ -227,6 +229,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       maxThreshold: "",
       lowerLimit: "",
       upperLimit: "",
+      multiplier: "",
       A: "",
       B: "",
       C: "",
@@ -363,12 +366,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         organization_connection: formData.organization_connection,
         plant_id: formData.plant_id,
         department_id: formData.department_id,
-        device_reporting: isVirtualReporting ? reportData : {
-          report_name: "",
-          report_unit: "",
-          report_formula: "",
-          neutrality_formula: "",
-        },
+        device_reporting: isVirtualReporting
+          ? reportData
+          : {
+              report_name: "",
+              report_unit: "",
+              report_formula: "",
+              neutrality_formula: "",
+            },
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {
@@ -466,6 +471,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               maxThreshold: deviceData.params?.maxThreshold || "",
               lowerLimit: deviceData.params?.lowerLimit || "",
               upperLimit: deviceData.params?.upperLimit || "",
+              multiplier: deviceData.params?.multiplier || "",
               A: deviceData.params?.A || "",
               B: deviceData.params?.B || "",
               C: deviceData.params?.C || "",
@@ -476,6 +482,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               maxThreshold: commonData?.maxThreshold?.toString() || "",
               lowerLimit: commonData?.lowerLimit?.toString() || "",
               upperLimit: commonData?.upperLimit?.toString() || "",
+              multiplier: commonData?.multiplier?.toString() || "",
               A: commonData?.A?.toString() || "",
               B: commonData?.B?.toString() || "",
               C: commonData?.C?.toString() || "",
@@ -1251,6 +1258,34 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   placeholder="Enter upper limit"
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                     errors.upperLimit
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  Multiplier
+                </label>
+                <input
+                  type="text"
+                  name="multiplier"
+                  value={commonInputValues.multiplier}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      multiplier: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      multiplier: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter multiplier"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.multiplier
                       ? "border-status-danger"
                       : "border-border-primary"
                   }`}
