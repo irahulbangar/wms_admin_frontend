@@ -476,7 +476,7 @@ const DataSync = () => {
               isUploading ||
               !selectedDevice
             }
-            className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-roboto"
+            className="px-3 py-1.5 cursor-pointer bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-roboto"
           >
             {isUploading ? (
               <>
@@ -494,7 +494,7 @@ const DataSync = () => {
       </div>
 
       {csvData.length > 0 && (
-        <div className="bg-primary border border-border-primary rounded-xl p-4 sm:p-6 shadow-sm">
+        <div className="bg-primary border border-border-primary rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-text-primary" />
@@ -505,7 +505,7 @@ const DataSync = () => {
             <button
               type="button"
               onClick={handleClearPreview}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary text-text-primary rounded-lg hover:bg-hover-bg-primary transition-colors font-roboto"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary cursor-pointer text-text-primary rounded-lg hover:bg-hover-bg-primary transition-colors font-roboto"
             >
               <X className="w-4 h-4" />
               Clear
@@ -513,7 +513,7 @@ const DataSync = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <div className="max-h-96 overflow-y-auto">
+            <div className="h-[calc(100vh-335px)] table-scrollbar">
               <table className="w-full text-sm text-left rtl:text-right text-text-primary min-w-full">
                 <thead className="text-xs text-text-primary uppercase bg-secondary border-b border-border-primary sticky top-0 z-10">
                   <tr>
