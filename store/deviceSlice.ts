@@ -251,6 +251,44 @@ export const deleteDevice = createAsyncThunk(
   }
 );
 
+interface DataSyncForFMDevicesPayload {
+  plant_id: number;
+  device_id: number;
+  year: string;
+  month: string;
+  data: object;
+}
+
+// data sync for FM devices
+export const dataSyncForFMDevices = createAsyncThunk(
+  "device/dataSyncForFMDevices",
+  async (
+    { plant_id, device_id, year, month, data }: DataSyncForFMDevicesPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/device/admin/data-sync-for-fm-devices/${plant_id}/${device_id}`,
+        {
+          year,
+          month,
+          data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;
