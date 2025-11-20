@@ -147,6 +147,14 @@ function App() {
                   }
                 />
                 <Route
+                  path="/data-sync"
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/profile"
                   element={
                     <ProtectedRoute>

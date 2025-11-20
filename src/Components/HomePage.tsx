@@ -15,6 +15,7 @@ import Plants from "./Organization/Plant/Plants";
 import AdminUsers from "./Settings/AdminUsers";
 import Departments from "./Organization/Department/Departments";
 import Systems from "./Organization/System/Systems";
+import DataSync from "./Services/DataSync";
 
 const HomePage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -58,6 +59,8 @@ const HomePage = () => {
       setCurrentPage("admin-users");
     } else if (location.pathname === "/admin-setting") {
       setCurrentPage("admin-setting");
+    } else if (location.pathname === "/data-sync") {
+      setCurrentPage("data-sync");
     }
   }, [location.pathname]);
 
@@ -102,6 +105,9 @@ const HomePage = () => {
       case "admin-setting":
         navigate("/admin-setting");
         break;
+      case "data-sync":
+        navigate("/data-sync");
+        break;
       default:
         navigate("/home");
     }
@@ -131,6 +137,8 @@ const HomePage = () => {
         return <AdminUsers />;
       case "admin-setting":
         return <AdminSetting />;
+      case "data-sync":
+        return <DataSync />;
       default:
         return <Dashboard />;
     }
