@@ -69,6 +69,7 @@ const DataSync = () => {
   const [jsonData, setJsonData] = useState<object>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [rowErrors, setRowErrors] = useState<Record<number, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const flowMeterFamilies = deviceFamily.filter(
@@ -94,6 +95,7 @@ const DataSync = () => {
     setCsvHeaders([]);
     setJsonData({});
     setSelectedFile(null);
+    setRowErrors({});
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -155,6 +157,7 @@ const DataSync = () => {
       setCsvHeaders(headers);
       setCsvData(data);
       setJsonData(data);
+      setRowErrors({});
       Success(`CSV file loaded successfully. ${data.length} rows found.`);
     };
 
@@ -203,13 +206,35 @@ const DataSync = () => {
         .unwrap()
         .then((res) => {
           if (res.success) {
-            Success(res.message || "Data synced successfully!");
-            setCsvData([]);
-            setCsvHeaders([]);
-            setJsonData({});
-            setSelectedFile(null);
-            if (fileInputRef.current) {
-              fileInputRef.current.value = "";
+            const errors: Record<number, string> = {};
+            if (res.data?.errors && Array.isArray(res.data.errors)) {
+              res.data.errors.forEach(
+                (error: { index: number; message: string }) => {
+                  errors[error.index] = error.message;
+                }
+              );
+            }
+            const errorCount = Object.keys(errors).length;
+            if (errorCount > 0) {
+              const updateCount = res.data?.updateCount || 0;
+              const insertCount = res.data?.insertCount || 0;
+              const skipCount = res.data?.skipCount || 0;
+
+              Success(
+                `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
+              );
+
+              setRowErrors(errors);
+            } else {
+              Success(res.message || "Data synced successfully!");
+              setCsvData([]);
+              setCsvHeaders([]);
+              setJsonData({});
+              setSelectedFile(null);
+              setRowErrors({});
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+              }
             }
           } else {
             Error(res.message || "Failed to sync data");
@@ -230,6 +255,7 @@ const DataSync = () => {
     setCsvHeaders([]);
     setJsonData({});
     setSelectedFile(null);
+    setRowErrors({});
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -392,27 +418,42 @@ const DataSync = () => {
                         {header}
                       </th>
                     ))}
+                    {Object.keys(rowErrors).length > 0 && (
+                      <th className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto font-normal bg-status-danger/10">
+                        Error
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {csvData.slice(0, 100).map((row, rowIndex) => (
-                    <tr
-                      key={rowIndex}
-                      className="bg-primary border-b border-border-primary hover:bg-secondary transition-colors"
-                    >
-                      <td className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto">
-                        {rowIndex + 1}
-                      </td>
-                      {csvHeaders.map((header, colIndex) => (
-                        <td
-                          key={colIndex}
-                          className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto"
-                        >
-                          {row[header] || "-"}
+                  {csvData.slice(0, 100).map((row, rowIndex) => {
+                    const hasError = rowErrors[rowIndex] !== undefined;
+                    return (
+                      <tr
+                        key={rowIndex}
+                        className={`border-b border-border-primary hover:bg-secondary transition-colors ${
+                          hasError ? "bg-status-danger/5" : "bg-primary"
+                        }`}
+                      >
+                        <td className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto">
+                          {rowIndex + 1}
                         </td>
-                      ))}
-                    </tr>
-                  ))}
+                        {csvHeaders.map((header, colIndex) => (
+                          <td
+                            key={colIndex}
+                            className="p-3 text-text-primary whitespace-nowrap text-center text-sm font-roboto"
+                          >
+                            {row[header] || "-"}
+                          </td>
+                        ))}
+                        {Object.keys(rowErrors).length > 0 && (
+                          <td className="p-3 text-status-danger whitespace-nowrap text-center text-sm font-roboto">
+                            {rowErrors[rowIndex] || "-"}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
               {csvData.length > 100 && (
