@@ -252,7 +252,6 @@ export const deleteDevice = createAsyncThunk(
 );
 
 interface DataSyncForFMDevicesPayload {
-  plant_id: number;
   device_id: number;
   year: string;
   month: string;
@@ -263,13 +262,13 @@ interface DataSyncForFMDevicesPayload {
 export const dataSyncForFMDevices = createAsyncThunk(
   "device/dataSyncForFMDevices",
   async (
-    { plant_id, device_id, year, month, data }: DataSyncForFMDevicesPayload,
+    { device_id, year, month, data }: DataSyncForFMDevicesPayload,
     thunkAPI
   ) => {
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().post(
-        `/device/admin/data-sync-for-fm-devices/${plant_id}/${device_id}`,
+        `/fm/device/fm-new-data-sync/${device_id}`,
         {
           year,
           month,

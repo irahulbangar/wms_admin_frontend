@@ -154,7 +154,7 @@ const DataSync = () => {
     }
 
     const [year, month] = monthYear.split("-");
-    const plant_id = selectedDevice.plant_id;
+    const plant_id = selectedDevice.plant_id.toString();
 
     if (!plant_id) {
       Error("Device does not have a plant ID");
@@ -166,7 +166,6 @@ const DataSync = () => {
     try {
       await dispatch(
         dataSyncForFMDevices({
-          plant_id: Number(plant_id),
           device_id: Number(deviceId),
           year,
           month,
@@ -177,7 +176,6 @@ const DataSync = () => {
         .then((res) => {
           if (res.success || res.status === 200) {
             Success(res.message || "Data synced successfully!");
-            // Reset form
             setCsvData([]);
             setCsvHeaders([]);
             setJsonData({});
@@ -186,11 +184,11 @@ const DataSync = () => {
               fileInputRef.current.value = "";
             }
           } else {
-            Error(res.message || "Failed to sync data");
+            Error(res?.data?.errors?.[0]?.message || "Failed to sync data");
           }
         })
         .catch((err) => {
-          Error(err.message || "Failed to sync data");
+          Error(err?.data?.errors?.[0]?.message || "Failed to sync data");
         });
     } catch {
       Error("An error occurred while syncing data");
@@ -199,7 +197,6 @@ const DataSync = () => {
     }
   };
 
-  // Clear preview
   const handleClearPreview = () => {
     setCsvData([]);
     setCsvHeaders([]);
@@ -209,6 +206,7 @@ const DataSync = () => {
       fileInputRef.current.value = "";
     }
   };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
@@ -331,7 +329,6 @@ const DataSync = () => {
         </div>
       </div>
 
-      {/* CSV Preview Table */}
       {csvData.length > 0 && (
         <div className="bg-primary border border-border-primary rounded-xl p-4 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
