@@ -40,7 +40,6 @@ const DataSync = () => {
       });
   }, [dispatch]);
 
-
   const getDeviceFamily = useCallback(async () => {
     await dispatch(getDeviceFamiliy())
       .unwrap()
@@ -203,7 +202,7 @@ const DataSync = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res.success || res.status === 200) {
+          if (res.success) {
             Success(res.message || "Data synced successfully!");
             setCsvData([]);
             setCsvHeaders([]);
@@ -213,11 +212,11 @@ const DataSync = () => {
               fileInputRef.current.value = "";
             }
           } else {
-            Error(res?.data?.errors?.[0]?.message || "Failed to sync data");
+            Error(res.message || "Failed to sync data");
           }
         })
         .catch((err) => {
-          Error(err?.data?.errors?.[0]?.message || "Failed to sync data");
+          Error(err.message || "Failed to sync data");
         });
     } catch {
       Error("An error occurred while syncing data");

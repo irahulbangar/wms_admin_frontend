@@ -6,6 +6,7 @@ import type {
   DeviceResult,
 } from "../model/devices.interface";
 import { handleApiError } from "../src/utils/errorHandler";
+import type { DataSyncResponse } from "../model/data-sync.interface";
 
 interface DeviceState {
   devices: DeviceResult[];
@@ -267,7 +268,7 @@ export const dataSyncForFMDevices = createAsyncThunk(
   ) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().post(
+      const response = await api().post<DataSyncResponse>(
         `/fm/device/fm-new-data-sync/${device_id}`,
         {
           year,
