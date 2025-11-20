@@ -4,15 +4,15 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/store";
 import Dashboard from "./Dashboard/Dashboard";
-import Profile from "./Profile";
+import Profile from "./Settings/Profile";
 import Devices from "./Organization/Device/Devices";
 import OrganizationUsers from "./Organization/OrganizationUser/OrganizationUsers";
-import AdminSetting from "./AdminSetting";
+import AdminSetting from "./Settings/AdminSetting";
 import Setting from "./Organization/Setting";
 import Organization from "./Organization/Organization";
 import Loader from "./Loader";
 import Plants from "./Organization/Plant/Plants";
-import AdminUsers from "./AdminUsers";
+import AdminUsers from "./Settings/AdminUsers";
 import Departments from "./Organization/Department/Departments";
 import Systems from "./Organization/System/Systems";
 

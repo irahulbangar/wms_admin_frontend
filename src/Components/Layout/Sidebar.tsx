@@ -5,8 +5,10 @@ import {
   Dock,
   FileText,
   FolderGit,
+  FolderSyncIcon,
   LayoutDashboard,
   Monitor,
+  Server,
   Settings,
   User,
   Users,
@@ -83,6 +85,19 @@ const menuItems = [
     id: "admin-users",
     icon: <Users className="w-5 h-5" />,
     label: "Admin Users",
+  },
+  {
+    id: "services",
+    icon: <Server className="w-5 h-5" />,
+    label: "Services",
+    submenu: [
+      {
+        id: "data-sync",
+        label: "Data Sync",
+        icon: <FolderSyncIcon className="w-5 h-5" />,
+        href: "/data-sync",
+      },
+    ],
   },
   {
     id: "settings",

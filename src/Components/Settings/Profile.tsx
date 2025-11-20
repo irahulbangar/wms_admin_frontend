@@ -1,6 +1,6 @@
-import { useAppSelector } from "../../store/store";
+import { useAppSelector } from "../../../store/store";
 import { User, Mail, Phone, MapPin, Calendar } from "lucide-react";
-import { fromatDateWithTime } from "../utils/utils";
+import { fromatDateWithTime } from "../../utils/utils";
 
 const Profile: React.FC = () => {
   const { admin } = useAppSelector((state) => state.admin);

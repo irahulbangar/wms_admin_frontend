@@ -10,8 +10,8 @@ import {
   Lock,
 } from "lucide-react";
 import { useState } from "react";
-import { useTheme } from "../context/ThemeContext";
-import { Success, Error } from "../utils/toast";
+import { useTheme } from "../../context/ThemeContext";
+import { Success, Error } from "../../utils/toast";
 
 interface PasswordForm {
   currentPassword: string;

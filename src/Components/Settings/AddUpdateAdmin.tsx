@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch } from "../../store/store";
+import { useAppDispatch } from "../../../store/store";
 import {
   addAdminUser,
   getAdminById,
   updateAdminProfile,
-} from "../../store/adminSlice";
+} from "../../../store/adminSlice";
 import { X, Save } from "lucide-react";
-import { Success, Error } from "../utils/toast";
-import type { CreateAdminPayload } from "../../store/adminSlice";
+import { Success, Error } from "../../utils/toast";
+import type { CreateAdminPayload } from "../../../store/adminSlice";
 
 interface AddUpdateAdminProps {
   isOpen: boolean;

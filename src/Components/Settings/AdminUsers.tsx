@@ -6,19 +6,19 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
-import NoDataFound from "./NoDataFound";
+import NoDataFound from "../NoDataFound";
 import AddUpdateAdmin from "./AddUpdateAdmin";
-import DeleteAdminPopup from "./DeleteAdminPopup";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import DeleteAdminPopup from "../DeleteAdminPopup";
+import { useAppDispatch, useAppSelector } from "../../../store/store";
 import type {
   AdminUsers,
   AdminUsersResponse,
-} from "../../model/admin-users.interface";
+} from "../../../model/admin-users.interface";
 import { useEffect, useMemo, useState } from "react";
-import { getAllUsers, deleteAdminUser } from "../../store/adminSlice";
-import { Error, Success } from "../utils/toast";
-import { fromatDateWithTime, handleStatus } from "../utils/utils";
-import Pagination from "./Pagination";
+import { getAllUsers, deleteAdminUser } from "../../../store/adminSlice";
+import { Error, Success } from "../../utils/toast";
+import { fromatDateWithTime, handleStatus } from "../../utils/utils";
+import Pagination from "../Pagination";
 
 const Users = () => {
   const dispatch = useAppDispatch();
