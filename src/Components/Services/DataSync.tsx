@@ -96,19 +96,19 @@ const DataSync = () => {
 
   const filteredDevices = deviceFamilyId
     ? devices.filter(
-      (device) =>
-        device.device_family_id.toString() === deviceFamilyId.toString()
-    )
+        (device) =>
+          device.device_family_id.toString() === deviceFamilyId.toString()
+      )
     : [];
 
   const searchedDevices = deviceSearchTerm
     ? filteredDevices.filter(
-      (device) =>
-        device.device_name
-          .toLowerCase()
-          .includes(deviceSearchTerm.toLowerCase()) ||
-        device.hwid.toLowerCase().includes(deviceSearchTerm.toLowerCase())
-    )
+        (device) =>
+          device.device_name
+            .toLowerCase()
+            .includes(deviceSearchTerm.toLowerCase()) ||
+          device.hwid.toLowerCase().includes(deviceSearchTerm.toLowerCase())
+      )
     : filteredDevices;
 
   const selectedDevice = filteredDevices.find(
@@ -238,23 +238,25 @@ const DataSync = () => {
     );
     const isBrwhms = selectedFamily?.type?.toLowerCase() === "brwhms";
     const isTank = selectedFamily?.type?.toLowerCase() === "tank";
-    const syncAction = isBrwhms
-      ? dataSyncForBRWHMSDevices
-      : isTank
-        ? dataSyncForBTLMDevices
-        : dataSyncForFMDevices;
+
+    const payload = {
+      device_id: Number(deviceId),
+      year,
+      month,
+      data: jsonData,
+    };
 
     try {
-      await dispatch(
-        syncAction({
-          device_id: Number(deviceId),
-          year,
-          month,
-          data: jsonData,
-        })
-      )
+      const promise = isBrwhms
+        ? dispatch(dataSyncForBRWHMSDevices(payload))
+        : isTank
+        ? dispatch(dataSyncForBTLMDevices(payload))
+        : dispatch(dataSyncForFMDevices(payload));
+
+      await promise
         .unwrap()
-        .then((res) => {
+        .then((res: any) => {
+          console.log("res", res);
           if (res?.success || res.status === 200) {
             const errors: Record<number, string> = {};
             if (res?.data?.errors && Array.isArray(res?.data?.errors)) {
@@ -293,7 +295,7 @@ const DataSync = () => {
             Error(res?.message || "Failed to sync data");
           }
         })
-        .catch((err) => {
+        .catch((err: any) => {
           Error(err?.message || "Failed to sync data");
         });
     } catch {
@@ -386,22 +388,23 @@ const DataSync = () => {
               <span className="truncate">
                 {deviceId && deviceFamilyId
                   ? (() => {
-                    const selected = filteredDevices.find(
-                      (d) => String(d.device_id) === String(deviceId)
-                    );
-                    return selected
-                      ? `${selected.device_name}`
-                      : "Select Device";
-                  })()
+                      const selected = filteredDevices.find(
+                        (d) => String(d.device_id) === String(deviceId)
+                      );
+                      return selected
+                        ? `${selected.device_name}`
+                        : "Select Device";
+                    })()
                   : deviceFamilyId
-                    ? filteredDevices.length === 0
-                      ? "No devices found"
-                      : "Select Device"
-                    : "Select Device Family first"}
+                  ? filteredDevices.length === 0
+                    ? "No devices found"
+                    : "Select Device"
+                  : "Select Device Family first"}
               </span>
               <ChevronDown
-                className={`w-4 h-4 flex-shrink-0 transition-transform ${isDeviceDropdownOpen ? "rotate-180" : ""
-                  }`}
+                className={`w-4 h-4 flex-shrink-0 transition-transform ${
+                  isDeviceDropdownOpen ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -430,8 +433,9 @@ const DataSync = () => {
                     return (
                       <div
                         key={device.device_id}
-                        className={`px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary ${isSelected ? "bg-secondary" : ""
-                          }`}
+                        className={`px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary ${
+                          isSelected ? "bg-secondary" : ""
+                        }`}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();

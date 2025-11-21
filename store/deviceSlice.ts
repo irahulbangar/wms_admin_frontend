@@ -257,6 +257,7 @@ interface DataSyncForFMDevicesPayload {
   year: string;
   month: string;
   data: object;
+  onChunk?: (chunk: any) => void;
 }
 
 // data sync for FM devices
@@ -294,18 +295,19 @@ interface DataSyncForBRWHMSDevicesPayload {
   year: string;
   month: string;
   data: object;
+  onChunk?: (chunk: any) => void;
 }
 
 // data sync for BRWHMS device
 export const dataSyncForBRWHMSDevices = createAsyncThunk(
   "device/dataSyncForBRWHMSDevices",
   async (
-    { device_id, year, month, data }: DataSyncForBRWHMSDevicesPayload,
+    { device_id, year, month, data, onChunk }: DataSyncForBRWHMSDevicesPayload,
     thunkAPI
   ) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().post<DataSyncResponse>(
+      const response = await apiStream().post(
         `/brwhms/device/brwhms-new-data-sync/${device_id}`,
         {
           year,
@@ -315,11 +317,95 @@ export const dataSyncForBRWHMSDevices = createAsyncThunk(
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            responseType: 'stream'
           },
         }
       );
-      return response.data;
+      return new Promise((resolve, reject) => {
+        if (response.data && typeof response.data.on === "function") {
+          const chunks: Uint8Array[] = [];
+
+          response.data.on("data", (chunk: Uint8Array | Buffer) => {
+            const uint8Chunk =
+              chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk);
+            chunks.push(uint8Chunk);
+            if (onChunk) {
+              onChunk(chunk);
+            }
+          });
+
+          response.data.on("end", () => {
+            try {
+              const totalLength = chunks.reduce(
+                (sum, chunk) => sum + chunk.length,
+                0
+              );
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+
+              const combinedData = new TextDecoder().decode(combined);
+              let parsedData;
+
+              try {
+                parsedData = JSON.parse(combinedData);
+              } catch {
+                parsedData = combinedData;
+              }
+
+              resolve(parsedData);
+            } catch (error) {
+              const apiError = handleApiError(error);
+              reject(apiError);
+            }
+          });
+
+          response.data.on("error", (error: Error) => {
+            const apiError = handleApiError(error);
+            reject(apiError);
+          });
+        } else if (response.data instanceof ReadableStream) {
+          const reader = response.data.getReader();
+          const decoder = new TextDecoder();
+          const chunks: string[] = [];
+
+          const readChunk = async () => {
+            try {
+              while (true) {
+                const { done, value } = await reader.read();
+
+                if (done) {
+                  const combinedData = chunks.join("");
+                  let parsedData;
+                  try {
+                    parsedData = JSON.parse(combinedData);
+                  } catch {
+                    parsedData = combinedData;
+                  }
+                  resolve(parsedData);
+                  break;
+                }
+
+                const chunkText = decoder.decode(value, { stream: true });
+                chunks.push(chunkText);
+
+                if (onChunk) {
+                  onChunk(chunkText);
+                }
+              }
+            } catch (error) {
+              const apiError = handleApiError(error);
+              reject(apiError);
+            }
+          };
+
+          readChunk();
+        } else {
+          resolve(response.data);
+        }
+      });
     } catch (error: unknown) {
       const apiError = handleApiError(error);
       return rejectWithValue(apiError);
@@ -332,13 +418,14 @@ interface DataSyncForBTLMDevicesPayload {
   year: string;
   month: string;
   data: object;
+  onChunk?: (chunk: any) => void;
 }
 
 // data sync for BTLM devices
 export const dataSyncForBTLMDevices = createAsyncThunk(
   "device/dataSyncForBTLMDevices",
   async (
-    { device_id, year, month, data }: DataSyncForBTLMDevicesPayload,
+    { device_id, year, month, data, onChunk }: DataSyncForBTLMDevicesPayload,
     thunkAPI
   ) => {
     const { rejectWithValue } = thunkAPI;
@@ -356,14 +443,101 @@ export const dataSyncForBTLMDevices = createAsyncThunk(
           },
         }
       );
-      return response.data;
+
+      return new Promise((resolve, reject) => {
+        if (response.data && typeof response.data.on === "function") {
+          const chunks: Uint8Array[] = [];
+
+          response.data.on("data", (chunk: Uint8Array | Buffer) => {
+            const uint8Chunk =
+              chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk);
+            chunks.push(uint8Chunk);
+            if (onChunk) {
+              onChunk(chunk);
+            }
+          });
+
+          response.data.on("end", () => {
+            try {
+              const totalLength = chunks.reduce(
+                (sum, chunk) => sum + chunk.length,
+                0
+              );
+              const combined = new Uint8Array(totalLength);
+              let offset = 0;
+              for (const chunk of chunks) {
+                combined.set(chunk, offset);
+                offset += chunk.length;
+              }
+
+              const combinedData = new TextDecoder().decode(combined);
+              let parsedData;
+
+              try {
+                parsedData = JSON.parse(combinedData);
+              } catch {
+                parsedData = combinedData;
+              }
+
+              resolve(parsedData);
+            } catch (error) {
+              const apiError = handleApiError(error);
+              reject(apiError);
+            }
+          });
+
+          response.data.on("error", (error: Error) => {
+            const apiError = handleApiError(error);
+            reject(apiError);
+          });
+        } else if (response.data instanceof ReadableStream) {
+          const reader = response.data.getReader();
+          const decoder = new TextDecoder();
+          const chunks: string[] = [];
+
+          const readChunk = async () => {
+            try {
+              while (true) {
+                const { done, value } = await reader.read();
+
+                if (done) {
+                  const combinedData = chunks.join("");
+                  let parsedData;
+
+                  try {
+                    parsedData = JSON.parse(combinedData);
+                  } catch {
+                    parsedData = combinedData;
+                  }
+
+                  resolve(parsedData);
+                  break;
+                }
+
+                const chunkText = decoder.decode(value, { stream: true });
+                chunks.push(chunkText);
+
+                if (onChunk) {
+                  onChunk(chunkText);
+                }
+              }
+            } catch (error) {
+              const apiError = handleApiError(error);
+              reject(apiError);
+            }
+          };
+
+          readChunk();
+        } else {
+          resolve(response.data);
+        }
+      });
     } catch (error: unknown) {
       const apiError = handleApiError(error);
       return rejectWithValue(apiError);
     }
   }
 );
-
 
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 

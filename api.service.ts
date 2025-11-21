@@ -70,8 +70,8 @@ export const apiStream = (baseURL?: string) => {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      responseType: "stream",
     },
+    responseType: "stream",
   });
 
   axiosInstance.interceptors.request.use(requestInterceptor, errorInterceptor);
