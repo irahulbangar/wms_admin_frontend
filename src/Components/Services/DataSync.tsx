@@ -14,6 +14,7 @@ import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import {
   dataSyncForFMDevices,
   dataSyncForBRWHMSDevices,
+  dataSyncForBTLMDevices,
   getAllDevices,
   setDevices,
 } from "../../../store/deviceSlice";
@@ -89,7 +90,8 @@ const DataSync = () => {
     (family) =>
       family.name.toLowerCase().includes("flow") ||
       family.type?.toLowerCase() === "fm" ||
-      family.type?.toLowerCase() === "brwhms"
+      family.type?.toLowerCase() === "brwhms" ||
+      family.type?.toLowerCase() === "tank"
   );
 
   const filteredDevices = deviceFamilyId
@@ -235,9 +237,12 @@ const DataSync = () => {
       (f) => String(f.device_family_id) === String(deviceFamilyId)
     );
     const isBrwhms = selectedFamily?.type?.toLowerCase() === "brwhms";
+    const isTank = selectedFamily?.type?.toLowerCase() === "tank";
     const syncAction = isBrwhms
       ? dataSyncForBRWHMSDevices
-      : dataSyncForFMDevices;
+      : isTank
+        ? dataSyncForBTLMDevices
+        : dataSyncForFMDevices;
 
     try {
       await dispatch(

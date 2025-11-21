@@ -326,6 +326,44 @@ export const dataSyncForBRWHMSDevices = createAsyncThunk(
   }
 );
 
+interface DataSyncForBTLMDevicesPayload {
+  device_id: number;
+  year: string;
+  month: string;
+  data: object;
+}
+
+// data sync for BTLM devices
+export const dataSyncForBTLMDevices = createAsyncThunk(
+  "device/dataSyncForBTLMDevices",
+  async (
+    { device_id, year, month, data }: DataSyncForBTLMDevicesPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post<DataSyncResponse>(
+        `/tank/device/tank-new-data-sync/${device_id}`,
+        {
+          year,
+          month,
+          data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;
