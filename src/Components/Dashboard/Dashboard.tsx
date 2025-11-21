@@ -7,7 +7,7 @@ import {
   Loader2,
   Monitor,
   Dock,
-  // Grid,
+  Grid,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
@@ -23,8 +23,8 @@ import { getAllDevices } from "../../../store/deviceSlice";
 import type { PlantResult } from "../../../model/plant.interface";
 import { getAllPlants } from "../../../store/plantSlice";
 import type { DepartmentResult } from "../../../model/department.interface";
-// import type { SystemResult } from "../../../model/system.interface";
-// import { getAllSystems } from "../../../store/systemSlice";
+import type { SystemResult } from "../../../model/system.interface";
+import { getAllSystems } from "../../../store/systemSlice";
 import { getAllDepartments } from "../../../store/departmentSlice";
 
 const Dashboard = () => {
@@ -35,7 +35,7 @@ const Dashboard = () => {
   const [users, setUsers] = useState<ClientUsersResult[]>([]);
   const [devices, setDevices] = useState<DeviceResult[]>([]);
   const [departments, setDepartments] = useState<DepartmentResult[]>([]);
-  // const [systems, setSystems] = useState<SystemResult[]>([]);
+  const [systems, setSystems] = useState<SystemResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -139,24 +139,24 @@ const Dashboard = () => {
       });
   }, [dispatch]);
 
-  // const fetchSystems = useCallback(async () => {
-  //   if (isLoading) return;
-  //   setIsLoading(true);
+  const fetchSystems = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
 
-  //   await dispatch(getAllSystems())
-  //     .unwrap()
-  //     .then((res) => {
-  //       if (res.success || res.status === 200) {
-  //         setSystems(res?.data);
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       Error(err.message || "Failed to fetch systems");
-  //     })
-  //     .finally(() => {
-  //       setIsLoading(false);
-  //     });
-  // }, [dispatch]);
+    await dispatch(getAllSystems())
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          setSystems(res?.data);
+        }
+      })
+      .catch((err) => {
+        Error(err.message || "Failed to fetch systems");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
 
   useEffect(() => {
     fetchOrganizations();
@@ -164,7 +164,7 @@ const Dashboard = () => {
     fetchUsers();
     fetchDevices();
     fetchDepartments();
-    // fetchSystems();
+    fetchSystems();
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -176,6 +176,7 @@ const Dashboard = () => {
     fetchUsers,
     fetchDevices,
     fetchDepartments,
+    fetchSystems,
   ]);
 
   const stats = [
@@ -215,15 +216,15 @@ const Dashboard = () => {
       iconColor: "text-green-600",
       href: "/organization/departments",
     },
-    // {
-    //   title: "Total Systems",
-    //   value: systems.length,
-    //   icon: Grid,
-    //   gradient: "from-[#304352] to-[#d7d2cc]",
-    //   iconBg: "bg-green-100",
-    //   iconColor: "text-green-600",
-    //   href: "/organization/systems",
-    // },
+    {
+      title: "Total Systems",
+      value: systems.length,
+      icon: Grid,
+      gradient: "from-[#304352] to-[#d7d2cc]",
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600",
+      href: "/organization/systems",
+    },
     {
       title: "Total Devices",
       value: devices.length,

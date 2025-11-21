@@ -258,7 +258,6 @@ const DataSync = () => {
     const url = `${baseURL}${endpoint}`;
 
     try {
-      // Use fetch API for streaming support
       const response = await fetch(url, {
         method: "POST",
         headers: {
