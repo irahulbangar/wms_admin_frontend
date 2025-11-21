@@ -13,6 +13,7 @@ import type { DeviceFamilyResult } from "../../../model/device-family.interface"
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
 import {
   dataSyncForFMDevices,
+  dataSyncForBRWHMSDevices,
   getAllDevices,
   setDevices,
 } from "../../../store/deviceSlice";
@@ -230,9 +231,17 @@ const DataSync = () => {
 
     setIsUploading(true);
 
+    const selectedFamily = deviceFamily.find(
+      (f) => String(f.device_family_id) === String(deviceFamilyId)
+    );
+    const isBrwhms = selectedFamily?.type?.toLowerCase() === "brwhms";
+    const syncAction = isBrwhms
+      ? dataSyncForBRWHMSDevices
+      : dataSyncForFMDevices;
+
     try {
       await dispatch(
-        dataSyncForFMDevices({
+        syncAction({
           device_id: Number(deviceId),
           year,
           month,
