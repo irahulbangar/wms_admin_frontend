@@ -243,8 +243,8 @@ const DataSync = () => {
 
     setProgress(null);
     chunkBufferRef.current = "";
+    setRowErrors({});
 
-    // Determine the API endpoint
     const endpoint = isBrwhms
       ? `/brwhms/device/brwhms-new-data-sync/${deviceId}`
       : isTank
@@ -292,65 +292,216 @@ const DataSync = () => {
 
         if (done) {
           try {
-            const finalData = buffer.trim();
-            if (finalData) {
-              let parsedData;
-              try {
-                parsedData = JSON.parse(finalData);
-              } catch {
-                const lastJsonMatch = finalData.match(/\{[\s\S]*\}$/);
-                if (lastJsonMatch) {
-                  parsedData = JSON.parse(lastJsonMatch[0]);
-                } else {
-                  parsedData = { message: finalData };
+            const remainingBuffer = buffer.trim();
+            if (remainingBuffer) {
+              let processedLength = 0;
+              let finalResponseData: any = null;
+              const collectedErrors: Record<number, string> = {};
+
+              if (remainingBuffer.trim().startsWith("{")) {
+                try {
+                  const parsedAsSingle = JSON.parse(remainingBuffer);
+                  if (
+                    parsedAsSingle?.success !== undefined ||
+                    parsedAsSingle?.status !== undefined
+                  ) {
+                    finalResponseData = parsedAsSingle;
+                    processedLength = remainingBuffer.length;
+                  }
+                } catch (e) {
+                  console.log(
+                    "Buffer is not a single JSON object, will parse chunks:",
+                    e
+                  );
                 }
               }
 
-              if (parsedData?.success || parsedData?.status === 200) {
-                const errors: Record<number, string> = {};
-                if (
-                  parsedData?.data?.errors &&
-                  Array.isArray(parsedData.data.errors)
-                ) {
-                  parsedData.data.errors.forEach(
-                    (error: { index: number; message: string }) => {
-                      errors[error?.index] = error?.message;
-                    }
-                  );
-                }
-                const errorCount = Object.keys(errors).length;
-                setIsSyncCompleted(true);
+              while (processedLength < remainingBuffer.length) {
+                const jsonStart = remainingBuffer.indexOf("{", processedLength);
+                if (jsonStart === -1) break;
 
-                if (parsedData?.status === 200 || parsedData?.success) {
-                  if (parsedData?.message) {
-                    Success(parsedData.message);
+                let braceCount = 0;
+                let jsonEnd = -1;
+                for (let i = jsonStart; i < remainingBuffer.length; i++) {
+                  if (remainingBuffer[i] === "{") braceCount++;
+                  if (remainingBuffer[i] === "}") {
+                    braceCount--;
+                    if (braceCount === 0) {
+                      jsonEnd = i + 1;
+                      break;
+                    }
+                  }
+                }
+
+                if (jsonEnd === -1) break;
+
+                const jsonStr = remainingBuffer.substring(jsonStart, jsonEnd);
+                try {
+                  const parsed = JSON.parse(jsonStr);
+
+                  if (
+                    parsed.Progress !== undefined &&
+                    parsed.Total !== undefined &&
+                    parsed.Percent !== undefined
+                  ) {
+                    setProgress({
+                      progress: parsed.Progress,
+                      total: parsed.Total,
+                      percent: parsed.Percent,
+                    });
+                  }
+
+                  if (parsed.error && parsed.error.index !== undefined) {
+                    const errorIndex = parsed.error.index;
+                    const errorMessage = parsed.error.message || "";
+                    if (errorMessage) {
+                      collectedErrors[errorIndex] = errorMessage;
+                    }
+                  }
+
+                  if (
+                    parsed.success !== undefined ||
+                    parsed.status !== undefined
+                  ) {
+                    finalResponseData = parsed;
+                  }
+                } catch (e) {
+                  console.log("Failed to parse JSON object:", jsonStr, e);
+                }
+
+                processedLength = jsonEnd;
+                while (
+                  processedLength < remainingBuffer.length &&
+                  /\s/.test(remainingBuffer[processedLength])
+                ) {
+                  processedLength++;
+                }
+              }
+
+              if (finalResponseData) {
+                if (
+                  finalResponseData?.success ||
+                  finalResponseData?.status === 200
+                ) {
+                  const finalErrors: Record<number, string> = {
+                    ...rowErrors,
+                    ...collectedErrors,
+                  };
+
+                  if (
+                    finalResponseData?.data?.errors &&
+                    Array.isArray(finalResponseData.data.errors)
+                  ) {
+                    finalResponseData.data.errors.forEach(
+                      (error: { index: number; message: string }) => {
+                        if (error?.message) {
+                          finalErrors[error?.index] = error?.message;
+                        }
+                      }
+                    );
+                  }
+
+                  const errorCount = Object.keys(finalErrors).length;
+                  setIsSyncCompleted(true);
+
+                  if (finalResponseData?.message) {
+                    Success(finalResponseData.message);
                   } else if (errorCount > 0) {
-                    const updateCount = parsedData?.data?.updateCount || 0;
-                    const insertCount = parsedData?.data?.insertCount || 0;
-                    const skipCount = parsedData?.data?.skipCount || 0;
+                    const updateCount =
+                      finalResponseData?.data?.updateCount || 0;
+                    const insertCount =
+                      finalResponseData?.data?.insertCount || 0;
+                    const skipCount = finalResponseData?.data?.skipCount || 0;
                     Success(
                       `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
                     );
                   } else {
                     Success("Data synced successfully!");
                   }
-                }
 
-                if (errorCount > 0) {
-                  setRowErrors(errors);
-                } else {
-                  setRowErrors({});
-                  setCsvData([]);
-                  setCsvHeaders([]);
-                  setJsonData({});
-                  setSelectedFile(null);
-                  setIsSyncCompleted(false);
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = "";
+                  setRowErrors(finalErrors);
+
+                  if (errorCount === 0) {
+                    setCsvData([]);
+                    setCsvHeaders([]);
+                    setJsonData({});
+                    setSelectedFile(null);
+                    setIsSyncCompleted(false);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = "";
+                    }
                   }
+                } else {
+                  ErrorToast(
+                    finalResponseData?.message || "Failed to sync data"
+                  );
                 }
               } else {
-                ErrorToast(parsedData?.message || "Failed to sync data");
+                try {
+                  const parsedData = JSON.parse(remainingBuffer);
+                  if (parsedData?.success || parsedData?.status === 200) {
+                    finalResponseData = parsedData;
+
+                    const finalErrors: Record<number, string> = {
+                      ...rowErrors,
+                      ...collectedErrors,
+                    };
+
+                    if (
+                      finalResponseData?.data?.errors &&
+                      Array.isArray(finalResponseData.data.errors)
+                    ) {
+                      finalResponseData.data.errors.forEach(
+                        (error: { index: number; message: string }) => {
+                          if (error?.message) {
+                            finalErrors[error?.index] = error?.message;
+                          }
+                        }
+                      );
+                    }
+
+                    const errorCount = Object.keys(finalErrors).length;
+                    setIsSyncCompleted(true);
+
+                    if (finalResponseData?.message) {
+                      Success(finalResponseData.message);
+                    } else if (errorCount > 0) {
+                      const updateCount =
+                        finalResponseData?.data?.updateCount || 0;
+                      const insertCount =
+                        finalResponseData?.data?.insertCount || 0;
+                      const skipCount = finalResponseData?.data?.skipCount || 0;
+                      Success(
+                        `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
+                      );
+                    } else {
+                      Success("Data synced successfully!");
+                    }
+
+                    setRowErrors(finalErrors);
+
+                    if (errorCount === 0) {
+                      setCsvData([]);
+                      setCsvHeaders([]);
+                      setJsonData({});
+                      setSelectedFile(null);
+                      setIsSyncCompleted(false);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.warn(
+                    "No final response found in buffer and failed to parse as single JSON:",
+                    e
+                  );
+                  const errorCount = Object.keys(rowErrors).length;
+                  if (errorCount > 0) {
+                    setIsSyncCompleted(true);
+                    Success("Data sync completed with errors");
+                  }
+                }
               }
             }
           } catch (error) {
@@ -363,54 +514,17 @@ const DataSync = () => {
         const chunkText = decoder.decode(value, { stream: true });
         buffer += chunkText;
 
-        // Debug: log chunks to see what we're receiving
-        console.log("Received chunk:", chunkText);
+        let processedLength = 0;
 
-        // Try to parse newline-delimited JSON first
-        const lines = buffer.split(/\r?\n/);
-
-        // Process complete lines (all except the last one which might be incomplete)
-        for (let i = 0; i < lines.length - 1; i++) {
-          const line = lines[i].trim();
-          if (line) {
-            try {
-              const parsed = JSON.parse(line);
-              console.log("Parsed JSON:", parsed);
-
-              // Check if it's a progress update
-              if (
-                parsed.Progress !== undefined &&
-                parsed.Total !== undefined &&
-                parsed.Percent !== undefined
-              ) {
-                console.log("Setting progress:", parsed);
-                setProgress({
-                  progress: parsed.Progress,
-                  total: parsed.Total,
-                  percent: parsed.Percent,
-                });
-              }
-            } catch (e) {
-              // Not valid JSON, might be part of final response
-              console.log("Failed to parse line as JSON:", line, e);
-            }
-          }
-        }
-
-        // Keep the last line in buffer (might be incomplete)
-        let remainingBuffer = lines[lines.length - 1];
-
-        // Also try to parse JSON objects that might not be newline-delimited
-        // Look for complete JSON objects in the remaining buffer
-        while (remainingBuffer.length > 0) {
-          const jsonStart = remainingBuffer.indexOf("{");
+        while (processedLength < buffer.length) {
+          const jsonStart = buffer.indexOf("{", processedLength);
           if (jsonStart === -1) break;
 
           let braceCount = 0;
           let jsonEnd = -1;
-          for (let i = jsonStart; i < remainingBuffer.length; i++) {
-            if (remainingBuffer[i] === "{") braceCount++;
-            if (remainingBuffer[i] === "}") {
+          for (let i = jsonStart; i < buffer.length; i++) {
+            if (buffer[i] === "{") braceCount++;
+            if (buffer[i] === "}") {
               braceCount--;
               if (braceCount === 0) {
                 jsonEnd = i + 1;
@@ -420,38 +534,85 @@ const DataSync = () => {
           }
 
           if (jsonEnd === -1) {
-            // Incomplete JSON, keep from start position
-            buffer = remainingBuffer.substring(jsonStart);
+            buffer = buffer.substring(jsonStart);
             break;
           }
 
-          const jsonStr = remainingBuffer.substring(jsonStart, jsonEnd);
+          const jsonStr = buffer.substring(jsonStart, jsonEnd);
           try {
             const parsed = JSON.parse(jsonStr);
-            console.log("Parsed JSON object:", parsed);
 
-            // Check if it's a progress update
             if (
               parsed.Progress !== undefined &&
               parsed.Total !== undefined &&
               parsed.Percent !== undefined
             ) {
-              console.log("Setting progress from object:", parsed);
               setProgress({
                 progress: parsed.Progress,
                 total: parsed.Total,
                 percent: parsed.Percent,
               });
             }
+
+            if (parsed.error && parsed.error.index !== undefined) {
+              const errorIndex = parsed.error.index;
+              const errorMessage = parsed.error.message || "";
+              if (errorMessage) {
+                setRowErrors((prev) => ({
+                  ...prev,
+                  [errorIndex]: errorMessage,
+                }));
+              }
+            }
+
+            if (parsed.success !== undefined || parsed.status !== undefined) {
+              if (parsed?.data?.errors && Array.isArray(parsed.data.errors)) {
+                const errors: Record<number, string> = {};
+                parsed.data.errors.forEach(
+                  (error: { index: number; message: string }) => {
+                    if (error?.message) {
+                      errors[error?.index] = error?.message;
+                    }
+                  }
+                );
+                setRowErrors((prev) => ({
+                  ...prev,
+                  ...errors,
+                }));
+                setIsSyncCompleted(true);
+
+                if (parsed?.message) {
+                  Success(parsed.message);
+                } else {
+                  const errorCount = Object.keys(errors).length;
+                  const updateCount = parsed?.data?.updateCount || 0;
+                  const insertCount = parsed?.data?.insertCount || 0;
+                  const skipCount = parsed?.data?.skipCount || 0;
+                  if (errorCount > 0) {
+                    Success(
+                      `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
+                    );
+                  } else {
+                    Success("Data synced successfully!");
+                  }
+                }
+              }
+            }
           } catch (e) {
             console.log("Failed to parse JSON object:", jsonStr, e);
           }
 
-          // Move past this JSON object and any whitespace
-          remainingBuffer = remainingBuffer.substring(jsonEnd).trim();
+          processedLength = jsonEnd;
+
+          while (
+            processedLength < buffer.length &&
+            /\s/.test(buffer[processedLength])
+          ) {
+            processedLength++;
+          }
         }
 
-        buffer = remainingBuffer;
+        buffer = buffer.substring(processedLength);
       }
 
       setProgress(null);
