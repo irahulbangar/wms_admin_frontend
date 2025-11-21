@@ -1,5 +1,5 @@
 import {
-  // Bell,
+  Bell,
   ChevronDown,
   Menu,
   Sun,
@@ -117,12 +117,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           )}
         </button>
 
-        {/* <button className="relative p-2.5 rounded-xl text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer">
+        <button className="relative p-2.5 rounded-xl text-text-secondary hover:bg-hover-bg-primary transition-colors cursor-pointer">
           <Bell className="w-5 h-5" />
           <span className="absolute -top-1 -right-1 bg-status-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-roboto">
             3
           </span>
-        </button> */}
+        </button>
 
         <div className="relative" ref={dropdownRef}>
           <button

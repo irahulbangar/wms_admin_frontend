@@ -241,14 +241,10 @@ const Plants = () => {
     setFilteredPlants(filtered);
   }, [plants, filterBy, searchTerm]);
 
-  // This useEffect handles dropdown changes (not URL parameter changes)
   useEffect(() => {
-    // Only trigger if selectedOrganizationId changed due to dropdown selection
-    // and not due to URL parameter (which is handled in the first useEffect)
     if (selectedOrganizationId === "all") {
       fetchPlants();
     } else if (selectedOrganizationId !== "all" && !organization_id) {
-      // Only call API if there's no organization_id in URL (dropdown selection)
       getPlantByOrganizationId(selectedOrganizationId);
     }
   }, [
