@@ -255,7 +255,7 @@ const DataSync = () => {
       )
         .unwrap()
         .then((res) => {
-          if (res?.success) {
+          if (res?.success || res.status === 200) {
             const errors: Record<number, string> = {};
             if (res?.data?.errors && Array.isArray(res?.data?.errors)) {
               res?.data?.errors?.forEach(

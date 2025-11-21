@@ -1,5 +1,6 @@
 export interface DataSyncResponse {
   success: boolean;
+  status: number;
   data: DataSyncResult;
   message: string;
 }

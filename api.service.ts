@@ -61,3 +61,24 @@ export const api = (baseURL?: string) => {
 
   return axiosInstance;
 };
+
+export const apiStream = (baseURL?: string) => {
+  const baseURLToUse = baseURL || HOST;
+
+  const axiosInstance = axios.create({
+    baseURL: baseURLToUse,
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      responseType: "stream",
+    },
+  });
+
+  axiosInstance.interceptors.request.use(requestInterceptor, errorInterceptor);
+  axiosInstance.interceptors.response.use(
+    responseInterceptor,
+    errorInterceptor
+  );
+
+  return axiosInstance;
+};

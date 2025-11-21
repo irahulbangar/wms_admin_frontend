@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../api.service";
+import { api, apiStream } from "../api.service";
 import type {
   DeviceReporting,
   DeviceResponse,
@@ -315,6 +315,7 @@ export const dataSyncForBRWHMSDevices = createAsyncThunk(
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            responseType: 'stream'
           },
         }
       );
@@ -342,7 +343,7 @@ export const dataSyncForBTLMDevices = createAsyncThunk(
   ) => {
     const { rejectWithValue } = thunkAPI;
     try {
-      const response = await api().post<DataSyncResponse>(
+      const response = await apiStream().post(
         `/tank/device/tank-new-data-sync/${device_id}`,
         {
           year,
