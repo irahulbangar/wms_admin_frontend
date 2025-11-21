@@ -463,7 +463,7 @@ export const getErrorMessage = (error: ApiError): string => {
   };
 
   const statusMessage = getUserFriendlyMessage(error.status);
-  
+
   if (statusMessage !== 'An unexpected error occurred. Please try again.') {
     return statusMessage;
   }
@@ -480,7 +480,7 @@ export const getErrorMessage = (error: ApiError): string => {
     case ErrorType.VALIDATION_ERROR:
       return error.message || 'Please check your input and try again.';
     case ErrorType.SERVER_ERROR:
-      return error.status >= 500 
+      return error.status >= 500
         ? 'Server error. Please try again later or contact support if the problem persists.'
         : error.message || 'An error occurred while processing your request.';
     default:
@@ -498,13 +498,13 @@ export const isRetryableError = (error: ApiError): boolean => {
 
 export const formatValidationErrors = (errors: Record<string, string[]>): string[] => {
   const formattedErrors: string[] = [];
-  
+
   Object.entries(errors).forEach(([field, messages]) => {
     messages.forEach(message => {
       formattedErrors.push(`${field}: ${message}`);
     });
   });
-  
+
   return formattedErrors;
 };
 

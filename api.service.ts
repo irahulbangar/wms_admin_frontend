@@ -47,7 +47,6 @@ export const api = (baseURL?: string) => {
 
   const axiosInstance = axios.create({
     baseURL: baseURLToUse,
-    timeout: 30000,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",

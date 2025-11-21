@@ -517,7 +517,7 @@ const DataSync = () => {
             <button
               type="button"
               onClick={handleClearPreview}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary cursor-pointer text-text-primary rounded-lg hover:bg-hover-bg-primary transition-colors font-roboto"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-status-danger/80 cursor-pointer text-white rounded-lg hover:bg-status-danger/50 transition-colors font-roboto"
             >
               <X className="w-4 h-4" />
               Clear
