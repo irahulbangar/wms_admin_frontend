@@ -11,14 +11,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
-import {
-  dataSyncForFMDevices,
-  dataSyncForBRWHMSDevices,
-  dataSyncForBTLMDevices,
-  getAllDevices,
-  setDevices,
-} from "../../../store/deviceSlice";
-import { Error, Success } from "../../utils/toast";
+import { getAllDevices, setDevices } from "../../../store/deviceSlice";
+import { Error as ErrorToast, Success } from "../../utils/toast";
 
 const DataSync = () => {
   const getCurrentMonthYear = () => {
@@ -41,12 +35,12 @@ const DataSync = () => {
         if (res.success || res.status === 200) {
           dispatch(setDevices(res?.data));
         } else {
-          Error(res.message || "Failed to get devices");
+          ErrorToast(res.message || "Failed to get devices");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error(err.message || "Failed to get devices");
+        ErrorToast(err.message || "Failed to get devices");
       });
   }, [dispatch]);
 
@@ -57,12 +51,12 @@ const DataSync = () => {
         if (res.success || res.status === 200) {
           setDeviceFamily(res.data);
         } else {
-          Error(res.message || "Failed to get device families");
+          ErrorToast(res.message || "Failed to get device families");
         }
       })
       .catch((err) => {
         console.log(err);
-        Error(err.message || "Failed to get device families");
+        ErrorToast(err.message || "Failed to get device families");
       });
   }, [dispatch]);
 
@@ -83,8 +77,14 @@ const DataSync = () => {
   const [isSyncCompleted, setIsSyncCompleted] = useState(false);
   const [deviceSearchTerm, setDeviceSearchTerm] = useState("");
   const [isDeviceDropdownOpen, setIsDeviceDropdownOpen] = useState(false);
+  const [progress, setProgress] = useState<{
+    progress: number;
+    total: number;
+    percent: string;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const deviceDropdownRef = useRef<HTMLDivElement>(null);
+  const chunkBufferRef = useRef<string>("");
 
   const flowMeterFamilies = deviceFamily.filter(
     (family) =>
@@ -125,6 +125,8 @@ const DataSync = () => {
     setIsSyncCompleted(false);
     setDeviceSearchTerm("");
     setIsDeviceDropdownOpen(false);
+    setProgress(null);
+    chunkBufferRef.current = "";
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -182,7 +184,7 @@ const DataSync = () => {
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith(".csv")) {
-      Error("Please upload a CSV file");
+      ErrorToast("Please upload a CSV file");
       return;
     }
 
@@ -194,7 +196,7 @@ const DataSync = () => {
       const { headers, data } = parseCSV(text);
 
       if (headers.length === 0 || data.length === 0) {
-        Error("CSV file is empty or invalid");
+        ErrorToast("CSV file is empty or invalid");
         return;
       }
 
@@ -207,7 +209,7 @@ const DataSync = () => {
     };
 
     reader.onerror = () => {
-      Error("Failed to read CSV file");
+      ErrorToast("Failed to read CSV file");
     };
 
     reader.readAsText(file);
@@ -215,17 +217,17 @@ const DataSync = () => {
 
   const handleUpload = async () => {
     if (!selectedDevice) {
-      Error("Please select a device");
+      ErrorToast("Please select a device");
       return;
     }
 
     if (!selectedFile || csvData.length === 0) {
-      Error("Please upload a CSV file first");
+      ErrorToast("Please upload a CSV file first");
       return;
     }
 
     if (!monthYear) {
-      Error("Please select a month");
+      ErrorToast("Please select a month");
       return;
     }
 
@@ -239,67 +241,226 @@ const DataSync = () => {
     const isBrwhms = selectedFamily?.type?.toLowerCase() === "brwhms";
     const isTank = selectedFamily?.type?.toLowerCase() === "tank";
 
-    const payload = {
-      device_id: Number(deviceId),
-      year,
-      month,
-      data: jsonData,
-    };
+    setProgress(null);
+    chunkBufferRef.current = "";
+
+    // Determine the API endpoint
+    const endpoint = isBrwhms
+      ? `/brwhms/device/brwhms-new-data-sync/${deviceId}`
+      : isTank
+      ? `/tank/device/tank-new-data-sync/${deviceId}`
+      : `/fm/device/fm-new-data-sync/${deviceId}`;
+
+    const baseURL =
+      document.location.hostname === "localhost"
+        ? import.meta.env.VITE_API_URL
+        : document.location.origin + "/api";
+    const url = `${baseURL}${endpoint}`;
 
     try {
-      const promise = isBrwhms
-        ? dispatch(dataSyncForBRWHMSDevices(payload))
-        : isTank
-        ? dispatch(dataSyncForBTLMDevices(payload))
-        : dispatch(dataSyncForFMDevices(payload));
+      // Use fetch API for streaming support
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify({
+          year,
+          month,
+          data: jsonData,
+        }),
+      });
 
-      await promise
-        .unwrap()
-        .then((res: any) => {
-          console.log("res", res);
-          if (res?.success || res.status === 200) {
-            const errors: Record<number, string> = {};
-            if (res?.data?.errors && Array.isArray(res?.data?.errors)) {
-              res?.data?.errors?.forEach(
-                (error: { index: number; message: string }) => {
-                  errors[error?.index] = error?.message;
+      if (!response.ok) {
+        const errorMsg = `HTTP error! status: ${response.status}`;
+        throw new globalThis.Error(errorMsg);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        const errorMsg = "Response body is not readable";
+        throw new globalThis.Error(errorMsg);
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          try {
+            const finalData = buffer.trim();
+            if (finalData) {
+              let parsedData;
+              try {
+                parsedData = JSON.parse(finalData);
+              } catch {
+                const lastJsonMatch = finalData.match(/\{[\s\S]*\}$/);
+                if (lastJsonMatch) {
+                  parsedData = JSON.parse(lastJsonMatch[0]);
+                } else {
+                  parsedData = { message: finalData };
                 }
-              );
-            }
-            const errorCount = Object.keys(errors).length;
-            setIsSyncCompleted(true);
+              }
 
-            if (errorCount > 0) {
-              const updateCount = res?.data?.updateCount || 0;
-              const insertCount = res?.data?.insertCount || 0;
-              const skipCount = res?.data?.skipCount || 0;
+              // Handle final response
+              if (parsedData?.success || parsedData?.status === 200) {
+                const errors: Record<number, string> = {};
+                if (
+                  parsedData?.data?.errors &&
+                  Array.isArray(parsedData.data.errors)
+                ) {
+                  parsedData.data.errors.forEach(
+                    (error: { index: number; message: string }) => {
+                      errors[error?.index] = error?.message;
+                    }
+                  );
+                }
+                const errorCount = Object.keys(errors).length;
+                setIsSyncCompleted(true);
 
-              Success(
-                `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
-              );
+                if (parsedData?.status === 200 || parsedData?.success) {
+                  if (parsedData?.message) {
+                    Success(parsedData.message);
+                  } else if (errorCount > 0) {
+                    const updateCount = parsedData?.data?.updateCount || 0;
+                    const insertCount = parsedData?.data?.insertCount || 0;
+                    const skipCount = parsedData?.data?.skipCount || 0;
+                    Success(
+                      `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
+                    );
+                  } else {
+                    Success("Data synced successfully!");
+                  }
+                }
 
-              setRowErrors(errors);
-            } else {
-              Success(res?.message || "Data synced successfully!");
-              setCsvData([]);
-              setCsvHeaders([]);
-              setJsonData({});
-              setSelectedFile(null);
-              setRowErrors({});
-              setIsSyncCompleted(false);
-              if (fileInputRef.current) {
-                fileInputRef.current.value = "";
+                if (errorCount > 0) {
+                  setRowErrors(errors);
+                } else {
+                  setRowErrors({});
+                  setCsvData([]);
+                  setCsvHeaders([]);
+                  setJsonData({});
+                  setSelectedFile(null);
+                  setIsSyncCompleted(false);
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                  }
+                }
+              } else {
+                ErrorToast(parsedData?.message || "Failed to sync data");
               }
             }
-          } else {
-            Error(res?.message || "Failed to sync data");
+          } catch (error) {
+            console.error("Error parsing final response:", error);
+            ErrorToast("Failed to parse response");
           }
-        })
-        .catch((err: any) => {
-          Error(err?.message || "Failed to sync data");
-        });
-    } catch {
-      Error("An error occurred while syncing data");
+          break;
+        }
+
+        const chunkText = decoder.decode(value, { stream: true });
+        buffer += chunkText;
+
+        // Debug: log chunks to see what we're receiving
+        console.log("Received chunk:", chunkText);
+
+        // Try to parse newline-delimited JSON first
+        const lines = buffer.split(/\r?\n/);
+
+        // Process complete lines (all except the last one which might be incomplete)
+        for (let i = 0; i < lines.length - 1; i++) {
+          const line = lines[i].trim();
+          if (line) {
+            try {
+              const parsed = JSON.parse(line);
+              console.log("Parsed JSON:", parsed);
+
+              // Check if it's a progress update
+              if (
+                parsed.Progress !== undefined &&
+                parsed.Total !== undefined &&
+                parsed.Percent !== undefined
+              ) {
+                console.log("Setting progress:", parsed);
+                setProgress({
+                  progress: parsed.Progress,
+                  total: parsed.Total,
+                  percent: parsed.Percent,
+                });
+              }
+            } catch (e) {
+              // Not valid JSON, might be part of final response
+              console.log("Failed to parse line as JSON:", line, e);
+            }
+          }
+        }
+
+        // Keep the last line in buffer (might be incomplete)
+        let remainingBuffer = lines[lines.length - 1];
+
+        // Also try to parse JSON objects that might not be newline-delimited
+        // Look for complete JSON objects in the remaining buffer
+        while (remainingBuffer.length > 0) {
+          const jsonStart = remainingBuffer.indexOf("{");
+          if (jsonStart === -1) break;
+
+          let braceCount = 0;
+          let jsonEnd = -1;
+          for (let i = jsonStart; i < remainingBuffer.length; i++) {
+            if (remainingBuffer[i] === "{") braceCount++;
+            if (remainingBuffer[i] === "}") {
+              braceCount--;
+              if (braceCount === 0) {
+                jsonEnd = i + 1;
+                break;
+              }
+            }
+          }
+
+          if (jsonEnd === -1) {
+            // Incomplete JSON, keep from start position
+            buffer = remainingBuffer.substring(jsonStart);
+            break;
+          }
+
+          const jsonStr = remainingBuffer.substring(jsonStart, jsonEnd);
+          try {
+            const parsed = JSON.parse(jsonStr);
+            console.log("Parsed JSON object:", parsed);
+
+            // Check if it's a progress update
+            if (
+              parsed.Progress !== undefined &&
+              parsed.Total !== undefined &&
+              parsed.Percent !== undefined
+            ) {
+              console.log("Setting progress from object:", parsed);
+              setProgress({
+                progress: parsed.Progress,
+                total: parsed.Total,
+                percent: parsed.Percent,
+              });
+            }
+          } catch (e) {
+            console.log("Failed to parse JSON object:", jsonStr, e);
+          }
+
+          // Move past this JSON object and any whitespace
+          remainingBuffer = remainingBuffer.substring(jsonEnd).trim();
+        }
+
+        buffer = remainingBuffer;
+      }
+
+      setProgress(null);
+      chunkBufferRef.current = "";
+    } catch (err: any) {
+      setProgress(null);
+      chunkBufferRef.current = "";
+      ErrorToast(err?.message || "Failed to sync data");
     } finally {
       setIsUploading(false);
     }
@@ -312,6 +473,8 @@ const DataSync = () => {
     setSelectedFile(null);
     setRowErrors({});
     setIsSyncCompleted(false);
+    setProgress(null);
+    chunkBufferRef.current = "";
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -509,6 +672,39 @@ const DataSync = () => {
         </div>
       </div>
 
+      {isUploading && (
+        <div className="bg-primary border border-border-primary rounded-xl p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-status-info" />
+              <span className="text-sm font-medium text-text-primary font-roboto">
+                Syncing Data...
+              </span>
+            </div>
+            {progress ? (
+              <span className="text-sm font-medium text-text-secondary font-roboto">
+                {progress.progress} / {progress.total} (
+                {parseFloat(progress.percent).toFixed(2)}%)
+              </span>
+            ) : (
+              <span className="text-sm font-medium text-text-secondary font-roboto">
+                Processing...
+              </span>
+            )}
+          </div>
+          <div className="w-full bg-secondary rounded-full h-2.5 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-blue-500 to-purple-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+              style={{
+                width: progress
+                  ? `${Math.min(parseFloat(progress.percent), 100)}%`
+                  : "0%",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {csvData.length > 0 && (
         <div className="bg-primary border border-border-primary rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
@@ -521,6 +717,7 @@ const DataSync = () => {
             <button
               type="button"
               onClick={handleClearPreview}
+              disabled={isUploading}
               className="flex items-center gap-2 px-3 py-1.5 text-sm bg-status-danger/80 cursor-pointer text-white rounded-lg hover:bg-status-danger/50 transition-colors font-roboto"
             >
               <X className="w-4 h-4" />
