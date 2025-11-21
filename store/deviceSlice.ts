@@ -289,6 +289,43 @@ export const dataSyncForFMDevices = createAsyncThunk(
   }
 );
 
+interface DataSyncForBRWHMSDevicesPayload {
+  device_id: number;
+  year: string;
+  month: string;
+  data: object;
+}
+
+// data sync for BRWHMS device
+export const dataSyncForBRWHMSDevices = createAsyncThunk(
+  "device/dataSyncForBRWHMSDevices",
+  async (
+    { device_id, year, month, data }: DataSyncForBRWHMSDevicesPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post<DataSyncResponse>(
+        `/brwhms/device/brwhms-new-data-sync/${device_id}`,
+        {
+          year,
+          month,
+          data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;

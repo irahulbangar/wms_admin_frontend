@@ -87,24 +87,25 @@ const DataSync = () => {
   const flowMeterFamilies = deviceFamily.filter(
     (family) =>
       family.name.toLowerCase().includes("flow") ||
-      family.type?.toLowerCase() === "fm"
+      family.type?.toLowerCase() === "fm" ||
+      family.type?.toLowerCase() === "brwhms"
   );
 
   const filteredDevices = deviceFamilyId
     ? devices.filter(
-        (device) =>
-          device.device_family_id.toString() === deviceFamilyId.toString()
-      )
+      (device) =>
+        device.device_family_id.toString() === deviceFamilyId.toString()
+    )
     : [];
 
   const searchedDevices = deviceSearchTerm
     ? filteredDevices.filter(
-        (device) =>
-          device.device_name
-            .toLowerCase()
-            .includes(deviceSearchTerm.toLowerCase()) ||
-          device.hwid.toLowerCase().includes(deviceSearchTerm.toLowerCase())
-      )
+      (device) =>
+        device.device_name
+          .toLowerCase()
+          .includes(deviceSearchTerm.toLowerCase()) ||
+        device.hwid.toLowerCase().includes(deviceSearchTerm.toLowerCase())
+    )
     : filteredDevices;
 
   const selectedDevice = filteredDevices.find(
@@ -173,12 +174,10 @@ const DataSync = () => {
     return { headers, data };
   };
 
-  // Handle file upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check if file is CSV
     if (!file.name.toLowerCase().endsWith(".csv")) {
       Error("Please upload a CSV file");
       return;
@@ -228,12 +227,6 @@ const DataSync = () => {
     }
 
     const [year, month] = monthYear.split("-");
-    const plant_id = selectedDevice.plant_id.toString();
-
-    if (!plant_id) {
-      Error("Device does not have a plant ID");
-      return;
-    }
 
     setIsUploading(true);
 
@@ -259,7 +252,7 @@ const DataSync = () => {
             }
             const errorCount = Object.keys(errors).length;
             setIsSyncCompleted(true);
-            
+
             if (errorCount > 0) {
               const updateCount = res?.data?.updateCount || 0;
               const insertCount = res?.data?.insertCount || 0;
@@ -379,23 +372,22 @@ const DataSync = () => {
               <span className="truncate">
                 {deviceId && deviceFamilyId
                   ? (() => {
-                      const selected = filteredDevices.find(
-                        (d) => String(d.device_id) === String(deviceId)
-                      );
-                      return selected
-                        ? `${selected.device_name}`
-                        : "Select Device";
-                    })()
+                    const selected = filteredDevices.find(
+                      (d) => String(d.device_id) === String(deviceId)
+                    );
+                    return selected
+                      ? `${selected.device_name}`
+                      : "Select Device";
+                  })()
                   : deviceFamilyId
-                  ? filteredDevices.length === 0
-                    ? "No devices found"
-                    : "Select Device"
-                  : "Select Device Family first"}
+                    ? filteredDevices.length === 0
+                      ? "No devices found"
+                      : "Select Device"
+                    : "Select Device Family first"}
               </span>
               <ChevronDown
-                className={`w-4 h-4 flex-shrink-0 transition-transform ${
-                  isDeviceDropdownOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 flex-shrink-0 transition-transform ${isDeviceDropdownOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -424,9 +416,8 @@ const DataSync = () => {
                     return (
                       <div
                         key={device.device_id}
-                        className={`px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary ${
-                          isSelected ? "bg-secondary" : ""
-                        }`}
+                        className={`px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary ${isSelected ? "bg-secondary" : ""
+                          }`}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -554,7 +545,7 @@ const DataSync = () => {
                       }
                       return "bg-status-success/5";
                     };
-                    
+
                     return (
                       <tr
                         key={rowIndex}
