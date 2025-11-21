@@ -306,7 +306,6 @@ const DataSync = () => {
                 }
               }
 
-              // Handle final response
               if (parsedData?.success || parsedData?.status === 200) {
                 const errors: Record<number, string> = {};
                 if (
@@ -718,7 +717,7 @@ const DataSync = () => {
               type="button"
               onClick={handleClearPreview}
               disabled={isUploading}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-status-danger/80 cursor-pointer text-white rounded-lg hover:bg-status-danger/50 transition-colors font-roboto"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-status-danger/80 cursor-pointer text-white rounded-lg hover:bg-status-danger/50 transition-colors font-roboto disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <X className="w-4 h-4" />
               Clear
