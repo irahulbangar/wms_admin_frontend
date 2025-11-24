@@ -131,6 +131,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     lowerLimit: "",
     upperLimit: "",
     multiplier: "",
+    shifter: "",
     A: "0",
     B: "0",
     C: "1",
@@ -230,6 +231,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       lowerLimit: "",
       upperLimit: "",
       multiplier: "",
+      shifter: "",
       A: "",
       B: "",
       C: "",
@@ -472,6 +474,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               lowerLimit: deviceData.params?.lowerLimit || "",
               upperLimit: deviceData.params?.upperLimit || "",
               multiplier: deviceData.params?.multiplier || "",
+              shifter: deviceData.params?.shifter || "",
               A: deviceData.params?.A || "",
               B: deviceData.params?.B || "",
               C: deviceData.params?.C || "",
@@ -483,6 +486,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               lowerLimit: commonData?.lowerLimit?.toString() || "",
               upperLimit: commonData?.upperLimit?.toString() || "",
               multiplier: commonData?.multiplier?.toString() || "",
+              shifter: commonData?.shifter?.toString() || "",
               A: commonData?.A?.toString() || "",
               B: commonData?.B?.toString() || "",
               C: commonData?.C?.toString() || "",
@@ -1286,6 +1290,34 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   placeholder="Enter multiplier"
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
                     errors.multiplier
+                      ? "border-status-danger"
+                      : "border-border-primary"
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                  Shifter
+                </label>
+                <input
+                  type="text"
+                  name="shifter"
+                  value={commonInputValues.shifter}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    setCommonInputValues((prev) => ({
+                      ...prev,
+                      shifter: inputValue,
+                    }));
+
+                    setCommonParams((prev) => ({
+                      ...prev,
+                      shifter: inputValue,
+                    }));
+                  }}
+                  placeholder="Enter shifter"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                    errors.shifter
                       ? "border-status-danger"
                       : "border-border-primary"
                   }`}
