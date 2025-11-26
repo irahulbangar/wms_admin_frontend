@@ -357,8 +357,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Report Formula
           </label>
-          <input
-            type="text"
+          <textarea
             name="report_formula"
             value={reportData.report_formula}
             onChange={(e) =>
@@ -373,8 +372,7 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Report Neutrality Formula
           </label>
-          <input
-            type="text"
+          <textarea
             name="report_neutrality_formula"
             value={reportData.neutrality_formula}
             onChange={(e) =>
