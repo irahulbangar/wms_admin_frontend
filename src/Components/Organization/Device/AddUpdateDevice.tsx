@@ -912,7 +912,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <option value="0">Select Plant</option>
                   <option value="null">None</option>
                   {plantData
-                    .filter((plant) => plant.organization_id === organizationId)
+                    .filter(
+                      (plant) =>
+                        plant.organization_id === organizationId &&
+                        plant.plant_id === plant_id
+                    )
                     .map((plant) => (
                       <option key={plant.plant_id} value={plant.plant_id}>
                         {plant.plant_name}
@@ -944,7 +948,9 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     <option value="null">None</option>
                     {plantData
                       .filter(
-                        (plant) => plant.organization_id === organizationId
+                        (plant) =>
+                          plant.organization_id === organizationId &&
+                          plant.plant_id === plant_id
                       )
                       .map((plant) => (
                         <option key={plant.plant_id} value={plant.plant_id}>
