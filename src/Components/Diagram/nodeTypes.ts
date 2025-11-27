@@ -7,6 +7,7 @@ import GroupNodeWrapper from "./GroupNodeWrapper";
 import SourceNode from "./SourceNode";
 import SinkNode from "./SinkNode";
 import VirtualNode from "./VirtualNode";
+import ResultantNode from "./ResultantNode";
 
 export const nodeTypes = {
   tank: TankNode,
@@ -18,4 +19,5 @@ export const nodeTypes = {
   source: SourceNode,
   sink: SinkNode,
   virtual: VirtualNode,
+  resultant: ResultantNode,
 };

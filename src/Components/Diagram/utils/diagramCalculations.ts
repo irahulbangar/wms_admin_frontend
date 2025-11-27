@@ -530,8 +530,9 @@ export const convertDevicesToDiagram = (
 
         const virtuals = system.devices.filter(
           (device: DeviceResult) =>
-            device.device_family_type === "virtual" ||
-            device.device_family?.toLowerCase().includes("virtual")
+            (device.device_family_type === "virtual" ||
+              device.device_family?.toLowerCase().includes("virtual")) &&
+            device.device_type !== "Resultant Reporting"
         );
 
         virtuals.forEach((device: DeviceResult, virtualIndex: number) => {
@@ -551,6 +552,33 @@ export const convertDevicesToDiagram = (
               args.length
           );
           nodes.push(virtualNode);
+        });
+
+        const resultants = system.devices.filter(
+          (device: DeviceResult) =>
+            device.device_type === "Resultant Reporting" ||
+            (device.device_family_type === "virtual" &&
+              device.device_type?.toLowerCase().includes("resultant"))
+        );
+
+        resultants.forEach((device: DeviceResult, resultantIndex: number) => {
+          const deviceId = `${systemId}-resultant${resultantIndex + 1}`;
+          const resultantNode = createResultantNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            resultantIndex,
+            resultants.length,
+            tanks.length +
+              fms.length +
+              brwhms.length +
+              phmcs.length +
+              args.length +
+              virtuals.length
+          );
+          nodes.push(resultantNode);
         });
       });
     });
@@ -1099,6 +1127,77 @@ const createVirtualNode = (
     type: "virtual",
     width: virtualWidth,
     height: virtualHeight,
+  };
+
+  return result;
+};
+
+const createResultantNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  resultantIndex: number,
+  _totalResultants: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const resultantWidth = 60;
+  const resultantHeight = 20;
+  const resultantSpacing = 20;
+  const sideMargin = 50;
+  const footerHeight = 30;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxResultantsPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (resultantWidth + resultantSpacing))
+  );
+
+  const row = Math.floor(resultantIndex / maxResultantsPerRow);
+  const col = resultantIndex % maxResultantsPerRow;
+
+  const deviceX = sideMargin + col * (resultantWidth + resultantSpacing);
+  const deviceY =
+    50 + previousDevicesCount * 30 + row * (resultantHeight + resultantSpacing);
+
+  const maxX = groupWidth - resultantWidth - sideMargin;
+  const maxY = groupHeight - resultantHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const resultantNodeData: NodeData = {
+    label: device.device_name,
+    type: "resultant",
+    unit: device.unit || "Ltr",
+    departmentConnection:
+      device.in_department_id === null
+        ? "None"
+        : device.in_department_id
+        ? "In"
+        : "Out",
+    plantConnection:
+      device.in_plant_id === null ? "None" : device.in_plant_id ? "In" : "Out",
+    organizationConnection: device.organization_connection || "none",
+    systemName: device.system_name || "",
+    systemConnection:
+      device.in_system_id === null
+        ? "None"
+        : device.in_system_id
+        ? "In"
+        : "Out",
+  };
+
+  const result = {
+    id: deviceId,
+    data: resultantNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "resultant",
+    width: resultantWidth,
+    height: resultantHeight,
   };
 
   return result;

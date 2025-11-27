@@ -355,7 +355,31 @@ export const useDiagramData = (plantId: string | undefined) => {
             (device) =>
               device?.device_name === node?.data?.label &&
               (device?.device_family_type === "virtual" ||
-                device?.device_family?.toLowerCase().includes("virtual"))
+                device?.device_family?.toLowerCase().includes("virtual")) &&
+              device?.device_type !== "Resultant Reporting"
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
+                organizationConnection: matchingDevice?.organization_connection,
+                systemName: matchingDevice?.system_name,
+                systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
+              },
+            };
+          }
+        } else if (node?.type === "resultant") {
+          const matchingDevice = deviceData?.find(
+            (device) =>
+              device?.device_name === node?.data?.label &&
+              (device?.device_type === "Resultant Reporting" ||
+                (device?.device_family_type === "virtual" &&
+                  device?.device_type?.toLowerCase().includes("resultant")))
           );
 
           if (matchingDevice) {
