@@ -100,7 +100,6 @@ export interface DeviceReporting {
   report_name: string;
   report_unit: string;
   report_formula: string;
-  neutrality_formula: string;
 }
 
 export interface Params {
