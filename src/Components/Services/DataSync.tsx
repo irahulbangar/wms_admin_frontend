@@ -11,8 +11,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import type { DeviceFamilyResult } from "../../../model/device-family.interface";
 import { getDeviceFamiliy } from "../../../store/deviceFamilySlice";
-import { getAllDevices, setDevices } from "../../../store/deviceSlice";
-import { Error as ErrorToast, Success } from "../../utils/toast";
+import {
+  dataSyncForFMDevices,
+  dataSyncForBRWHMSDevices,
+  dataSyncForBTLMDevices,
+  getAllDevices,
+  setDevices,
+} from "../../../store/deviceSlice";
+import { Error, Error as ErrorToast, Success } from "../../utils/toast";
 
 const DataSync = () => {
   const getCurrentMonthYear = () => {
@@ -70,7 +76,7 @@ const DataSync = () => {
   const [deviceId, setDeviceId] = useState("");
   const [csvData, setCsvData] = useState<Record<string, string>[]>([]);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
-  const [jsonData, setJsonData] = useState<object>({});
+  const [_jsonData, setJsonData] = useState<object>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [rowErrors, setRowErrors] = useState<Record<number, string>>({});
@@ -215,414 +221,471 @@ const DataSync = () => {
     reader.readAsText(file);
   };
 
-  const handleUpload = async () => {
-    if (!selectedDevice) {
+  // const handleUpload = async () => {
+  //   if (!selectedDevice) {
+  //     ErrorToast("Please select a device");
+  //     return;
+  //   }
+
+  //   if (!selectedFile || csvData.length === 0) {
+  //     ErrorToast("Please upload a CSV file first");
+  //     return;
+  //   }
+
+  //   if (!monthYear) {
+  //     ErrorToast("Please select a month");
+  //     return;
+  //   }
+
+  //   const [year, month] = monthYear.split("-");
+
+  //   setIsUploading(true);
+
+  //   const selectedFamily = deviceFamily.find(
+  //     (f) => String(f.device_family_id) === String(deviceFamilyId)
+  //   );
+  //   const isBrwhms = selectedFamily?.type?.toLowerCase() === "brwhms";
+  //   const isTank = selectedFamily?.type?.toLowerCase() === "tank";
+
+  //   setProgress(null);
+  //   chunkBufferRef.current = "";
+  //   setRowErrors({});
+
+  //   const endpoint = isBrwhms
+  //     ? `/brwhms/device/brwhms-new-data-sync/${deviceId}`
+  //     : isTank
+  //     ? `/tank/device/tank-new-data-sync/${deviceId}`
+  //     : `/fm/device/fm-new-data-sync/${deviceId}`;
+
+  //   const baseURL =
+  //     document.location.hostname === "localhost"
+  //       ? import.meta.env.VITE_API_URL
+  //       : document.location.origin + "/api";
+  //   const url = `${baseURL}${endpoint}`;
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Accept: "application/json",
+  //         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //       },
+  //       body: JSON.stringify({
+  //         year,
+  //         month,
+  //         data: jsonData,
+  //       }),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorMsg = `HTTP error! status: ${response.status}`;
+  //       throw new globalThis.Error(errorMsg);
+  //     }
+
+  //     const reader = response.body?.getReader();
+  //     if (!reader) {
+  //       const errorMsg = "Response body is not readable";
+  //       throw new globalThis.Error(errorMsg);
+  //     }
+
+  //     const decoder = new TextDecoder();
+  //     let buffer = "";
+
+  //     while (true) {
+  //       const { done, value } = await reader.read();
+
+  //       if (done) {
+  //         try {
+  //           const remainingBuffer = buffer.trim();
+  //           if (remainingBuffer) {
+  //             let processedLength = 0;
+  //             let finalResponseData: any = null;
+  //             const collectedErrors: Record<number, string> = {};
+
+  //             if (remainingBuffer.trim().startsWith("{")) {
+  //               try {
+  //                 const parsedAsSingle = JSON.parse(remainingBuffer);
+  //                 if (
+  //                   parsedAsSingle?.success !== undefined ||
+  //                   parsedAsSingle?.status !== undefined
+  //                 ) {
+  //                   finalResponseData = parsedAsSingle;
+  //                   processedLength = remainingBuffer.length;
+  //                 }
+  //               } catch (e) {
+  //                 console.log(
+  //                   "Buffer is not a single JSON object, will parse chunks:",
+  //                   e
+  //                 );
+  //               }
+  //             }
+
+  //             while (processedLength < remainingBuffer.length) {
+  //               const jsonStart = remainingBuffer.indexOf("{", processedLength);
+  //               if (jsonStart === -1) break;
+
+  //               let braceCount = 0;
+  //               let jsonEnd = -1;
+  //               for (let i = jsonStart; i < remainingBuffer.length; i++) {
+  //                 if (remainingBuffer[i] === "{") braceCount++;
+  //                 if (remainingBuffer[i] === "}") {
+  //                   braceCount--;
+  //                   if (braceCount === 0) {
+  //                     jsonEnd = i + 1;
+  //                     break;
+  //                   }
+  //                 }
+  //               }
+
+  //               if (jsonEnd === -1) break;
+
+  //               const jsonStr = remainingBuffer.substring(jsonStart, jsonEnd);
+  //               try {
+  //                 const parsed = JSON.parse(jsonStr);
+
+  //                 if (
+  //                   parsed.Progress !== undefined &&
+  //                   parsed.Total !== undefined &&
+  //                   parsed.Percent !== undefined
+  //                 ) {
+  //                   setProgress({
+  //                     progress: parsed.Progress,
+  //                     total: parsed.Total,
+  //                     percent: parsed.Percent,
+  //                   });
+  //                 }
+
+  //                 if (parsed.error && parsed.error.index !== undefined) {
+  //                   const errorIndex = parsed.error.index;
+  //                   const errorMessage = parsed.error.message || "";
+  //                   if (errorMessage) {
+  //                     collectedErrors[errorIndex] = errorMessage;
+  //                   }
+  //                 }
+
+  //                 if (
+  //                   parsed.success !== undefined ||
+  //                   parsed.status !== undefined
+  //                 ) {
+  //                   finalResponseData = parsed;
+  //                 }
+  //               } catch (e) {
+  //                 console.log("Failed to parse JSON object:", jsonStr, e);
+  //               }
+
+  //               processedLength = jsonEnd;
+  //               while (
+  //                 processedLength < remainingBuffer.length &&
+  //                 /\s/.test(remainingBuffer[processedLength])
+  //               ) {
+  //                 processedLength++;
+  //               }
+  //             }
+
+  //             if (finalResponseData) {
+  //               if (
+  //                 finalResponseData?.success ||
+  //                 finalResponseData?.status === 200
+  //               ) {
+  //                 const finalErrors: Record<number, string> = {
+  //                   ...rowErrors,
+  //                   ...collectedErrors,
+  //                 };
+
+  //                 if (
+  //                   finalResponseData?.data?.errors &&
+  //                   Array.isArray(finalResponseData.data.errors)
+  //                 ) {
+  //                   finalResponseData.data.errors.forEach(
+  //                     (error: { index: number; message: string }) => {
+  //                       if (error?.message) {
+  //                         finalErrors[error?.index] = error?.message;
+  //                       }
+  //                     }
+  //                   );
+  //                 }
+
+  //                 const errorCount = Object.keys(finalErrors).length;
+  //                 setIsSyncCompleted(true);
+
+  //                 if (finalResponseData?.message) {
+  //                   Success(finalResponseData.message);
+  //                 } else if (errorCount > 0) {
+  //                   const updateCount =
+  //                     finalResponseData?.data?.updateCount || 0;
+  //                   const insertCount =
+  //                     finalResponseData?.data?.insertCount || 0;
+  //                   const skipCount = finalResponseData?.data?.skipCount || 0;
+  //                   Success(
+  //                     `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
+  //                   );
+  //                 } else {
+  //                   Success("Data synced successfully!");
+  //                 }
+
+  //                 setRowErrors(finalErrors);
+
+  //                 if (errorCount === 0) {
+  //                   setCsvData([]);
+  //                   setCsvHeaders([]);
+  //                   setJsonData({});
+  //                   setSelectedFile(null);
+  //                   setIsSyncCompleted(false);
+  //                   if (fileInputRef.current) {
+  //                     fileInputRef.current.value = "";
+  //                   }
+  //                 }
+  //               } else {
+  //                 ErrorToast(
+  //                   finalResponseData?.message || "Failed to sync data"
+  //                 );
+  //               }
+  //             } else {
+  //               try {
+  //                 const parsedData = JSON.parse(remainingBuffer);
+  //                 if (parsedData?.success || parsedData?.status === 200) {
+  //                   finalResponseData = parsedData;
+
+  //                   const finalErrors: Record<number, string> = {
+  //                     ...rowErrors,
+  //                     ...collectedErrors,
+  //                   };
+
+  //                   if (
+  //                     finalResponseData?.data?.errors &&
+  //                     Array.isArray(finalResponseData.data.errors)
+  //                   ) {
+  //                     finalResponseData.data.errors.forEach(
+  //                       (error: { index: number; message: string }) => {
+  //                         if (error?.message) {
+  //                           finalErrors[error?.index] = error?.message;
+  //                         }
+  //                       }
+  //                     );
+  //                   }
+
+  //                   const errorCount = Object.keys(finalErrors).length;
+  //                   setIsSyncCompleted(true);
+
+  //                   if (finalResponseData?.message) {
+  //                     Success(finalResponseData.message);
+  //                   } else if (errorCount > 0) {
+  //                     const updateCount =
+  //                       finalResponseData?.data?.updateCount || 0;
+  //                     const insertCount =
+  //                       finalResponseData?.data?.insertCount || 0;
+  //                     const skipCount = finalResponseData?.data?.skipCount || 0;
+  //                     Success(
+  //                       `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
+  //                     );
+  //                   } else {
+  //                     Success("Data synced successfully!");
+  //                   }
+
+  //                   setRowErrors(finalErrors);
+
+  //                   if (errorCount === 0) {
+  //                     setCsvData([]);
+  //                     setCsvHeaders([]);
+  //                     setJsonData({});
+  //                     setSelectedFile(null);
+  //                     setIsSyncCompleted(false);
+  //                     if (fileInputRef.current) {
+  //                       fileInputRef.current.value = "";
+  //                     }
+  //                   }
+  //                 }
+  //               } catch (e) {
+  //                 console.warn(
+  //                   "No final response found in buffer and failed to parse as single JSON:",
+  //                   e
+  //                 );
+  //                 const errorCount = Object.keys(rowErrors).length;
+  //                 if (errorCount > 0) {
+  //                   setIsSyncCompleted(true);
+  //                   Success("Data sync completed with errors");
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         } catch (error) {
+  //           console.error("Error parsing final response:", error);
+  //           ErrorToast("Failed to parse response");
+  //         }
+  //         break;
+  //       }
+
+  //       const chunkText = decoder.decode(value, { stream: true });
+  //       buffer += chunkText;
+
+  //       let processedLength = 0;
+
+  //       while (processedLength < buffer.length) {
+  //         const jsonStart = buffer.indexOf("{", processedLength);
+  //         if (jsonStart === -1) break;
+
+  //         let braceCount = 0;
+  //         let jsonEnd = -1;
+  //         for (let i = jsonStart; i < buffer.length; i++) {
+  //           if (buffer[i] === "{") braceCount++;
+  //           if (buffer[i] === "}") {
+  //             braceCount--;
+  //             if (braceCount === 0) {
+  //               jsonEnd = i + 1;
+  //               break;
+  //             }
+  //           }
+  //         }
+
+  //         if (jsonEnd === -1) {
+  //           buffer = buffer.substring(jsonStart);
+  //           break;
+  //         }
+
+  //         const jsonStr = buffer.substring(jsonStart, jsonEnd);
+  //         try {
+  //           const parsed = JSON.parse(jsonStr);
+
+  //           if (
+  //             parsed.Progress !== undefined &&
+  //             parsed.Total !== undefined &&
+  //             parsed.Percent !== undefined
+  //           ) {
+  //             setProgress({
+  //               progress: parsed.Progress,
+  //               total: parsed.Total,
+  //               percent: parsed.Percent,
+  //             });
+  //           }
+
+  //           if (parsed.error && parsed.error.index !== undefined) {
+  //             const errorIndex = parsed.error.index;
+  //             const errorMessage = parsed.error.message || "";
+  //             if (errorMessage) {
+  //               setRowErrors((prev) => ({
+  //                 ...prev,
+  //                 [errorIndex]: errorMessage,
+  //               }));
+  //             }
+  //           }
+
+  //           if (parsed.success !== undefined || parsed.status !== undefined) {
+  //             if (parsed?.data?.errors && Array.isArray(parsed.data.errors)) {
+  //               const errors: Record<number, string> = {};
+  //               parsed.data.errors.forEach(
+  //                 (error: { index: number; message: string }) => {
+  //                   if (error?.message) {
+  //                     errors[error?.index] = error?.message;
+  //                   }
+  //                 }
+  //               );
+  //               setRowErrors((prev) => ({
+  //                 ...prev,
+  //                 ...errors,
+  //               }));
+  //               setIsSyncCompleted(true);
+
+  //               if (parsed?.message) {
+  //                 Success(parsed.message);
+  //               } else {
+  //                 const errorCount = Object.keys(errors).length;
+  //                 const updateCount = parsed?.data?.updateCount || 0;
+  //                 const insertCount = parsed?.data?.insertCount || 0;
+  //                 const skipCount = parsed?.data?.skipCount || 0;
+  //                 if (errorCount > 0) {
+  //                   Success(
+  //                     `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
+  //                   );
+  //                 } else {
+  //                   Success("Data synced successfully!");
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         } catch (e) {
+  //           console.log("Failed to parse JSON object:", jsonStr, e);
+  //         }
+
+  //         processedLength = jsonEnd;
+
+  //         while (
+  //           processedLength < buffer.length &&
+  //           /\s/.test(buffer[processedLength])
+  //         ) {
+  //           processedLength++;
+  //         }
+  //       }
+
+  //       buffer = buffer.substring(processedLength);
+  //     }
+
+  //     setProgress(null);
+  //     chunkBufferRef.current = "";
+  //   } catch (err: any) {
+  //     setProgress(null);
+  //     chunkBufferRef.current = "";
+  //     ErrorToast(err?.message || "Failed to sync data");
+  //   } finally {
+  //     setIsUploading(false);
+  //   }
+  // };
+
+  const handleUpload = () => {
+    if (!deviceId) {
       ErrorToast("Please select a device");
       return;
     }
-
-    if (!selectedFile || csvData.length === 0) {
-      ErrorToast("Please upload a CSV file first");
+    if (!selectedFile) {
+      ErrorToast("Please upload a CSV file");
       return;
     }
-
-    if (!monthYear) {
-      ErrorToast("Please select a month");
-      return;
-    }
-
-    const [year, month] = monthYear.split("-");
-
-    setIsUploading(true);
 
     const selectedFamily = deviceFamily.find(
       (f) => String(f.device_family_id) === String(deviceFamilyId)
     );
-    const isBrwhms = selectedFamily?.type?.toLowerCase() === "brwhms";
-    const isTank = selectedFamily?.type?.toLowerCase() === "tank";
+    const familyType = selectedFamily?.type?.toLowerCase();
 
-    setProgress(null);
-    chunkBufferRef.current = "";
-    setRowErrors({});
-
-    const endpoint = isBrwhms
-      ? `/brwhms/device/brwhms-new-data-sync/${deviceId}`
-      : isTank
-      ? `/tank/device/tank-new-data-sync/${deviceId}`
-      : `/fm/device/fm-new-data-sync/${deviceId}`;
-
-    const baseURL =
-      document.location.hostname === "localhost"
-        ? import.meta.env.VITE_API_URL
-        : document.location.origin + "/api";
-    const url = `${baseURL}${endpoint}`;
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: JSON.stringify({
-          year,
-          month,
-          data: jsonData,
-        }),
+    let syncData;
+    if (familyType === "brwhms") {
+      syncData = dataSyncForBRWHMSDevices({
+        device_id: Number(deviceId),
+        year: monthYear.split("-")[0],
+        month: monthYear.split("-")[1],
+        data: csvData,
       });
-
-      if (!response.ok) {
-        const errorMsg = `HTTP error! status: ${response.status}`;
-        throw new globalThis.Error(errorMsg);
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) {
-        const errorMsg = "Response body is not readable";
-        throw new globalThis.Error(errorMsg);
-      }
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) {
-          try {
-            const remainingBuffer = buffer.trim();
-            if (remainingBuffer) {
-              let processedLength = 0;
-              let finalResponseData: any = null;
-              const collectedErrors: Record<number, string> = {};
-
-              if (remainingBuffer.trim().startsWith("{")) {
-                try {
-                  const parsedAsSingle = JSON.parse(remainingBuffer);
-                  if (
-                    parsedAsSingle?.success !== undefined ||
-                    parsedAsSingle?.status !== undefined
-                  ) {
-                    finalResponseData = parsedAsSingle;
-                    processedLength = remainingBuffer.length;
-                  }
-                } catch (e) {
-                  console.log(
-                    "Buffer is not a single JSON object, will parse chunks:",
-                    e
-                  );
-                }
-              }
-
-              while (processedLength < remainingBuffer.length) {
-                const jsonStart = remainingBuffer.indexOf("{", processedLength);
-                if (jsonStart === -1) break;
-
-                let braceCount = 0;
-                let jsonEnd = -1;
-                for (let i = jsonStart; i < remainingBuffer.length; i++) {
-                  if (remainingBuffer[i] === "{") braceCount++;
-                  if (remainingBuffer[i] === "}") {
-                    braceCount--;
-                    if (braceCount === 0) {
-                      jsonEnd = i + 1;
-                      break;
-                    }
-                  }
-                }
-
-                if (jsonEnd === -1) break;
-
-                const jsonStr = remainingBuffer.substring(jsonStart, jsonEnd);
-                try {
-                  const parsed = JSON.parse(jsonStr);
-
-                  if (
-                    parsed.Progress !== undefined &&
-                    parsed.Total !== undefined &&
-                    parsed.Percent !== undefined
-                  ) {
-                    setProgress({
-                      progress: parsed.Progress,
-                      total: parsed.Total,
-                      percent: parsed.Percent,
-                    });
-                  }
-
-                  if (parsed.error && parsed.error.index !== undefined) {
-                    const errorIndex = parsed.error.index;
-                    const errorMessage = parsed.error.message || "";
-                    if (errorMessage) {
-                      collectedErrors[errorIndex] = errorMessage;
-                    }
-                  }
-
-                  if (
-                    parsed.success !== undefined ||
-                    parsed.status !== undefined
-                  ) {
-                    finalResponseData = parsed;
-                  }
-                } catch (e) {
-                  console.log("Failed to parse JSON object:", jsonStr, e);
-                }
-
-                processedLength = jsonEnd;
-                while (
-                  processedLength < remainingBuffer.length &&
-                  /\s/.test(remainingBuffer[processedLength])
-                ) {
-                  processedLength++;
-                }
-              }
-
-              if (finalResponseData) {
-                if (
-                  finalResponseData?.success ||
-                  finalResponseData?.status === 200
-                ) {
-                  const finalErrors: Record<number, string> = {
-                    ...rowErrors,
-                    ...collectedErrors,
-                  };
-
-                  if (
-                    finalResponseData?.data?.errors &&
-                    Array.isArray(finalResponseData.data.errors)
-                  ) {
-                    finalResponseData.data.errors.forEach(
-                      (error: { index: number; message: string }) => {
-                        if (error?.message) {
-                          finalErrors[error?.index] = error?.message;
-                        }
-                      }
-                    );
-                  }
-
-                  const errorCount = Object.keys(finalErrors).length;
-                  setIsSyncCompleted(true);
-
-                  if (finalResponseData?.message) {
-                    Success(finalResponseData.message);
-                  } else if (errorCount > 0) {
-                    const updateCount =
-                      finalResponseData?.data?.updateCount || 0;
-                    const insertCount =
-                      finalResponseData?.data?.insertCount || 0;
-                    const skipCount = finalResponseData?.data?.skipCount || 0;
-                    Success(
-                      `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
-                    );
-                  } else {
-                    Success("Data synced successfully!");
-                  }
-
-                  setRowErrors(finalErrors);
-
-                  if (errorCount === 0) {
-                    setCsvData([]);
-                    setCsvHeaders([]);
-                    setJsonData({});
-                    setSelectedFile(null);
-                    setIsSyncCompleted(false);
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = "";
-                    }
-                  }
-                } else {
-                  ErrorToast(
-                    finalResponseData?.message || "Failed to sync data"
-                  );
-                }
-              } else {
-                try {
-                  const parsedData = JSON.parse(remainingBuffer);
-                  if (parsedData?.success || parsedData?.status === 200) {
-                    finalResponseData = parsedData;
-
-                    const finalErrors: Record<number, string> = {
-                      ...rowErrors,
-                      ...collectedErrors,
-                    };
-
-                    if (
-                      finalResponseData?.data?.errors &&
-                      Array.isArray(finalResponseData.data.errors)
-                    ) {
-                      finalResponseData.data.errors.forEach(
-                        (error: { index: number; message: string }) => {
-                          if (error?.message) {
-                            finalErrors[error?.index] = error?.message;
-                          }
-                        }
-                      );
-                    }
-
-                    const errorCount = Object.keys(finalErrors).length;
-                    setIsSyncCompleted(true);
-
-                    if (finalResponseData?.message) {
-                      Success(finalResponseData.message);
-                    } else if (errorCount > 0) {
-                      const updateCount =
-                        finalResponseData?.data?.updateCount || 0;
-                      const insertCount =
-                        finalResponseData?.data?.insertCount || 0;
-                      const skipCount = finalResponseData?.data?.skipCount || 0;
-                      Success(
-                        `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
-                      );
-                    } else {
-                      Success("Data synced successfully!");
-                    }
-
-                    setRowErrors(finalErrors);
-
-                    if (errorCount === 0) {
-                      setCsvData([]);
-                      setCsvHeaders([]);
-                      setJsonData({});
-                      setSelectedFile(null);
-                      setIsSyncCompleted(false);
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = "";
-                      }
-                    }
-                  }
-                } catch (e) {
-                  console.warn(
-                    "No final response found in buffer and failed to parse as single JSON:",
-                    e
-                  );
-                  const errorCount = Object.keys(rowErrors).length;
-                  if (errorCount > 0) {
-                    setIsSyncCompleted(true);
-                    Success("Data sync completed with errors");
-                  }
-                }
-              }
-            }
-          } catch (error) {
-            console.error("Error parsing final response:", error);
-            ErrorToast("Failed to parse response");
-          }
-          break;
-        }
-
-        const chunkText = decoder.decode(value, { stream: true });
-        buffer += chunkText;
-
-        let processedLength = 0;
-
-        while (processedLength < buffer.length) {
-          const jsonStart = buffer.indexOf("{", processedLength);
-          if (jsonStart === -1) break;
-
-          let braceCount = 0;
-          let jsonEnd = -1;
-          for (let i = jsonStart; i < buffer.length; i++) {
-            if (buffer[i] === "{") braceCount++;
-            if (buffer[i] === "}") {
-              braceCount--;
-              if (braceCount === 0) {
-                jsonEnd = i + 1;
-                break;
-              }
-            }
-          }
-
-          if (jsonEnd === -1) {
-            buffer = buffer.substring(jsonStart);
-            break;
-          }
-
-          const jsonStr = buffer.substring(jsonStart, jsonEnd);
-          try {
-            const parsed = JSON.parse(jsonStr);
-
-            if (
-              parsed.Progress !== undefined &&
-              parsed.Total !== undefined &&
-              parsed.Percent !== undefined
-            ) {
-              setProgress({
-                progress: parsed.Progress,
-                total: parsed.Total,
-                percent: parsed.Percent,
-              });
-            }
-
-            if (parsed.error && parsed.error.index !== undefined) {
-              const errorIndex = parsed.error.index;
-              const errorMessage = parsed.error.message || "";
-              if (errorMessage) {
-                setRowErrors((prev) => ({
-                  ...prev,
-                  [errorIndex]: errorMessage,
-                }));
-              }
-            }
-
-            if (parsed.success !== undefined || parsed.status !== undefined) {
-              if (parsed?.data?.errors && Array.isArray(parsed.data.errors)) {
-                const errors: Record<number, string> = {};
-                parsed.data.errors.forEach(
-                  (error: { index: number; message: string }) => {
-                    if (error?.message) {
-                      errors[error?.index] = error?.message;
-                    }
-                  }
-                );
-                setRowErrors((prev) => ({
-                  ...prev,
-                  ...errors,
-                }));
-                setIsSyncCompleted(true);
-
-                if (parsed?.message) {
-                  Success(parsed.message);
-                } else {
-                  const errorCount = Object.keys(errors).length;
-                  const updateCount = parsed?.data?.updateCount || 0;
-                  const insertCount = parsed?.data?.insertCount || 0;
-                  const skipCount = parsed?.data?.skipCount || 0;
-                  if (errorCount > 0) {
-                    Success(
-                      `Data synced! Updated: ${updateCount}, Inserted: ${insertCount}, Skipped: ${skipCount}, Errors: ${errorCount}`
-                    );
-                  } else {
-                    Success("Data synced successfully!");
-                  }
-                }
-              }
-            }
-          } catch (e) {
-            console.log("Failed to parse JSON object:", jsonStr, e);
-          }
-
-          processedLength = jsonEnd;
-
-          while (
-            processedLength < buffer.length &&
-            /\s/.test(buffer[processedLength])
-          ) {
-            processedLength++;
-          }
-        }
-
-        buffer = buffer.substring(processedLength);
-      }
-
-      setProgress(null);
-      chunkBufferRef.current = "";
-    } catch (err: any) {
-      setProgress(null);
-      chunkBufferRef.current = "";
-      ErrorToast(err?.message || "Failed to sync data");
-    } finally {
-      setIsUploading(false);
+    } else if (familyType === "tank" || familyType === "btlm") {
+      syncData = dataSyncForBTLMDevices({
+        device_id: Number(deviceId),
+        year: monthYear.split("-")[0],
+        month: monthYear.split("-")[1],
+        data: csvData,
+      });
+    } else {
+      syncData = dataSyncForFMDevices({
+        device_id: Number(deviceId),
+        year: monthYear.split("-")[0],
+        month: monthYear.split("-")[1],
+        data: csvData,
+      });
     }
+
+    setIsUploading(true);
+    dispatch(syncData)
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          Success(res.message);
+        } else {
+          Error(res.message || "Failed to sync data");
+        }
+      })
+      .finally(() => {
+        setIsUploading(false);
+      })
+      .catch((err) => {
+        Error(err.message || "Failed to sync data");
+      });
   };
 
   const handleClearPreview = () => {

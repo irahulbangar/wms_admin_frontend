@@ -8,6 +8,7 @@ import {
   updateSystem,
 } from "../../../../store/systemSlice";
 import { ApiError } from "../../../utils/errorHandler";
+import { Editor } from "@monaco-editor/react";
 
 interface AddUpdateSystemProps {
   setShowAddSystemPopup: (show: boolean) => void;
@@ -347,7 +348,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Report Formula
           </label>
-          <textarea
+          {/* <textarea
             name="report_formula"
             value={reportData.report_formula}
             onChange={(e) =>
@@ -358,11 +359,24 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             }
             className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
             placeholder="Enter report formula"
+          /> */}
+          <Editor
+            height="80%"
+            width="100%"
+            value={reportData.report_formula}
+            onChange={(value) =>
+              setReportData((prev) => ({
+                ...prev,
+                report_formula: value ? value : "",
+              }))
+            }
+            language="javascript"
+            className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
           />
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Report Neutrality Formula
           </label>
-          <textarea
+          {/* <textarea
             name="report_neutrality_formula"
             value={reportData.neutrality_formula}
             onChange={(e) =>
@@ -373,6 +387,19 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             }
             className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
             placeholder="Enter report neutrality formula"
+          /> */}
+          <Editor
+            height="80%"
+            width="100%"
+            value={reportData.neutrality_formula}
+            onChange={(value) =>
+              setReportData((prev) => ({
+                ...prev,
+                neutrality_formula: value ? value : "",
+              }))
+            }
+            language="javascript"
+            className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
           />
 
           <div className="flex items-center justify-end gap-4 pt-4">

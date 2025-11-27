@@ -19,6 +19,7 @@ import { getAllReportTypes } from "../../../../store/reportTypeSlice";
 import type { PlantResult } from "../../../../model/plant.interface";
 import type { DepartmentResult } from "../../../../model/department.interface";
 import { ApiError } from "../../../utils/errorHandler";
+import { Editor } from "@monaco-editor/react";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -191,7 +192,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     : false;
   const isVirtualReporting =
     getSelectedDeviceFamilyName() === "virtual" &&
-    getSelectedDeviceTypeName() === "System Report";
+    getSelectedDeviceTypeName() === "Resultant Reporting";
   const resetForm = () => {
     setFormData({
       device_family_id: 0,
@@ -1127,7 +1128,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               <>
                 <div>
                   <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
-                    Virtual Reporting
+                    Resultant Reporting
                   </label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -1169,12 +1170,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     </select>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                  <div>
-                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                      Report Formula
-                    </label>
-                    <textarea
+                <div>
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                    Report Formula
+                  </label>
+                  {/* <textarea
                       name="report_formula"
                       value={reportData.report_formula}
                       onChange={(e) =>
@@ -1185,13 +1185,26 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }
                       className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
                       placeholder="Enter report formula"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                      Report Neutrality Formula
-                    </label>
-                    <textarea
+                    /> */}
+                  <Editor
+                    height="80%"
+                    width="100%"
+                    value={reportData.report_formula}
+                    onChange={(value) =>
+                      setReportData((prev) => ({
+                        ...prev,
+                        report_formula: value ? value : "",
+                      }))
+                    }
+                    language="javascript"
+                    className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                    Report Neutrality Formula
+                  </label>
+                  {/* <textarea
                       name="report_neutrality_formula"
                       value={reportData.neutrality_formula}
                       onChange={(e) =>
@@ -1202,264 +1215,295 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }
                       className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
                       placeholder="Enter report neutrality formula"
-                    />
-                  </div>
+                    /> */}
+
+                  <Editor
+                    height="80%"
+                    width="100%"
+                    value={reportData.neutrality_formula}
+                    onChange={(value) =>
+                      setReportData((prev) => ({
+                        ...prev,
+                        neutrality_formula: value ? value : "",
+                      }))
+                    }
+                    language="javascript"
+                    className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                  />
                 </div>
               </>
             )}
 
             {/* Common Parameters */}
-            <div>
-              <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
-                Common Parameters
-              </label>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Lower Limit
-                </label>
-                <input
-                  type="text"
-                  name="lowerLimit"
-                  value={commonInputValues.lowerLimit}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      lowerLimit: inputValue,
-                    }));
+            {!isVirtualReporting && (
+              <>
+                <div>
+                  <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                    Common Parameters
+                  </label>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Lower Limit
+                    </label>
+                    <input
+                      type="text"
+                      name="lowerLimit"
+                      value={commonInputValues.lowerLimit}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setCommonInputValues((prev) => ({
+                          ...prev,
+                          lowerLimit: inputValue,
+                        }));
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      lowerLimit: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter lower limit"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.lowerLimit
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Upper Limit
-                </label>
-                <input
-                  type="text"
-                  name="upperLimit"
-                  value={commonInputValues.upperLimit}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      upperLimit: inputValue,
-                    }));
+                        setCommonParams((prev) => ({
+                          ...prev,
+                          lowerLimit: inputValue,
+                        }));
+                      }}
+                      placeholder="Enter lower limit"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.lowerLimit
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Upper Limit
+                    </label>
+                    <input
+                      type="text"
+                      name="upperLimit"
+                      value={commonInputValues.upperLimit}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setCommonInputValues((prev) => ({
+                          ...prev,
+                          upperLimit: inputValue,
+                        }));
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      upperLimit: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter upper limit"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.upperLimit
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Multiplier
-                </label>
-                <input
-                  type="text"
-                  name="multiplier"
-                  value={commonInputValues.multiplier}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      multiplier: inputValue,
-                    }));
+                        setCommonParams((prev) => ({
+                          ...prev,
+                          upperLimit: inputValue,
+                        }));
+                      }}
+                      placeholder="Enter upper limit"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.upperLimit
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Multiplier
+                    </label>
+                    <input
+                      type="text"
+                      name="multiplier"
+                      value={commonInputValues.multiplier}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setCommonInputValues((prev) => ({
+                          ...prev,
+                          multiplier: inputValue,
+                        }));
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      multiplier: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter multiplier"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.multiplier
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Shifter
-                </label>
-                <input
-                  type="text"
-                  name="shifter"
-                  value={commonInputValues.shifter}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      shifter: inputValue,
-                    }));
+                        setCommonParams((prev) => ({
+                          ...prev,
+                          multiplier: inputValue,
+                        }));
+                      }}
+                      placeholder="Enter multiplier"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.multiplier
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Shifter
+                    </label>
+                    <input
+                      type="text"
+                      name="shifter"
+                      value={commonInputValues.shifter}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setCommonInputValues((prev) => ({
+                          ...prev,
+                          shifter: inputValue,
+                        }));
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      shifter: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter shifter"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.shifter
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Max Threshold
-                </label>
-                <input
-                  type="text"
-                  name="maxThreshold"
-                  value={commonInputValues.maxThreshold}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      maxThreshold: inputValue,
-                    }));
+                        setCommonParams((prev) => ({
+                          ...prev,
+                          shifter: inputValue,
+                        }));
+                      }}
+                      placeholder="Enter shifter"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.shifter
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      Max Threshold
+                    </label>
+                    <input
+                      type="text"
+                      name="maxThreshold"
+                      value={commonInputValues.maxThreshold}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setCommonInputValues((prev) => ({
+                          ...prev,
+                          maxThreshold: inputValue,
+                        }));
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      maxThreshold: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter max threshold"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.maxThreshold
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  A
-                </label>
-                <input
-                  type="text"
-                  name="A"
-                  value={commonInputValues.A}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      A: inputValue,
-                    }));
+                        setCommonParams((prev) => ({
+                          ...prev,
+                          maxThreshold: inputValue,
+                        }));
+                      }}
+                      placeholder="Enter max threshold"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.maxThreshold
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      A: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter A"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.A ? "border-status-danger" : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  B
-                </label>
-                <input
-                  type="text"
-                  name="B"
-                  value={commonInputValues.B}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      B: inputValue,
-                    }));
+                  {getSelectedDeviceFamilyName() !== "brwhms" && (
+                    <>
+                      <div>
+                        <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                          A
+                        </label>
+                        <input
+                          type="text"
+                          name="A"
+                          value={commonInputValues.A}
+                          onChange={(e) => {
+                            const inputValue = e.target.value;
+                            setCommonInputValues((prev) => ({
+                              ...prev,
+                              A: inputValue,
+                            }));
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      B: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter B"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.B ? "border-status-danger" : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  C
-                </label>
-                <input
-                  type="text"
-                  name="C"
-                  value={commonInputValues.C}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      C: inputValue,
-                    }));
+                            setCommonParams((prev) => ({
+                              ...prev,
+                              A: inputValue,
+                            }));
+                          }}
+                          placeholder="Enter A"
+                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                            errors.A
+                              ? "border-status-danger"
+                              : "border-border-primary"
+                          }`}
+                        />
+                      </div>
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      C: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter C"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.C ? "border-status-danger" : "border-border-primary"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  D
-                </label>
-                <input
-                  type="text"
-                  name="D"
-                  value={commonInputValues.D}
-                  onChange={(e) => {
-                    const inputValue = e.target.value;
-                    setCommonInputValues((prev) => ({
-                      ...prev,
-                      D: inputValue,
-                    }));
+                      <div>
+                        <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                          B
+                        </label>
+                        <input
+                          type="text"
+                          name="B"
+                          value={commonInputValues.B}
+                          onChange={(e) => {
+                            const inputValue = e.target.value;
+                            setCommonInputValues((prev) => ({
+                              ...prev,
+                              B: inputValue,
+                            }));
 
-                    setCommonParams((prev) => ({
-                      ...prev,
-                      D: inputValue,
-                    }));
-                  }}
-                  placeholder="Enter D"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors.D ? "border-status-danger" : "border-border-primary"
-                  }`}
-                />
-              </div>
-            </div>
+                            setCommonParams((prev) => ({
+                              ...prev,
+                              B: inputValue,
+                            }));
+                          }}
+                          placeholder="Enter B"
+                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                            errors.B
+                              ? "border-status-danger"
+                              : "border-border-primary"
+                          }`}
+                        />
+                      </div>
+                    </>
+                  )}
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      C
+                    </label>
+                    <input
+                      type="text"
+                      name="C"
+                      value={commonInputValues.C}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setCommonInputValues((prev) => ({
+                          ...prev,
+                          C: inputValue,
+                        }));
+
+                        setCommonParams((prev) => ({
+                          ...prev,
+                          C: inputValue,
+                        }));
+                      }}
+                      placeholder="Enter C"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.C
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                      D
+                    </label>
+                    <input
+                      type="text"
+                      name="D"
+                      value={commonInputValues.D}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        setCommonInputValues((prev) => ({
+                          ...prev,
+                          D: inputValue,
+                        }));
+
+                        setCommonParams((prev) => ({
+                          ...prev,
+                          D: inputValue,
+                        }));
+                      }}
+                      placeholder="Enter D"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                        errors.D
+                          ? "border-status-danger"
+                          : "border-border-primary"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Tank Parameters */}
             {getSelectedDeviceFamilyName() === "tank" && (
