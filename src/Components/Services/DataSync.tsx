@@ -17,6 +17,7 @@ import {
   dataSyncForBTLMDevices,
   getAllDevices,
   setDevices,
+  dataSyncForPHMCDevices,
 } from "../../../store/deviceSlice";
 import { Error, Error as ErrorToast, Success } from "../../utils/toast";
 
@@ -656,6 +657,13 @@ const DataSync = () => {
       });
     } else if (familyType === "tank" || familyType === "btlm") {
       syncData = dataSyncForBTLMDevices({
+        device_id: Number(deviceId),
+        year: monthYear.split("-")[0],
+        month: monthYear.split("-")[1],
+        data: csvData,
+      });
+    } else if (familyType === "phmc") {
+      syncData = dataSyncForPHMCDevices({
         device_id: Number(deviceId),
         year: monthYear.split("-")[0],
         month: monthYear.split("-")[1],

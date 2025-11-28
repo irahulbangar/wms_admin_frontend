@@ -363,6 +363,43 @@ export const dataSyncForBTLMDevices = createAsyncThunk(
   }
 );
 
+interface DataSyncForPHMCDevicesPayload {
+  device_id: number;
+  year: string;
+  month: string;
+  data: object;
+}
+
+// data sync for PHMC devices
+export const dataSyncForPHMCDevices = createAsyncThunk(
+  "device/dataSyncForPHMCDevices",
+  async (
+    { device_id, year, month, data }: DataSyncForPHMCDevicesPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post<DataSyncResponse>(
+        `/phmc/device/phmc-new-data-sync/${device_id}`,
+        {
+          year,
+          month,
+          data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;
