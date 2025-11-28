@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Copy, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../../model/device-type.interface";
@@ -94,6 +94,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
   const [showAddSystemPopup, setShowAddSystemPopup] = useState(false);
   const [reportTypes, setReportTypes] = useState<ReportTypeResult[]>([]);
+  const [lastRecord, setLastRecord] = useState<Record<string, any> | null>(
+    null
+  );
+  const [copied, setCopied] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { organizations } = useAppSelector((state) => state.organization);
 
   const getSelectedDeviceFamilyName = () => {
@@ -112,6 +117,37 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       (type) => type.device_type_id === formData.device_type_id
     );
     return selectedType?.device_type_name || "";
+  };
+
+  const getDevicePath = () => {
+    const department = departmentData.find(
+      (d) => d.department_id === departmentId
+    );
+    const departmentName = department?.department_name || "";
+
+    const system = systemData.find((s) => s.system_id === systemId);
+    const systemName = system?.system_name || "";
+
+    const deviceName = formData.device_name || "";
+
+    if (departmentName && systemName && deviceName) {
+      return `plant['${departmentName}']['${systemName}']['${deviceName}']`;
+    }
+    return "";
+  };
+
+  const handleCopyPath = async () => {
+    const path = getDevicePath();
+    if (path) {
+      try {
+        await navigator.clipboard.writeText(path);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        Success("Path copied to clipboard!");
+      } catch {
+        Error("Failed to copy path");
+      }
+    }
   };
 
   const [commonParams, setCommonParams] = useState<object>({
@@ -268,6 +304,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       report_unit: "",
       report_formula: "",
     });
+    setLastRecord(null);
     setErrors({});
   };
 
@@ -531,6 +568,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   deviceData.device_reporting?.report_formula || "",
               });
             }
+
+            if (deviceData.last_record) {
+              setLastRecord(deviceData.last_record);
+            }
           } else {
             Error(res.message || "Failed to get device data");
           }
@@ -563,6 +604,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         department_id: departmentId,
         device_reporting: null,
       });
+      setLastRecord(null);
     }
   }, [type, deviceId, dispatch, familyData, organizationId]);
 
@@ -638,7 +680,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   );
                   const systemName = system?.system_name || "Unknown System";
 
-                  return `${organizationName} > ${plantName} > ${departmentName} > ${systemName}`;
+                  return `${organizationName} / ${plantName} / ${departmentName} / ${systemName}`;
                 })()}
               </span>
             </div>
@@ -656,6 +698,80 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="flex flex-col gap-3">
+            {(getDevicePath() || lastRecord) && (
+              <div className="bg-secondary rounded-lg border border-border-primary">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="w-full flex items-center cursor-pointer justify-between px-4 py-2 hover:bg-primary/50 transition-colors border-b border-border-primary"
+                >
+                  <label className="text-xl font-normal text-text-primary font-roboto cursor-pointer">
+                    Parameters for Formula
+                  </label>
+                  {isExpanded ? (
+                    <ChevronUp className="w-5 h-5 text-text-secondary" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-text-secondary" />
+                  )}
+                </button>
+
+                {isExpanded && (
+                  <div className="p-3 flex flex-col gap-3">
+                    {getDevicePath() && (
+                      <div>
+                        <label className="text-sm font-normal text-text-secondary mb-2 font-roboto flex items-center justify-between">
+                          <span className="text-text-primary text-base font-medium">
+                            Device Path (for formula)
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleCopyPath}
+                            className="px-3 py-2 bg-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors cursor-pointer flex items-center gap-2 text-text-primary"
+                            title="Copy path"
+                          >
+                            {copied ? (
+                              <>
+                                <Check className="w-4 h-4 text-status-success" />
+                                <span className="text-xs text-status-success">
+                                  Copied!
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-4 h-4" />
+                                <span className="text-xs">Copy</span>
+                              </>
+                            )}
+                          </button>
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 px-3 py-2 bg-primary border border-border-primary rounded-lg text-text-primary font-mono text-sm break-all">
+                            {getDevicePath()}
+                          </code>
+                        </div>
+                      </div>
+                    )}
+
+                    {lastRecord && (
+                      <div>
+                        <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
+                          Variable Values
+                        </label>
+                        <div className="px-3 py-2 bg-primary border border-border-primary rounded-lg">
+                          <pre className="text-text-primary font-mono text-xs overflow-x-auto">
+                            {JSON.stringify(lastRecord, null, 2)}
+                          </pre>
+                        </div>
+                        <p className="text-xs text-text-secondary mt-1 font-roboto italic">
+                          Variable values for this device
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div>
               <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2">
                 Device Details
