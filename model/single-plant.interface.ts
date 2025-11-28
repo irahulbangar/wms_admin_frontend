@@ -80,6 +80,7 @@ export interface NodeData {
   minMm?: number;
   lastMm?: number;
   firstMm?: number;
+  reportValue?: string;
 }
 
 export interface Style {

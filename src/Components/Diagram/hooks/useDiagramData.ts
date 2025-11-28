@@ -364,12 +364,7 @@ export const useDiagramData = (plantId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                departmentConnection: getDepartmentConnection(matchingDevice),
-                plantConnection: getPlantConnection(matchingDevice),
-                organizationConnection: matchingDevice?.organization_connection,
                 systemName: matchingDevice?.system_name,
-                systemConnection: getSystemConnection(matchingDevice),
-                lastRecordTime: matchingDevice?.last_record?.time || "",
               },
             };
           }
@@ -387,12 +382,9 @@ export const useDiagramData = (plantId: string | undefined) => {
               ...node,
               data: {
                 ...node.data,
-                departmentConnection: getDepartmentConnection(matchingDevice),
-                plantConnection: getPlantConnection(matchingDevice),
-                organizationConnection: matchingDevice?.organization_connection,
-                systemName: matchingDevice?.system_name,
-                systemConnection: getSystemConnection(matchingDevice),
-                lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportValue:
+                  matchingDevice?.device_reporting?.report_value || "",
+                unit: matchingDevice?.device_reporting?.report_unit || "Ltr",
               },
             };
           }

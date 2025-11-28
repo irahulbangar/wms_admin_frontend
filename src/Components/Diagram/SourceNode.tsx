@@ -9,9 +9,6 @@ interface SourceNodeProps {
 const SourceNode: React.FC<SourceNodeProps> = ({ data }) => {
   const isActive = data.isActive !== false;
   const deviceName = data.label || "";
-  const flowRate = Number(data.flowRate) || 0;
-  const totalizerReading = Number(data.totalizerReading) || 0;
-  const unit = data.unit || "Ltr";
 
   return (
     <div
@@ -22,9 +19,6 @@ const SourceNode: React.FC<SourceNodeProps> = ({ data }) => {
       }`}
       title={`
 Device Name: ${deviceName}
-Flow Rate: ${flowRate} LPM
-Totalizer Reading: ${totalizerReading} ${unit}
-Type: Source Node
       `}
     >
 
