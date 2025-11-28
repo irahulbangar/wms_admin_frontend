@@ -98,7 +98,8 @@ const DataSync = () => {
       family.name.toLowerCase().includes("flow") ||
       family.type?.toLowerCase() === "fm" ||
       family.type?.toLowerCase() === "brwhms" ||
-      family.type?.toLowerCase() === "tank"
+      family.type?.toLowerCase() === "tank" ||
+      family.type?.toLowerCase() === "phmc"
   );
 
   const filteredDevices = deviceFamilyId
