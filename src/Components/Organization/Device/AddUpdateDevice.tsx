@@ -367,11 +367,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         plant_id: formData.plant_id,
         department_id: formData.department_id,
         device_reporting: isVirtualReporting
-          ? reportData
+          ? { ...reportData, report_value: "0" }
           : {
               report_name: "",
               report_unit: "",
               report_formula: "",
+              report_value: "",
             },
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();

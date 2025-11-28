@@ -383,7 +383,7 @@ export const useDiagramData = (plantId: string | undefined) => {
               data: {
                 ...node.data,
                 reportValue:
-                  matchingDevice?.device_reporting?.report_value || "",
+                  Number(matchingDevice?.device_reporting?.report_value) || 0,
                 unit: matchingDevice?.device_reporting?.report_unit || "Ltr",
               },
             };

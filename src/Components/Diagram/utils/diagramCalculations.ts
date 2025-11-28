@@ -1169,7 +1169,8 @@ const createResultantNode = (
   const resultantNodeData: NodeData = {
     label: device.device_name,
     type: "resultant",
-    unit: device.unit || "Ltr",
+    unit: device.device_reporting?.report_unit || "Ltr",
+    reportValue: Number(device.device_reporting?.report_value) || 0,
     departmentConnection:
       device.in_department_id === null
         ? "None"
