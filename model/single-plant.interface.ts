@@ -45,6 +45,7 @@ export interface Node {
 }
 
 export interface NodeData {
+  reportName?: string;
   type: string;
   unit: string;
   label: string;
