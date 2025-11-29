@@ -77,8 +77,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/");
     setIsDropdownOpen(false);
+    navigate("/login");
     Success("You have been logged out successfully.");
   };
 

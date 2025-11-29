@@ -215,7 +215,7 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-100">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto scrollbar-hide">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border-primary sticky top-0 bg-primary z-10">
           <h2 className="text-xl font-normal text-text-primary font-roboto">
             {type === "add" ? "Add New Department" : "Update Department"}
           </h2>

@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { useAppSelector } from "../../../store/store";
 import Logo from "../../assets/images/logo.png";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface SubmenuItem {
   id: string;
@@ -31,6 +32,7 @@ const menuItems = [
     id: "dashboard",
     icon: <LayoutDashboard className="w-5 h-5" />,
     label: "Dashboard",
+    href: "/home",
   },
   {
     id: "organizations",
@@ -59,7 +61,7 @@ const menuItems = [
         id: "systems",
         label: "Systems",
         icon: <FolderGit className="w-5 h-5" />,
-        href: "/organization/systems/:organization_id/:plant_id/:department_id",
+        href: "/organization/systems",
       },
       {
         id: "devices",
@@ -79,6 +81,7 @@ const menuItems = [
     id: "admin-users",
     icon: <Users className="w-5 h-5" />,
     label: "Admin Users",
+    href: "/admin-users",
   },
   {
     id: "services",
@@ -167,15 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handleSubmenuClick = (submenu: SubmenuItem) => {
-    if (submenu.id === "devices") {
-      onPageChange("devices");
-    } else if (submenu.id === "users") {
-      onPageChange("users");
-    } else if (submenu.id === "organization-setting") {
-      onPageChange("organization-setting");
-    } else {
-      onPageChange(submenu.id);
-    }
+    onPageChange(submenu.id);
   };
 
   return (
@@ -218,7 +213,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           {menuItems?.map((item) => {
             return (
               <div key={item.id}>
-                <button
+                <Link
+                  to={item.submenu ? item.submenu[0]?.href : item.href || "#"}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
                     isMenuItemActive(item)
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
@@ -244,14 +240,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                   {isOpen && item.submenu && (
                     <ChevronDown className="w-4 h-4 transition-transform" />
                   )}
-                </button>
+                </Link>
 
                 {item.submenu && expanded.has(item.id) && (
                   <div className="ml-8 mt-2 space-y-1">
                     {item.submenu?.map((submenu: SubmenuItem) => {
                       return (
-                        <button
+                        <Link
                           key={submenu.id}
+                          to={submenu.href}
                           className={`w-full flex items-center text-left px-2 py-1.5 text-sm rounded-lg transition-all cursor-pointer ${
                             currentPage === submenu.id
                               ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:text-white"
@@ -268,7 +265,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           <span className="font-normal ml-2 font-roboto text-base">
                             {submenu.label}
                           </span>
-                        </button>
+                        </Link>
                       );
                     })}
                   </div>

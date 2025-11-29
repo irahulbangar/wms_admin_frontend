@@ -1,19 +1,29 @@
-import ProtectedRoute from "./Components/ProtectedRoute";
 import Login from "./Components/Login";
-import HomePage from "./Components/HomePage";
 import AuthInitializer from "./Components/AuthInitializer";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import {
-  HashRouter as Router,
-  Routes,
-  Route,
   Navigate,
+  createBrowserRouter,
+  RouterProvider,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import store from "../store/store";
 import DiagramPage from "./Components/DiagramPage";
+import RootLayout from "./Components/Layout/RootLayout";
+import Dashboard from "./Components/Dashboard/Dashboard";
+import Organization from "./Components/Organization/Organization";
+import Plants from "./Components/Organization/Plant/Plants";
+import Departments from "./Components/Organization/Department/Departments";
+import Systems from "./Components/Organization/System/Systems";
+import Devices from "./Components/Organization/Device/Devices";
+import OrganizationUsers from "./Components/Organization/OrganizationUser/OrganizationUsers";
+import AdminUsers from "./Components/Settings/AdminUsers";
+import DataSync from "./Components/Services/DataSync";
+import Setting from "./Components/Organization/Setting";
+import AdminSetting from "./Components/Settings/AdminSetting";
+import Profile from "./Components/Settings/Profile";
 
 function ThemedToast() {
   const { theme } = useTheme();
@@ -33,12 +43,56 @@ function ThemedToast() {
   );
 }
 
+const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { path: "/home", element: <Dashboard /> },
+      { path: "/organization", element: <Organization /> },
+      { path: "/organization/plants", element: <Plants /> },
+      { path: "/organization/plants/:organization_id", element: <Plants /> },
+      { path: "/organization/departments", element: <Departments /> },
+      {
+        path: "/organization/departments/:organization_id/:plant_id",
+        element: <Departments />,
+      },
+      { path: "/organization/systems", element: <Systems /> },
+      {
+        path: "/organization/systems/:organization_id/:plant_id/:department_id",
+        element: <Systems />,
+      },
+      { path: "/organization/devices", element: <Devices /> },
+      {
+        path: "/organization/devices/:organization_id/:plant_id/:department_id/:system_id",
+        element: <Devices />,
+      },
+      { path: "/organization/users", element: <OrganizationUsers /> },
+      { path: "/organization/setting", element: <Setting /> },
+      { path: "/admin-users", element: <AdminUsers /> },
+      { path: "/data-sync", element: <DataSync /> },
+      { path: "/profile", element: <Profile /> },
+      { path: "/admin-setting", element: <AdminSetting /> },
+      { path: "/diagram/:plant_id", element: <DiagramPage /> },
+      { path: "/", element: <Navigate to="/home" replace /> },
+    ],
+  },
+  { path: "*", element: <Navigate to="/login" replace /> },
+]);
+
 function App() {
   return (
     <ThemeProvider>
       <Provider store={store}>
         <AuthInitializer>
-          <Router>
+          <RouterProvider router={router} />
+
+          <ThemedToast />
+          {/* <Router>
             <div className="App">
               <Routes>
                 <Route path="/" element={<Login />} />
@@ -181,10 +235,9 @@ function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
 
-              {/* Toast Container (theme-aware) */}
               <ThemedToast />
             </div>
-          </Router>
+          </Router> */}
         </AuthInitializer>
       </Provider>
     </ThemeProvider>
