@@ -329,7 +329,22 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
               <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
                 Report Unit
               </label>
-              <select
+
+              <input
+                type="text"
+                name="report_unit"
+                value={reportData.report_unit}
+                onChange={(e) =>
+                  setReportData((prev) => ({
+                    ...prev,
+                    report_unit: e.target.value,
+                  }))
+                }
+                className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                placeholder="Enter report unit"
+              />
+
+              {/* <select
                 name="report_unit"
                 value={reportData.report_unit}
                 onChange={(e) =>
@@ -342,7 +357,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
               >
                 <option value="Ltr">Ltr</option>
                 <option value="M^3">m³</option>
-              </select>
+              </select> */}
             </div>
           </div>
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
