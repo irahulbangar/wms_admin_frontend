@@ -20,12 +20,14 @@ import { getAllClients } from "../../../store/clientSlice";
 import type { DeviceResult } from "../../../model/devices.interface";
 import { getAllDevices } from "../../../store/deviceSlice";
 import type { PlantResult } from "../../../model/plant.interface";
-import { getAllPlants } from "../../../store/plantSlice";
 import type { DepartmentResult } from "../../../model/department.interface";
 import type { SystemResult } from "../../../model/system.interface";
 import { getAllSystems } from "../../../store/systemSlice";
 import { getAllDepartments } from "../../../store/departmentSlice";
-import { useGetAllOrganizationsQuery } from "../../../store/rtkQuery";
+import {
+  useGetAllOrganizationsQuery,
+  useGetAllPlantsQuery,
+} from "../../../store/rtkQuery";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
@@ -45,10 +47,16 @@ const Dashboard = () => {
     refetch: refetchOrganizations,
   } = useGetAllOrganizationsQuery();
 
-  const fetchOrganizations = useCallback(async () => {
+  const {
+    data: plantsData,
+    isLoading: isFetchingPlants,
+    refetch: refetchPlants,
+  } = useGetAllPlantsQuery();
+
+  const fetchOrganizations = () => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  }, [refetchOrganizations]);
+  };
 
   useEffect(() => {
     if (organizationsData?.success && organizationsData?.data) {
@@ -56,25 +64,16 @@ const Dashboard = () => {
     }
   }, [organizationsData]);
 
-  const fetchPlants = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllPlants())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setPlants(res?.data);
-        } else {
-          Error(res.message || "Failed to fetch plants");
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to fetch plants");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const fetchPlants = () => {
+    if (isFetchingPlants) return;
+    refetchPlants();
+  };
+
+  useEffect(() => {
+    if (plantsData?.success && plantsData?.data) {
+      setPlants(plantsData.data);
+    }
+  }, [plantsData]);
 
   const fetchUsers = useCallback(async () => {
     if (isLoading) return;

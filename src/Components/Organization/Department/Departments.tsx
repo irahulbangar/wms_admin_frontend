@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { setOrganizations } from "../../../../store/organizationSlice";
-import { getAllPlants, setPlants } from "../../../../store/plantSlice";
+import { setPlants } from "../../../../store/plantSlice";
 import type { DepartmentResult } from "../../../../model/department.interface";
 import { Error, Warning } from "../../../utils/toast";
 import {
@@ -27,7 +27,10 @@ import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
 import Pagination from "../../Pagination";
-import { useGetAllOrganizationsQuery } from "../../../../store/rtkQuery";
+import {
+  useGetAllOrganizationsQuery,
+  useGetAllPlantsQuery,
+} from "../../../../store/rtkQuery";
 
 const Departments = () => {
   const { organization_id, plant_id } = useParams<{
@@ -70,6 +73,12 @@ const Departments = () => {
     refetch: refetchOrganizations,
   } = useGetAllOrganizationsQuery();
 
+  const {
+    data: plantsData,
+    isLoading: isFetchingPlants,
+    refetch: refetchPlants,
+  } = useGetAllPlantsQuery();
+
   const totalItems = useMemo(() => {
     return filteredDepartments.length;
   }, [filteredDepartments]);
@@ -99,23 +108,15 @@ const Departments = () => {
   }, [organizationsData, dispatch]);
 
   const fetchPlants = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllPlants())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          dispatch(setPlants(res.data));
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error("Failed to get plants");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+    if (isFetchingPlants) return;
+    refetchPlants();
+  }, [refetchPlants]);
+
+  useEffect(() => {
+    if (plantsData?.success && plantsData?.data) {
+      dispatch(setPlants(plantsData.data));
+    }
+  }, [plantsData, dispatch]);
 
   useEffect(() => {
     if (
@@ -125,11 +126,15 @@ const Departments = () => {
     ) {
       getOrganization();
     }
-    
-    if (plants.length === 0) {
+
+    if (
+      plants.length === 0 ||
+      plantsData?.success === false ||
+      plantsData?.data?.length === 0
+    ) {
       fetchPlants();
     }
-  }, [getOrganization, organizationsData]);
+  }, [getOrganization, organizationsData, plantsData]);
 
   useEffect(() => {
     if (organization_id) {

@@ -7,7 +7,7 @@ import deviceReducer from "./deviceSlice";
 import userPlantReducer from "./userPlantSlice";
 import departmentReducer from "./departmentSlice";
 import systemReducer from "./systemSlice";
-import { organizationApi } from "./rtkQuery";
+import { organizationApi, plantApi } from "./rtkQuery";
 
 const rootReducer = combineReducers({
   admin: adminReducer,
@@ -19,6 +19,7 @@ const rootReducer = combineReducers({
   department: departmentReducer,
   system: systemReducer,
   [organizationApi.reducerPath]: organizationApi.reducer,
+  [plantApi.reducerPath]: plantApi.reducer,
 });
 
 export default rootReducer;

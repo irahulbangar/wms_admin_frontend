@@ -21,7 +21,7 @@ import {
 } from "../../../../store/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { setOrganizations } from "../../../../store/organizationSlice";
-import { getAllPlants, setPlants } from "../../../../store/plantSlice";
+import { setPlants } from "../../../../store/plantSlice";
 import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
 import { fromatDateWithTime } from "../../../utils/utils";
 import AddUpdateDevice from "./AddUpdateDevice";
@@ -36,7 +36,10 @@ import { getDeviceFamiliy } from "../../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../../store/deviceTypeSlice";
 import DeletePopup from "../DeletePopup";
 import { getAllSystems, setSystems } from "../../../../store/systemSlice";
-import { useGetAllOrganizationsQuery } from "../../../../store/rtkQuery";
+import {
+  useGetAllOrganizationsQuery,
+  useGetAllPlantsQuery,
+} from "../../../../store/rtkQuery";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -102,6 +105,12 @@ const Devices = () => {
     isLoading: isFetchingOrganizations,
     refetch: refetchOrganizations,
   } = useGetAllOrganizationsQuery();
+
+  const {
+    data: plantsData,
+    isLoading: isFetchingPlants,
+    refetch: refetchPlants,
+  } = useGetAllPlantsQuery();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -179,10 +188,10 @@ const Devices = () => {
       });
   }, [dispatch]);
 
-  const getOrganization = useCallback(async () => {
+  const getOrganization = () => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  }, [refetchOrganizations]);
+  };
 
   useEffect(() => {
     if (organizationsData?.success && organizationsData?.data) {
@@ -190,26 +199,16 @@ const Devices = () => {
     }
   }, [organizationsData, dispatch]);
 
-  const fetchPlants = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllPlants())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setPlants(res.data));
-        } else {
-          Error(res.message || "Failed to get plants");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to get plants");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const fetchPlants = () => {
+    if (isFetchingPlants) return;
+    refetchPlants();
+  };
+
+  useEffect(() => {
+    if (plantsData?.success && plantsData?.data) {
+      dispatch(setPlants(plantsData.data));
+    }
+  }, [plantsData, dispatch]);
 
   const getDeviceFamily = useCallback(async () => {
     setIsLoading(true);
@@ -253,11 +252,20 @@ const Devices = () => {
   useEffect(() => {
     if (
       organizations.length === 0 ||
-      plants.length === 0 ||
-      departments.length === 0
+      organizationsData?.success === false ||
+      organizationsData?.data?.length === 0
     ) {
       getOrganization();
+    }
+    if (
+      plants.length === 0 ||
+      plantsData?.success === false ||
+      plantsData?.data?.length === 0
+    ) {
       fetchPlants();
+    }
+
+    if (departments.length === 0) {
       getDepartment();
     }
     getDeviceFamily();

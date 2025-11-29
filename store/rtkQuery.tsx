@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { HOST } from "../api.service";
 import type { GetOrganizationsResponse } from "../model/organizations.interface";
+import type { GetPlantsResponse } from "../model/plant.interface";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: HOST,
@@ -30,4 +31,17 @@ export const organizationApi = createApi({
   }),
 });
 
+export const plantApi = createApi({
+  reducerPath: "plantApi",
+  baseQuery,
+  tagTypes: ["Plant"],
+  endpoints: (builder) => ({
+    getAllPlants: builder.query<GetPlantsResponse, void>({
+      query: () => "/plant/admin/all-plants",
+      providesTags: ["Plant"],
+    }),
+  }),
+});
+
 export const { useGetAllOrganizationsQuery } = organizationApi;
+export const { useGetAllPlantsQuery } = plantApi;

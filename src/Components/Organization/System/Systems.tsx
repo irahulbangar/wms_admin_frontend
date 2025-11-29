@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { setOrganizations } from "../../../../store/organizationSlice";
-import { getAllPlants, setPlants } from "../../../../store/plantSlice";
+import { setPlants } from "../../../../store/plantSlice";
 import { Error, Warning } from "../../../utils/toast";
 import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
@@ -27,7 +27,10 @@ import {
   setSystems,
 } from "../../../../store/systemSlice";
 import type { SystemResult } from "../../../../model/system.interface";
-import { useGetAllOrganizationsQuery } from "../../../../store/rtkQuery";
+import {
+  useGetAllOrganizationsQuery,
+  useGetAllPlantsQuery,
+} from "../../../../store/rtkQuery";
 
 const Systems = () => {
   const { organization_id, plant_id, department_id } = useParams<{
@@ -78,6 +81,12 @@ const Systems = () => {
     refetch: refetchOrganizations,
   } = useGetAllOrganizationsQuery();
 
+  const {
+    data: plantsData,
+    isLoading: isFetchingPlants,
+    refetch: refetchPlants,
+  } = useGetAllPlantsQuery();
+
   const totalItems = useMemo(() => {
     return filteredSystems.length;
   }, [filteredSystems]);
@@ -107,28 +116,31 @@ const Systems = () => {
   }, [organizationsData, dispatch]);
 
   const fetchPlants = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllPlants())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          dispatch(setPlants(res.data));
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error("Failed to get plants");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+    if (isFetchingPlants) return;
+    refetchPlants();
+  }, [refetchPlants]);
 
   useEffect(() => {
-    if (organizations.length === 0 || plants.length === 0) {
-      getOrganization();
+    if (plantsData?.success && plantsData?.data) {
+      dispatch(setPlants(plantsData.data));
+    }
+  }, [plantsData, dispatch]);
+
+  useEffect(() => {
+    if (
+      organizations.length === 0 ||
+      plantsData?.success === false ||
+      plantsData?.data?.length === 0
+    ) {
       fetchPlants();
+    }
+
+    if (
+      organizations.length === 0 ||
+      organizationsData?.success === false ||
+      organizationsData?.data?.length === 0
+    ) {
+      getOrganization();
     }
   }, [getOrganization, fetchPlants]);
 

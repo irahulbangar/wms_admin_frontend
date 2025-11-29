@@ -5,7 +5,7 @@ import {
 } from "@reduxjs/toolkit/react";
 import { useDispatch, useSelector } from "react-redux";
 import rootReducer from "./rootReducers";
-import { organizationApi } from "./rtkQuery";
+import { organizationApi, plantApi } from "./rtkQuery";
 
 const listenerMiddlewareInstance = createListenerMiddleware({
   onError: () => console.error,
@@ -44,7 +44,8 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .prepend(listenerMiddlewareInstance.middleware)
-      .concat(organizationApi.middleware),
+      .concat(organizationApi.middleware)
+      .concat(plantApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;
