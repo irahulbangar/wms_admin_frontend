@@ -1,13 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  X,
-  Loader2,
-  Copy,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Search,
-} from "lucide-react";
+import { X, Loader2, Copy, Check, Search } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../../model/device-type.interface";
@@ -105,12 +97,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
   const [showAddSystemPopup, setShowAddSystemPopup] = useState(false);
   const [reportTypes, setReportTypes] = useState<ReportTypeResult[]>([]);
-  const [lastRecord, setLastRecord] = useState<Record<string, any> | null>(
+  const [_lastRecord, setLastRecord] = useState<Record<string, any> | null>(
     null
   );
-  const [copied, setCopied] = useState(false);
   const [copiedPathIndex, setCopiedPathIndex] = useState<number | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [devicePathSearchTerm, setDevicePathSearchTerm] = useState("");
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(
     null
@@ -192,23 +182,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     return selectedType?.device_type_name || "";
   };
 
-  const getDevicePath = () => {
-    const department = departmentData.find(
-      (d) => d.department_id === departmentId
-    );
-    const departmentName = department?.department_name || "";
-
-    const system = systemData.find((s) => s.system_id === systemId);
-    const systemName = system?.system_name || "";
-
-    const deviceName = formData.device_name || "";
-
-    if (departmentName && systemName && deviceName) {
-      return `plant['${departmentName}']['${systemName}']['${deviceName}']`;
-    }
-    return "";
-  };
-
   const getAllSystemDevicePaths = useCallback(() => {
     if (!systemDevices || systemDevices.length === 0) return [];
 
@@ -244,20 +217,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       (key) => lastRecord?.[key] !== null && lastRecord?.[key] !== undefined
     );
   }, []);
-
-  const handleCopyPath = async () => {
-    const path = getDevicePath();
-    if (path) {
-      try {
-        await navigator.clipboard.writeText(path);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        Success("Path copied to clipboard!");
-      } catch {
-        Error("Failed to copy path");
-      }
-    }
-  };
 
   const [commonParams, setCommonParams] = useState<object>({
     maxThreshold: "",
@@ -798,80 +757,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="flex flex-col gap-3">
-            {(getDevicePath() || lastRecord) && (
-              <div className="bg-secondary rounded-lg border border-border-primary">
-                <button
-                  type="button"
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="w-full flex items-center cursor-pointer justify-between px-4 py-2 hover:bg-primary/50 transition-colors border-b border-border-primary"
-                >
-                  <label className="text-xl font-normal text-text-primary font-roboto cursor-pointer">
-                    Parameters for Formula
-                  </label>
-                  {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-text-secondary" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-text-secondary" />
-                  )}
-                </button>
-
-                {isExpanded && (
-                  <div className="p-3 flex flex-col gap-3">
-                    {getDevicePath() && (
-                      <div>
-                        <label className="text-sm font-normal text-text-secondary mb-2 font-roboto flex items-center justify-between">
-                          <span className="text-text-primary text-base font-medium">
-                            Device Path (for formula)
-                          </span>
-                          <button
-                            type="button"
-                            onClick={handleCopyPath}
-                            className="px-3 py-2 bg-primary border border-border-primary rounded-lg hover:bg-secondary transition-colors cursor-pointer flex items-center gap-2 text-text-primary"
-                            title="Copy path"
-                          >
-                            {copied ? (
-                              <>
-                                <Check className="w-4 h-4 text-status-success" />
-                                <span className="text-xs text-status-success">
-                                  Copied!
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-4 h-4" />
-                                <span className="text-xs">Copy</span>
-                              </>
-                            )}
-                          </button>
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <code className="flex-1 px-3 py-2 bg-primary border border-border-primary rounded-lg text-text-primary font-mono text-sm break-all">
-                            {getDevicePath()}
-                          </code>
-                        </div>
-                      </div>
-                    )}
-
-                    {lastRecord && (
-                      <div>
-                        <label className="block text-sm font-normal text-text-secondary mb-2 font-roboto">
-                          Variable Values
-                        </label>
-                        <div className="px-3 py-2 bg-primary border border-border-primary rounded-lg">
-                          <pre className="text-text-primary font-mono text-xs overflow-x-auto">
-                            {JSON.stringify(lastRecord, null, 2)}
-                          </pre>
-                        </div>
-                        <p className="text-xs text-text-secondary mt-1 font-roboto italic">
-                          Variable values for this device
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
             <div>
               <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2">
                 Device Details
@@ -1413,8 +1298,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   {systemDevices.length > 0 && (
                     <div className="mb-2 p-2 bg-secondary/50 rounded-lg border border-border-primary">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs text-text-secondary font-roboto">
-                          Available System Devices:
+                        <p className="text-base text-text-secondary font-roboto">
+                          Available System Devices
                         </p>
                         <div className="relative mb-2">
                           <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
@@ -1533,8 +1418,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                                       className="absolute right-0 top-full mt-1 bg-primary border border-border-primary rounded-lg shadow-lg z-50 w-[490px] max-h-64 overflow-y-auto variable-dropdown"
                                     >
                                       <div className="p-2 border-b border-border-primary sticky top-0 bg-primary">
-                                        <p className="text-xs text-text-secondary font-roboto font-semibold">
-                                          Select Variable:
+                                        <p className="text-sm text-text-secondary font-roboto font-normal">
+                                          Select Variable
                                         </p>
                                       </div>
                                       {hasVariables ? (
