@@ -186,6 +186,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     if (!systemDevices || systemDevices.length === 0) return [];
 
     return systemDevices
+      .filter((device) => {
+        const isVirtual =
+          device.device_family_type === "virtual" ||
+          device.device_family?.toLowerCase().includes("virtual");
+        return !isVirtual;
+      })
       .map((device) => {
         const department = departmentData.find(
           (d) => d.department_id === device.department_id
