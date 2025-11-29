@@ -230,6 +230,28 @@ export const getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId =
     }
   );
 
+// get device by systemId
+export const getDeviceBySystemId = createAsyncThunk(
+  "device/getDeviceBySystemId",
+  async (systemId: number, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().get<DeviceResponse>(
+        `/device/admin/device-system/${systemId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 // delete device
 export const deleteDevice = createAsyncThunk(
   "device/deleteDevice",

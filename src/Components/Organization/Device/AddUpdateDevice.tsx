@@ -1,11 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
-import { X, Loader2, Copy, Check, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  X,
+  Loader2,
+  Copy,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Search,
+} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
 import type { DeviceTypeResult } from "../../../../model/device-type.interface";
 import {
   createDevice,
   getDeviceById,
+  getDeviceBySystemId,
   updateDevice,
   type CreateDevicePayload,
 } from "../../../../store/deviceSlice";
@@ -21,6 +30,7 @@ import type { DepartmentResult } from "../../../../model/department.interface";
 import { ApiError } from "../../../utils/errorHandler";
 import { Editor } from "@monaco-editor/react";
 import { useGetAllSystemsQuery } from "../../../../store/rtkQuery";
+import type { DeviceResult } from "../../../../model/devices.interface";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -99,14 +109,44 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     null
   );
   const [copied, setCopied] = useState(false);
+  const [copiedPathIndex, setCopiedPathIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [devicePathSearchTerm, setDevicePathSearchTerm] = useState("");
   const { organizations } = useAppSelector((state) => state.organization);
+  const [systemDevices, setSystemDevices] = useState<DeviceResult[]>([]);
 
   const {
     data: systemsData,
     isLoading: isFetchingSystems,
     refetch: refetchSystems,
   } = useGetAllSystemsQuery();
+
+  console.log("systemDevices", systemDevices);
+
+  const fetchSystemDevices = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getDeviceBySystemId(systemId))
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          setSystemDevices(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error(err.message || "Failed to get system devices");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch, systemId]);
+
+  useEffect(() => {
+    if (systemId) {
+      fetchSystemDevices();
+    }
+  }, [systemId]);
 
   const getSelectedDeviceFamilyName = () => {
     const selectedFamily = familyData.find(
@@ -142,6 +182,29 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
     return "";
   };
+
+  const getAllSystemDevicePaths = useCallback(() => {
+    if (!systemDevices || systemDevices.length === 0) return [];
+
+    return systemDevices
+      .map((device) => {
+        const department = departmentData.find(
+          (d) => d.department_id === device.department_id
+        );
+        const departmentName = department?.department_name || "";
+
+        const system = systemData.find((s) => s.system_id === device.system_id);
+        const systemName = system?.system_name || "";
+
+        const deviceName = device.device_name || "";
+
+        if (departmentName && systemName && deviceName) {
+          return `plant['${departmentName}']['${systemName}']['${deviceName}']`;
+        }
+        return null;
+      })
+      .filter((path): path is string => path !== null);
+  }, [systemDevices, departmentData, systemData]);
 
   const handleCopyPath = async () => {
     const path = getDevicePath();
@@ -1308,6 +1371,125 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
                       placeholder="Enter report formula"
                     /> */}
+                  {systemDevices.length > 0 && (
+                    <div className="mb-2 p-2 bg-secondary/50 rounded-lg border border-border-primary">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-text-secondary font-roboto">
+                          Available System Devices:
+                        </p>
+                        <div className="relative mb-2">
+                          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
+                          <input
+                            type="text"
+                            placeholder="Search device paths..."
+                            value={devicePathSearchTerm}
+                            onChange={(e) =>
+                              setDevicePathSearchTerm(e.target.value)
+                            }
+                            className="w-full pl-8 pr-8 py-1.5 text-xs text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                          />
+                          {devicePathSearchTerm && (
+                            <button
+                              type="button"
+                              onClick={() => setDevicePathSearchTerm("")}
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+                              title="Clear search"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="max-h-32 overflow-y-auto">
+                        {getAllSystemDevicePaths()
+                          .filter((path) =>
+                            devicePathSearchTerm
+                              ? path
+                                  .toLowerCase()
+                                  .includes(devicePathSearchTerm.toLowerCase())
+                              : true
+                          )
+                          .map((path, index) => {
+                            const originalIndex =
+                              getAllSystemDevicePaths().indexOf(path);
+                            return (
+                              <div
+                                key={index}
+                                className="flex items-center gap-2 py-1 px-2 hover:bg-primary/50 rounded group"
+                              >
+                                <span className="text-xs text-text-secondary font-roboto min-w-[20px]">
+                                  {index + 1}.
+                                </span>
+                                <code
+                                  className="flex-1 text-xs text-text-primary font-mono cursor-pointer"
+                                  onClick={(e) => {
+                                    if (
+                                      (e.target as HTMLElement).closest(
+                                        "button"
+                                      )
+                                    ) {
+                                      return;
+                                    }
+                                    const currentValue =
+                                      reportData.report_formula || "";
+                                    setReportData((prev) => ({
+                                      ...prev,
+                                      report_formula: currentValue
+                                        ? `${currentValue}\n${path}`
+                                        : path,
+                                    }));
+                                  }}
+                                  title="Click to insert into editor"
+                                >
+                                  {path}
+                                </code>
+                                <button
+                                  type="button"
+                                  onClick={async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    try {
+                                      await navigator.clipboard.writeText(path);
+                                      setCopiedPathIndex(originalIndex);
+                                      setTimeout(() => {
+                                        setCopiedPathIndex(null);
+                                      }, 2000);
+                                      Success("Path copied to clipboard!");
+                                    } catch {
+                                      Error("Failed to copy path");
+                                    }
+                                  }}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-primary rounded"
+                                  title="Copy path to clipboard"
+                                >
+                                  {copiedPathIndex === originalIndex ? (
+                                    <Check className="w-4 h-4 text-status-success cursor-pointer" />
+                                  ) : (
+                                    <Copy className="w-4 h-4 text-text-secondary hover:text-text-primary cursor-pointer" />
+                                  )}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        {getAllSystemDevicePaths().filter((path) =>
+                          devicePathSearchTerm
+                            ? path
+                                .toLowerCase()
+                                .includes(devicePathSearchTerm.toLowerCase())
+                            : true
+                        ).length === 0 && (
+                          <div className="text-center py-4 text-xs text-text-secondary font-roboto">
+                            No device paths found matching "
+                            {devicePathSearchTerm}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <Editor
                     height="80%"
                     width="100%"
@@ -1320,6 +1502,63 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     }
                     language="javascript"
                     className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                    onMount={(_editor, monaco) => {
+                      const devicePaths = getAllSystemDevicePaths();
+
+                      monaco.languages.registerCompletionItemProvider(
+                        "javascript",
+                        {
+                          provideCompletionItems: () => {
+                            const suggestions = devicePaths.map((path) => ({
+                              label: path,
+                              kind: monaco.languages.CompletionItemKind
+                                .Variable,
+                              insertText: path,
+                              documentation: `Device path: ${path}`,
+                              detail: "System Device",
+                            }));
+
+                            return { suggestions };
+                          },
+                          triggerCharacters: [
+                            "p",
+                            "l",
+                            "a",
+                            "n",
+                            "t",
+                            "[",
+                            "'",
+                          ],
+                        }
+                      );
+
+                      monaco.languages.registerHoverProvider("javascript", {
+                        provideHover: (model: any, position: any) => {
+                          const word = model.getWordAtPosition(position);
+                          if (word) {
+                            const devicePath = devicePaths.find((path) =>
+                              path.includes(word.word)
+                            );
+                            if (devicePath) {
+                              return {
+                                range: new monaco.Range(
+                                  position.lineNumber,
+                                  word.startColumn,
+                                  position.lineNumber,
+                                  word.endColumn
+                                ),
+                                contents: [
+                                  {
+                                    value: `**Device Path:**\n\`${devicePath}\``,
+                                  },
+                                ],
+                              };
+                            }
+                          }
+                          return null;
+                        },
+                      });
+                    }}
                   />
                 </div>
               </>
