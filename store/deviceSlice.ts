@@ -40,23 +40,23 @@ export const deviceSlice = createSlice({
       state.error = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(getAllDevices.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllDevices.fulfilled, (state, action) => {
-      state.loading = false;
-      state.devices = action.payload.data;
-      state.status = action.payload.status;
-      state.success = action.payload.success;
-    });
-    builder.addCase(getAllDevices.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message || "Failed to fetch devices";
-      state.status = 0;
-      state.success = false;
-    });
-  },
+  // extraReducers: (builder) => {
+  //   builder.addCase(getAllDevices.pending, (state) => {
+  //     state.loading = true;
+  //   });
+  //   builder.addCase(getAllDevices.fulfilled, (state, action) => {
+  //     state.loading = false;
+  //     state.devices = action.payload.data;
+  //     state.status = action.payload.status;
+  //     state.success = action.payload.success;
+  //   });
+  //   builder.addCase(getAllDevices.rejected, (state, action) => {
+  //     state.loading = false;
+  //     state.error = action.error.message || "Failed to fetch devices";
+  //     state.status = 0;
+  //     state.success = false;
+  //   });
+  // },
 });
 
 export interface CreateDevicePayload {
@@ -107,26 +107,26 @@ export const createDevice = createAsyncThunk(
 );
 
 // Get device
-export const getAllDevices = createAsyncThunk(
-  "device/getAllDevices",
-  async (_, thunkAPI) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().get<DeviceResponse>(
-        "/device/admin/all-devices",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = handleApiError(error);
-      return rejectWithValue(apiError);
-    }
-  }
-);
+// export const getAllDevices = createAsyncThunk(
+//   "device/getAllDevices",
+//   async (_, thunkAPI) => {
+//     const { rejectWithValue } = thunkAPI;
+//     try {
+//       const response = await api().get<DeviceResponse>(
+//         "/device/admin/all-devices",
+//         {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+//           },
+//         }
+//       );
+//       return response.data;
+//     } catch (error: unknown) {
+//       const apiError = handleApiError(error);
+//       return rejectWithValue(apiError);
+//     }
+//   }
+// );
 
 // get device by id
 export const getDeviceById = createAsyncThunk(

@@ -137,10 +137,10 @@ const Plants = () => {
     navigate("/");
   };
 
-  const fetchPlants = useCallback(async () => {
+  const fetchPlants = useCallback(() => {
     if (isFetchingPlants) return;
     refetchPlants();
-  }, [refetchPlants]);
+  }, [isFetchingPlants, refetchPlants]);
 
   useEffect(() => {
     if (plantsData?.success && plantsData?.data) {
@@ -181,10 +181,10 @@ const Plants = () => {
     [dispatch, organization_id]
   );
 
-  const getAllOrganizations = useCallback(async () => {
+  const fetchOrganizations = useCallback(() => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  }, [refetchOrganizations]);
+  }, [isFetchingOrganizations, refetchOrganizations]);
 
   useEffect(() => {
     if (organizationsData?.success && organizationsData?.data) {
@@ -196,7 +196,7 @@ const Plants = () => {
     setPlants([]);
     setIsLoading(false);
     if (organizations.length === 0) {
-      getAllOrganizations();
+      fetchOrganizations();
     }
 
     if (organization_id) {
@@ -210,7 +210,7 @@ const Plants = () => {
     organization_id,
     fetchPlants,
     getPlantByOrganizationId,
-    getAllOrganizations,
+    fetchOrganizations,
   ]);
 
   useEffect(() => {

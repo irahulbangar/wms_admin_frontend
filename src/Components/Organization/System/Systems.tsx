@@ -22,7 +22,6 @@ import NoDataFound from "../../NoDataFound";
 import Pagination from "../../Pagination";
 import AddUpdateSystem from "./AddUpdateSystem";
 import {
-  getAllSystems,
   getSystemByOrganizationIdPlantIdAndDepartmentId,
   setSystems,
 } from "../../../../store/systemSlice";
@@ -30,6 +29,7 @@ import type { SystemResult } from "../../../../model/system.interface";
 import {
   useGetAllOrganizationsQuery,
   useGetAllPlantsQuery,
+  useGetAllSystemsQuery,
 } from "../../../../store/rtkQuery";
 
 const Systems = () => {
@@ -87,6 +87,12 @@ const Systems = () => {
     refetch: refetchPlants,
   } = useGetAllPlantsQuery();
 
+  const {
+    data: systemsData,
+    isLoading: isFetchingSystems,
+    refetch: refetchSystems,
+  } = useGetAllSystemsQuery();
+
   const totalItems = useMemo(() => {
     return filteredSystems.length;
   }, [filteredSystems]);
@@ -104,10 +110,10 @@ const Systems = () => {
     setCurrentPage(1);
   };
 
-  const getOrganization = useCallback(async () => {
+  const fetchOrganizations = useCallback(() => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  }, [refetchOrganizations]);
+  }, [isFetchingOrganizations, refetchOrganizations]);
 
   useEffect(() => {
     if (organizationsData?.success && organizationsData?.data) {
@@ -115,10 +121,10 @@ const Systems = () => {
     }
   }, [organizationsData, dispatch]);
 
-  const fetchPlants = useCallback(async () => {
+  const fetchPlants = useCallback(() => {
     if (isFetchingPlants) return;
     refetchPlants();
-  }, [refetchPlants]);
+  }, [isFetchingPlants, refetchPlants]);
 
   useEffect(() => {
     if (plantsData?.success && plantsData?.data) {
@@ -140,9 +146,9 @@ const Systems = () => {
       organizationsData?.success === false ||
       organizationsData?.data?.length === 0
     ) {
-      getOrganization();
+      fetchOrganizations();
     }
-  }, [getOrganization, fetchPlants]);
+  }, [fetchOrganizations, fetchPlants]);
 
   useEffect(() => {
     if (organization_id) {
@@ -350,31 +356,16 @@ const Systems = () => {
     }
   };
 
-  const refreshSystems = useCallback(() => {
-    if (isLoading) return;
+  const fetchSystems = useCallback(() => {
+    if (isFetchingSystems) return;
+    refetchSystems();
+  }, [isFetchingSystems, refetchSystems]);
 
-    if (organization_id && plant_id && department_id) {
-      setIsLoading(true);
+  useEffect(() => {
+    if (systemsData?.success && systemsData?.data) {
+      dispatch(setSystems(systemsData.data));
     }
-
-    dispatch(getAllSystems())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setSystems(res?.data));
-          setFilteredSystems(res?.data);
-        } else {
-          Error(res.message || "Failed to get systems");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to get systems");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  }, [systemsData, dispatch]);
 
   useEffect(() => {
     if (organization_id && plant_id && department_id) {
@@ -410,7 +401,7 @@ const Systems = () => {
       selectedPlant === "all" &&
       selectedDepartment === "all"
     ) {
-      refreshSystems();
+      fetchSystems();
     } else if (
       selectedOrganization !== "all" &&
       selectedPlant !== "all" &&
@@ -441,7 +432,7 @@ const Systems = () => {
           setIsLoading(false);
         });
     } else {
-      refreshSystems();
+      fetchSystems();
     }
   }, [
     organization_id,
@@ -451,7 +442,7 @@ const Systems = () => {
     selectedPlant,
     selectedDepartment,
     dispatch,
-    refreshSystems,
+    fetchSystems,
   ]);
 
   const handleSystemUpdate = useCallback(
@@ -469,7 +460,7 @@ const Systems = () => {
       }
 
       if (result?.data?.refreshOrganizations) {
-        getOrganization();
+        fetchOrganizations();
         return;
       }
 
@@ -524,7 +515,7 @@ const Systems = () => {
             setIsLoading(false);
           });
       } else {
-        refreshSystems();
+        fetchSystems();
       }
     },
     [
@@ -533,9 +524,9 @@ const Systems = () => {
       selectedPlant,
       organization_id,
       plant_id,
-      refreshSystems,
+      fetchSystems,
       fetchPlants,
-      getOrganization,
+      fetchOrganizations,
     ]
   );
 

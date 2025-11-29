@@ -15,7 +15,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../../model/devices.interface";
 import {
   deleteDevice,
-  getAllDevices,
   getDeviceByOrganizationIdPlantIdDepartmentIdAndSystemId,
   setDevices,
 } from "../../../../store/deviceSlice";
@@ -28,17 +27,17 @@ import AddUpdateDevice from "./AddUpdateDevice";
 import { Error, Success, Warning } from "../../../utils/toast";
 import NoDataFound from "../../NoDataFound";
 import type { DeviceTypeResult } from "../../../../model/device-type.interface";
-import {
-  getAllDepartments,
-  setDepartments,
-} from "../../../../store/departmentSlice";
+import { setDepartments } from "../../../../store/departmentSlice";
 import { getDeviceFamiliy } from "../../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../../store/deviceTypeSlice";
 import DeletePopup from "../DeletePopup";
-import { getAllSystems, setSystems } from "../../../../store/systemSlice";
+import { setSystems } from "../../../../store/systemSlice";
 import {
+  useGetAllDepartmentsQuery,
+  useGetAllDevicesQuery,
   useGetAllOrganizationsQuery,
   useGetAllPlantsQuery,
+  useGetAllSystemsQuery,
 } from "../../../../store/rtkQuery";
 
 const Devices = () => {
@@ -99,6 +98,8 @@ const Devices = () => {
     null
   );
   const { admin } = useAppSelector((state) => state.admin);
+  const hasInitializedRef = useRef(false);
+  const isFetchingDataRef = useRef(false);
 
   const {
     data: organizationsData,
@@ -111,6 +112,24 @@ const Devices = () => {
     isLoading: isFetchingPlants,
     refetch: refetchPlants,
   } = useGetAllPlantsQuery();
+
+  const {
+    data: departmentsData,
+    isLoading: isFetchingDepartments,
+    refetch: refetchDepartments,
+  } = useGetAllDepartmentsQuery();
+
+  const {
+    data: systemsData,
+    isLoading: isFetchingSystems,
+    refetch: refetchSystems,
+  } = useGetAllSystemsQuery();
+
+  const {
+    data: devicesData,
+    isLoading: isFetchingDevices,
+    refetch: refetchDevices,
+  } = useGetAllDevicesQuery();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -150,48 +169,32 @@ const Devices = () => {
     };
   }, []);
 
-  const getSystem = useCallback(async () => {
-    setIsLoading(true);
-    await dispatch(getAllSystems())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setSystems(res.data));
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to get systems");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const fetchSystems = useCallback(() => {
+    if (isFetchingSystems) return;
+    refetchSystems();
+  }, [isFetchingSystems, refetchSystems]);
 
-  const getDepartment = useCallback(async () => {
-    setIsLoading(true);
-    await dispatch(getAllDepartments())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setDepartments(res.data));
-        } else {
-          Error(res.message || "Failed to get departments");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to get departments");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  useEffect(() => {
+    if (systemsData?.success && systemsData?.data) {
+      dispatch(setSystems(systemsData.data));
+    }
+  }, [systemsData, dispatch]);
 
-  const getOrganization = () => {
+  const fetchDepartments = useCallback(() => {
+    if (isFetchingDepartments) return;
+    refetchDepartments();
+  }, [isFetchingDepartments, refetchDepartments]);
+
+  useEffect(() => {
+    if (departmentsData?.success && departmentsData?.data) {
+      dispatch(setDepartments(departmentsData.data));
+    }
+  }, [departmentsData, dispatch]);
+
+  const fetchOrganizations = useCallback(() => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  };
+  }, [isFetchingOrganizations, refetchOrganizations]);
 
   useEffect(() => {
     if (organizationsData?.success && organizationsData?.data) {
@@ -199,10 +202,10 @@ const Devices = () => {
     }
   }, [organizationsData, dispatch]);
 
-  const fetchPlants = () => {
+  const fetchPlants = useCallback(() => {
     if (isFetchingPlants) return;
     refetchPlants();
-  };
+  }, [isFetchingPlants, refetchPlants]);
 
   useEffect(() => {
     if (plantsData?.success && plantsData?.data) {
@@ -250,28 +253,54 @@ const Devices = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (hasInitializedRef.current || isFetchingDataRef.current) return;
+
+    isFetchingDataRef.current = true;
+    hasInitializedRef.current = true;
+
     if (
-      organizations.length === 0 ||
-      organizationsData?.success === false ||
-      organizationsData?.data?.length === 0
+      !isFetchingOrganizations &&
+      organizations.length === 0 &&
+      (!organizationsData ||
+        organizationsData?.success === false ||
+        (organizationsData?.data && organizationsData.data.length === 0))
     ) {
-      getOrganization();
+      fetchOrganizations();
     }
+
     if (
-      plants.length === 0 ||
-      plantsData?.success === false ||
-      plantsData?.data?.length === 0
+      !isFetchingPlants &&
+      plants.length === 0 &&
+      (!plantsData ||
+        plantsData?.success === false ||
+        (plantsData?.data && plantsData.data.length === 0))
     ) {
       fetchPlants();
     }
 
-    if (departments.length === 0) {
-      getDepartment();
+    if (
+      !isFetchingDepartments &&
+      departments.length === 0 &&
+      (!departmentsData ||
+        departmentsData?.success === false ||
+        departmentsData?.data?.length === 0)
+    ) {
+      fetchDepartments();
     }
-    getDeviceFamily();
-    getDeviceType();
-    getSystem();
+    if (deviceFamily.length === 0) {
+      getDeviceFamily();
+    }
+    if (deviceType.length === 0) {
+      getDeviceType();
+    }
+    if (systems.length === 0) {
+      fetchSystems();
+    }
 
+    isFetchingDataRef.current = false;
+  }, []);
+
+  useEffect(() => {
     if (organization_id && plant_id && department_id && system_id) {
       setIsLoading(true);
       setSelectedOrganization(organization_id);
@@ -314,42 +343,18 @@ const Devices = () => {
       setSelectedDepartment("all");
       setSelectedSystem("all");
     }
-  }, [
-    organization_id,
-    plant_id,
-    department_id,
-    system_id,
-    dispatch,
-    getOrganization,
-    fetchPlants,
-    getDeviceFamily,
-    getDeviceType,
-    getDepartment,
-    getSystem,
-  ]);
+  }, [organization_id, plant_id, department_id, system_id, dispatch]);
 
-  const refreshDevices = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
+  const fetchDevices = useCallback(() => {
+    if (isFetchingDevices) return;
+    refetchDevices();
+  }, [isFetchingDevices, refetchDevices]);
 
-    dispatch(getAllDevices())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setDevices(res?.data));
-          setFilteredDevices(res?.data);
-        } else {
-          Error(res.message || "Failed to get devices");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to get devices");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch, setFilteredDevices, setDevices]);
+  useEffect(() => {
+    if (devicesData?.success && devicesData?.data) {
+      dispatch(setDevices(devicesData.data));
+    }
+  }, [devicesData, dispatch]);
 
   useEffect(() => {
     if (organization_id && plant_id && department_id && system_id) {
@@ -362,7 +367,7 @@ const Devices = () => {
       selectedDepartment === "all" &&
       selectedSystem === "all"
     ) {
-      refreshDevices();
+      fetchDevices();
     } else if (
       selectedOrganization !== "all" &&
       selectedPlant !== "all" &&
@@ -405,7 +410,7 @@ const Devices = () => {
     plant_id,
     department_id,
     system_id,
-    refreshDevices,
+    fetchDevices,
   ]);
 
   useEffect(() => {
@@ -627,7 +632,7 @@ const Devices = () => {
       if (isLoading) return;
 
       if (result?.data?.refreshDepartments) {
-        getDepartment();
+        fetchDepartments();
         return;
       }
 
@@ -642,7 +647,7 @@ const Devices = () => {
       }
 
       if (result?.data?.refreshOrganizations) {
-        getOrganization();
+        fetchOrganizations();
         return;
       }
 
@@ -652,7 +657,7 @@ const Devices = () => {
       }
 
       if (result?.data?.refreshSystems) {
-        getSystem();
+        fetchSystems();
         return;
       }
 
@@ -714,7 +719,7 @@ const Devices = () => {
             setIsLoading(false);
           });
       } else {
-        refreshDevices();
+        fetchDevices();
       }
     },
     [
@@ -723,7 +728,7 @@ const Devices = () => {
       selectedPlant,
       organization_id,
       plant_id,
-      refreshDevices,
+      fetchDevices,
       selectedDepartment,
       selectedSystem,
     ]
@@ -827,7 +832,7 @@ const Devices = () => {
       .then((res) => {
         if (res.success || res.status === 200) {
           Success(res.message);
-          refreshDevices();
+          fetchDevices();
           setShowDeletePopup(false);
           setDeviceName(null);
           setDeviceToDelete(null);

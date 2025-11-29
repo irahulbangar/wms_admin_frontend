@@ -15,11 +15,11 @@ import {
   dataSyncForFMDevices,
   dataSyncForBRWHMSDevices,
   dataSyncForBTLMDevices,
-  getAllDevices,
   setDevices,
   dataSyncForPHMCDevices,
 } from "../../../store/deviceSlice";
-import { Error, Error as ErrorToast, Success } from "../../utils/toast";
+import { Error, Success } from "../../utils/toast";
+import { useGetAllDevicesQuery } from "../../../store/rtkQuery";
 
 const DataSync = () => {
   const getCurrentMonthYear = () => {
@@ -35,21 +35,22 @@ const DataSync = () => {
   const [deviceFamilyId, setDeviceFamilyId] = useState("");
   const dispatch = useAppDispatch();
 
-  const refreshDevices = useCallback(async () => {
-    dispatch(getAllDevices())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setDevices(res?.data));
-        } else {
-          ErrorToast(res.message || "Failed to get devices");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        ErrorToast(err.message || "Failed to get devices");
-      });
-  }, [dispatch]);
+  const {
+    data: devicesData,
+    isLoading: isFetchingDevices,
+    refetch: refetchDevices,
+  } = useGetAllDevicesQuery();
+
+  const fetchDevices = useCallback(() => {
+    if (isFetchingDevices) return;
+    refetchDevices();
+  }, [isFetchingDevices, refetchDevices]);
+
+  useEffect(() => {
+    if (devicesData?.success && devicesData?.data) {
+      dispatch(setDevices(devicesData.data));
+    }
+  }, [devicesData, dispatch]);
 
   const getDeviceFamily = useCallback(async () => {
     await dispatch(getDeviceFamiliy())
@@ -58,21 +59,21 @@ const DataSync = () => {
         if (res.success || res.status === 200) {
           setDeviceFamily(res.data);
         } else {
-          ErrorToast(res.message || "Failed to get device families");
+          Error(res.message || "Failed to get device families");
         }
       })
       .catch((err) => {
         console.log(err);
-        ErrorToast(err.message || "Failed to get device families");
+        Error(err.message || "Failed to get device families");
       });
   }, [dispatch]);
 
   useEffect(() => {
     if (devices.length === 0) {
-      refreshDevices();
+      fetchDevices();
     }
     getDeviceFamily();
-  }, [getDeviceFamily, refreshDevices, devices]);
+  }, [getDeviceFamily, fetchDevices, devices]);
 
   const [deviceId, setDeviceId] = useState("");
   const [csvData, setCsvData] = useState<Record<string, string>[]>([]);
@@ -192,7 +193,7 @@ const DataSync = () => {
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith(".csv")) {
-      ErrorToast("Please upload a CSV file");
+      Error("Please upload a CSV file");
       return;
     }
 
@@ -204,7 +205,7 @@ const DataSync = () => {
       const { headers, data } = parseCSV(text);
 
       if (headers.length === 0 || data.length === 0) {
-        ErrorToast("CSV file is empty or invalid");
+        Error("CSV file is empty or invalid");
         return;
       }
 
@@ -217,7 +218,7 @@ const DataSync = () => {
     };
 
     reader.onerror = () => {
-      ErrorToast("Failed to read CSV file");
+      Error("Failed to read CSV file");
     };
 
     reader.readAsText(file);
@@ -225,17 +226,17 @@ const DataSync = () => {
 
   // const handleUpload = async () => {
   //   if (!selectedDevice) {
-  //     ErrorToast("Please select a device");
+  //     Error("Please select a device");
   //     return;
   //   }
 
   //   if (!selectedFile || csvData.length === 0) {
-  //     ErrorToast("Please upload a CSV file first");
+  //     Error("Please upload a CSV file first");
   //     return;
   //   }
 
   //   if (!monthYear) {
-  //     ErrorToast("Please select a month");
+  //     Error("Please select a month");
   //     return;
   //   }
 
@@ -439,7 +440,7 @@ const DataSync = () => {
   //                   }
   //                 }
   //               } else {
-  //                 ErrorToast(
+  //                 Error(
   //                   finalResponseData?.message || "Failed to sync data"
   //                 );
   //               }
@@ -513,7 +514,7 @@ const DataSync = () => {
   //           }
   //         } catch (error) {
   //           console.error("Error parsing final response:", error);
-  //           ErrorToast("Failed to parse response");
+  //           Error("Failed to parse response");
   //         }
   //         break;
   //       }
@@ -627,7 +628,7 @@ const DataSync = () => {
   //   } catch (err: any) {
   //     setProgress(null);
   //     chunkBufferRef.current = "";
-  //     ErrorToast(err?.message || "Failed to sync data");
+  //     Error(err?.message || "Failed to sync data");
   //   } finally {
   //     setIsUploading(false);
   //   }
@@ -635,11 +636,11 @@ const DataSync = () => {
 
   const handleUpload = () => {
     if (!deviceId) {
-      ErrorToast("Please select a device");
+      Error("Please select a device");
       return;
     }
     if (!selectedFile) {
-      ErrorToast("Please upload a CSV file");
+      Error("Please upload a CSV file");
       return;
     }
 

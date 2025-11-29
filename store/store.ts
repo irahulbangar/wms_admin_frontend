@@ -5,7 +5,13 @@ import {
 } from "@reduxjs/toolkit/react";
 import { useDispatch, useSelector } from "react-redux";
 import rootReducer from "./rootReducers";
-import { organizationApi, plantApi } from "./rtkQuery";
+import {
+  organizationApi,
+  plantApi,
+  departmentApi,
+  systemApi,
+  deviceApi,
+} from "./rtkQuery";
 
 const listenerMiddlewareInstance = createListenerMiddleware({
   onError: () => console.error,
@@ -45,7 +51,10 @@ const store = configureStore({
     getDefaultMiddleware()
       .prepend(listenerMiddlewareInstance.middleware)
       .concat(organizationApi.middleware)
-      .concat(plantApi.middleware),
+      .concat(plantApi.middleware)
+      .concat(departmentApi.middleware)
+      .concat(systemApi.middleware)
+      .concat(deviceApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -78,10 +78,16 @@ const Organization = () => {
     );
   }, [filteredOrganizations, currentPage, rowsPerPage]);
 
-  const refreshOrganizations = () => {
+  const fetchOrganizations = useCallback(() => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  };
+  }, [isFetchingOrganizations, refetchOrganizations]);
+
+  useEffect(() => {
+    if (organizationsData?.success && organizationsData?.data) {
+      dispatch(setOrganizations(organizationsData.data));
+    }
+  }, [organizationsData, dispatch]);
 
   const filterOrganizations = (searchTerm: string) => {
     if (!searchTerm.trim()) {
@@ -107,12 +113,6 @@ const Organization = () => {
   };
 
   useEffect(() => {
-    if (organizationsData?.success && organizationsData?.data) {
-      dispatch(setOrganizations(organizationsData.data));
-    }
-  }, [organizationsData, dispatch]);
-
-  useEffect(() => {
     setFilteredOrganizations(organizations);
   }, [organizations]);
 
@@ -133,7 +133,7 @@ const Organization = () => {
       .then((res) => {
         if (res.success || res.status === 200) {
           Success(res.message);
-          refreshOrganizations();
+          fetchOrganizations();
           setShowDeletePopup(false);
           setOrganizationToDelete(null);
         } else {
@@ -159,7 +159,7 @@ const Organization = () => {
     setShowAddModalType("add");
     setOrganizationId("");
     if (isAdd && !isLoading) {
-      refreshOrganizations();
+      fetchOrganizations();
     }
   };
 
@@ -469,7 +469,7 @@ const Organization = () => {
           onUpdateSuccess={
             showAddModalType === "update" ? handleOrganizationUpdate : undefined
           }
-          refreshOrganizations={refreshOrganizations}
+          refreshOrganizations={fetchOrganizations}
         />
       )}
     </div>

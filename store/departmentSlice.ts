@@ -34,17 +34,17 @@ export const departmentSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getAllDepartments.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllDepartments.fulfilled, (state, action) => {
-      state.loading = false;
-      state.departments = action.payload.data;
-    });
-    builder.addCase(getAllDepartments.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message || "Failed to get departments";
-    });
+    // builder.addCase(getAllDepartments.pending, (state) => {
+    //   state.loading = true;
+    // });
+    // builder.addCase(getAllDepartments.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   state.departments = action.payload.data;
+    // });
+    // builder.addCase(getAllDepartments.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.error.message || "Failed to get departments";
+    // });
     
     builder.addCase(getDepartmentByOrganizationIdAndPlantId.pending, (state) => {
       state.loading = true;
@@ -92,26 +92,26 @@ export const createDepartment = createAsyncThunk(
 );
 
 // Get departments
-export const getAllDepartments = createAsyncThunk(
-  "department/getAllDepartments",
-  async (_, thunkAPI) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().get<DepartmentResponse>(
-        "/department/admin/all-departments",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = handleApiError(error);
-      return rejectWithValue(apiError);
-    }
-  }
-);
+// export const getAllDepartments = createAsyncThunk(
+//   "department/getAllDepartments",
+//   async (_, thunkAPI) => {
+//     const { rejectWithValue } = thunkAPI;
+//     try {
+//       const response = await api().get<DepartmentResponse>(
+//         "/department/admin/all-departments",
+//         {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+//           },
+//         }
+//       );
+//       return response.data;
+//     } catch (error: unknown) {
+//       const apiError = handleApiError(error);
+//       return rejectWithValue(apiError);
+//     }
+//   }
+// );
 
 // Update department
 export const updateDepartment = createAsyncThunk(

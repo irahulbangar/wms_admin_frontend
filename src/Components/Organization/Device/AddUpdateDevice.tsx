@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, Loader2, Copy, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
@@ -11,7 +11,7 @@ import {
 } from "../../../../store/deviceSlice";
 
 import { Error, Success } from "../../../utils/toast";
-import { getAllSystems } from "../../../../store/systemSlice";
+import { setSystems } from "../../../../store/systemSlice";
 import AddUpdateSystem from "../System/AddUpdateSystem";
 import type { SystemResult } from "../../../../model/system.interface";
 import type { ReportTypeResult } from "../../../../model/report-type.interface";
@@ -20,6 +20,7 @@ import type { PlantResult } from "../../../../model/plant.interface";
 import type { DepartmentResult } from "../../../../model/department.interface";
 import { ApiError } from "../../../utils/errorHandler";
 import { Editor } from "@monaco-editor/react";
+import { useGetAllSystemsQuery } from "../../../../store/rtkQuery";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -100,6 +101,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { organizations } = useAppSelector((state) => state.organization);
+
+  const {
+    data: systemsData,
+    isLoading: isFetchingSystems,
+    refetch: refetchSystems,
+  } = useGetAllSystemsQuery();
 
   const getSelectedDeviceFamilyName = () => {
     const selectedFamily = familyData.find(
@@ -614,25 +621,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     }
   }, [deviceId, type]);
 
-  const refreshSystemData = async () => {
-    await dispatch(getAllSystems())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setShowAddSystemPopup(false);
-          onUpdateSuccess?.({
-            success: true,
-            data: { refreshSystems: true },
-          });
-        } else {
-          Error(res.message || "Failed to refresh system data");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to refresh system data");
-      });
-  };
+  const fetchSystems = useCallback(() => {
+    if (isFetchingSystems) return;
+    refetchSystems();
+  }, [isFetchingSystems, refetchSystems]);
+
+  useEffect(() => {
+    if (systemsData?.success && systemsData?.data) {
+      dispatch(setSystems(systemsData.data));
+    }
+  }, [systemsData, dispatch]);
 
   useEffect(() => {
     dispatch(getAllReportTypes())
@@ -1934,7 +1932,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           organizationId={organizationId}
           systemId={systemId || 0}
           onUpdateSuccess={() => {
-            refreshSystemData();
+            fetchSystems();
           }}
         />
       )}

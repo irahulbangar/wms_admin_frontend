@@ -166,10 +166,10 @@ const OrganizationUsers = () => {
     navigate(path);
   };
 
-  const getOrganizationData = useCallback(async () => {
+  const fetchOrganizations = useCallback(() => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  }, [refetchOrganizations]);
+  }, [isFetchingOrganizations, refetchOrganizations]);
 
   useEffect(() => {
     if (organizationsData?.success && organizationsData?.data) {
@@ -218,11 +218,25 @@ const OrganizationUsers = () => {
   }, [searchTerm, clients, organizationClients, organizationId]);
 
   useEffect(() => {
-    if (organizations.length === 0 && clients.length === 0) {
-      getClients();
-      getOrganizationData();
+    if (
+      !isFetchingOrganizations &&
+      organizations.length === 0 &&
+      organizationsData?.success &&
+      organizationsData?.data
+    ) {
+      fetchOrganizations();
     }
-  }, [getClients, getOrganizationData, organizations.length, clients.length]);
+    if (clients.length === 0) {
+      getClients();
+    }
+  }, [
+    getClients,
+    fetchOrganizations,
+    organizationsData,
+    clients,
+    isFetchingOrganizations,
+    organizations,
+  ]);
 
   const handleEditUser = (clientId: number, organizationId: number) => {
     setModalType("update");
