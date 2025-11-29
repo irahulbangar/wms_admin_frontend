@@ -28,11 +28,13 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import AddUpdateUser from "./AddUpdateUser";
 import { Error } from "../../../utils/toast";
-import { setOrganizations } from "../../../../store/organizationSlice";
+import {
+  getOrganizations,
+  setOrganizations,
+} from "../../../../store/organizationSlice";
 import UserPlants from "../UserPlants";
 import Pagination from "../../Pagination";
 import { ApiError } from "../../../utils/errorHandler";
-import { useGetAllOrganizationsQuery } from "../../../../store/rtkQuery";
 
 const OrganizationUsers = () => {
   const navigate = useNavigate();
@@ -55,12 +57,6 @@ const OrganizationUsers = () => {
   const [showUserPlants, setShowUserPlants] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const {
-    data: organizationsData,
-    isLoading: isFetchingOrganizations,
-    refetch: refetchOrganizations,
-  } = useGetAllOrganizationsQuery();
 
   const totalItems = useMemo(() => {
     return filteredUsers.length;
@@ -167,15 +163,24 @@ const OrganizationUsers = () => {
   };
 
   const getOrganizationData = useCallback(async () => {
-    if (isFetchingOrganizations) return;
-    refetchOrganizations();
-  }, [refetchOrganizations]);
-
-  useEffect(() => {
-    if (organizationsData?.success && organizationsData?.data) {
-      dispatch(setOrganizations(organizationsData.data));
-    }
-  }, [organizationsData, dispatch]);
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          dispatch(setOrganizations(res.data));
+        } else {
+          Error(res.message || "Failed to get organizations");
+        }
+      })
+      .catch((err) => {
+        Error(err.message || "Failed to get organizations");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
 
   const getClients = useCallback(() => {
     if (isLoading) return;

@@ -45,46 +45,46 @@ export const organizationSlice = createSlice({
       state.message = action.payload;
     },
   },
-  // extraReducers: (builder) => {
-  //   builder.addCase(getOrganizations.pending, (state) => {
-  //     state.loading = true;
-  //   });
-  //   builder.addCase(getOrganizations.fulfilled, (state, action) => {
-  //     state.loading = false;
-  //     state.organizations = action.payload.data;
-  //     state.status = action.payload.status;
-  //     state.success = action.payload.success;
-  //     state.message = action.payload.message;
-  //   });
-  //   builder.addCase(getOrganizations.rejected, (state, action) => {
-  //     state.loading = false;
-  //     state.error = action.error.message || "Failed to fetch organizations";
-  //     state.status = 0;
-  //     state.success = false;
-  //     state.message = action.error.message || "Failed to fetch organizations";
-  //   });
-  // },
+  extraReducers: (builder) => {
+    builder.addCase(getOrganizations.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getOrganizations.fulfilled, (state, action) => {
+      state.loading = false;
+      state.organizations = action.payload.data;
+      state.status = action.payload.status;
+      state.success = action.payload.success;
+      state.message = action.payload.message;
+    });
+    builder.addCase(getOrganizations.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "Failed to fetch organizations";
+      state.status = 0;
+      state.success = false;
+      state.message = action.error.message || "Failed to fetch organizations";
+    });
+  },
 });
 
-// export const getOrganizations = createAsyncThunk(
-//   "organization/getOrganizations",
-//   async (_, thunkAPI) => {
-//     try {
-//       const response = await api().get<GetOrganizationsResponse>(
-//         "/organization/admin/all-organizations",
-//         {
-//           headers: {
-//             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-//           },
-//         }
-//       );
-//       return response.data;
-//     } catch (error: unknown) {
-//       const apiError = handleApiError(error);
-//       return thunkAPI.rejectWithValue(apiError);
-//     }
-//   }
-// );
+export const getOrganizations = createAsyncThunk(
+  "organization/getOrganizations",
+  async (_, thunkAPI) => {
+    try {
+      const response = await api().get<GetOrganizationsResponse>(
+        "/organization/admin/all-organizations",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
+    }
+  }
+);
 
 interface AddOrganizationPayload {
   organization_name: string;

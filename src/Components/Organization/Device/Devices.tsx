@@ -20,7 +20,10 @@ import {
   setDevices,
 } from "../../../../store/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
-import { setOrganizations } from "../../../../store/organizationSlice";
+import {
+  getOrganizations,
+  setOrganizations,
+} from "../../../../store/organizationSlice";
 import { getAllPlants, setPlants } from "../../../../store/plantSlice";
 import type { DeviceFamilyResult } from "../../../../model/device-family.interface";
 import { fromatDateWithTime } from "../../../utils/utils";
@@ -36,7 +39,6 @@ import { getDeviceFamiliy } from "../../../../store/deviceFamilySlice";
 import { getDeviceTypes } from "../../../../store/deviceTypeSlice";
 import DeletePopup from "../DeletePopup";
 import { getAllSystems, setSystems } from "../../../../store/systemSlice";
-import { useGetAllOrganizationsQuery } from "../../../../store/rtkQuery";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -96,12 +98,6 @@ const Devices = () => {
     null
   );
   const { admin } = useAppSelector((state) => state.admin);
-
-  const {
-    data: organizationsData,
-    isLoading: isFetchingOrganizations,
-    refetch: refetchOrganizations,
-  } = useGetAllOrganizationsQuery();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -180,15 +176,25 @@ const Devices = () => {
   }, [dispatch]);
 
   const getOrganization = useCallback(async () => {
-    if (isFetchingOrganizations) return;
-    refetchOrganizations();
-  }, [refetchOrganizations]);
-
-  useEffect(() => {
-    if (organizationsData?.success && organizationsData?.data) {
-      dispatch(setOrganizations(organizationsData.data));
-    }
-  }, [organizationsData, dispatch]);
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          dispatch(setOrganizations(res.data));
+        } else {
+          Error(res.message || "Failed to get organizations");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error(err.message || "Failed to get organizations");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
 
   const fetchPlants = useCallback(async () => {
     if (isLoading) return;

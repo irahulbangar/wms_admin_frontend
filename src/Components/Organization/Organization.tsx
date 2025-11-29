@@ -15,6 +15,7 @@ import NoDataFound from "../NoDataFound";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import {
   deleteOrganization,
+  getOrganizations,
   setOrganizations,
 } from "../../../store/organizationSlice";
 import type { OrganizationResult } from "../../../model/organizations.interface";
@@ -23,7 +24,6 @@ import DeletePopup from "./DeletePopup";
 import { Success, Error } from "../../utils/toast";
 import { fromatDateWithTime, handleStatus } from "../../utils/utils";
 import Pagination from "../Pagination";
-import { useGetAllOrganizationsQuery } from "../../../store/rtkQuery";
 
 const Organization = () => {
   const navigate = useNavigate();
@@ -44,12 +44,6 @@ const Organization = () => {
   >([]);
   const { admin } = useAppSelector((state) => state.admin);
   const [organizationTitle, setOrganizationTitle] = useState("");
-
-  const {
-    data: organizationsData,
-    isLoading: isFetchingOrganizations,
-    refetch: refetchOrganizations,
-  } = useGetAllOrganizationsQuery();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -79,8 +73,23 @@ const Organization = () => {
   }, [filteredOrganizations, currentPage, rowsPerPage]);
 
   const refreshOrganizations = () => {
-    if (isFetchingOrganizations) return;
-    refetchOrganizations();
+    if (isLoading) return;
+    setIsLoading(true);
+    dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          dispatch(setOrganizations(res.data));
+        } else {
+          Error(res.message || "Failed to get organizations");
+        }
+      })
+      .catch((err) => {
+        Error(err.message || "Failed to get organizations");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const filterOrganizations = (searchTerm: string) => {
@@ -107,14 +116,14 @@ const Organization = () => {
   };
 
   useEffect(() => {
-    if (organizationsData?.success && organizationsData?.data) {
-      dispatch(setOrganizations(organizationsData.data));
-    }
-  }, [organizationsData, dispatch]);
-
-  useEffect(() => {
     setFilteredOrganizations(organizations);
   }, [organizations]);
+
+  useEffect(() => {
+    if (organizations.length === 0) {
+      refreshOrganizations();
+    }
+  }, []);
 
   const handleEditOrganization = (id: string) => {
     setShowAddModal(true);

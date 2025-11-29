@@ -14,7 +14,10 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
-import { setOrganizations } from "../../../../store/organizationSlice";
+import {
+  getOrganizations,
+  setOrganizations,
+} from "../../../../store/organizationSlice";
 import { getAllPlants, setPlants } from "../../../../store/plantSlice";
 import type { DepartmentResult } from "../../../../model/department.interface";
 import { Error, Warning } from "../../../utils/toast";
@@ -27,7 +30,6 @@ import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
 import Pagination from "../../Pagination";
-import { useGetAllOrganizationsQuery } from "../../../../store/rtkQuery";
 
 const Departments = () => {
   const { organization_id, plant_id } = useParams<{
@@ -64,12 +66,6 @@ const Departments = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const {
-    data: organizationsData,
-    isLoading: isFetchingOrganizations,
-    refetch: refetchOrganizations,
-  } = useGetAllOrganizationsQuery();
-
   const totalItems = useMemo(() => {
     return filteredDepartments.length;
   }, [filteredDepartments]);
@@ -87,16 +83,24 @@ const Departments = () => {
     setCurrentPage(1);
   };
 
-  const getOrganization = () => {
-    if (isFetchingOrganizations) return;
-    refetchOrganizations();
-  };
-
-  useEffect(() => {
-    if (organizationsData?.success && organizationsData?.data) {
-      dispatch(setOrganizations(organizationsData.data));
-    }
-  }, [organizationsData, dispatch]);
+  const getOrganization = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getOrganizations())
+      .unwrap()
+      .then((res) => {
+        if (res.success) {
+          dispatch(setOrganizations(res.data));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error("Failed to get organizations");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
 
   const fetchPlants = useCallback(async () => {
     if (isLoading) return;
@@ -118,18 +122,11 @@ const Departments = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (
-      organizations.length === 0 ||
-      organizationsData?.success === false ||
-      organizationsData?.data?.length === 0
-    ) {
+    if (organizations.length === 0 || plants.length === 0) {
       getOrganization();
-    }
-    
-    if (plants.length === 0) {
       fetchPlants();
     }
-  }, [getOrganization, organizationsData]);
+  }, [getOrganization, fetchPlants]);
 
   useEffect(() => {
     if (organization_id) {

@@ -5,7 +5,6 @@ import {
 } from "@reduxjs/toolkit/react";
 import { useDispatch, useSelector } from "react-redux";
 import rootReducer from "./rootReducers";
-import { organizationApi } from "./rtkQuery";
 
 const listenerMiddlewareInstance = createListenerMiddleware({
   onError: () => console.error,
@@ -42,9 +41,7 @@ const store = configureStore({
   preloadedState: getInitialState(),
   devTools: true,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
-      .prepend(listenerMiddlewareInstance.middleware)
-      .concat(organizationApi.middleware),
+    getDefaultMiddleware().prepend(listenerMiddlewareInstance.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;
