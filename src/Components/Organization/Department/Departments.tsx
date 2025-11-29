@@ -14,15 +14,11 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
-import {
-  getOrganizations,
-  setOrganizations,
-} from "../../../../store/organizationSlice";
-import { getAllPlants, setPlants } from "../../../../store/plantSlice";
+import { setOrganizations } from "../../../../store/organizationSlice";
+import { setPlants } from "../../../../store/plantSlice";
 import type { DepartmentResult } from "../../../../model/department.interface";
 import { Error, Warning } from "../../../utils/toast";
 import {
-  getAllDepartments,
   getDepartmentByOrganizationIdAndPlantId,
   setDepartments,
 } from "../../../../store/departmentSlice";
@@ -30,6 +26,11 @@ import AddUpdateDepartment from "./AddUpdateDepartment";
 import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
 import Pagination from "../../Pagination";
+import {
+  useGetAllDepartmentsQuery,
+  useGetAllOrganizationsQuery,
+  useGetAllPlantsQuery,
+} from "../../../../store/rtkQuery";
 
 const Departments = () => {
   const { organization_id, plant_id } = useParams<{
@@ -66,6 +67,24 @@ const Departments = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const {
+    data: organizationsData,
+    isLoading: isFetchingOrganizations,
+    refetch: refetchOrganizations,
+  } = useGetAllOrganizationsQuery();
+
+  const {
+    data: plantsData,
+    isLoading: isFetchingPlants,
+    refetch: refetchPlants,
+  } = useGetAllPlantsQuery();
+
+  const {
+    data: departmentsData,
+    isLoading: isFetchingDepartments,
+    refetch: refetchDepartments,
+  } = useGetAllDepartmentsQuery();
+
   const totalItems = useMemo(() => {
     return filteredDepartments.length;
   }, [filteredDepartments]);
@@ -83,50 +102,45 @@ const Departments = () => {
     setCurrentPage(1);
   };
 
-  const getOrganization = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getOrganizations())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          dispatch(setOrganizations(res.data));
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error("Failed to get organizations");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
-
-  const fetchPlants = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllPlants())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          dispatch(setPlants(res.data));
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error("Failed to get plants");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const fetchOrganizations = useCallback(() => {
+    if (isFetchingOrganizations) return;
+    refetchOrganizations();
+  }, [isFetchingOrganizations, refetchOrganizations]);
 
   useEffect(() => {
-    if (organizations.length === 0 || plants.length === 0) {
-      getOrganization();
+    if (organizationsData?.success && organizationsData?.data) {
+      dispatch(setOrganizations(organizationsData.data));
+    }
+  }, [organizationsData, dispatch]);
+
+  const fetchPlants = useCallback(() => {
+    if (isFetchingPlants) return;
+    refetchPlants();
+  }, [isFetchingPlants, refetchPlants]);
+
+  useEffect(() => {
+    if (plantsData?.success && plantsData?.data) {
+      dispatch(setPlants(plantsData.data));
+    }
+  }, [plantsData, dispatch]);
+
+  useEffect(() => {
+    if (
+      organizations.length === 0 ||
+      organizationsData?.success === false ||
+      organizationsData?.data?.length === 0
+    ) {
+      fetchOrganizations();
+    }
+
+    if (
+      plants.length === 0 ||
+      plantsData?.success === false ||
+      plantsData?.data?.length === 0
+    ) {
       fetchPlants();
     }
-  }, [getOrganization, fetchPlants]);
+  }, [fetchOrganizations, organizationsData, plantsData]);
 
   useEffect(() => {
     if (organization_id) {
@@ -144,7 +158,7 @@ const Departments = () => {
     if (!organization_id && !plant_id) {
       setOrganizationSearchTerm("");
       setPlantSearchTerm("");
-      refreshDepartments();
+      fetchDepartments();
     }
   }, [organization_id, plant_id]);
 
@@ -299,31 +313,16 @@ const Departments = () => {
     }
   };
 
-  const refreshDepartments = useCallback(() => {
-    if (isLoading) return;
+  const fetchDepartments = useCallback(() => {
+    if (isFetchingDepartments) return;
+    refetchDepartments();
+  }, [isFetchingDepartments, refetchDepartments]);
 
-    if (organization_id && plant_id) {
-      setIsLoading(true);
+  useEffect(() => {
+    if (departmentsData?.success && departmentsData?.data) {
+      dispatch(setDepartments(departmentsData.data));
     }
-
-    dispatch(getAllDepartments())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setDepartments(res?.data));
-          setFilteredDepartments(res?.data);
-        } else {
-          Error(res.message || "Failed to get departments");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to get departments");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  }, [departmentsData, dispatch]);
 
   useEffect(() => {
     if (organization_id && plant_id) {
@@ -354,7 +353,7 @@ const Departments = () => {
     }
 
     if (selectedOrganization === "all" && selectedPlant === "all") {
-      refreshDepartments();
+      fetchDepartments();
     } else if (selectedOrganization !== "all" && selectedPlant !== "all") {
       setIsLoading(true);
       dispatch(
@@ -380,7 +379,7 @@ const Departments = () => {
           setIsLoading(false);
         });
     } else {
-      refreshDepartments();
+      fetchDepartments();
     }
   }, [
     organization_id,
@@ -388,7 +387,7 @@ const Departments = () => {
     selectedOrganization,
     selectedPlant,
     dispatch,
-    refreshDepartments,
+    fetchDepartments,
   ]);
 
   const handleDepartmentUpdate = useCallback(
@@ -406,7 +405,7 @@ const Departments = () => {
       }
 
       if (result?.data?.refreshOrganizations) {
-        getOrganization();
+        fetchOrganizations();
         return;
       }
 
@@ -459,7 +458,7 @@ const Departments = () => {
             setIsLoading(false);
           });
       } else {
-        refreshDepartments();
+        fetchDepartments();
       }
     },
     [
@@ -468,9 +467,9 @@ const Departments = () => {
       selectedPlant,
       organization_id,
       plant_id,
-      refreshDepartments,
+      fetchDepartments,
       fetchPlants,
-      getOrganization,
+      fetchOrganizations,
     ]
   );
 

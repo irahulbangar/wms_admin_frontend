@@ -34,46 +34,46 @@ export const systemSlice = createSlice({
       state.error = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(getAllSystems.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllSystems.fulfilled, (state, action) => {
-      state.loading = false;
-      state.systems = action.payload.data;
-      state.status = action.payload.status;
-      state.success = action.payload.success;
-    });
-    builder.addCase(getAllSystems.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message || "Failed to get systems";
-      state.status = 0;
-      state.success = false;
-    });
-  },
+  // extraReducers: (builder) => {
+  //   builder.addCase(getAllSystems.pending, (state) => {
+  //     state.loading = true;
+  //   });
+  //   builder.addCase(getAllSystems.fulfilled, (state, action) => {
+  //     state.loading = false;
+  //     state.systems = action.payload.data;
+  //     state.status = action.payload.status;
+  //     state.success = action.payload.success;
+  //   });
+  //   builder.addCase(getAllSystems.rejected, (state, action) => {
+  //     state.loading = false;
+  //     state.error = action.error.message || "Failed to get systems";
+  //     state.status = 0;
+  //     state.success = false;
+  //   });
+  // },
 });
 
 // Get all systems
-export const getAllSystems = createAsyncThunk(
-  "system/getAllSystems",
-  async (_, thunkAPI) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().get<SystemResponse>(
-        "/system/admin/all-systems",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = handleApiError(error);
-      return rejectWithValue(apiError);
-    }
-  }
-);
+// export const getAllSystems = createAsyncThunk(
+//   "system/getAllSystems",
+//   async (_, thunkAPI) => {
+//     const { rejectWithValue } = thunkAPI;
+//     try {
+//       const response = await api().get<SystemResponse>(
+//         "/system/admin/all-systems",
+//         {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+//           },
+//         }
+//       );
+//       return response.data;
+//     } catch (error: unknown) {
+//       const apiError = handleApiError(error);
+//       return rejectWithValue(apiError);
+//     }
+//   }
+// );
 
 export interface SystemPayload {
   system_name: string;

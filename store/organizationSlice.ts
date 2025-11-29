@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
-import type {
-  GetOrganizationsResponse,
-  OrganizationResult,
-} from "../model/organizations.interface";
+import type { OrganizationResult } from "../model/organizations.interface";
 import { handleApiError } from "../src/utils/errorHandler";
 import type { SingleOrganizationResponse } from "../model/single-organization.interface";
 
@@ -151,11 +148,14 @@ export const getOrganizationById = createAsyncThunk(
   "organization/getOrganizationById",
   async (id: string, thunkAPI) => {
     try {
-      const response = await api().get<SingleOrganizationResponse>(`/organization/admin/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await api().get<SingleOrganizationResponse>(
+        `/organization/admin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
       return response.data;
     } catch (error: unknown) {
       const apiError = handleApiError(error);
@@ -184,6 +184,7 @@ export const deleteOrganization = createAsyncThunk(
   }
 );
 
-export const { setOrganizations, setLoading, setError, setMessage } = organizationSlice.actions;
+export const { setOrganizations, setLoading, setError, setMessage } =
+  organizationSlice.actions;
 
 export default organizationSlice.reducer;

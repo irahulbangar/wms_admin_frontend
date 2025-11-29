@@ -3,7 +3,10 @@ import { api } from "../api.service";
 import type { NodesResult } from "../model/nodes.interface";
 import type { EdgesResult } from "../model/edges.interface";
 import type { GetPlantsResponse, PlantResult } from "../model/plant.interface";
-import type { PlantReporting, SinglePlantResponse } from "../model/single-plant.interface";
+import type {
+  PlantReporting,
+  SinglePlantResponse,
+} from "../model/single-plant.interface";
 import { handleApiError } from "../src/utils/errorHandler";
 
 interface PlantResponse {
@@ -37,45 +40,45 @@ export const plantSlice = createSlice({
       state.plants = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(getAllPlants.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getAllPlants.fulfilled, (state, action) => {
-      state.loading = false;
-      state.plants = action.payload.data;
-      state.status = action.payload.status;
-      state.success = action.payload.success;
-    });
-    builder.addCase(getAllPlants.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message || "Failed to fetch plants";
-      state.status = 0;
-      state.success = false;
-    });
-  },
+  // extraReducers: (builder) => {
+  //   builder.addCase(getAllPlants.pending, (state) => {
+  //     state.loading = true;
+  //   });
+  //   builder.addCase(getAllPlants.fulfilled, (state, action) => {
+  //     state.loading = false;
+  //     state.plants = action.payload.data;
+  //     state.status = action.payload.status;
+  //     state.success = action.payload.success;
+  //   });
+  //   builder.addCase(getAllPlants.rejected, (state, action) => {
+  //     state.loading = false;
+  //     state.error = action.error.message || "Failed to fetch plants";
+  //     state.status = 0;
+  //     state.success = false;
+  //   });
+  // },
 });
 
 // Get all plants
-export const getAllPlants = createAsyncThunk(
-  "plant/admin/getAllPlants",
-  async (_, thunkAPI) => {
-    try {
-      const response = await api().get<GetPlantsResponse>(
-        "/plant/admin/all-plants",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = handleApiError(error);
-      return thunkAPI.rejectWithValue(apiError);
-    }
-  }
-);
+// export const getAllPlants = createAsyncThunk(
+//   "plant/admin/getAllPlants",
+//   async (_, thunkAPI) => {
+//     try {
+//       const response = await api().get<GetPlantsResponse>(
+//         "/plant/admin/all-plants",
+//         {
+//           headers: {
+//             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+//           },
+//         }
+//       );
+//       return response.data;
+//     } catch (error: unknown) {
+//       const apiError = handleApiError(error);
+//       return thunkAPI.rejectWithValue(apiError);
+//     }
+//   }
+// );
 
 // Get plant by id
 export const getPlantById = createAsyncThunk(

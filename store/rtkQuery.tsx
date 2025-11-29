@@ -1,6 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { HOST } from "../api.service";
 import type { GetOrganizationsResponse } from "../model/organizations.interface";
+import type { GetPlantsResponse } from "../model/plant.interface";
+import type { DepartmentResponse } from "../model/department.interface";
+import type { SystemResponse } from "../model/system.interface";
+import type { DeviceResponse } from "../model/devices.interface";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: HOST,
@@ -30,4 +34,56 @@ export const organizationApi = createApi({
   }),
 });
 
+export const plantApi = createApi({
+  reducerPath: "plantApi",
+  baseQuery,
+  tagTypes: ["Plant"],
+  endpoints: (builder) => ({
+    getAllPlants: builder.query<GetPlantsResponse, void>({
+      query: () => "/plant/admin/all-plants",
+      providesTags: ["Plant"],
+    }),
+  }),
+});
+
+export const departmentApi = createApi({
+  reducerPath: "departmentApi",
+  baseQuery,
+  tagTypes: ["Department"],
+  endpoints: (builder) => ({
+    getAllDepartments: builder.query<DepartmentResponse, void>({
+      query: () => "/department/admin/all-departments",
+      providesTags: ["Department"],
+    }),
+  }),
+});
+
+export const systemApi = createApi({
+  reducerPath: "systemApi",
+  baseQuery,
+  tagTypes: ["System"],
+  endpoints: (builder) => ({
+    getAllSystems: builder.query<SystemResponse, void>({
+      query: () => "/system/admin/all-systems",
+      providesTags: ["System"],
+    }),
+  }),
+});
+
+export const deviceApi = createApi({
+  reducerPath: "deviceApi",
+  baseQuery,
+  tagTypes: ["Device"],
+  endpoints: (builder) => ({
+    getAllDevices: builder.query<DeviceResponse, void>({
+      query: () => "/device/admin/all-devices",
+      providesTags: ["Device"],
+    }),
+  }),
+});
+
 export const { useGetAllOrganizationsQuery } = organizationApi;
+export const { useGetAllPlantsQuery } = plantApi;
+export const { useGetAllDepartmentsQuery } = departmentApi;
+export const { useGetAllSystemsQuery } = systemApi;
+export const { useGetAllDevicesQuery } = deviceApi;

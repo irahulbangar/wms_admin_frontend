@@ -18,20 +18,20 @@ import NoDataFound from "../../NoDataFound";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { Error, Success, Warning } from "../../../utils/toast";
 import { fromatDateWithTime, handleStatus } from "../../../utils/utils";
-import {
-  getOrganizations,
-  setOrganizations,
-} from "../../../../store/organizationSlice";
+import { setOrganizations } from "../../../../store/organizationSlice";
 import AddUpdatePlant from "./AddUpdatePlant";
 import Pagination from "../../Pagination";
 import type { PlantResult } from "../../../../model/plant.interface";
 import {
   deletePlantById,
-  getAllPlants,
   getPlantsByOrganizationId,
   setPlants,
 } from "../../../../store/plantSlice";
 import { ApiError } from "../../../utils/errorHandler";
+import {
+  useGetAllOrganizationsQuery,
+  useGetAllPlantsQuery,
+} from "../../../../store/rtkQuery";
 
 const Plants = () => {
   const { organization_id } = useParams<{ organization_id: string }>();
@@ -62,6 +62,18 @@ const Plants = () => {
   const totalItems = useMemo(() => {
     return filteredPlants.length;
   }, [filteredPlants]);
+
+  const {
+    data: organizationsData,
+    isLoading: isFetchingOrganizations,
+    refetch: refetchOrganizations,
+  } = useGetAllOrganizationsQuery();
+
+  const {
+    data: plantsData,
+    isLoading: isFetchingPlants,
+    refetch: refetchPlants,
+  } = useGetAllPlantsQuery();
 
   const totalPages = useMemo(() => {
     return Math.ceil(totalItems / rowsPerPage);
@@ -125,27 +137,16 @@ const Plants = () => {
     navigate("/");
   };
 
-  const fetchPlants = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllPlants())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setPlants(res.data));
-        } else {
-          Error(res.message || "Failed to fetch plants");
-          console.log(res);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error(err.message || "Failed to fetch plants");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const fetchPlants = useCallback(() => {
+    if (isFetchingPlants) return;
+    refetchPlants();
+  }, [isFetchingPlants, refetchPlants]);
+
+  useEffect(() => {
+    if (plantsData?.success && plantsData?.data) {
+      dispatch(setPlants(plantsData.data));
+    }
+  }, [plantsData, dispatch]);
 
   const getPlantByOrganizationId = useCallback(
     async (orgId?: string) => {
@@ -180,31 +181,22 @@ const Plants = () => {
     [dispatch, organization_id]
   );
 
-  const getAllOrganizations = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getOrganizations())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          dispatch(setOrganizations(res.data));
-        } else {
-          Error(res.message || "Failed to get organizations");
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to get organizations");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const fetchOrganizations = useCallback(() => {
+    if (isFetchingOrganizations) return;
+    refetchOrganizations();
+  }, [isFetchingOrganizations, refetchOrganizations]);
+
+  useEffect(() => {
+    if (organizationsData?.success && organizationsData?.data) {
+      dispatch(setOrganizations(organizationsData.data));
+    }
+  }, [organizationsData, dispatch]);
 
   useEffect(() => {
     setPlants([]);
     setIsLoading(false);
     if (organizations.length === 0) {
-      getAllOrganizations();
+      fetchOrganizations();
     }
 
     if (organization_id) {
@@ -218,7 +210,7 @@ const Plants = () => {
     organization_id,
     fetchPlants,
     getPlantByOrganizationId,
-    getAllOrganizations,
+    fetchOrganizations,
   ]);
 
   useEffect(() => {

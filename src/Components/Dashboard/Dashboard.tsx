@@ -9,9 +9,8 @@ import {
   Dock,
   Grid,
 } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
-import { getOrganizations } from "../../../store/organizationSlice";
 import type { AppDispatch } from "../../../store/store";
 import { Error } from "../../utils/toast";
 import { useDispatch } from "react-redux";
@@ -19,13 +18,16 @@ import { useNavigate } from "react-router-dom";
 import type { ClientUsersResult } from "../../../model/client-users.interface";
 import { getAllClients } from "../../../store/clientSlice";
 import type { DeviceResult } from "../../../model/devices.interface";
-import { getAllDevices } from "../../../store/deviceSlice";
 import type { PlantResult } from "../../../model/plant.interface";
-import { getAllPlants } from "../../../store/plantSlice";
 import type { DepartmentResult } from "../../../model/department.interface";
 import type { SystemResult } from "../../../model/system.interface";
-import { getAllSystems } from "../../../store/systemSlice";
-import { getAllDepartments } from "../../../store/departmentSlice";
+import {
+  useGetAllDepartmentsQuery,
+  useGetAllOrganizationsQuery,
+  useGetAllPlantsQuery,
+  useGetAllSystemsQuery,
+  useGetAllDevicesQuery,
+} from "../../../store/rtkQuery";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
@@ -38,46 +40,59 @@ const Dashboard = () => {
   const [systems, setSystems] = useState<SystemResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const hasInitializedRef = useRef(false);
 
-  const fetchOrganizations = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getOrganizations())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setOrganizations(res?.data);
-        } else {
-          Error(res.message || "Failed to fetch organizations");
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to fetch organizations");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const {
+    data: organizationsData,
+    isLoading: isFetchingOrganizations,
+    refetch: refetchOrganizations,
+  } = useGetAllOrganizationsQuery();
 
-  const fetchPlants = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllPlants())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setPlants(res?.data);
-        } else {
-          Error(res.message || "Failed to fetch plants");
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to fetch plants");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const {
+    data: plantsData,
+    isLoading: isFetchingPlants,
+    refetch: refetchPlants,
+  } = useGetAllPlantsQuery();
+
+  const {
+    data: departmentsData,
+    isLoading: isFetchingDepartments,
+    refetch: refetchDepartments,
+  } = useGetAllDepartmentsQuery();
+
+  const {
+    data: systemsData,
+    isLoading: isFetchingSystems,
+    refetch: refetchSystems,
+  } = useGetAllSystemsQuery();
+
+  const {
+    data: devicesData,
+    isLoading: isFetchingDevices,
+    refetch: refetchDevices,
+  } = useGetAllDevicesQuery();
+
+  const fetchOrganizations = useCallback(() => {
+    if (isFetchingOrganizations) return;
+    refetchOrganizations();
+  }, [isFetchingOrganizations, refetchOrganizations]);
+
+  useEffect(() => {
+    if (organizationsData?.success && organizationsData?.data) {
+      setOrganizations(organizationsData.data);
+    }
+  }, [organizationsData, dispatch]);
+
+  const fetchPlants = useCallback(() => {
+    if (isFetchingPlants) return;
+    refetchPlants();
+  }, [isFetchingPlants, refetchPlants]);
+
+  useEffect(() => {
+    if (plantsData?.success && plantsData?.data) {
+      setPlants(plantsData.data);
+    }
+  }, [plantsData, dispatch]);
 
   const fetchUsers = useCallback(async () => {
     if (isLoading) return;
@@ -99,85 +114,56 @@ const Dashboard = () => {
       });
   }, [dispatch]);
 
-  const fetchDevices = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllDevices())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setDevices(res?.data);
-        } else {
-          Error(res.message || "Failed to fetch devices");
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to fetch devices");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
-
-  const fetchDepartments = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getAllDepartments())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setDepartments(res?.data);
-        } else {
-          Error(res.message || "Failed to fetch departments");
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to fetch departments");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
-
-  const fetchSystems = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-
-    await dispatch(getAllSystems())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setSystems(res?.data);
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to fetch systems");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+  const fetchDevices = useCallback(() => {
+    if (isFetchingDevices) return;
+    refetchDevices();
+  }, [isFetchingDevices, refetchDevices]);
 
   useEffect(() => {
+    if (devicesData?.success && devicesData?.data) {
+      setDevices(devicesData.data);
+    }
+  }, [devicesData, dispatch]);
+
+  const fetchDepartments = useCallback(() => {
+    if (isFetchingDepartments) return;
+    refetchDepartments();
+  }, [isFetchingDepartments, refetchDepartments]);
+
+  useEffect(() => {
+    if (departmentsData?.success && departmentsData?.data) {
+      setDepartments(departmentsData.data);
+    }
+  }, [departmentsData, dispatch]);
+
+  const fetchSystems = useCallback(() => {
+    if (isFetchingSystems) return;
+    refetchSystems();
+  }, [isFetchingSystems, refetchSystems]);
+
+  useEffect(() => {
+    if (systemsData?.success && systemsData?.data) {
+      setSystems(systemsData.data);
+    }
+  }, [systemsData, dispatch]);
+
+  useEffect(() => {
+    if (hasInitializedRef.current) return;
+    hasInitializedRef.current = true;
+
     fetchOrganizations();
     fetchPlants();
     fetchUsers();
     fetchDevices();
     fetchDepartments();
     fetchSystems();
+
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [
-    fetchOrganizations,
-    fetchPlants,
-    fetchUsers,
-    fetchDevices,
-    fetchDepartments,
-    fetchSystems,
-  ]);
+  }, []);
 
   const stats = [
     {
