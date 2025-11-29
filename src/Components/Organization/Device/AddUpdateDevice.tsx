@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   X,
   Loader2,
@@ -112,6 +112,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   const [copiedPathIndex, setCopiedPathIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [devicePathSearchTerm, setDevicePathSearchTerm] = useState("");
+  const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(
+    null
+  );
+  const dropdownRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const { organizations } = useAppSelector((state) => state.organization);
   const [systemDevices, setSystemDevices] = useState<DeviceResult[]>([]);
 
@@ -120,8 +124,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     isLoading: isFetchingSystems,
     refetch: refetchSystems,
   } = useGetAllSystemsQuery();
-
-  console.log("systemDevices", systemDevices);
 
   const fetchSystemDevices = useCallback(async () => {
     if (isLoading) return;
@@ -147,6 +149,30 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       fetchSystemDevices();
     }
   }, [systemId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      let clickedInside = false;
+
+      Object.values(dropdownRefs.current).forEach((ref) => {
+        if (ref && ref.contains(target)) {
+          clickedInside = true;
+        }
+      });
+
+      if (!clickedInside) {
+        setOpenDropdownIndex(null);
+      }
+    };
+
+    if (openDropdownIndex !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [openDropdownIndex]);
 
   const getSelectedDeviceFamilyName = () => {
     const selectedFamily = familyData.find(
@@ -199,12 +225,25 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         const deviceName = device.device_name || "";
 
         if (departmentName && systemName && deviceName) {
-          return `plant['${departmentName}']['${systemName}']['${deviceName}']`;
+          return {
+            path: `plant['${departmentName}']['${systemName}']['${deviceName}']`,
+            device: device,
+          };
         }
         return null;
       })
-      .filter((path): path is string => path !== null);
+      .filter(
+        (item): item is { path: string; device: DeviceResult } => item !== null
+      );
   }, [systemDevices, departmentData, systemData]);
+
+  const getDeviceVariables = useCallback((device: DeviceResult | null) => {
+    if (!device || !device.last_record) return [];
+    const lastRecord = device.last_record as Record<string, any>;
+    return Object.keys(lastRecord).filter(
+      (key) => lastRecord?.[key] !== null && lastRecord?.[key] !== undefined
+    );
+  }, []);
 
   const handleCopyPath = async () => {
     const path = getDevicePath();
@@ -1400,22 +1439,31 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                           )}
                         </div>
                       </div>
-                      <div className="max-h-32 overflow-y-auto">
+                      <div className="max-h-48 overflow-y-auto">
                         {getAllSystemDevicePaths()
-                          .filter((path) =>
+                          .filter((item) =>
                             devicePathSearchTerm
-                              ? path
+                              ? item.path
                                   .toLowerCase()
                                   .includes(devicePathSearchTerm.toLowerCase())
                               : true
                           )
-                          .map((path, index) => {
-                            const originalIndex =
-                              getAllSystemDevicePaths().indexOf(path);
+                          .map((item, index) => {
+                            const allPaths = getAllSystemDevicePaths();
+                            const originalIndex = allPaths.findIndex(
+                              (p) =>
+                                p.path === item.path &&
+                                p.device.device_id === item.device.device_id
+                            );
+                            const deviceVariables = getDeviceVariables(
+                              item.device
+                            );
+                            const hasVariables = deviceVariables.length > 0;
+
                             return (
                               <div
                                 key={index}
-                                className="flex items-center gap-2 py-1 px-2 hover:bg-primary/50 rounded group"
+                                className="flex items-center gap-2 py-1 px-2 hover:bg-primary/50 rounded group relative"
                               >
                                 <span className="text-xs text-text-secondary font-roboto min-w-[20px]">
                                   {index + 1}.
@@ -1426,58 +1474,198 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                                     if (
                                       (e.target as HTMLElement).closest(
                                         "button"
+                                      ) ||
+                                      (e.target as HTMLElement).closest(
+                                        ".variable-dropdown"
                                       )
                                     ) {
                                       return;
                                     }
-                                    const currentValue =
-                                      reportData.report_formula || "";
-                                    setReportData((prev) => ({
-                                      ...prev,
-                                      report_formula: currentValue
-                                        ? `${currentValue}\n${path}`
-                                        : path,
-                                    }));
+                                    setOpenDropdownIndex(
+                                      openDropdownIndex === originalIndex
+                                        ? null
+                                        : originalIndex
+                                    );
                                   }}
-                                  title="Click to insert into editor"
+                                  title="Click to open variable dropdown"
                                 >
-                                  {path}
+                                  {item.path}
                                 </code>
-                                <button
-                                  type="button"
-                                  onClick={async (e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    try {
-                                      await navigator.clipboard.writeText(path);
-                                      setCopiedPathIndex(originalIndex);
-                                      setTimeout(() => {
-                                        setCopiedPathIndex(null);
-                                      }, 2000);
-                                      Success("Path copied to clipboard!");
-                                    } catch {
-                                      Error("Failed to copy path");
-                                    }
-                                  }}
-                                  onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                  }}
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-primary rounded"
-                                  title="Copy path to clipboard"
-                                >
-                                  {copiedPathIndex === originalIndex ? (
-                                    <Check className="w-4 h-4 text-status-success cursor-pointer" />
-                                  ) : (
-                                    <Copy className="w-4 h-4 text-text-secondary hover:text-text-primary cursor-pointer" />
+                                <div className="relative">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setOpenDropdownIndex(
+                                        openDropdownIndex === originalIndex
+                                          ? null
+                                          : originalIndex
+                                      );
+                                    }}
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                    className="opacity-70 group-hover:opacity-100 transition-opacity p-1 hover:bg-primary rounded"
+                                    title="Copy path with variable"
+                                  >
+                                    {copiedPathIndex === originalIndex &&
+                                    openDropdownIndex !== originalIndex ? (
+                                      <Check className="w-4 h-4 text-status-success cursor-pointer" />
+                                    ) : (
+                                      <Copy className="w-4 h-4 text-text-secondary hover:text-text-primary cursor-pointer" />
+                                    )}
+                                  </button>
+                                  {openDropdownIndex === originalIndex && (
+                                    <div
+                                      ref={(el) => {
+                                        if (el) {
+                                          dropdownRefs.current[originalIndex] =
+                                            el;
+                                        } else {
+                                          delete dropdownRefs.current[
+                                            originalIndex
+                                          ];
+                                        }
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="absolute right-0 top-full mt-1 bg-primary border border-border-primary rounded-lg shadow-lg z-50 w-[490px] max-h-64 overflow-y-auto variable-dropdown"
+                                    >
+                                      <div className="p-2 border-b border-border-primary sticky top-0 bg-primary">
+                                        <p className="text-xs text-text-secondary font-roboto font-semibold">
+                                          Select Variable:
+                                        </p>
+                                      </div>
+                                      {hasVariables ? (
+                                        <>
+                                          <div
+                                            className="px-3 py-2 text-xs text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                                            onClick={async (e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              try {
+                                                await navigator.clipboard.writeText(
+                                                  item.path
+                                                );
+                                                setCopiedPathIndex(
+                                                  originalIndex
+                                                );
+                                                setTimeout(() => {
+                                                  setCopiedPathIndex(null);
+                                                }, 2000);
+                                                setOpenDropdownIndex(null);
+                                                Success(
+                                                  "Path copied to clipboard!"
+                                                );
+                                              } catch {
+                                                Error("Failed to copy path");
+                                              }
+                                            }}
+                                          >
+                                            <span className="font-mono text-xs">
+                                              {item.path}
+                                            </span>
+                                            <span className="text-text-secondary ml-2 text-[10px]">
+                                              (path only)
+                                            </span>
+                                          </div>
+                                          {deviceVariables.map((variable) => {
+                                            const lastRecord = item.device
+                                              .last_record as Record<
+                                              string,
+                                              any
+                                            >;
+                                            const variableValue =
+                                              lastRecord?.[variable];
+                                            const pathWithVariable = `${item.path}['${variable}']`;
+
+                                            return (
+                                              <div
+                                                key={variable}
+                                                className="px-3 py-2 text-xs text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
+                                                onClick={async (e) => {
+                                                  e.preventDefault();
+                                                  e.stopPropagation();
+                                                  try {
+                                                    await navigator.clipboard.writeText(
+                                                      pathWithVariable
+                                                    );
+                                                    setCopiedPathIndex(
+                                                      originalIndex
+                                                    );
+                                                    setTimeout(() => {
+                                                      setCopiedPathIndex(null);
+                                                    }, 2000);
+                                                    setOpenDropdownIndex(null);
+                                                    Success(
+                                                      "Path with variable copied to clipboard!"
+                                                    );
+                                                  } catch {
+                                                    Error(
+                                                      "Failed to copy path"
+                                                    );
+                                                  }
+                                                }}
+                                              >
+                                                <div className="font-mono text-xs mb-1">
+                                                  {pathWithVariable}
+                                                </div>
+                                                <div className="flex items-center justify-between text-[10px] text-text-secondary">
+                                                  <span className="font-semibold">
+                                                    {variable}:
+                                                  </span>
+                                                  <span className="ml-2">
+                                                    {variableValue !== null &&
+                                                    variableValue !== undefined
+                                                      ? String(variableValue)
+                                                      : "N/A"}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </>
+                                      ) : (
+                                        <div
+                                          className="px-3 py-2 text-xs text-text-primary hover:bg-secondary cursor-pointer"
+                                          onClick={async (e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            try {
+                                              await navigator.clipboard.writeText(
+                                                item.path
+                                              );
+                                              setCopiedPathIndex(originalIndex);
+                                              setTimeout(() => {
+                                                setCopiedPathIndex(null);
+                                              }, 2000);
+                                              setOpenDropdownIndex(null);
+                                              Success(
+                                                "Path copied to clipboard!"
+                                              );
+                                            } catch {
+                                              Error("Failed to copy path");
+                                            }
+                                          }}
+                                        >
+                                          <span className="font-mono text-xs">
+                                            {item.path}
+                                          </span>
+                                          <div className="text-text-secondary text-[10px] mt-1">
+                                            No variables available
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
                                   )}
-                                </button>
+                                </div>
                               </div>
                             );
                           })}
-                        {getAllSystemDevicePaths().filter((path) =>
+                        {getAllSystemDevicePaths().filter((item) =>
                           devicePathSearchTerm
-                            ? path
+                            ? item.path
                                 .toLowerCase()
                                 .includes(devicePathSearchTerm.toLowerCase())
                             : true
@@ -1501,7 +1689,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                       }))
                     }
                     language="javascript"
-                    className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+                    className="w-full h-[150px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
                     onMount={(_editor, monaco) => {
                       const devicePaths = getAllSystemDevicePaths();
 
@@ -1509,12 +1697,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                         "javascript",
                         {
                           provideCompletionItems: () => {
-                            const suggestions = devicePaths.map((path) => ({
-                              label: path,
+                            const suggestions = devicePaths.map((item) => ({
+                              label: item.path,
                               kind: monaco.languages.CompletionItemKind
                                 .Variable,
-                              insertText: path,
-                              documentation: `Device path: ${path}`,
+                              insertText: item.path,
+                              documentation: `Device path: ${item.path}`,
                               detail: "System Device",
                             }));
 
@@ -1536,8 +1724,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                         provideHover: (model: any, position: any) => {
                           const word = model.getWordAtPosition(position);
                           if (word) {
-                            const devicePath = devicePaths.find((path) =>
-                              path.includes(word.word)
+                            const devicePath = devicePaths.find((item) =>
+                              item.path.includes(word.word)
                             );
                             if (devicePath) {
                               return {
@@ -1549,7 +1737,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                                 ),
                                 contents: [
                                   {
-                                    value: `**Device Path:**\n\`${devicePath}\``,
+                                    value: `**Device Path:**\n\`${devicePath.path}\``,
                                   },
                                 ],
                               };
