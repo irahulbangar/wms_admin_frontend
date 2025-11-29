@@ -49,6 +49,10 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    path: "/plant-layout/:plant_id",
+    element: <DiagramPage />,
+  },
+  {
     path: "/",
     element: <RootLayout />,
     children: [
@@ -77,7 +81,6 @@ const router = createBrowserRouter([
       { path: "/data-sync", element: <DataSync /> },
       { path: "/profile", element: <Profile /> },
       { path: "/admin-setting", element: <AdminSetting /> },
-      { path: "/plant-layout/:plant_id", element: <DiagramPage /> },
       { path: "/", element: <Navigate to="/home" replace /> },
     ],
   },
