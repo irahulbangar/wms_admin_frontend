@@ -87,10 +87,10 @@ const Departments = () => {
     setCurrentPage(1);
   };
 
-  const getOrganization = useCallback(async () => {
+  const getOrganization = () => {
     if (isFetchingOrganizations) return;
     refetchOrganizations();
-  }, [refetchOrganizations]);
+  };
 
   useEffect(() => {
     if (organizationsData?.success && organizationsData?.data) {
@@ -118,11 +118,18 @@ const Departments = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (organizations.length === 0 || plants.length === 0) {
+    if (
+      organizations.length === 0 ||
+      organizationsData?.success === false ||
+      organizationsData?.data?.length === 0
+    ) {
       getOrganization();
+    }
+    
+    if (plants.length === 0) {
       fetchPlants();
     }
-  }, [getOrganization, fetchPlants]);
+  }, [getOrganization, organizationsData]);
 
   useEffect(() => {
     if (organization_id) {
