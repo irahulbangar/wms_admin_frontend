@@ -77,7 +77,7 @@ const router = createBrowserRouter([
       { path: "/data-sync", element: <DataSync /> },
       { path: "/profile", element: <Profile /> },
       { path: "/admin-setting", element: <AdminSetting /> },
-      { path: "/diagram/:plant_id", element: <DiagramPage /> },
+      { path: "/plant-layout/:plant_id", element: <DiagramPage /> },
       { path: "/", element: <Navigate to="/home" replace /> },
     ],
   },
@@ -225,7 +225,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/diagram/:plant_id"
+                  path="/plant-layout/:plant_id"
                   element={
                     <ProtectedRoute>
                       <DiagramPage />
