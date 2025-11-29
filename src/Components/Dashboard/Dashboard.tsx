@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import type { OrganizationResult } from "../../../model/organizations.interface";
-import { getOrganizations } from "../../../store/organizationSlice";
 import type { AppDispatch } from "../../../store/store";
 import { Error } from "../../utils/toast";
 import { useDispatch } from "react-redux";
@@ -26,6 +25,7 @@ import type { DepartmentResult } from "../../../model/department.interface";
 import type { SystemResult } from "../../../model/system.interface";
 import { getAllSystems } from "../../../store/systemSlice";
 import { getAllDepartments } from "../../../store/departmentSlice";
+import { useGetAllOrganizationsQuery } from "../../../store/rtkQuery";
 
 const Dashboard = () => {
   const [organizations, setOrganizations] = useState<OrganizationResult[]>([]);
@@ -39,25 +39,22 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const {
+    data: organizationsData,
+    isLoading: isFetchingOrganizations,
+    refetch: refetchOrganizations,
+  } = useGetAllOrganizationsQuery();
+
   const fetchOrganizations = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getOrganizations())
-      .unwrap()
-      .then((res) => {
-        if (res.success || res.status === 200) {
-          setOrganizations(res?.data);
-        } else {
-          Error(res.message || "Failed to fetch organizations");
-        }
-      })
-      .catch((err) => {
-        Error(err.message || "Failed to fetch organizations");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+    if (isFetchingOrganizations) return;
+    refetchOrganizations();
+  }, [refetchOrganizations]);
+
+  useEffect(() => {
+    if (organizationsData?.success && organizationsData?.data) {
+      setOrganizations(organizationsData.data);
+    }
+  }, [organizationsData]);
 
   const fetchPlants = useCallback(async () => {
     if (isLoading) return;

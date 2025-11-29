@@ -14,10 +14,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
-import {
-  getOrganizations,
-  setOrganizations,
-} from "../../../../store/organizationSlice";
+import { setOrganizations } from "../../../../store/organizationSlice";
 import { getAllPlants, setPlants } from "../../../../store/plantSlice";
 import { Error, Warning } from "../../../utils/toast";
 import { fromatDateWithTime } from "../../../utils/utils";
@@ -30,6 +27,7 @@ import {
   setSystems,
 } from "../../../../store/systemSlice";
 import type { SystemResult } from "../../../../model/system.interface";
+import { useGetAllOrganizationsQuery } from "../../../../store/rtkQuery";
 
 const Systems = () => {
   const { organization_id, plant_id, department_id } = useParams<{
@@ -74,6 +72,12 @@ const Systems = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const {
+    data: organizationsData,
+    isLoading: isFetchingOrganizations,
+    refetch: refetchOrganizations,
+  } = useGetAllOrganizationsQuery();
+
   const totalItems = useMemo(() => {
     return filteredSystems.length;
   }, [filteredSystems]);
@@ -92,23 +96,15 @@ const Systems = () => {
   };
 
   const getOrganization = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    await dispatch(getOrganizations())
-      .unwrap()
-      .then((res) => {
-        if (res.success) {
-          dispatch(setOrganizations(res.data));
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Error("Failed to get organizations");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
+    if (isFetchingOrganizations) return;
+    refetchOrganizations();
+  }, [refetchOrganizations]);
+
+  useEffect(() => {
+    if (organizationsData?.success && organizationsData?.data) {
+      dispatch(setOrganizations(organizationsData.data));
+    }
+  }, [organizationsData, dispatch]);
 
   const fetchPlants = useCallback(async () => {
     if (isLoading) return;
