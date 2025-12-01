@@ -1,5 +1,6 @@
 import { Editor } from "@monaco-editor/react";
 import DevicePathList from "./DevicePathList";
+import ReportUnitDropdown from "../../../Common/ReportUnitDropdown";
 import type { DeviceResult } from "../../../../../model/devices.interface";
 import type { DepartmentResult } from "../../../../../model/department.interface";
 import type { SystemResult } from "../../../../../model/system.interface";
@@ -25,6 +26,7 @@ const VirtualReportingForm: React.FC<VirtualReportingFormProps> = ({
   departmentData,
   systemData,
 }) => {
+
   return (
     <>
       <div>
@@ -51,24 +53,15 @@ const VirtualReportingForm: React.FC<VirtualReportingFormProps> = ({
             placeholder="Enter report name"
           />
         </div>
-        <div>
-          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-            Report Unit
-          </label>
-          <input
-            type="text"
-            name="report_unit"
-            value={reportData.report_unit}
-            onChange={(e) =>
-              onReportDataChange({
-                ...reportData,
-                report_unit: e.target.value,
-              })
-            }
-            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-            placeholder="Enter report unit"
-          />
-        </div>
+        <ReportUnitDropdown
+          value={reportData.report_unit}
+          onChange={(value) =>
+            onReportDataChange({
+              ...reportData,
+              report_unit: value,
+            })
+          }
+        />
       </div>
       <div>
         <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
@@ -105,7 +98,7 @@ const VirtualReportingForm: React.FC<VirtualReportingFormProps> = ({
           className="w-full h-[150px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
           onMount={(_editor, monaco) => {
             if (!monaco) return;
-            
+
             // Get device paths for autocomplete
             const devicePaths: { path: string; device: DeviceResult }[] = [];
             systemDevices
@@ -121,7 +114,9 @@ const VirtualReportingForm: React.FC<VirtualReportingFormProps> = ({
                 );
                 const departmentName = department?.department_name || "";
 
-                const system = systemData.find((s) => s.system_id === device.system_id);
+                const system = systemData.find(
+                  (s) => s.system_id === device.system_id
+                );
                 const systemName = system?.system_name || "";
 
                 const deviceName = device.device_name || "";
@@ -183,4 +178,3 @@ const VirtualReportingForm: React.FC<VirtualReportingFormProps> = ({
 };
 
 export default VirtualReportingForm;
-

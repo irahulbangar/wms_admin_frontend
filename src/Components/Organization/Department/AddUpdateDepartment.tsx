@@ -10,6 +10,7 @@ import { Error, Success } from "../../../utils/toast";
 import { ApiError } from "../../../utils/errorHandler";
 import type { DepartmentResult } from "../../../../model/department.interface";
 import { Editor } from "@monaco-editor/react";
+import ReportUnitDropdown from "../../Common/ReportUnitDropdown";
 
 interface UpdateDepartmentProps {
   setShowAddDepartmentPopup: (show: boolean) => void;
@@ -302,42 +303,15 @@ const UpdateDepartment: React.FC<UpdateDepartmentProps> = ({
                 placeholder="Enter report name"
               />
             </div>
-            <div>
-              <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                Report Unit
-              </label>
-
-              <input
-                type="text"
-                name="report_unit"
-                value={reportData.report_unit}
-                onChange={(e) =>
-                  setReportData((prev) => ({
-                    ...prev,
-                    report_unit: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-                placeholder="Enter report unit"
-              />
-              
-              {/* <select
-                name="report_unit"
-                value={reportData.report_unit}
-                onChange={(e) =>
-                  setReportData((prev) => ({
-                    ...prev,
-                    report_unit: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2.5 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-              >
-                <option value="Ltr">Ltr</option>
-                <option value="M^3">
-                  m<sup>3</sup>
-                </option>
-              </select> */}
-            </div>
+            <ReportUnitDropdown
+              value={reportData.report_unit}
+              onChange={(value) =>
+                setReportData((prev) => ({
+                  ...prev,
+                  report_unit: value,
+                }))
+              }
+            />
           </div>
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Report Formula
