@@ -35,7 +35,16 @@ const reportUnits: ReportUnitOption[] = [
   { value: "volt", label: "Volts" },
   { value: "hertz", label: "Hz" },
   { value: "kw", label: "KW" },
+  { value: "mg", label: "mg" },
+  { value: "g", label: "g" },
+  { value: "kg", label: "kg" },
+  { value: "kWh", label: "kWh" },
+  { value: "calories", label: "cal" },
+  { value: "joules", label: "J" },
+  { value: "pascal", label: "Pa" },
+  { value: "pint", label: "pt" },
 ];
+
 
 const ReportUnitDropdown: React.FC<ReportUnitDropdownProps> = ({
   value,
