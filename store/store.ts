@@ -50,11 +50,13 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .prepend(listenerMiddlewareInstance.middleware)
-      .concat(organizationApi.middleware)
-      .concat(plantApi.middleware)
-      .concat(departmentApi.middleware)
-      .concat(systemApi.middleware)
-      .concat(deviceApi.middleware),
+      .concat(
+        organizationApi.middleware,
+        plantApi.middleware,
+        departmentApi.middleware,
+        systemApi.middleware,
+        deviceApi.middleware
+      ),
 });
 
 export type AppDispatch = typeof store.dispatch;
