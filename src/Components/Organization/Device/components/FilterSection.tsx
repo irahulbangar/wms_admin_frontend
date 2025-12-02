@@ -1,4 +1,5 @@
-import FilterDropdown from "./FilterDropdown";
+import FilterDropdown from "../../../Common/FilterDropdown";
+import { useState } from "react";
 
 interface FilterSectionProps {
   organizations: Array<{
@@ -50,6 +51,15 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   onSystemChange,
   onOrganizationClear,
 }) => {
+  const [orgSearchTerm, setOrgSearchTerm] = useState("");
+  const [plantSearchTerm, setPlantSearchTerm] = useState("");
+  const [deptSearchTerm, setDeptSearchTerm] = useState("");
+  const [systemSearchTerm, setSystemSearchTerm] = useState("");
+  const [isOrgOpen, setIsOrgOpen] = useState(false);
+  const [isPlantOpen, setIsPlantOpen] = useState(false);
+  const [isDeptOpen, setIsDeptOpen] = useState(false);
+  const [isSystemOpen, setIsSystemOpen] = useState(false);
+
   const filteredPlants = plants.filter((plant) => {
     if (selectedOrganization === "all") return true;
     return plant.organization_id === parseInt(selectedOrganization);
@@ -71,50 +81,82 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         <FilterDropdown
           placeholder="Select organization..."
           allLabel="All Organization"
-          selectedValue={selectedOrganization}
-          options={organizations}
-          onSelect={onOrganizationChange}
-          onClear={onOrganizationClear}
-          getDisplayValue={(opt) => opt.organization_name}
-          getOptionId={(opt) => opt.organization_id.toString()}
-          searchPlaceholder="Search organizations..."
-          className="organization-dropdown"
+          value={selectedOrganization}
+          options={organizations.map((org) => ({
+            id: org.organization_id,
+            name: org.organization_name,
+          }))}
+          onSelect={(id) => {
+            onOrganizationChange(id);
+            if (onOrganizationClear) {
+              onOrganizationClear();
+            }
+          }}
+          onSelectAll={() => {
+            onOrganizationChange("all");
+            if (onOrganizationClear) {
+              onOrganizationClear();
+            }
+          }}
+          searchTerm={orgSearchTerm}
+          onSearchChange={setOrgSearchTerm}
+          isOpen={isOrgOpen}
+          onToggle={() => setIsOrgOpen(!isOrgOpen)}
+          className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
         />
 
         <FilterDropdown
           placeholder="Select plant..."
           allLabel="All Plant"
-          selectedValue={selectedPlant}
-          options={filteredPlants}
+          value={selectedPlant}
+          options={filteredPlants.map((plant) => ({
+            id: plant.plant_id,
+            name: plant.plant_name,
+          }))}
           onSelect={onPlantChange}
-          getDisplayValue={(opt) => opt.plant_name}
-          getOptionId={(opt) => opt.plant_id.toString()}
-          searchPlaceholder="Search plants..."
-          className="plant-dropdown"
+          onSelectAll={() => onPlantChange("all")}
+          searchTerm={plantSearchTerm}
+          onSearchChange={setPlantSearchTerm}
+          isOpen={isPlantOpen}
+          onToggle={() => setIsPlantOpen(!isPlantOpen)}
+          className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
+          dropdownClassName="border-b-0"
         />
 
         <FilterDropdown
           placeholder="Select department..."
           allLabel="All Department"
-          selectedValue={selectedDepartment}
-          options={filteredDepartments}
+          value={selectedDepartment}
+          options={filteredDepartments.map((dept) => ({
+            id: dept.department_id,
+            name: dept.department_name,
+          }))}
           onSelect={onDepartmentChange}
-          getDisplayValue={(opt) => opt.department_name}
-          getOptionId={(opt) => opt.department_id.toString()}
-          searchPlaceholder="Search departments..."
-          className="plant-dropdown"
+          onSelectAll={() => onDepartmentChange("all")}
+          searchTerm={deptSearchTerm}
+          onSearchChange={setDeptSearchTerm}
+          isOpen={isDeptOpen}
+          onToggle={() => setIsDeptOpen(!isDeptOpen)}
+          className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
+          dropdownClassName="border-b-0"
         />
 
         <FilterDropdown
           placeholder="Select system..."
           allLabel="All System"
-          selectedValue={selectedSystem}
-          options={filteredSystems}
+          value={selectedSystem}
+          options={filteredSystems.map((system) => ({
+            id: system.system_id,
+            name: system.system_name,
+          }))}
           onSelect={onSystemChange}
-          getDisplayValue={(opt) => opt.system_name}
-          getOptionId={(opt) => opt.system_id.toString()}
-          searchPlaceholder="Search systems..."
-          className="plant-dropdown"
+          onSelectAll={() => onSystemChange("all")}
+          searchTerm={systemSearchTerm}
+          onSearchChange={setSystemSearchTerm}
+          isOpen={isSystemOpen}
+          onToggle={() => setIsSystemOpen(!isSystemOpen)}
+          className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
+          dropdownClassName="border-b-0"
         />
       </div>
     </div>

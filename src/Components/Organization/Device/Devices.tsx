@@ -26,10 +26,10 @@ import {
   useGetAllPlantsQuery,
   useGetAllSystemsQuery,
 } from "../../../../store/rtkQuery";
-import BreadcrumbNav from "./components/BreadcrumbNav";
-import SearchBar from "./components/SearchBar";
 import FilterSection from "./components/FilterSection";
 import DeviceList from "./components/DeviceList";
+import SearchInput from "../../Common/SearchInput";
+import OrganizationBreadcrumb from "../../Common/OrganizationBreadcrumb";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -711,23 +711,59 @@ const Devices = () => {
           ?.system_name || "System"
       : undefined;
 
+  const handleBackToHome = () => navigate("/");
+  const handleBackToOrganizations = () => navigate("/organization");
+  const handleBackToPlants = () => {
+    if (organization_id) {
+      navigate(`/organization/plants/${organization_id}`);
+    } else {
+      navigate("/organization/plants");
+    }
+  };
+  const handleBackToDepartments = () => {
+    if (organization_id && plant_id) {
+      navigate(`/organization/departments/${organization_id}/${plant_id}`);
+    } else {
+      navigate("/organization/departments");
+    }
+  };
+  const handleBackToSystems = () => {
+    if (organization_id && plant_id && department_id) {
+      navigate(
+        `/organization/systems/${organization_id}/${plant_id}/${department_id}`
+      );
+    } else {
+      navigate("/organization/systems");
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto overflow-x-hidden">
       <div className="flex items-center justify-between gap-2 md:flex-row flex-col flex-wrap">
-        <BreadcrumbNav
-          organizationId={organization_id}
-          plantId={plant_id}
-          departmentId={department_id}
-          selectedSystem={selectedSystem}
-          systemName={systemName}
+        <OrganizationBreadcrumb
+          onHomeClick={handleBackToHome}
+          items={[
+            { label: "Organization", onClick: handleBackToOrganizations },
+            { label: "Plants", onClick: handleBackToPlants },
+            { label: "Departments", onClick: handleBackToDepartments },
+            { label: "Systems", onClick: handleBackToSystems },
+            {
+              label: "System",
+              onClick: () => {},
+              isActive: selectedSystem !== "all" && systemName !== undefined,
+              displayValue: systemName,
+            },
+          ]}
         />
 
         <div className="flex items-center flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <SearchBar
+          <SearchInput
             value={searchTerm}
             onChange={setSearchTerm}
             onClear={handleSearchClear}
             placeholder="Search devices by name, HWID, status, type, family name, or family ID..."
+            className="flex-shrink-0 relative sm:w-auto w-full"
+            inputClassName="sm:w-auto w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
           />
 
           <button

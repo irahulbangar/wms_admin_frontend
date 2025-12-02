@@ -18,10 +18,10 @@ import {
   useGetAllPlantsQuery,
   useGetAllSystemsQuery,
 } from "../../../../store/rtkQuery";
-import SystemBreadcrumb from "./components/SystemBreadcrumb";
-import FilterDropdown from "./components/FilterDropdown";
 import SystemTableRow from "./components/SystemTableRow";
-import SearchInput from "./components/SearchInput";
+import FilterDropdown from "../../Common/FilterDropdown";
+import SearchInput from "../../Common/SearchInput";
+import OrganizationBreadcrumb from "../../Common/OrganizationBreadcrumb";
 
 const Systems = () => {
   const { organization_id, plant_id, department_id } = useParams<{
@@ -526,13 +526,22 @@ const Systems = () => {
   return (
     <div className="flex flex-col gap-4 h-full">
       <div className="flex items-center justify-between gap-3 flex-col md:flex-row flex-wrap">
-        <SystemBreadcrumb
-          selectedDepartment={selectedDepartment}
-          departments={departments}
-          onBackToHome={handleBackToHome}
-          onBackToOrganizations={handleBackToOrganizations}
-          onBackToPlants={handleBackToPlants}
-          onBackToDepartments={handleBackToDepartments}
+        <OrganizationBreadcrumb
+          onHomeClick={handleBackToHome}
+          items={[
+            { label: "Organization", onClick: handleBackToOrganizations },
+            { label: "Plants", onClick: handleBackToPlants },
+            { label: "Departments", onClick: handleBackToDepartments },
+            {
+              label: "Department",
+              onClick: () => {},
+              isActive: selectedDepartment !== "all",
+              displayValue:
+                departments.find(
+                  (dept) => dept.department_id.toString() === selectedDepartment
+                )?.department_name || "Department",
+            },
+          ]}
         />
         <div className="flex items-center flex-col md:flex-row gap-3 w-full md:w-auto">
           <SearchInput
