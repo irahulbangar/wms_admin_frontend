@@ -42,7 +42,7 @@ const BRWHMSReport: React.FC = () => {
   >([]);
   const [device, setDevice] = useState<DeviceResult | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const totalItems = useMemo(() => {
     return activeTab === "runtime"
@@ -213,7 +213,7 @@ const BRWHMSReport: React.FC = () => {
   return (
     <div className="flex flex-col gap-4 overflow-x-hidden h-full">
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
           <button
             onClick={handleBackToHome}
@@ -273,10 +273,6 @@ const BRWHMSReport: React.FC = () => {
               <ChevronRight className="w-4 h-4 text-text-muted" />
               <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
                 {device.device_name}
-              </span>
-              <ChevronRight className="w-4 h-4 text-text-muted" />
-              <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-                BRWHMS Report
               </span>
             </>
           )}
@@ -375,10 +371,10 @@ const BRWHMSReport: React.FC = () => {
                           To Time
                         </th>
                         <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Flow (m³/h)
+                          Flow
                         </th>
                         <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Totalizer (ltr)
+                          Totalizer
                         </th>
                       </tr>
                     </thead>
@@ -411,7 +407,7 @@ const BRWHMSReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available.
+                                No data available for the selected date.
                               </span>
                             </div>
                           </td>
@@ -535,10 +531,10 @@ const BRWHMSReport: React.FC = () => {
                           To Time
                         </th>
                         <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Flow (m³/h)
+                          Flow
                         </th>
                         <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Totalizer (ltr)
+                          Totalizer
                         </th>
                       </tr>
                     </thead>
@@ -571,7 +567,7 @@ const BRWHMSReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available.
+                                No data available for the selected date.
                               </span>
                             </div>
                           </td>

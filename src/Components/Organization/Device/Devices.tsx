@@ -498,6 +498,10 @@ const Devices = () => {
     plantId: number,
     deviceFamilyType: string
   ) => {
+    if (deviceFamilyType === "virtual") {
+      Warning("Virtual devices do not support reporting");
+      return;
+    }
     navigate(
       `/organization/devices/report/${deviceFamilyType}/${plantId}/${deviceId}`
     );
