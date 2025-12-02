@@ -18,6 +18,7 @@ import Plants from "./Components/Organization/Plant/Plants";
 import Departments from "./Components/Organization/Department/Departments";
 import Systems from "./Components/Organization/System/Systems";
 import Devices from "./Components/Organization/Device/Devices";
+import FMReport from "./Components/Organization/Device/components/FMReport";
 import OrganizationUsers from "./Components/Organization/OrganizationUser/OrganizationUsers";
 import AdminUsers from "./Components/Settings/AdminUsers";
 import DataSync from "./Components/Services/DataSync";
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
       {
         path: "/organization/devices/:organization_id/:plant_id/:department_id/:system_id",
         element: <Devices />,
+      },
+      {
+        path: "/organization/devices/report/fm/:plant_id/:device_id",
+        element: <FMReport />,
       },
       { path: "/organization/users", element: <OrganizationUsers /> },
       { path: "/organization/setting", element: <Setting /> },

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { PlusCircle, Loader2 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import type { DeviceResult } from "../../../../model/devices.interface";
 import {
   deleteDevice,
@@ -32,6 +32,7 @@ import FilterSection from "./components/FilterSection";
 import DeviceList from "./components/DeviceList";
 
 const Devices = () => {
+  const navigate = useNavigate();
   const { organization_id, plant_id, department_id, system_id } = useParams<{
     organization_id: string;
     plant_id: string;
@@ -493,7 +494,7 @@ const Devices = () => {
   };
 
   const handleReportDeviceClick = (deviceId: number, plantId: number) => {
-    console.log(deviceId, plantId);
+    navigate(`/organization/devices/report/fm/${plantId}/${deviceId}`);
   };
 
   const handleDeviceUpdate = useCallback(
