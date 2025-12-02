@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import type { FmDeviceResultItem } from "../../../../../model/fm-device.interface";
 import { useAppSelector } from "../../../../../store/store";
 import {
@@ -12,6 +12,12 @@ import { useAppDispatch } from "../../../../../store/store";
 import type { DeviceResult } from "../../../../../model/devices.interface";
 import Pagination from "../../../Pagination";
 import { formatDateForCSV } from "../../../../utils/utils";
+import { useDeviceReportBreadcrumb } from "./hooks/useDeviceReportBreadcrumb";
+import {
+  getOneWeekAgoDate,
+  getTodayDate,
+  reportTypeDurationMap,
+} from "./utils/reportUtils";
 
 type TabType = "runtime" | "custom";
 type ReportType = "1day" | "15min" | "1hour";
@@ -21,7 +27,6 @@ const FMReport: React.FC = () => {
     plant_id: string;
     device_id: string;
   }>();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { devices } = useAppSelector((state) => state.device);
 
@@ -92,20 +97,11 @@ const FMReport: React.FC = () => {
     }
   }, [deviceId, devices, dispatch]);
 
-  const [runtimeDate, setRuntimeDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
+  const [runtimeDate, setRuntimeDate] = useState<string>(getTodayDate());
 
   const [reportType, setReportType] = useState<ReportType>("1day");
-  const getOneWeekAgoDate = () => {
-    const date = new Date();
-    date.setDate(date.getDate() - 7);
-    return date.toISOString().split("T")[0];
-  };
   const [fromDate, setFromDate] = useState<string>(getOneWeekAgoDate());
-  const [toDate, setToDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
+  const [toDate, setToDate] = useState<string>(getTodayDate());
 
   const handleGetData = async () => {
     setIsLoading(true);
@@ -128,19 +124,13 @@ const FMReport: React.FC = () => {
             setRuntimeReportData([]);
           });
       } else {
-        const durationMap: Record<ReportType, string> = {
-          "1day": "1day",
-          "15min": "15min",
-          "1hour": "1hour",
-        };
-
         await dispatch(
           getFMCustomReportData({
             plantId: _plantId,
             deviceId,
             from_date: fromDate,
             to_date: toDate,
-            duration: durationMap[reportType],
+            duration: reportTypeDurationMap[reportType],
           })
         )
           .unwrap()
@@ -207,47 +197,14 @@ const FMReport: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const handleBackToHome = () => navigate("/");
-  const handleBackToOrganizations = () => navigate("/organization");
-  const handleBackToPlants = () => {
-    if (device?.organization_id) {
-      navigate(`/organization/plants/${device.organization_id}`);
-    } else {
-      navigate("/organization/plants");
-    }
-  };
-  const handleBackToDepartments = () => {
-    if (device?.organization_id && device?.plant_id) {
-      navigate(
-        `/organization/departments/${device.organization_id}/${device.plant_id}`
-      );
-    } else {
-      navigate("/organization/departments");
-    }
-  };
-  const handleBackToSystems = () => {
-    if (device?.organization_id && device?.plant_id && device?.department_id) {
-      navigate(
-        `/organization/systems/${device.organization_id}/${device.plant_id}/${device.department_id}`
-      );
-    } else {
-      navigate("/organization/systems");
-    }
-  };
-  const handleBackToDevices = () => {
-    if (
-      device?.organization_id &&
-      device?.plant_id &&
-      device?.department_id &&
-      device?.system_id
-    ) {
-      navigate(
-        `/organization/devices/${device.organization_id}/${device.plant_id}/${device.department_id}/${device.system_id}`
-      );
-    } else {
-      navigate("/organization/devices");
-    }
-  };
+  const {
+    handleBackToHome,
+    handleBackToOrganizations,
+    handleBackToPlants,
+    handleBackToDepartments,
+    handleBackToSystems,
+    handleBackToDevices,
+  } = useDeviceReportBreadcrumb(device);
 
   return (
     <div className="flex flex-col gap-4 overflow-x-hidden h-full">

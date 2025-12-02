@@ -16,7 +16,11 @@ interface DeviceTableProps {
     systemId: number,
     organizationId?: number
   ) => void;
-  onReport: (deviceId: number, plantId: number) => void;
+  onReport: (
+    deviceId: number,
+    plantId: number,
+    deviceFamilyType: string
+  ) => void;
   onDelete: (deviceId: number) => void;
   canDelete: boolean;
 }
@@ -180,7 +184,11 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
                   <span title="Report" aria-label="Report device">
                     <FileText
                       onClick={() =>
-                        onReport(device.device_id, device.plant_id)
+                        onReport(
+                          device.device_id,
+                          device.plant_id,
+                          device.device_family_type
+                        )
                       }
                       className="w-5 h-5 text-text-primary cursor-pointer"
                     />

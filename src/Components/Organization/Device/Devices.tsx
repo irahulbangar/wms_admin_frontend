@@ -493,8 +493,14 @@ const Devices = () => {
     setSystemId(systemId);
   };
 
-  const handleReportDeviceClick = (deviceId: number, plantId: number) => {
-    navigate(`/organization/devices/report/fm/${plantId}/${deviceId}`);
+  const handleReportDeviceClick = (
+    deviceId: number,
+    plantId: number,
+    deviceFamilyType: string
+  ) => {
+    navigate(
+      `/organization/devices/report/${deviceFamilyType}/${plantId}/${deviceId}`
+    );
   };
 
   const handleDeviceUpdate = useCallback(

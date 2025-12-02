@@ -25,6 +25,7 @@ import DataSync from "./Components/Services/DataSync";
 import Setting from "./Components/Organization/Setting";
 import AdminSetting from "./Components/Settings/AdminSetting";
 import Profile from "./Components/Settings/Profile";
+import BRWHMSReport from "./Components/Organization/Device/components/BRWHMSReport";
 
 function ThemedToast() {
   const { theme } = useTheme();
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
       {
         path: "/organization/devices/report/fm/:plant_id/:device_id",
         element: <FMReport />,
+      },
+      {
+        path: "/organization/devices/report/brwhms/:plant_id/:device_id",
+        element: <BRWHMSReport />,
       },
       { path: "/organization/users", element: <OrganizationUsers /> },
       { path: "/organization/setting", element: <Setting /> },

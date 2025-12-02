@@ -27,7 +27,11 @@ interface DeviceListProps {
   onAddDevice: () => void;
   onClearSearch: () => void;
   canDelete: boolean;
-  onReport: (deviceId: number, plantId: number) => void;
+  onReport: (
+    deviceId: number,
+    plantId: number,
+    deviceFamilyType: string
+  ) => void;
 }
 
 const DeviceList: React.FC<DeviceListProps> = ({
