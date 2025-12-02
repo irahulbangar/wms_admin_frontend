@@ -27,6 +27,8 @@ import AdminSetting from "./Components/Settings/AdminSetting";
 import Profile from "./Components/Settings/Profile";
 import BRWHMSReport from "./Components/Organization/Device/DeviceReport/BRWHMSReport";
 import BTLMReport from "./Components/Organization/Device/DeviceReport/BTLMReport";
+import ARGReport from "./Components/Organization/Device/DeviceReport/ARGReport";
+import PHMCReport from "./Components/Organization/Device/DeviceReport/PHMCReport";
 
 function ThemedToast() {
   const { theme } = useTheme();
@@ -89,6 +91,14 @@ const router = createBrowserRouter([
       {
         path: "/organization/devices/report/tank/:plant_id/:device_id",
         element: <BTLMReport />,
+      },
+      {
+        path: "/organization/devices/report/phmc/:plant_id/:device_id",
+        element: <PHMCReport />,
+      },
+      {
+        path: "/organization/devices/report/arg/:plant_id/:device_id",
+        element: <ARGReport />,
       },
       { path: "/organization/users", element: <OrganizationUsers /> },
       { path: "/organization/setting", element: <Setting /> },

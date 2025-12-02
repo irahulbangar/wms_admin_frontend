@@ -54,7 +54,7 @@ const OrganizationUsers = () => {
   >([]);
   const [showUserPlants, setShowUserPlants] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const {
     data: organizationsData,

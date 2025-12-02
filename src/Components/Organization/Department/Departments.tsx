@@ -65,7 +65,7 @@ const Departments = () => {
   const [isEditDepartmentOpen, setIsEditDepartmentOpen] = useState(false);
   const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const {
     data: organizationsData,

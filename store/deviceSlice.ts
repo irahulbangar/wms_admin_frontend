@@ -724,6 +724,81 @@ export const getPHMCCustomReportData = createAsyncThunk(
   }
 );
 
+interface GetARGRuntimeDataPayload {
+  plantId: number;
+  deviceId: number;
+  date: string;
+}
+
+// get ARG runtime data
+export const getARGRuntimeData = createAsyncThunk(
+  "device/getARGRuntimeData",
+  async ({ plantId, deviceId, date }: GetARGRuntimeDataPayload, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/arg/admin/device/arg-logs/${plantId}/${deviceId}`,
+        {
+          date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetARGCustomReportDataPayload {
+  plantId: number;
+  deviceId: number;
+  from_date: string;
+  to_date: string;
+  duration: string;
+}
+
+// get ARG custom report data
+export const getARGCustomReportData = createAsyncThunk(
+  "device/getARGCustomReportData",
+  async (
+    {
+      plantId,
+      deviceId,
+      from_date,
+      to_date,
+      duration,
+    }: GetARGCustomReportDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/arg/admin/device/arg-reports/${plantId}/${deviceId}`,
+        {
+          from_date,
+          to_date,
+          duration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;

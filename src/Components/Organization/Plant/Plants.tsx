@@ -57,7 +57,7 @@ const Plants = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [organizationSearchTerm, setOrganizationSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const { admin } = useAppSelector((state) => state.admin);
   const totalItems = useMemo(() => {
     return filteredPlants.length;

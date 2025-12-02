@@ -47,7 +47,7 @@ const FMReport: React.FC = () => {
   >([]);
   const [device, setDevice] = useState<DeviceResult | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const {
     data: devicesData,
@@ -420,7 +420,7 @@ const FMReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available.
+                                No data available for the selected date.
                               </span>
                             </div>
                           </td>
@@ -580,7 +580,7 @@ const FMReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available.
+                                No data available for the selected date.
                               </span>
                             </div>
                           </td>
