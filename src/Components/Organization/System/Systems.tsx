@@ -18,7 +18,7 @@ import {
   useGetAllPlantsQuery,
   useGetAllSystemsQuery,
 } from "../../../../store/rtkQuery";
-import SystemTableRow from "./components/SystemTableRow";
+import SystemTableRow from "./SystemTableRow";
 import FilterDropdown from "../../Common/FilterDropdown";
 import SearchInput from "../../Common/SearchInput";
 import OrganizationBreadcrumb from "../../Common/OrganizationBreadcrumb";

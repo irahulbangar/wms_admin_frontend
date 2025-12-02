@@ -18,10 +18,10 @@ import {
   useGetAllOrganizationsQuery,
   useGetAllPlantsQuery,
 } from "../../../../store/rtkQuery";
-import DepartmentTableRow from "./components/DepartmentTableRow";
 import FilterDropdown from "../../Common/FilterDropdown";
 import SearchInput from "../../Common/SearchInput";
 import OrganizationBreadcrumb from "../../Common/OrganizationBreadcrumb";
+import DepartmentTableRow from "./DepartmentTableRow";
 
 const Departments = () => {
   const { organization_id, plant_id } = useParams<{

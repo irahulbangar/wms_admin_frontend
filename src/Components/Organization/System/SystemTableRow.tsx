@@ -1,37 +1,39 @@
 import { Edit, Eye, Trash2 } from "lucide-react";
-import { fromatDateWithTime } from "../../../../utils/utils";
-import type { DepartmentResult } from "../../../../../model/department.interface";
+import { fromatDateWithTime } from "../../../utils/utils";
+import type { SystemResult } from "../../../../model/system.interface";
 
-interface DepartmentTableRowProps {
-  department: DepartmentResult;
+interface SystemTableRowProps {
+  system: SystemResult;
   index: number;
   currentPage: number;
   rowsPerPage: number;
   adminRole?: string;
-  onViewSystems: (
+  onViewDevices: (
     departmentId: number,
     organizationId: number,
-    plantId: number
+    plantId: number,
+    systemId: number
   ) => void;
-  onEditDepartment: (departmentId: number, plantId: number) => void;
+  onEditSystem: (systemId: number, plantId: number) => void;
 }
 
-const DepartmentTableRow: React.FC<DepartmentTableRowProps> = ({
-  department,
+const SystemTableRow: React.FC<SystemTableRowProps> = ({
+  system,
   index,
   currentPage,
   rowsPerPage,
   adminRole,
-  onViewSystems,
-  onEditDepartment,
+  onViewDevices,
+  onEditSystem,
 }) => {
   return (
     <tr
       onDoubleClick={() =>
-        onViewSystems(
-          department.department_id,
-          department.organization_id,
-          department.plant_id
+        onViewDevices(
+          system.department_id,
+          system.organization_id,
+          system.plant_id,
+          system.system_id
         )
       }
       className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer"
@@ -40,46 +42,48 @@ const DepartmentTableRow: React.FC<DepartmentTableRowProps> = ({
         {(currentPage - 1) * rowsPerPage + index + 1}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {department.department_name}
+        {system.system_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {department.organization_name}
+        {system.organization_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {department.plant_name}
+        {system.plant_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {fromatDateWithTime(department.created_at)}
+        {system.department_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {fromatDateWithTime(department.updated_at)}
+        {fromatDateWithTime(system.created_at)}
+      </td>
+      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+        {fromatDateWithTime(system.updated_at)}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
         <div className="flex items-center justify-center gap-2">
-          <span title="View systems" aria-label="View systems">
+          <span title="View devices" aria-label="View devices">
             <Eye
               onClick={() =>
-                onViewSystems(
-                  department.department_id,
-                  department.organization_id,
-                  department.plant_id
+                onViewDevices(
+                  system.department_id,
+                  system.organization_id,
+                  system.plant_id,
+                  system.system_id
                 )
               }
               className="w-5 h-5 text-fuchsia-500 cursor-pointer"
             />
           </span>
 
-          <span title="Edit department" aria-label="Edit department">
+          <span title="Edit system" aria-label="Edit system">
             <Edit
-              onClick={() =>
-                onEditDepartment(department.department_id, department.plant_id)
-              }
+              onClick={() => onEditSystem(system.system_id, system.plant_id)}
               className="w-5 h-5 text-status-info cursor-pointer"
             />
           </span>
 
           {adminRole === "super_admin" && (
-            <span title="Delete department" aria-label="Delete department">
+            <span title="Delete system" aria-label="Delete system">
               <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
             </span>
           )}
@@ -89,5 +93,4 @@ const DepartmentTableRow: React.FC<DepartmentTableRowProps> = ({
   );
 };
 
-export default DepartmentTableRow;
-
+export default SystemTableRow;
