@@ -11,7 +11,7 @@ import {
 import { useAppDispatch } from "../../../../../store/store";
 import type { DeviceResult } from "../../../../../model/devices.interface";
 import Pagination from "../../../Pagination";
-import { fromatDateWithTime } from "../../../../utils/utils";
+import { formatDateForCSV } from "../../../../utils/utils";
 
 type TabType = "runtime" | "custom";
 type ReportType = "1day" | "15min" | "1hour";
@@ -178,9 +178,17 @@ const FMReport: React.FC = () => {
 
     const csvContent = [
       headers.join(","),
-      ...dataToExport.map((item, index) =>
-        [index + 1, fromatDateWithTime(item.from_time), fromatDateWithTime(item.to_time), item.flow, item.max].join(",")
-      ),
+      ...dataToExport.map((item, index) => {
+        const fromTime =
+          activeTab === "runtime"
+            ? formatDateForCSV(item.from_time)
+            : formatDateForCSV(item.interval_start);
+        const toTime =
+          activeTab === "runtime"
+            ? formatDateForCSV(item.to_time)
+            : formatDateForCSV(item.interval_end);
+        return [index + 1, fromTime, toTime, item.flow, item.max].join(",");
+      }),
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -424,10 +432,10 @@ const FMReport: React.FC = () => {
                               {(currentPage - 1) * rowsPerPage + index + 1}
                             </td>
                             <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {fromatDateWithTime(item.from_time)}
+                              {formatDateForCSV(item.from_time)}
                             </td>
                             <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {fromatDateWithTime(item.to_time)}
+                              {formatDateForCSV(item.to_time)}
                             </td>
                             <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {item.flow}
@@ -584,10 +592,10 @@ const FMReport: React.FC = () => {
                               {(currentPage - 1) * rowsPerPage + index + 1}
                             </td>
                             <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {fromatDateWithTime(item.interval_start)}
+                              {formatDateForCSV(item.interval_start)}
                             </td>
                             <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {fromatDateWithTime(item.interval_end)}
+                              {formatDateForCSV(item.interval_end)}
                             </td>
                             <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {item.flow}

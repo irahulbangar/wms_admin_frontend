@@ -9,6 +9,31 @@ export const fromatDateWithTime = (date: string) => {
   });
 };
 
+/**
+ * Converts a date string to dd/mm/yyyy format with time (dd/mm/yyyy HH:mm)
+ * @param dateString - The date string to convert
+ * @returns Formatted date string in dd/mm/yyyy HH:mm format
+ */
+export const formatDateForCSV = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return dateString;
+    }
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  } catch (error) {
+    console.error("Error formatting date for CSV:", error);
+    return dateString;
+  }
+};
+
 export const handleStatus = (status: string) => {
   if (status === "Active" || status === "active") {
     return "bg-green-100 text-status-success";
