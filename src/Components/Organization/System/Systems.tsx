@@ -1,23 +1,10 @@
-import {
-  ChevronDown,
-  ChevronRight,
-  Dock,
-  Edit,
-  Eye,
-  Home,
-  Loader2,
-  PlusCircle,
-  Search,
-  Trash2,
-  X,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Dock, Loader2, PlusCircle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { setOrganizations } from "../../../../store/organizationSlice";
 import { setPlants } from "../../../../store/plantSlice";
 import { Error, Warning } from "../../../utils/toast";
-import { fromatDateWithTime } from "../../../utils/utils";
 import NoDataFound from "../../NoDataFound";
 import Pagination from "../../Pagination";
 import AddUpdateSystem from "./AddUpdateSystem";
@@ -31,6 +18,10 @@ import {
   useGetAllPlantsQuery,
   useGetAllSystemsQuery,
 } from "../../../../store/rtkQuery";
+import SystemBreadcrumb from "./components/SystemBreadcrumb";
+import FilterDropdown from "./components/FilterDropdown";
+import SystemTableRow from "./components/SystemTableRow";
+import SearchInput from "./components/SearchInput";
 
 const Systems = () => {
   const { organization_id, plant_id, department_id } = useParams<{
@@ -48,9 +39,6 @@ const Systems = () => {
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [plantSearchTerm, setPlantSearchTerm] = useState("");
-  const organizationDropdownRef = useRef<HTMLDivElement>(null);
-  const plantDropdownRef = useRef<HTMLDivElement>(null);
-  const departmentDropdownRef = useRef<HTMLDivElement>(null);
   const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] =
     useState(false);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
@@ -256,54 +244,6 @@ const Systems = () => {
     const matchesPlant = department.plant_id === parseInt(selectedPlant);
     return matchesDepartment && matchesPlant;
   });
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        organizationDropdownRef.current &&
-        !organizationDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOrganizationDropdownOpen(false);
-        setOrganizationSearchTerm("");
-      }
-      if (
-        plantDropdownRef.current &&
-        !plantDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsPlantDropdownOpen(false);
-        setPlantSearchTerm("");
-      }
-      if (
-        departmentDropdownRef.current &&
-        !departmentDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDepartmentDropdownOpen(false);
-        setDepartmentSearchTerm("");
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (!target.closest(".organization-dropdown")) {
-        setIsOrganizationDropdownOpen(false);
-      }
-      if (!target.closest(".plant-dropdown")) {
-        setIsPlantDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     if (selectedOrganization !== "all") {
@@ -586,75 +526,24 @@ const Systems = () => {
   return (
     <div className="flex flex-col gap-4 h-full">
       <div className="flex items-center justify-between gap-3 flex-col md:flex-row flex-wrap">
-        <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
-          <button
-            onClick={handleBackToHome}
-            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-          >
-            <Home className="w-4 h-4" />
-            <span>Home</span>
-          </button>
-
-          <ChevronRight className="w-4 h-4 text-text-muted" />
-
-          <button
-            onClick={handleBackToOrganizations}
-            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-          >
-            <span>Organization</span>
-          </button>
-
-          <ChevronRight className="w-4 h-4 text-text-muted" />
-          <button
-            onClick={handleBackToPlants}
-            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-          >
-            <span>Plants</span>
-          </button>
-
-          <ChevronRight className="w-4 h-4 text-text-muted" />
-          <button
-            onClick={handleBackToDepartments}
-            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-          >
-            <span>Departments</span>
-          </button>
-
-          {selectedDepartment !== "all" && (
-            <>
-              <ChevronRight className="w-4 h-4 text-text-muted" />
-              <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-                {departments.find(
-                  (department) =>
-                    department.department_id.toString() === selectedDepartment
-                )?.department_name || "Department"}
-              </span>
-            </>
-          )}
-        </div>
+        <SystemBreadcrumb
+          selectedDepartment={selectedDepartment}
+          departments={departments}
+          onBackToHome={handleBackToHome}
+          onBackToOrganizations={handleBackToOrganizations}
+          onBackToPlants={handleBackToPlants}
+          onBackToDepartments={handleBackToDepartments}
+        />
         <div className="flex items-center flex-col md:flex-row gap-3 w-full md:w-auto">
-          <div className="flex-shrink-0 relative md:w-60 lg:w-80 w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
-            <input
-              type="text"
-              placeholder="Search systems..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="md:w-60 lg:w-80 w-full pl-10 pr-4 py-1.5 text-text-secondary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilteredSystems(systems);
-                }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
-                title="Clear search"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
-          </div>
+          <SearchInput
+            value={searchTerm}
+            placeholder="Search systems..."
+            onChange={setSearchTerm}
+            onClear={() => {
+              setSearchTerm("");
+              setFilteredSystems(systems);
+            }}
+          />
 
           <button
             onClick={handleAddSystem}
@@ -668,249 +557,76 @@ const Systems = () => {
 
       <div className="flex items-start md:items-center justify-center md:justify-end lg:justify-between w-full gap-3 md:flex-row flex-col flex-wrap">
         <div className="flex items-center gap-3 pl-1 md:flex-row flex-col w-full md:w-auto">
-          <div
+          <FilterDropdown
+            placeholder="Select organization..."
+            allLabel="All Organization"
+            value={organization_id || selectedOrganization}
+            options={filteredOrganizations.map((org) => ({
+              id: org.organization_id,
+              name: org.organization_name,
+            }))}
+            searchTerm={organizationSearchTerm}
+            onSearchChange={setOrganizationSearchTerm}
+            onSelect={(id) => {
+              setSelectedOrganization(id);
+              setSelectedPlant("all");
+              setPlantSearchTerm("");
+            }}
+            onSelectAll={() => {
+              setSelectedOrganization("all");
+              setSelectedPlant("all");
+              setPlantSearchTerm("");
+            }}
+            isOpen={isOrganizationDropdownOpen}
+            onToggle={() =>
+              setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
+            }
             className="flex-shrink-0 md:w-54 w-full relative organization-dropdown"
-            ref={organizationDropdownRef}
-          >
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Select organization..."
-                value={
-                  (organization_id || selectedOrganization) === "all"
-                    ? "All Organization"
-                    : organizations.find(
-                        (org) =>
-                          org.organization_id.toString() ===
-                          (organization_id || selectedOrganization)
-                      )?.organization_name || "Select organization..."
-                }
-                readOnly
-                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
-                onClick={() =>
-                  setIsOrganizationDropdownOpen(!isOrganizationDropdownOpen)
-                }
-              />
-              <ChevronDown
-                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
-                  isOrganizationDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </div>
-
-            {isOrganizationDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
-                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
-                    <input
-                      type="text"
-                      placeholder="Search organizations..."
-                      value={organizationSearchTerm}
-                      onChange={(e) =>
-                        setOrganizationSearchTerm(e.target.value)
-                      }
-                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </div>
-                </div>
-
-                <div
-                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
-                  onClick={() => {
-                    setSelectedOrganization("all");
-                    setSelectedPlant("all");
-                    setIsOrganizationDropdownOpen(false);
-                    setOrganizationSearchTerm("");
-                    setPlantSearchTerm("");
-                  }}
-                >
-                  All Organization
-                </div>
-
-                {filteredOrganizations.length > 0 ? (
-                  filteredOrganizations.map((org) => (
-                    <div
-                      key={org.organization_id}
-                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
-                      onClick={() => {
-                        setSelectedOrganization(org.organization_id.toString());
-                        setSelectedPlant("all");
-                        setIsOrganizationDropdownOpen(false);
-                        setOrganizationSearchTerm(org.organization_name);
-                        setPlantSearchTerm("");
-                      }}
-                    >
-                      {org.organization_name}
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-text-secondary text-sm">
-                    No organizations found
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <div
+          />
+          <FilterDropdown
+            placeholder="Select plant..."
+            allLabel="All Plant"
+            value={plant_id || selectedPlant}
+            options={filteredPlants.map((plant) => ({
+              id: plant.plant_id,
+              name: plant.plant_name,
+            }))}
+            searchTerm={plantSearchTerm}
+            onSearchChange={setPlantSearchTerm}
+            onSelect={(id) => {
+              setSelectedPlant(id);
+            }}
+            onSelectAll={() => {
+              setSelectedPlant("all");
+            }}
+            isOpen={isPlantDropdownOpen}
+            onToggle={() => setIsPlantDropdownOpen(!isPlantDropdownOpen)}
             className="flex-shrink-0 md:w-54 w-full relative plant-dropdown"
-            ref={plantDropdownRef}
-          >
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Select plant..."
-                value={
-                  (plant_id || selectedPlant) === "all"
-                    ? "All Plant"
-                    : plants.find(
-                        (plant) =>
-                          plant.plant_id.toString() ===
-                          (plant_id || selectedPlant)
-                      )?.plant_name || "Select plant..."
-                }
-                readOnly
-                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
-                onClick={() => setIsPlantDropdownOpen(!isPlantDropdownOpen)}
-              />
-              <ChevronDown
-                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
-                  isPlantDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </div>
-
-            {isPlantDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
-                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
-                    <input
-                      type="text"
-                      placeholder="Search plants..."
-                      value={plantSearchTerm}
-                      onChange={(e) => setPlantSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </div>
-                </div>
-
-                <div
-                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
-                  onClick={() => {
-                    setSelectedPlant("all");
-                    setIsPlantDropdownOpen(false);
-                    setPlantSearchTerm("");
-                  }}
-                >
-                  All Plant
-                </div>
-
-                {filteredPlants.length > 0 ? (
-                  filteredPlants.map((plant) => (
-                    <div
-                      key={plant.plant_id}
-                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
-                      onClick={() => {
-                        setSelectedPlant(plant.plant_id.toString());
-                        setIsPlantDropdownOpen(false);
-                        setPlantSearchTerm(plant.plant_name);
-                      }}
-                    >
-                      {plant.plant_name}
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-text-secondary text-sm">
-                    No plants found
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <div
+            dropdownClassName="border-b-0"
+          />
+          <FilterDropdown
+            placeholder="Select department..."
+            allLabel="All Department"
+            value={department_id || selectedDepartment}
+            options={filteredDepartments.map((dept) => ({
+              id: dept.department_id,
+              name: dept.department_name,
+            }))}
+            searchTerm={departmentSearchTerm}
+            onSearchChange={setDepartmentSearchTerm}
+            onSelect={(id) => {
+              setSelectedDepartment(id);
+            }}
+            onSelectAll={() => {
+              setSelectedDepartment("all");
+            }}
+            isOpen={isDepartmentDropdownOpen}
+            onToggle={() =>
+              setIsDepartmentDropdownOpen(!isDepartmentDropdownOpen)
+            }
             className="flex-shrink-0 md:w-54 w-full relative department-dropdown"
-            ref={departmentDropdownRef}
-          >
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Select department..."
-                value={
-                  (department_id || selectedDepartment) === "all"
-                    ? "All Department"
-                    : departments.find(
-                        (department) =>
-                          department.department_id.toString() ===
-                          (department_id || selectedDepartment)
-                      )?.department_name || "Select department..."
-                }
-                readOnly
-                className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary w-full md:w-54 pr-8 cursor-pointer"
-                onClick={() =>
-                  setIsDepartmentDropdownOpen(!isDepartmentDropdownOpen)
-                }
-              />
-              <ChevronDown
-                className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted transition-transform duration-200 ${
-                  isDepartmentDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </div>
-
-            {isDepartmentDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-primary border border-border-primary border-b-0 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
-                <div className="sticky top-0 bg-primary p-3 border-b border-border-primary">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-secondary" />
-                    <input
-                      type="text"
-                      placeholder="Search departments..."
-                      value={departmentSearchTerm || ""}
-                      onChange={(e) => setDepartmentSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-3 py-1.5 text-sm text-text-primary bg-secondary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </div>
-                </div>
-
-                <div
-                  className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
-                  onClick={() => {
-                    setSelectedDepartment("all");
-                    setIsDepartmentDropdownOpen(false);
-                    setDepartmentSearchTerm("");
-                  }}
-                >
-                  All Department
-                </div>
-
-                {filteredDepartments.length > 0 ? (
-                  filteredDepartments.map((department) => (
-                    <div
-                      key={department.department_id}
-                      className="px-3 py-2 text-text-primary hover:bg-secondary cursor-pointer border-b border-border-primary"
-                      onClick={() => {
-                        setSelectedDepartment(
-                          department.department_id.toString()
-                        );
-                        setIsDepartmentDropdownOpen(false);
-                        setDepartmentSearchTerm(department.department_name);
-                      }}
-                    >
-                      {department.department_name}
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-text-secondary text-sm">
-                    No departments found
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+            dropdownClassName="border-b-0"
+          />
         </div>
       </div>
 
@@ -957,78 +673,16 @@ const Systems = () => {
               <tbody className="min-h-[800px]">
                 {handlePaginatedSystems.length > 0 ? (
                   handlePaginatedSystems.map((system, index) => (
-                    <tr
-                      onDoubleClick={() =>
-                        handleViewDevices(
-                          system.department_id,
-                          system.organization_id,
-                          system.plant_id,
-                          system.system_id
-                        )
-                      }
-                      key={index}
-                      className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer"
-                    >
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                        {(currentPage - 1) * rowsPerPage + index + 1}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {system.system_name}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {system.organization_name}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {system.plant_name}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {system.department_name}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {fromatDateWithTime(system.created_at)}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        {fromatDateWithTime(system.updated_at)}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-                        <div className="flex items-center justify-center gap-2">
-                          <span title="View devices" aria-label="View devices">
-                            <Eye
-                              onClick={() =>
-                                handleViewDevices(
-                                  system.department_id,
-                                  system.organization_id,
-                                  system.plant_id,
-                                  system.system_id
-                                )
-                              }
-                              className="w-5 h-5 text-fuchsia-500 cursor-pointer"
-                            />
-                          </span>
-
-                          <span title="Edit system" aria-label="Edit system">
-                            <Edit
-                              onClick={() =>
-                                handleEditSystem(
-                                  system.system_id,
-                                  system.plant_id
-                                )
-                              }
-                              className="w-5 h-5 text-status-info cursor-pointer"
-                            />
-                          </span>
-
-                          {admin?.role === "super_admin" && (
-                            <span
-                              title="Delete system"
-                              aria-label="Delete system"
-                            >
-                              <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" />
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                    <SystemTableRow
+                      key={system.system_id || index}
+                      system={system}
+                      index={index}
+                      currentPage={currentPage}
+                      rowsPerPage={rowsPerPage}
+                      adminRole={admin?.role}
+                      onViewDevices={handleViewDevices}
+                      onEditSystem={handleEditSystem}
+                    />
                   ))
                 ) : (
                   <tr>
