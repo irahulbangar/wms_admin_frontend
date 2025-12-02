@@ -128,8 +128,8 @@ const FMReport: React.FC = () => {
           getFMCustomReportData({
             plantId: _plantId,
             deviceId,
-            from_date: fromDate,
-            to_date: toDate,
+            from_date: `${fromDate} 00:00:00`,
+            to_date: `${toDate} 00:00:00`,
             duration: reportTypeDurationMap[reportType],
           })
         )
@@ -337,7 +337,7 @@ const FMReport: React.FC = () => {
                 <button
                   onClick={handleDownloadCSV}
                   disabled={runtimeReportData.length === 0 || isLoading}
-                  className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-1.5 bg-gradient-to-r bg-primary text-text-primary rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download CSV</span>
@@ -496,7 +496,7 @@ const FMReport: React.FC = () => {
                   <button
                     onClick={handleDownloadCSV}
                     disabled={customReportData.length === 0 || isLoading}
-                    className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-4 py-1.5 bg-gradient-to-r bg-primary text-text-primary rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     <Download className="w-4 h-4" />
                     <span>Download CSV</span>

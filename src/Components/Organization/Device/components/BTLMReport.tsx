@@ -42,7 +42,7 @@ const BTLMReport: React.FC = () => {
   >([]);
   const [device, setDevice] = useState<DeviceResult | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const totalItems = useMemo(() => {
     return activeTab === "runtime"
@@ -132,8 +132,8 @@ const BTLMReport: React.FC = () => {
           getBTLMCustomReportData({
             plantId: _plantId,
             deviceId,
-            from_date: fromDate,
-            to_date: toDate,
+            from_date: `${fromDate} 00:00:00`,
+            to_date: `${toDate} 00:00:00`,
             duration: reportTypeDurationMap[reportType],
           })
         )
@@ -343,7 +343,7 @@ const BTLMReport: React.FC = () => {
                 <button
                   onClick={handleDownloadCSV}
                   disabled={runtimeReportData.length === 0 || isLoading}
-                  className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-1.5 bg-gradient-to-r bg-primary text-text-primary rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download CSV</span>
@@ -410,10 +410,10 @@ const BTLMReport: React.FC = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={7} className="px-6 py-8 text-center">
+                          <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available.
+                                No data available for the selected date.
                               </span>
                             </div>
                           </td>
@@ -502,7 +502,7 @@ const BTLMReport: React.FC = () => {
                   <button
                     onClick={handleDownloadCSV}
                     disabled={customReportData.length === 0 || isLoading}
-                    className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-4 py-1.5 bg-gradient-to-r bg-primary text-text-primary rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     <Download className="w-4 h-4" />
                     <span>Download CSV</span>
@@ -570,10 +570,10 @@ const BTLMReport: React.FC = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={7} className="px-6 py-8 text-center">
+                          <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available.
+                                No data available for the selected date.
                               </span>
                             </div>
                           </td>
