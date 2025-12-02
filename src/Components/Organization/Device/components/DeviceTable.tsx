@@ -166,7 +166,7 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
               </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                 <div className="flex items-center justify-center gap-2">
-                  <span title="Edit device" aria-label="Edit device">
+                  <span title="Edit" aria-label="Edit device">
                     <Edit
                       onClick={() =>
                         onEdit(
@@ -190,7 +190,7 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
                           device.device_family_type
                         )
                       }
-                      className="w-5 h-5 text-text-primary cursor-pointer"
+                      className="w-5 h-5 text-text-secondary cursor-pointer"
                     />
                   </span>
 

@@ -119,7 +119,6 @@ const PHMCReport: React.FC = () => {
   const [fromDate, setFromDate] = useState<string>(getOneWeekAgoDate());
   const [toDate, setToDate] = useState<string>(getTodayDate());
 
-  // Sync tab state with URL parameter
   useEffect(() => {
     const tabFromUrl = searchParams.get("tab") as TabType | null;
     if (tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")) {
@@ -190,43 +189,58 @@ const PHMCReport: React.FC = () => {
       "SR No",
       "From Time",
       "To Time",
-      "First KWh",
-      "Last KWh",
-      "First KVAh",
-      "Last KVAh",
-      "First Flowrate",
-      "Last Flowrate",
-      "First Totalizer",
-      "Last Totalizer",
-      "First Active Power",
-      "Last Active Power",
-      "First Pressure1",
-      "Last Pressure1",
-      "First Temperature1",
-      "Last Temperature1",
+      "Voltage (R)",
+      "Voltage (Y)",
+      "Voltage (B)",
+      "Current (R)",
+      "Current (Y)",
+      "Current (B)",
+      "Frequency",
     ];
 
     const csvContent = [
       headers.join(","),
       ...dataToExport.map((item, index) => {
+        const voltageRAvg = calculateNumericAverage(
+          item.first_record?.voltage_r,
+          item.last_record?.voltage_r
+        );
+        const voltageYAvg = calculateNumericAverage(
+          item.first_record?.voltage_y,
+          item.last_record?.voltage_y
+        );
+        const voltageBAvg = calculateNumericAverage(
+          item.first_record?.voltage_b,
+          item.last_record?.voltage_b
+        );
+        const currentRAvg = calculateNumericAverage(
+          item.first_record?.Current_r,
+          item.last_record?.Current_r
+        );
+        const currentYAvg = calculateNumericAverage(
+          item.first_record?.Current_y,
+          item.last_record?.Current_y
+        );
+        const currentBAvg = calculateNumericAverage(
+          item.first_record?.Current_b,
+          item.last_record?.Current_b
+        );
+        const frequencyAvg = calculateNumericAverage(
+          item.first_record?.Frequency,
+          item.last_record?.Frequency
+        );
+
         return [
           index + 1,
           formatDateForCSV(item.from_time),
           formatDateForCSV(item.to_time),
-          item.first_record?.KWh || "",
-          item.last_record?.KWh || "",
-          item.first_record?.KVAh || "",
-          item.last_record?.KVAh || "",
-          item.first_record?.flowrate || "",
-          item.last_record?.flowrate || "",
-          item.first_record?.totalizer || "",
-          item.last_record?.totalizer || "",
-          item.first_record?.Active_Power || "",
-          item.last_record?.Active_Power || "",
-          item.first_record?.Pressure1 || "",
-          item.last_record?.Pressure1 || "",
-          item.first_record?.Temperature1 || "",
-          item.last_record?.Temperature1 || "",
+          voltageRAvg !== null ? `${(voltageRAvg / 10).toFixed(2)} V` : "-",
+          voltageYAvg !== null ? `${(voltageYAvg / 10).toFixed(2)} V` : "-",
+          voltageBAvg !== null ? `${(voltageBAvg / 10).toFixed(2)} V` : "-",
+          currentRAvg !== null ? `${currentRAvg.toFixed(1)} A` : "-",
+          currentYAvg !== null ? `${currentYAvg.toFixed(1)} A` : "-",
+          currentBAvg !== null ? `${currentBAvg.toFixed(1)} A` : "-",
+          frequencyAvg !== null ? `${frequencyAvg.toFixed(1)} Hz` : "-",
         ].join(",");
       }),
     ].join("\n");
