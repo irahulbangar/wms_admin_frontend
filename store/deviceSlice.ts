@@ -649,6 +649,81 @@ export const getBTLMCustomReportData = createAsyncThunk(
   }
 );
 
+interface GetPHMCRuntimeDataPayload {
+  plantId: number;
+  deviceId: number;
+  date: string;
+}
+
+// get PHMC runtime data
+export const getPHMCRuntimeData = createAsyncThunk(
+  "device/getPHMCRuntimeData",
+  async ({ plantId, deviceId, date }: GetPHMCRuntimeDataPayload, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/phmc/admin/device/phmc-logs/${plantId}/${deviceId}`,
+        {
+          date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetPHMCCustomReportDataPayload {
+  plantId: number;
+  deviceId: number;
+  from_date: string;
+  to_date: string;
+  duration: string;
+}
+
+// get PHMC custom report data
+export const getPHMCCustomReportData = createAsyncThunk(
+  "device/getPHMCCustomReportData",
+  async (
+    {
+      plantId,
+      deviceId,
+      from_date,
+      to_date,
+      duration,
+    }: GetPHMCCustomReportDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/phmc/admin/device/phmc-reports/${plantId}/${deviceId}`,
+        {
+          from_date,
+          to_date,
+          duration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;

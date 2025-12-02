@@ -18,15 +18,15 @@ import Plants from "./Components/Organization/Plant/Plants";
 import Departments from "./Components/Organization/Department/Departments";
 import Systems from "./Components/Organization/System/Systems";
 import Devices from "./Components/Organization/Device/Devices";
-import FMReport from "./Components/Organization/Device/components/FMReport";
+import FMReport from "./Components/Organization/Device/DeviceReport/FMReport";
 import OrganizationUsers from "./Components/Organization/OrganizationUser/OrganizationUsers";
 import AdminUsers from "./Components/Settings/AdminUsers";
 import DataSync from "./Components/Services/DataSync";
 import Setting from "./Components/Organization/Setting";
 import AdminSetting from "./Components/Settings/AdminSetting";
 import Profile from "./Components/Settings/Profile";
-import BRWHMSReport from "./Components/Organization/Device/components/BRWHMSReport";
-import BTLMReport from "./Components/Organization/Device/components/BTLMReport";
+import BRWHMSReport from "./Components/Organization/Device/DeviceReport/BRWHMSReport";
+import BTLMReport from "./Components/Organization/Device/DeviceReport/BTLMReport";
 
 function ThemedToast() {
   const { theme } = useTheme();
