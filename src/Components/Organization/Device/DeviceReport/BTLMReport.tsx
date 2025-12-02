@@ -302,42 +302,42 @@ const BTLMReport: React.FC = () => {
             </>
           )}
         </div>
-        <div className="flex gap-2 justify-center items-center">
-          <button
-            onClick={() => {
-              setActiveTab("runtime");
-              setCurrentPage(1);
-              setSearchParams({ tab: "runtime" });
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
-              activeTab === "runtime"
-                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-                : "text-text-secondary hover:text-text-primary bg-secondary"
-            }`}
-          >
-            <span>RunTime</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("custom");
-              setCurrentPage(1);
-              setSearchParams({ tab: "custom" });
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
-              activeTab === "custom"
-                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-                : "text-text-secondary hover:text-text-primary bg-secondary"
-            }`}
-          >
-            <span>Custom Report</span>
-          </button>
-        </div>
       </div>
 
       <div className="flex flex-col gap-4 h-full">
-        {activeTab === "runtime" && (
-          <>
-            <div className="flex items-center justify-end gap-4 flex-wrap">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex gap-3 justify-center items-center">
+            <button
+              onClick={() => {
+                setActiveTab("runtime");
+                setCurrentPage(1);
+                setSearchParams({ tab: "runtime" });
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+                activeTab === "runtime"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                  : "text-text-secondary hover:text-text-primary bg-secondary"
+              }`}
+            >
+              <span>RunTime</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("custom");
+                setCurrentPage(1);
+                setSearchParams({ tab: "custom" });
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+                activeTab === "custom"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                  : "text-text-secondary hover:text-text-primary bg-secondary"
+              }`}
+            >
+              <span>Custom Report</span>
+            </button>
+          </div>
+          {activeTab === "runtime" && (
+            <div className="flex items-center justify-end gap-3 flex-wrap">
               <div className="flex flex-col gap-2">
                 <input
                   type="date"
@@ -346,7 +346,7 @@ const BTLMReport: React.FC = () => {
                   className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto"
                 />
               </div>
-              <div className="flex items-end gap-4">
+              <div className="flex items-end gap-3">
                 <button
                   onClick={handleGetData}
                   disabled={isLoading}
@@ -371,95 +371,10 @@ const BTLMReport: React.FC = () => {
                 </button>
               </div>
             </div>
+          )}
 
-            {isLoading ? (
-              <div className="flex items-center justify-center h-full bg-primary rounded-lg">
-                <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
-              </div>
-            ) : (
-              <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
-                <div className="overflow-auto h-[calc(100vh-235px)] table-scrollbar pb-17">
-                  <table
-                    className={`w-full text-sm text-left rtl:text-right text-text-primary ${
-                      handlePaginatedRuntimeReportData.length > 0
-                        ? "h-auto"
-                        : "h-full"
-                    } min-w-[1000px]`}
-                  >
-                    <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-                      <tr>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          SR No
-                        </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          From Time
-                        </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          To Time
-                        </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Total Water Consumption(Start) (Ltr)
-                        </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Total Water Consumption(End)
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {handlePaginatedRuntimeReportData.length > 0 ? (
-                        handlePaginatedRuntimeReportData.map((item, index) => (
-                          <tr
-                            key={item.id || index}
-                            className="border-b border-border-primary bg-primary hover:bg-primary/50"
-                          >
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(currentPage - 1) * rowsPerPage + index + 1}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {formatDateForCSV(item.from_time)}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {formatDateForCSV(item.to_time)}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {item.first_level}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {item.last_level}
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="px-6 py-8 text-center">
-                            <div className="flex items-center justify-center">
-                              <span className="text-text-secondary font-roboto">
-                                No data available for the selected date.
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  rowsPerPage={rowsPerPage}
-                  totalItems={totalItems}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                />
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Custom Report Section */}
-        {activeTab === "custom" && (
-          <>
-            <div className="flex items-center justify-end gap-4 flex-wrap">
+          {activeTab === "custom" && (
+            <div className="flex items-center justify-end gap-3 flex-wrap">
               <div className="flex flex-col gap-2">
                 <label className="text-sm text-text-secondary font-roboto">
                   Report Type
@@ -531,7 +446,99 @@ const BTLMReport: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+        </div>
 
+        {/* Runtime Report Section */}
+        {activeTab === "runtime" && (
+          <>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+                <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+              </div>
+            ) : (
+              <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
+                <div className="overflow-auto h-[calc(100vh-238px)] table-scrollbar pb-17">
+                  <table
+                    className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                      handlePaginatedRuntimeReportData.length > 0
+                        ? "h-auto"
+                        : "h-full"
+                    } min-w-[1000px]`}
+                  >
+                    <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          SR No
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          From Time
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          To Time
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          Total Water Consumption(Start) (Ltr)
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          Total Water Consumption(End)
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {handlePaginatedRuntimeReportData.length > 0 ? (
+                        handlePaginatedRuntimeReportData.map((item, index) => (
+                          <tr
+                            key={item.id || index}
+                            className="border-b border-border-primary bg-primary hover:bg-primary/50"
+                          >
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {(currentPage - 1) * rowsPerPage + index + 1}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {formatDateForCSV(item.from_time)}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {formatDateForCSV(item.to_time)}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.first_level}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.last_level}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center">
+                            <div className="flex items-center justify-center">
+                              <span className="text-text-secondary font-roboto">
+                                No data available for the selected date.
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  rowsPerPage={rowsPerPage}
+                  totalItems={totalItems}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Custom Report Section */}
+        {activeTab === "custom" && (
+          <>
             {isLoading ? (
               <div className="flex items-center justify-center h-full bg-primary rounded-lg">
                 <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
@@ -548,19 +555,19 @@ const BTLMReport: React.FC = () => {
                   >
                     <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                       <tr>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                           SR No
                         </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                           From Time
                         </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                           To Time
                         </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                           Total Water Consumption(Start) (Ltr)
                         </th>
-                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                           Total Water Consumption(End)
                         </th>
                       </tr>
@@ -572,19 +579,19 @@ const BTLMReport: React.FC = () => {
                             key={item.id || index}
                             className="border-b border-border-primary bg-primary hover:bg-primary/50"
                           >
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {(currentPage - 1) * rowsPerPage + index + 1}
                             </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.from_time)}
                             </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.to_time)}
                             </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {item.first_level}
                             </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {item.last_level}
                             </td>
                           </tr>
