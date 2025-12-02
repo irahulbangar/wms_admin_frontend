@@ -1,12 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
 import type { TankDeviceResultItem } from "../../../../../model/tank-device.interface";
-import { useAppSelector } from "../../../../../store/store";
 import {
-  getDeviceById,
   getBTLMRuntimeData,
   getBTLMCustomReportData,
+  setDevices,
 } from "../../../../../store/deviceSlice";
 import { useAppDispatch } from "../../../../../store/store";
 import type { DeviceResult } from "../../../../../model/devices.interface";
@@ -18,6 +17,7 @@ import {
   getTodayDate,
   reportTypeDurationMap,
 } from "./utils/reportUtils";
+import { useGetAllDevicesQuery } from "../../../../../store/rtkQuery";
 
 type TabType = "runtime" | "custom";
 type ReportType = "1day" | "15min" | "1hour";
@@ -28,7 +28,6 @@ const BTLMReport: React.FC = () => {
     device_id: string;
   }>();
   const dispatch = useAppDispatch();
-  const { devices } = useAppSelector((state) => state.device);
 
   const _plantId = plant_id ? parseInt(plant_id) : 0;
   const deviceId = device_id ? parseInt(device_id) : 0;
@@ -49,6 +48,23 @@ const BTLMReport: React.FC = () => {
   const [device, setDevice] = useState<DeviceResult | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
+
+  const {
+    data: devicesData,
+    isLoading: isFetchingDevices,
+    refetch: refetchDevices,
+  } = useGetAllDevicesQuery();
+
+  const fetchDevices = useCallback(() => {
+    if (isFetchingDevices) return;
+    refetchDevices();
+  }, [isFetchingDevices, refetchDevices]);
+
+  useEffect(() => {
+    if (devicesData?.success && devicesData?.data) {
+      dispatch(setDevices(devicesData.data));
+    }
+  }, [devicesData, dispatch]);
 
   const totalItems = useMemo(() => {
     return activeTab === "runtime"
@@ -93,23 +109,16 @@ const BTLMReport: React.FC = () => {
 
   useEffect(() => {
     if (deviceId) {
-      const foundDevice = devices.find((d) => d.device_id === deviceId);
+      const foundDevice = devicesData?.data?.find(
+        (d) => d.device_id === deviceId
+      );
       if (foundDevice) {
         setDevice(foundDevice);
       } else {
-        dispatch(getDeviceById(deviceId))
-          .unwrap()
-          .then((res) => {
-            if (res.success && res.data && res.data.length > 0) {
-              setDevice(res.data[0]);
-            }
-          })
-          .catch((err) => {
-            console.error("Error fetching device:", err);
-          });
+        fetchDevices();
       }
     }
-  }, [deviceId, devices, dispatch]);
+  }, [deviceId, devicesData, fetchDevices]);
 
   const [runtimeDate, setRuntimeDate] = useState<string>(getTodayDate());
 
