@@ -435,7 +435,7 @@ export const getFMRuntimeData = createAsyncThunk(
     const { rejectWithValue } = thunkAPI;
     try {
       const response = await api().post(
-        `/fm/admin/device/fm-runtime-data/${plantId}/${deviceId}`,
+        `/fm/admin/device/fm-logs/${plantId}/${deviceId}`,
         {
           date,
         },

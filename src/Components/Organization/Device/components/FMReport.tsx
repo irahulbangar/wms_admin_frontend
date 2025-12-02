@@ -6,6 +6,7 @@ import { useAppSelector } from "../../../../../store/store";
 import {
   getDeviceById,
   getFMRuntimeData,
+  getFMCustomReportData,
 } from "../../../../../store/deviceSlice";
 import { useAppDispatch } from "../../../../../store/store";
 import type { DeviceResult } from "../../../../../model/devices.interface";
@@ -69,28 +70,62 @@ const FMReport: React.FC = () => {
   const handleGetData = async () => {
     setIsLoading(true);
     try {
-      await dispatch(
-        getFMRuntimeData({ plantId: _plantId, deviceId, date: runtimeDate })
-      )
-        .unwrap()
-        .then((res) => {
-          if (res.success && res.data && res.data.length > 0) {
-            setRuntimeReportData(res.data);
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching runtime report data:", err);
-        });
+      if (activeTab === "runtime") {
+        await dispatch(
+          getFMRuntimeData({ plantId: _plantId, deviceId, date: runtimeDate })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success && res.data && res.data.length > 0) {
+              setRuntimeReportData(res.data);
+            } else {
+              setRuntimeReportData([]);
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching runtime report data:", err);
+            setRuntimeReportData([]);
+          });
+      } else {
+        const durationMap: Record<ReportType, string> = {
+          daily: "daily",
+          "15 min": "15min",
+          hour: "hour",
+        };
+
+        await dispatch(
+          getFMCustomReportData({
+            plantId: _plantId,
+            deviceId,
+            from_date: fromDate,
+            to_date: toDate,
+            duration: durationMap[reportType],
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success && res.data && res.data.length > 0) {
+              setCustomReportData(res.data);
+            } else {
+              setCustomReportData([]);
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching custom report data:", err);
+            setCustomReportData([]);
+          });
+      }
     } catch (error) {
       console.error("Error fetching report data:", error);
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDownloadCSV = () => {
-    if (runtimeReportData.length === 0) return;
+    const dataToExport =
+      activeTab === "runtime" ? runtimeReportData : customReportData;
+    if (dataToExport.length === 0) return;
 
     const headers = [
       "SR No",
@@ -102,7 +137,7 @@ const FMReport: React.FC = () => {
 
     const csvContent = [
       headers.join(","),
-      ...runtimeReportData.map((item, index) =>
+      ...dataToExport.map((item, index) =>
         [index + 1, item.from_time, item.to_time, item.flow, item.max].join(",")
       ),
     ].join("\n");
@@ -113,7 +148,9 @@ const FMReport: React.FC = () => {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `fm-report-${deviceId}-${new Date().toISOString().split("T")[0]}.csv`
+      `fm-${activeTab}-report-${deviceId}-${
+        new Date().toISOString().split("T")[0]
+      }.csv`
     );
     link.style.visibility = "hidden";
     document.body.appendChild(link);
@@ -260,7 +297,7 @@ const FMReport: React.FC = () => {
       <div className="flex flex-col gap-4 bg-primary rounded-lg p-4">
         {activeTab === "runtime" && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center justify-end gap-4 flex-wrap">
               <div className="flex flex-col gap-2">
                 <label className="text-sm text-text-secondary font-roboto">
                   Date
@@ -272,7 +309,7 @@ const FMReport: React.FC = () => {
                   className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto"
                 />
               </div>
-              <div className="flex items-end">
+              <div className="flex items-end gap-2">
                 <button
                   onClick={handleGetData}
                   disabled={isLoading}
@@ -286,6 +323,14 @@ const FMReport: React.FC = () => {
                   ) : (
                     "Get Data"
                   )}
+                </button>
+                <button
+                  onClick={handleDownloadCSV}
+                  disabled={runtimeReportData.length === 0 || isLoading}
+                  className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download CSV</span>
                 </button>
               </div>
             </div>
@@ -362,7 +407,7 @@ const FMReport: React.FC = () => {
         {/* Custom Report Section */}
         {activeTab === "custom" && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center justify-end gap-4 flex-wrap">
               <div className="flex flex-col gap-2">
                 <label className="text-sm text-text-secondary font-roboto">
                   Report Type
@@ -399,7 +444,10 @@ const FMReport: React.FC = () => {
                   className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto"
                 />
               </div>
-              <div className="flex items-end gap-2">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary font-roboto opacity-0">
+                  Action
+                </label>
                 <button
                   onClick={handleGetData}
                   disabled={isLoading}
@@ -414,14 +462,21 @@ const FMReport: React.FC = () => {
                     "Get Data"
                   )}
                 </button>
-                <button
-                  onClick={handleDownloadCSV}
-                  disabled={customReportData.length === 0 || isLoading}
-                  className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download CSV</span>
-                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm text-text-secondary font-roboto opacity-0">
+                    Action
+                  </label>
+                  <button
+                    onClick={handleDownloadCSV}
+                    disabled={customReportData.length === 0 || isLoading}
+                    className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download CSV</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -475,10 +530,10 @@ const FMReport: React.FC = () => {
                           {index + 1}
                         </td>
                         <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.from_time}
+                          {item.interval_start}
                         </td>
                         <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.to_time}
+                          {item.interval_end}
                         </td>
                         <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                           {item.flow}
