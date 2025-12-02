@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import type { TankDeviceResultItem } from "../../../../../model/tank-device.interface";
 import { useAppSelector } from "../../../../../store/store";
 import {
@@ -32,7 +32,13 @@ const BTLMReport: React.FC = () => {
 
   const _plantId = plant_id ? parseInt(plant_id) : 0;
   const deviceId = device_id ? parseInt(device_id) : 0;
-  const [activeTab, setActiveTab] = useState<TabType>("runtime");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") as TabType | null;
+  const [activeTab, setActiveTab] = useState<TabType>(
+    tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")
+      ? tabFromUrl
+      : "runtime"
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [runtimeReportData, setRuntimeReportData] = useState<
     TankDeviceResultItem[]
@@ -76,6 +82,14 @@ const BTLMReport: React.FC = () => {
       currentPage * rowsPerPage
     );
   }, [customReportData, currentPage, rowsPerPage]);
+
+  // Sync tab state with URL parameter
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") as TabType | null;
+    if (tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (deviceId) {
@@ -276,10 +290,6 @@ const BTLMReport: React.FC = () => {
               <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
                 {device.device_name}
               </span>
-              <ChevronRight className="w-4 h-4 text-text-muted" />
-              <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-                BTLM Report
-              </span>
             </>
           )}
         </div>
@@ -288,6 +298,7 @@ const BTLMReport: React.FC = () => {
             onClick={() => {
               setActiveTab("runtime");
               setCurrentPage(1);
+              setSearchParams({ tab: "runtime" });
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
               activeTab === "runtime"
@@ -301,6 +312,7 @@ const BTLMReport: React.FC = () => {
             onClick={() => {
               setActiveTab("custom");
               setCurrentPage(1);
+              setSearchParams({ tab: "custom" });
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
               activeTab === "custom"

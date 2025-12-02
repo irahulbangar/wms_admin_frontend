@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import type { BrwhmsDeviceResultItem } from "../../../../../model/brwhms-device.interface";
 import { useAppSelector } from "../../../../../store/store";
 import {
@@ -32,7 +32,13 @@ const BRWHMSReport: React.FC = () => {
 
   const _plantId = plant_id ? parseInt(plant_id) : 0;
   const deviceId = device_id ? parseInt(device_id) : 0;
-  const [activeTab, setActiveTab] = useState<TabType>("runtime");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") as TabType | null;
+  const [activeTab, setActiveTab] = useState<TabType>(
+    tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")
+      ? tabFromUrl
+      : "runtime"
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [runtimeReportData, setRuntimeReportData] = useState<
     BrwhmsDeviceResultItem[]
@@ -76,6 +82,14 @@ const BRWHMSReport: React.FC = () => {
       currentPage * rowsPerPage
     );
   }, [customReportData, currentPage, rowsPerPage]);
+
+  // Sync tab state with URL parameter
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") as TabType | null;
+    if (tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (deviceId) {
@@ -282,6 +296,7 @@ const BRWHMSReport: React.FC = () => {
             onClick={() => {
               setActiveTab("runtime");
               setCurrentPage(1);
+              setSearchParams({ tab: "runtime" });
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
               activeTab === "runtime"
@@ -295,6 +310,7 @@ const BRWHMSReport: React.FC = () => {
             onClick={() => {
               setActiveTab("custom");
               setCurrentPage(1);
+              setSearchParams({ tab: "custom" });
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
               activeTab === "custom"
