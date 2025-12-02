@@ -15,6 +15,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (rowsPerPage: number) => void;
   disabled?: boolean;
+  className?: string;
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -26,6 +27,7 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   onRowsPerPageChange,
   disabled = false,
+  className = "",
 }) => {
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
@@ -56,7 +58,9 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-primary border-t border-border-primary absolute bottom-0 left-0 right-0">
+    <div
+      className={`flex items-center justify-between px-4 py-3 bg-primary border-t border-border-primary absolute bottom-0 left-0 right-0 ${className}`}
+    >
       <div className="flex items-center text-sm text-text-secondary">
         <span className="font-roboto">
           {currentPageItemCount} of {totalItems} row(s) selected.

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { FmDeviceResultItem } from "../../../../../model/fm-device.interface";
@@ -10,9 +10,10 @@ import {
 } from "../../../../../store/deviceSlice";
 import { useAppDispatch } from "../../../../../store/store";
 import type { DeviceResult } from "../../../../../model/devices.interface";
+import Pagination from "../../../Pagination";
 
 type TabType = "runtime" | "custom";
-type ReportType = "daily" | "15 min" | "hour";
+type ReportType = "1day" | "15min" | "1hour";
 
 const FMReport: React.FC = () => {
   const { plant_id, device_id } = useParams<{
@@ -34,6 +35,41 @@ const FMReport: React.FC = () => {
     FmDeviceResultItem[]
   >([]);
   const [device, setDevice] = useState<DeviceResult | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const totalItems = useMemo(() => {
+    return activeTab === "runtime"
+      ? runtimeReportData.length
+      : customReportData.length;
+  }, [activeTab, runtimeReportData, customReportData]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / rowsPerPage);
+  }, [totalItems, rowsPerPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
+  };
+
+  const handlePaginatedRuntimeReportData = useMemo(() => {
+    return runtimeReportData.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [runtimeReportData, currentPage, rowsPerPage]);
+
+  const handlePaginatedCustomReportData = useMemo(() => {
+    return customReportData.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [customReportData, currentPage, rowsPerPage]);
 
   useEffect(() => {
     if (deviceId) {
@@ -59,7 +95,7 @@ const FMReport: React.FC = () => {
     new Date().toISOString().split("T")[0]
   );
 
-  const [reportType, setReportType] = useState<ReportType>("daily");
+  const [reportType, setReportType] = useState<ReportType>("1day");
   const [fromDate, setFromDate] = useState<string>(
     new Date().toISOString().split("T")[0]
   );
@@ -69,6 +105,7 @@ const FMReport: React.FC = () => {
 
   const handleGetData = async () => {
     setIsLoading(true);
+    setCurrentPage(1); // Reset to first page when fetching new data
     try {
       if (activeTab === "runtime") {
         await dispatch(
@@ -88,9 +125,9 @@ const FMReport: React.FC = () => {
           });
       } else {
         const durationMap: Record<ReportType, string> = {
-          daily: "daily",
-          "15 min": "15min",
-          hour: "hour",
+          "1day": "1day",
+          "15min": "15min",
+          "1hour": "1hour",
         };
 
         await dispatch(
@@ -201,107 +238,111 @@ const FMReport: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto overflow-x-hidden">
+    <div className="flex flex-col gap-4 overflow-x-hidden h-full">
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
-        <button
-          onClick={handleBackToHome}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <Home className="w-4 h-4" />
-          <span>Home</span>
-        </button>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <Home className="w-4 h-4" />
+            <span>Home</span>
+          </button>
 
-        <ChevronRight className="w-4 h-4 text-text-muted" />
+          <ChevronRight className="w-4 h-4 text-text-muted" />
 
-        <button
-          onClick={handleBackToOrganizations}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <span>Organization</span>
-        </button>
+          <button
+            onClick={handleBackToOrganizations}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Organization</span>
+          </button>
 
-        <ChevronRight className="w-4 h-4 text-text-muted" />
-        <button
-          onClick={handleBackToPlants}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <span>Plants</span>
-        </button>
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToPlants}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Plants</span>
+          </button>
 
-        <ChevronRight className="w-4 h-4 text-text-muted" />
-        <button
-          onClick={handleBackToDepartments}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <span>Departments</span>
-        </button>
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToDepartments}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Departments</span>
+          </button>
 
-        <ChevronRight className="w-4 h-4 text-text-muted" />
-        <button
-          onClick={handleBackToSystems}
-          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-        >
-          <span>Systems</span>
-        </button>
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToSystems}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Systems</span>
+          </button>
 
-        {device?.system_id && (
-          <>
-            <ChevronRight className="w-4 h-4 text-text-muted" />
-            <button
-              onClick={handleBackToDevices}
-              className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
-            >
-              <span>Devices</span>
-            </button>
-          </>
-        )}
+          {device?.system_id && (
+            <>
+              <ChevronRight className="w-4 h-4 text-text-muted" />
+              <button
+                onClick={handleBackToDevices}
+                className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+              >
+                <span>Devices</span>
+              </button>
+            </>
+          )}
 
-        {device?.device_name && (
-          <>
-            <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-              {device.device_name}
-            </span>
-            <ChevronRight className="w-4 h-4 text-text-muted" />
-            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
-              FM Report
-            </span>
-          </>
-        )}
+          {device?.device_name && (
+            <>
+              <ChevronRight className="w-4 h-4 text-text-muted" />
+              <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
+                {device.device_name}
+              </span>
+              <ChevronRight className="w-4 h-4 text-text-muted" />
+              <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
+                FM Report
+              </span>
+            </>
+          )}
+        </div>
+        <div className="flex gap-2 justify-center items-center">
+          <button
+            onClick={() => {
+              setActiveTab("runtime");
+              setCurrentPage(1);
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+              activeTab === "runtime"
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                : "text-text-secondary hover:text-text-primary bg-secondary"
+            }`}
+          >
+            <span>RunTime</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("custom");
+              setCurrentPage(1);
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+              activeTab === "custom"
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                : "text-text-secondary hover:text-text-primary bg-secondary"
+            }`}
+          >
+            <span>Custom Report</span>
+          </button>
+        </div>
       </div>
 
-      <div className="flex gap-2 justify-center items-center">
-        <button
-          onClick={() => setActiveTab("runtime")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
-            activeTab === "runtime"
-              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-              : "text-text-secondary hover:text-text-primary bg-secondary"
-          }`}
-        >
-          <span>RunTime</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("custom")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
-            activeTab === "custom"
-              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-              : "text-text-secondary hover:text-text-primary bg-secondary"
-          }`}
-        >
-          <span>Custom Report</span>
-        </button>
-      </div>
-
-      <div className="flex flex-col gap-4 bg-primary rounded-lg p-4">
+      <div className="flex flex-col gap-4 h-full">
         {activeTab === "runtime" && (
-          <div className="space-y-4">
+          <>
             <div className="flex items-center justify-end gap-4 flex-wrap">
               <div className="flex flex-col gap-2">
-                <label className="text-sm text-text-secondary font-roboto">
-                  Date
-                </label>
                 <input
                   type="date"
                   value={runtimeDate}
@@ -309,7 +350,7 @@ const FMReport: React.FC = () => {
                   className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto"
                 />
               </div>
-              <div className="flex items-end gap-2">
+              <div className="flex items-end gap-4">
                 <button
                   onClick={handleGetData}
                   disabled={isLoading}
@@ -335,78 +376,93 @@ const FMReport: React.FC = () => {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1000px]">
-                <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-                  <tr>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      SR No
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      From Time
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      To Time
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      Flow (m³/h)
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      Totalizer (ltr)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={10} className="px-6 py-8 text-center">
-                        <div className="flex items-center justify-center">
-                          <Loader2 className="w-8 h-8 text-text-primary animate-spin" />
-                        </div>
-                      </td>
-                    </tr>
-                  ) : runtimeReportData.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={10}
-                        className="px-6 py-8 text-center text-text-secondary font-roboto"
-                      >
-                        No data available. Click "Get Data" to fetch report.
-                      </td>
-                    </tr>
-                  ) : (
-                    runtimeReportData.map((item, index) => (
-                      <tr
-                        key={item.id || index}
-                        className="border-b border-border-primary bg-primary hover:bg-primary/50"
-                      >
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {index + 1}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.from_time}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.to_time}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.flow}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.max}
-                        </td>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+                <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+              </div>
+            ) : (
+              <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
+                <div className="overflow-auto h-[calc(100vh-235px)] table-scrollbar pb-17">
+                  <table
+                    className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                      handlePaginatedRuntimeReportData.length > 0
+                        ? "h-auto"
+                        : "h-full"
+                    } min-w-[800px]`}
+                  >
+                    <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                      <tr>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          SR No
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          From Time
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          To Time
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          Flow (m³/h)
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          Totalizer (ltr)
+                        </th>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                    </thead>
+                    <tbody>
+                      {handlePaginatedRuntimeReportData.length > 0 ? (
+                        handlePaginatedRuntimeReportData.map((item, index) => (
+                          <tr
+                            key={item.id || index}
+                            className="border-b border-border-primary bg-primary hover:bg-primary/50"
+                          >
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {(currentPage - 1) * rowsPerPage + index + 1}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.from_time}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.to_time}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.flow}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.max}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center">
+                            <div className="flex items-center justify-center">
+                              <span className="text-text-secondary font-roboto">
+                                No data available.
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  rowsPerPage={rowsPerPage}
+                  totalItems={totalItems}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </div>
+            )}
+          </>
         )}
 
         {/* Custom Report Section */}
         {activeTab === "custom" && (
-          <div className="space-y-4">
+          <>
             <div className="flex items-center justify-end gap-4 flex-wrap">
               <div className="flex flex-col gap-2">
                 <label className="text-sm text-text-secondary font-roboto">
@@ -415,11 +471,11 @@ const FMReport: React.FC = () => {
                 <select
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value as ReportType)}
-                  className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto cursor-pointer"
+                  className="px-3 w-48 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto cursor-pointer"
                 >
-                  <option value="daily">Daily</option>
-                  <option value="15 min">15 Min</option>
-                  <option value="hour">Hour</option>
+                  <option value="15min">15 Min</option>
+                  <option value="1hour">Hour</option>
+                  <option value="1day">Daily</option>
                 </select>
               </div>
               <div className="flex flex-col gap-2">
@@ -480,74 +536,88 @@ const FMReport: React.FC = () => {
               </div>
             </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1000px]">
-                <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
-                  <tr>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      SR No
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      From Time
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      To Time
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      Flow (m³/h)
-                    </th>
-                    <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                      Totalizer (ltr)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={10} className="px-6 py-8 text-center">
-                        <div className="flex items-center justify-center">
-                          <Loader2 className="w-8 h-8 text-text-primary animate-spin" />
-                        </div>
-                      </td>
-                    </tr>
-                  ) : customReportData.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={10}
-                        className="px-6 py-8 text-center text-text-secondary font-roboto"
-                      >
-                        No data available. Click "Get Data" to fetch report.
-                      </td>
-                    </tr>
-                  ) : (
-                    customReportData.map((item, index) => (
-                      <tr
-                        key={item.id || index}
-                        className="border-b border-border-primary bg-primary hover:bg-primary/50"
-                      >
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {index + 1}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.interval_start}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.interval_end}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.flow}
-                        </td>
-                        <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                          {item.max}
-                        </td>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+                <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+              </div>
+            ) : (
+              <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full pb-17">
+                <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-330px)] table-scrollbar">
+                  <table
+                    className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                      handlePaginatedCustomReportData.length > 0
+                        ? "h-auto"
+                        : "h-full"
+                    } min-w-[800px]`}
+                  >
+                    <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                      <tr>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          SR No
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          From Time
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          To Time
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          Flow (m³/h)
+                        </th>
+                        <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                          Totalizer (ltr)
+                        </th>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                    </thead>
+                    <tbody>
+                      {handlePaginatedCustomReportData.length > 0 ? (
+                        handlePaginatedCustomReportData.map((item, index) => (
+                          <tr
+                            key={item.id || index}
+                            className="border-b border-border-primary bg-primary hover:bg-primary/50"
+                          >
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {(currentPage - 1) * rowsPerPage + index + 1}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.interval_start}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.interval_end}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.flow}
+                            </td>
+                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                              {item.max}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center">
+                            <div className="flex items-center justify-center">
+                              <span className="text-text-secondary font-roboto">
+                                No data available.
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  rowsPerPage={rowsPerPage}
+                  totalItems={totalItems}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
