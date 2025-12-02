@@ -497,6 +497,83 @@ export const getFMCustomReportData = createAsyncThunk(
   }
 );
 
+interface GetBRWHMSRuntimeDataPayload {
+  plantId: number;
+  deviceId: number;
+  date: string;
+}
+// get BRWHMS runtime data
+export const getBRWHMSRuntimeData = createAsyncThunk(
+  "device/getBRWHMSRuntimeData",
+  async (
+    { plantId, deviceId, date }: GetBRWHMSRuntimeDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/brwhms/admin/device/brwhms-logs/${plantId}/${deviceId}`,
+        {
+          date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetBRWHMSCustomReportDataPayload {
+  plantId: number;
+  deviceId: number;
+  from_date: string;
+  to_date: string;
+  duration: string;
+}
+
+// get BRWHMS custom report data
+export const getBRWHMSCustomReportData = createAsyncThunk(
+  "device/getBRWHMSCustomReportData",
+  async (
+    {
+      plantId,
+      deviceId,
+      from_date,
+      to_date,
+      duration,
+    }: GetBRWHMSCustomReportDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/brwhms/admin/device/brwhms-reports/${plantId}/${deviceId}`,
+        {
+          from_date,
+          to_date,
+          duration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;
