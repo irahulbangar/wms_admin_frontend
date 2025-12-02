@@ -422,6 +422,81 @@ export const dataSyncForPHMCDevices = createAsyncThunk(
   }
 );
 
+interface GetFMRuntimeDataPayload {
+  plantId: number;
+  deviceId: number;
+  date: string;
+}
+
+// get FM runtime data
+export const getFMRuntimeData = createAsyncThunk(
+  "device/getFMRuntimeData",
+  async ({ plantId, deviceId, date }: GetFMRuntimeDataPayload, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/fm/admin/device/fm-runtime-data/${plantId}/${deviceId}`,
+        {
+          date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetFMCustomReportDataPayload {
+  plantId: number;
+  deviceId: number;
+  from_date: string;
+  to_date: string;
+  duration: string;
+}
+
+// get FM custom report data
+export const getFMCustomReportData = createAsyncThunk(
+  "device/getFMCustomReportData",
+  async (
+    {
+      plantId,
+      deviceId,
+      from_date,
+      to_date,
+      duration,
+    }: GetFMCustomReportDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/fm/admin/device/fm-reports/${plantId}/${deviceId}`,
+        {
+          from_date,
+          to_date,
+          duration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;

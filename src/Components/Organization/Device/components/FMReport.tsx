@@ -1,23 +1,58 @@
-import { useState } from "react";
-import { Download, Loader2, ArrowLeft } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Download, Loader2, Home, ChevronRight } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { FmDeviceResultItem } from "../../../../../model/fm-device.interface";
+import { useAppSelector } from "../../../../../store/store";
+import {
+  getDeviceById,
+  getFMRuntimeData,
+} from "../../../../../store/deviceSlice";
+import { useAppDispatch } from "../../../../../store/store";
+import type { DeviceResult } from "../../../../../model/devices.interface";
 
 type TabType = "runtime" | "custom";
 type ReportType = "daily" | "15 min" | "hour";
 
 const FMReport: React.FC = () => {
-  const { device_id, plant_id } = useParams<{
-    device_id: string;
+  const { plant_id, device_id } = useParams<{
     plant_id: string;
+    device_id: string;
   }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { devices } = useAppSelector((state) => state.device);
 
-  const deviceId = device_id ? parseInt(device_id) : 0;
   const _plantId = plant_id ? parseInt(plant_id) : 0;
+  const deviceId = device_id ? parseInt(device_id) : 0;
   const [activeTab, setActiveTab] = useState<TabType>("runtime");
   const [isLoading, setIsLoading] = useState(false);
-  const [reportData, setReportData] = useState<FmDeviceResultItem[]>([]);
+  const [runtimeReportData, setRuntimeReportData] = useState<
+    FmDeviceResultItem[]
+  >([]);
+  const [customReportData, setCustomReportData] = useState<
+    FmDeviceResultItem[]
+  >([]);
+  const [device, setDevice] = useState<DeviceResult | null>(null);
+
+  useEffect(() => {
+    if (deviceId) {
+      const foundDevice = devices.find((d) => d.device_id === deviceId);
+      if (foundDevice) {
+        setDevice(foundDevice);
+      } else {
+        dispatch(getDeviceById(deviceId))
+          .unwrap()
+          .then((res) => {
+            if (res.success && res.data && res.data.length > 0) {
+              setDevice(res.data[0]);
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching device:", err);
+          });
+      }
+    }
+  }, [deviceId, devices, dispatch]);
 
   const [runtimeDate, setRuntimeDate] = useState<string>(
     new Date().toISOString().split("T")[0]
@@ -34,56 +69,41 @@ const FMReport: React.FC = () => {
   const handleGetData = async () => {
     setIsLoading(true);
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetchFmDeviceData({
-      //   deviceId,
-      //   plantId: _plantId,
-      //   ...(activeTab === "runtime" ? { date: runtimeDate } : { reportType, fromDate, toDate })
-      // });
-      // setReportData(response.data);
-
-      // Mock data for now
-      setTimeout(() => {
-        setReportData([]);
-        setIsLoading(false);
-      }, 1000);
+      await dispatch(
+        getFMRuntimeData({ plantId: _plantId, deviceId, date: runtimeDate })
+      )
+        .unwrap()
+        .then((res) => {
+          if (res.success && res.data && res.data.length > 0) {
+            setRuntimeReportData(res.data);
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching runtime report data:", err);
+        });
     } catch (error) {
       console.error("Error fetching report data:", error);
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };
 
   const handleDownloadCSV = () => {
-    if (reportData.length === 0) return;
+    if (runtimeReportData.length === 0) return;
 
     const headers = [
-      "ID",
-      "Device ID",
-      "Interval Start",
-      "Interval End",
-      "Min",
-      "Max",
-      "Avg",
-      "Flow",
+      "SR No",
       "From Time",
       "To Time",
+      "Flow (m³/h)",
+      "Totalizer (ltr)",
     ];
 
     const csvContent = [
       headers.join(","),
-      ...reportData.map((item) =>
-        [
-          item.id,
-          item.device_id,
-          item.interval_start,
-          item.interval_end,
-          item.min,
-          item.max,
-          item.avg,
-          item.flow,
-          item.from_time,
-          item.to_time,
-        ].join(",")
+      ...runtimeReportData.map((item, index) =>
+        [index + 1, item.from_time, item.to_time, item.flow, item.max].join(",")
       ),
     ].join("\n");
 
@@ -101,46 +121,140 @@ const FMReport: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleBackToHome = () => navigate("/");
+  const handleBackToOrganizations = () => navigate("/organization");
+  const handleBackToPlants = () => {
+    if (device?.organization_id) {
+      navigate(`/organization/plants/${device.organization_id}`);
+    } else {
+      navigate("/organization/plants");
+    }
+  };
+  const handleBackToDepartments = () => {
+    if (device?.organization_id && device?.plant_id) {
+      navigate(
+        `/organization/departments/${device.organization_id}/${device.plant_id}`
+      );
+    } else {
+      navigate("/organization/departments");
+    }
+  };
+  const handleBackToSystems = () => {
+    if (device?.organization_id && device?.plant_id && device?.department_id) {
+      navigate(
+        `/organization/systems/${device.organization_id}/${device.plant_id}/${device.department_id}`
+      );
+    } else {
+      navigate("/organization/systems");
+    }
+  };
+  const handleBackToDevices = () => {
+    if (
+      device?.organization_id &&
+      device?.plant_id &&
+      device?.department_id &&
+      device?.system_id
+    ) {
+      navigate(
+        `/organization/devices/${device.organization_id}/${device.plant_id}/${device.department_id}/${device.system_id}`
+      );
+    } else {
+      navigate("/organization/devices");
+    }
   };
 
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto overflow-x-hidden">
-      <div className="flex items-center justify-between border-b border-border-primary pb-4">
-        <div className="flex items-center gap-4 mb-2">
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-secondary rounded-lg transition-all duration-200 cursor-pointer font-roboto"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Devices</span>
-          </button>
-        </div>
-        <div className="flex items-center justify-between border-b border-border-primary pb-4">
-          <div className="flex gap-2">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
+        <button
+          onClick={handleBackToHome}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <Home className="w-4 h-4" />
+          <span>Home</span>
+        </button>
+
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+
+        <button
+          onClick={handleBackToOrganizations}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Organization</span>
+        </button>
+
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+        <button
+          onClick={handleBackToPlants}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Plants</span>
+        </button>
+
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+        <button
+          onClick={handleBackToDepartments}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Departments</span>
+        </button>
+
+        <ChevronRight className="w-4 h-4 text-text-muted" />
+        <button
+          onClick={handleBackToSystems}
+          className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+        >
+          <span>Systems</span>
+        </button>
+
+        {device?.system_id && (
+          <>
+            <ChevronRight className="w-4 h-4 text-text-muted" />
             <button
-              onClick={() => setActiveTab("runtime")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
-                activeTab === "runtime"
-                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-                  : "text-text-secondary hover:text-text-primary bg-secondary"
-              }`}
+              onClick={handleBackToDevices}
+              className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
             >
-              <span>RunTime</span>
+              <span>Devices</span>
             </button>
-            <button
-              onClick={() => setActiveTab("custom")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
-                activeTab === "custom"
-                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-                  : "text-text-secondary hover:text-text-primary bg-secondary"
-              }`}
-            >
-              <span>Custom Report</span>
-            </button>
-          </div>
-        </div>
+          </>
+        )}
+
+        {device?.device_name && (
+          <>
+            <ChevronRight className="w-4 h-4 text-text-muted" />
+            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
+              {device.device_name}
+            </span>
+            <ChevronRight className="w-4 h-4 text-text-muted" />
+            <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
+              FM Report
+            </span>
+          </>
+        )}
+      </div>
+
+      <div className="flex gap-2 justify-center items-center">
+        <button
+          onClick={() => setActiveTab("runtime")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+            activeTab === "runtime"
+              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+              : "text-text-secondary hover:text-text-primary bg-secondary"
+          }`}
+        >
+          <span>RunTime</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("custom")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+            activeTab === "custom"
+              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+              : "text-text-secondary hover:text-text-primary bg-secondary"
+          }`}
+        >
+          <span>Custom Report</span>
+        </button>
       </div>
 
       <div className="flex flex-col gap-4 bg-primary rounded-lg p-4">
@@ -206,7 +320,7 @@ const FMReport: React.FC = () => {
                         </div>
                       </td>
                     </tr>
-                  ) : reportData.length === 0 ? (
+                  ) : runtimeReportData.length === 0 ? (
                     <tr>
                       <td
                         colSpan={10}
@@ -216,7 +330,7 @@ const FMReport: React.FC = () => {
                       </td>
                     </tr>
                   ) : (
-                    reportData.map((item, index) => (
+                    runtimeReportData.map((item, index) => (
                       <tr
                         key={item.id || index}
                         className="border-b border-border-primary bg-primary hover:bg-primary/50"
@@ -302,7 +416,7 @@ const FMReport: React.FC = () => {
                 </button>
                 <button
                   onClick={handleDownloadCSV}
-                  disabled={reportData.length === 0 || isLoading}
+                  disabled={customReportData.length === 0 || isLoading}
                   className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   <Download className="w-4 h-4" />
@@ -342,7 +456,7 @@ const FMReport: React.FC = () => {
                         </div>
                       </td>
                     </tr>
-                  ) : reportData.length === 0 ? (
+                  ) : customReportData.length === 0 ? (
                     <tr>
                       <td
                         colSpan={10}
@@ -352,7 +466,7 @@ const FMReport: React.FC = () => {
                       </td>
                     </tr>
                   ) : (
-                    reportData.map((item, index) => (
+                    customReportData.map((item, index) => (
                       <tr
                         key={item.id || index}
                         className="border-b border-border-primary bg-primary hover:bg-primary/50"
