@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
 import type { FmDeviceResultItem } from "../../../../../model/fm-device.interface";
@@ -48,6 +48,7 @@ const FMReport: React.FC = () => {
   const [device, setDevice] = useState<DeviceResult | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
+  const prevActiveTabRef = useRef<TabType | null>(null);
 
   const {
     data: devicesData,
@@ -112,13 +113,22 @@ const FMReport: React.FC = () => {
     }
   }, [deviceId, devicesData, dispatch, fetchDevices]);
 
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") as TabType | null;
+    if (tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
   const [runtimeDate, setRuntimeDate] = useState<string>(getTodayDate());
 
   const [reportType, setReportType] = useState<ReportType>("1day");
   const [fromDate, setFromDate] = useState<string>(getOneWeekAgoDate());
   const [toDate, setToDate] = useState<string>(getTodayDate());
 
-  const handleGetData = async () => {
+  const handleGetData = useCallback(async () => {
+    if (!deviceId || !_plantId) return;
+
     setIsLoading(true);
     setCurrentPage(1);
     try {
@@ -166,7 +176,28 @@ const FMReport: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [
+    deviceId,
+    _plantId,
+    activeTab,
+    runtimeDate,
+    fromDate,
+    toDate,
+    reportType,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (deviceId && _plantId) {
+      const shouldFetch =
+        prevActiveTabRef.current === null ||
+        prevActiveTabRef.current !== activeTab;
+      if (shouldFetch) {
+        handleGetData();
+        prevActiveTabRef.current = activeTab;
+      }
+    }
+  }, [deviceId, _plantId, activeTab]);
 
   const handleDownloadCSV = () => {
     const dataToExport =
@@ -500,7 +531,7 @@ const FMReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available for the selected date.
+                                Click on get data button to get the data.
                               </span>
                             </div>
                           </td>
@@ -587,7 +618,7 @@ const FMReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available for the selected date.
+                                Click on get data button to get the data.
                               </span>
                             </div>
                           </td>

@@ -1,6 +1,6 @@
 import { useAppSelector } from "../../../store/store";
 import { User, Mail, Phone, MapPin, Calendar } from "lucide-react";
-import { fromatDateWithTime } from "../../utils/utils";
+import { formatDateForCSV } from "../../utils/utils";
 
 const Profile: React.FC = () => {
   const { admin } = useAppSelector((state) => state.admin);
@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
               <div className="flex items-center text-text-secondary font-roboto">
                 <Calendar className="w-4 h-4 mr-3" />
                 <span className="text-sm font-roboto">
-                  Joined {fromatDateWithTime(admin?.created_at || "")}
+                  Joined {formatDateForCSV(admin?.created_at || "")}
                 </span>
               </div>
             </div>

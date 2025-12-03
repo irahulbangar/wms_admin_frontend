@@ -1,7 +1,7 @@
 import { Edit, FileText, Trash2 } from "lucide-react";
 import type { DeviceResult } from "../../../../../model/devices.interface";
 import type { DeviceFamilyResult } from "../../../../../model/device-family.interface";
-import { fromatDateWithTime } from "../../../../utils/utils";
+import { formatDateForCSV } from "../../../../utils/utils";
 
 interface DeviceTableProps {
   devices: DeviceResult[];
@@ -159,10 +159,10 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
                 {device.hwid || "N/A"}
               </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                {fromatDateWithTime(device.created_at)}
+                {formatDateForCSV(device.created_at)}
               </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                {fromatDateWithTime(device.updated_at)}
+                {formatDateForCSV(device.updated_at)}
               </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                 <div className="flex items-center justify-center gap-2">

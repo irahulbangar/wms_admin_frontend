@@ -1,5 +1,5 @@
 import { Edit, Eye, Trash2 } from "lucide-react";
-import { fromatDateWithTime } from "../../../utils/utils";
+import { formatDateForCSV } from "../../../utils/utils";
 import type { SystemResult } from "../../../../model/system.interface";
 
 interface SystemTableRowProps {
@@ -54,10 +54,10 @@ const SystemTableRow: React.FC<SystemTableRowProps> = ({
         {system.department_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {fromatDateWithTime(system.created_at)}
+        {formatDateForCSV(system.created_at)}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {fromatDateWithTime(system.updated_at)}
+        {formatDateForCSV(system.updated_at)}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
         <div className="flex items-center justify-center gap-2">

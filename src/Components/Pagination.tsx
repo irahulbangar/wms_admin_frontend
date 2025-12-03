@@ -93,7 +93,7 @@ const Pagination: React.FC<PaginationProps> = ({
             className="p-1 rounded hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="First page"
           >
-            <ChevronsLeft className="w-4 h-4 text-text-secondary" />
+            <ChevronsLeft className="w-4 h-4 text-text-secondary cursor-pointer" />
           </button>
 
           <button
@@ -102,7 +102,7 @@ const Pagination: React.FC<PaginationProps> = ({
             className="p-1 rounded hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Previous page"
           >
-            <ChevronLeft className="w-4 h-4 text-text-secondary" />
+            <ChevronLeft className="w-4 h-4 text-text-secondary cursor-pointer" />
           </button>
 
           <button
@@ -111,7 +111,7 @@ const Pagination: React.FC<PaginationProps> = ({
             className="p-1 rounded hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Next page"
           >
-            <ChevronRight className="w-4 h-4 text-text-secondary" />
+            <ChevronRight className="w-4 h-4 text-text-secondary cursor-pointer" />
           </button>
 
           <button
@@ -120,7 +120,7 @@ const Pagination: React.FC<PaginationProps> = ({
             className="p-1 rounded hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Last page"
           >
-            <ChevronsRight className="w-4 h-4 text-text-secondary" />
+            <ChevronsRight className="w-4 h-4 text-text-secondary cursor-pointer" />
           </button>
         </div>
       </div>

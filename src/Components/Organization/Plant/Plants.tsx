@@ -17,7 +17,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import NoDataFound from "../../NoDataFound";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import { Error, Success, Warning } from "../../../utils/toast";
-import { fromatDateWithTime, handleStatus } from "../../../utils/utils";
+import { formatDateForCSV, handleStatus } from "../../../utils/utils";
 import { setOrganizations } from "../../../../store/organizationSlice";
 import AddUpdatePlant from "./AddUpdatePlant";
 import Pagination from "../../Pagination";
@@ -546,10 +546,10 @@ const Plants = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {fromatDateWithTime(plant?.created_at) || "N/A"}
+                        {formatDateForCSV(plant?.created_at) || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {fromatDateWithTime(plant?.updated_at) || "N/A"}
+                        {formatDateForCSV(plant?.updated_at) || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center justify-center gap-2">

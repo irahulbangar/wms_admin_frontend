@@ -13,7 +13,7 @@ import {
   User2,
 } from "lucide-react";
 import NoDataFound from "../../NoDataFound";
-import { fromatDateWithTime, handleStatus } from "../../../utils/utils";
+import { formatDateForCSV, handleStatus } from "../../../utils/utils";
 import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
@@ -544,10 +544,10 @@ const OrganizationUsers = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base">
-                        {fromatDateWithTime(user.created_at)}
+                        {formatDateForCSV(user.created_at)}
                       </td>
                       <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base">
-                        {fromatDateWithTime(user.updated_at)}
+                        {formatDateForCSV(user.updated_at)}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         <div className="flex items-center gap-3 justify-center">

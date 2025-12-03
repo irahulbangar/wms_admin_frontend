@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
 import type { TankDeviceResultItem } from "../../../../../model/tank-device.interface";
@@ -48,6 +48,7 @@ const BTLMReport: React.FC = () => {
   const [device, setDevice] = useState<DeviceResult | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
+  const prevActiveTabRef = useRef<TabType | null>(null);
 
   const {
     data: devicesData,
@@ -126,7 +127,9 @@ const BTLMReport: React.FC = () => {
   const [fromDate, setFromDate] = useState<string>(getOneWeekAgoDate());
   const [toDate, setToDate] = useState<string>(getTodayDate());
 
-  const handleGetData = async () => {
+  const handleGetData = useCallback(async () => {
+    if (!deviceId || !_plantId) return;
+
     setIsLoading(true);
     setCurrentPage(1);
     try {
@@ -178,7 +181,28 @@ const BTLMReport: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [
+    deviceId,
+    _plantId,
+    activeTab,
+    runtimeDate,
+    fromDate,
+    toDate,
+    reportType,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (deviceId && _plantId) {
+      const shouldFetch =
+        prevActiveTabRef.current === null ||
+        prevActiveTabRef.current !== activeTab;
+      if (shouldFetch) {
+        handleGetData();
+        prevActiveTabRef.current = activeTab;
+      }
+    }
+  }, [deviceId, _plantId, activeTab, handleGetData]);
 
   const handleDownloadCSV = () => {
     const dataToExport =
@@ -478,10 +502,10 @@ const BTLMReport: React.FC = () => {
                           To Time
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Total Water Consumption(Start) (Ltr)
+                          Available Water(Start) (Ltr)
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Total Water Consumption(End)
+                          Available Water(End)
                         </th>
                       </tr>
                     </thead>
@@ -514,7 +538,7 @@ const BTLMReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available for the selected date.
+                                Click on get data button to get the data.
                               </span>
                             </div>
                           </td>
@@ -565,10 +589,10 @@ const BTLMReport: React.FC = () => {
                           To Time
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Total Water Consumption(Start) (Ltr)
+                          Available Water(Start) (Ltr)
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Total Water Consumption(End)
+                          Available Water(End)
                         </th>
                       </tr>
                     </thead>
@@ -601,7 +625,7 @@ const BTLMReport: React.FC = () => {
                           <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
-                                No data available for the selected date.
+                                Click on get data button to get the data.
                               </span>
                             </div>
                           </td>

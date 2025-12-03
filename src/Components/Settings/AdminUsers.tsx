@@ -17,7 +17,7 @@ import type {
 import { useEffect, useMemo, useState } from "react";
 import { getAllUsers, deleteAdminUser } from "../../../store/adminSlice";
 import { Error, Success } from "../../utils/toast";
-import { fromatDateWithTime, handleStatus } from "../../utils/utils";
+import { formatDateForCSV, handleStatus } from "../../utils/utils";
 import Pagination from "../Pagination";
 
 const Users = () => {
@@ -251,10 +251,10 @@ const Users = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
-                        {fromatDateWithTime(user?.created_at)}
+                        {formatDateForCSV(user?.created_at)}
                       </td>
                       <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
-                        {fromatDateWithTime(user?.updated_at)}
+                        {formatDateForCSV(user?.updated_at)}
                       </td>
                       {admin?.role === "super_admin" && (
                         <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">

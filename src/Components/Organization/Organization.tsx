@@ -21,7 +21,7 @@ import type { OrganizationResult } from "../../../model/organizations.interface"
 import AddUpdateOrganization from "./AddUpdateOrganization";
 import DeletePopup from "./DeletePopup";
 import { Success, Error } from "../../utils/toast";
-import { fromatDateWithTime, handleStatus } from "../../utils/utils";
+import { formatDateForCSV, handleStatus } from "../../utils/utils";
 import Pagination from "../Pagination";
 import { useGetAllOrganizationsQuery } from "../../../store/rtkQuery";
 
@@ -353,7 +353,7 @@ const Organization = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {fromatDateWithTime(organization?.created_at) || "N/A"}
+                        {formatDateForCSV(organization?.created_at) || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         <div className="flex items-center gap-3 justify-center">

@@ -1,6 +1,6 @@
 import { Edit, Eye, Trash2 } from "lucide-react";
 import type { DepartmentResult } from "../../../../model/department.interface";
-import { fromatDateWithTime } from "../../../utils/utils";
+import { formatDateForCSV } from "../../../utils/utils";
 
 interface DepartmentTableRowProps {
   department: DepartmentResult;
@@ -49,10 +49,10 @@ const DepartmentTableRow: React.FC<DepartmentTableRowProps> = ({
         {department.plant_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {fromatDateWithTime(department.created_at)}
+        {formatDateForCSV(department.created_at)}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {fromatDateWithTime(department.updated_at)}
+        {formatDateForCSV(department.updated_at)}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
         <div className="flex items-center justify-center gap-2">
