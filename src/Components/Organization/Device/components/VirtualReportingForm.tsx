@@ -70,8 +70,6 @@ const VirtualReportingForm: React.FC<VirtualReportingFormProps> = ({
         {systemDevices.length > 0 && (
           <DevicePathList
             systemDevices={systemDevices}
-            departmentData={departmentData}
-            systemData={systemData}
             reportFormula={reportData.report_formula}
             onPathSelect={(path) => {
               const currentValue = reportData.report_formula || "";

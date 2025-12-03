@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { X, Copy, Check, Search } from "lucide-react";
 import { Success, Error } from "../../../../utils/toast";
 import type { DeviceResult } from "../../../../../model/devices.interface";
-import type { DepartmentResult } from "../../../../../model/department.interface";
-import type { SystemResult } from "../../../../../model/system.interface";
 
 interface DevicePathItem {
   path: string;
@@ -12,16 +10,12 @@ interface DevicePathItem {
 
 interface DevicePathListProps {
   systemDevices: DeviceResult[];
-  departmentData: DepartmentResult[];
-  systemData: SystemResult[];
   reportFormula?: string;
   onPathSelect?: (path: string) => void;
 }
 
 const DevicePathList: React.FC<DevicePathListProps> = ({
   systemDevices,
-  departmentData,
-  systemData,
   reportFormula: _reportFormula,
   onPathSelect: _onPathSelect,
 }) => {
@@ -43,27 +37,14 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
         return !isVirtual;
       })
       .map((device) => {
-        const department = departmentData.find(
-          (d) => d.department_id === device.department_id
-        );
-        const departmentName = department?.department_name || "";
+        const deviceName = device.device_id || "";
 
-        const system = systemData.find((s) => s.system_id === device.system_id);
-        const systemName = system?.system_name || "";
-
-        const deviceName = device.device_name || "";
-
-        if (departmentName && systemName && deviceName) {
-          return {
-            path: `plant['${departmentName}']['${systemName}']['${deviceName}']`,
-            device: device,
-          };
-        }
-        return null;
+        return {
+          path: `devices['${deviceName}']`,
+          device: device,
+        };
       })
-      .filter(
-        (item): item is DevicePathItem => item !== null
-      );
+      .filter((item): item is DevicePathItem => item !== null);
   };
 
   const getDeviceVariables = (device: DeviceResult | null): string[] => {
@@ -101,9 +82,7 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
   const devicePaths = getAllSystemDevicePaths();
   const filteredPaths = devicePaths.filter((item) =>
     devicePathSearchTerm
-      ? item.path
-          .toLowerCase()
-          .includes(devicePathSearchTerm.toLowerCase())
+      ? item.path.toLowerCase().includes(devicePathSearchTerm.toLowerCase())
       : true
   );
 
@@ -162,9 +141,7 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                     return;
                   }
                   setOpenDropdownIndex(
-                    openDropdownIndex === originalIndex
-                      ? null
-                      : originalIndex
+                    openDropdownIndex === originalIndex ? null : originalIndex
                   );
                 }}
                 title="Click to open variable dropdown"
@@ -178,9 +155,7 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                     e.preventDefault();
                     e.stopPropagation();
                     setOpenDropdownIndex(
-                      openDropdownIndex === originalIndex
-                        ? null
-                        : originalIndex
+                      openDropdownIndex === originalIndex ? null : originalIndex
                     );
                   }}
                   onMouseDown={(e) => {
@@ -240,8 +215,10 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                           </span>
                         </div>
                         {deviceVariables.map((variable) => {
-                          const lastRecord = item.device
-                            .last_record as Record<string, any>;
+                          const lastRecord = item.device.last_record as Record<
+                            string,
+                            any
+                          >;
                           const variableValue = lastRecord?.[variable];
                           const pathWithVariable = `${item.path}['${variable}']`;
 
@@ -329,4 +306,3 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
 };
 
 export default DevicePathList;
-
