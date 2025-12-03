@@ -94,6 +94,10 @@ const VirtualReportingForm: React.FC<VirtualReportingFormProps> = ({
           }
           language="javascript"
           className="w-full h-[150px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
+          options={{
+            wordWrap: "on",
+            automaticLayout: true,
+          }}
           onMount={(_editor, monaco) => {
             if (!monaco) return;
 
