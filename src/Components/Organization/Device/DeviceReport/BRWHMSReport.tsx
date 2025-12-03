@@ -212,8 +212,8 @@ const BRWHMSReport: React.FC = () => {
       "SR No",
       "From Time",
       "To Time",
-      "Flow (m³/h)",
-      "Totalizer (ltr)",
+      "Flow (Ltr)",
+      "Totalizer (Ltr)",
     ];
 
     const csvContent = [
@@ -585,10 +585,10 @@ const BRWHMSReport: React.FC = () => {
                           To Time
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Flow
+                          Flow (Ltr)
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Totalizer
+                          Totalizer (Ltr)
                         </th>
                       </tr>
                     </thead>
