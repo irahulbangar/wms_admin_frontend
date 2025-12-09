@@ -508,7 +508,7 @@ const Devices = () => {
   };
 
   const handleDeviceUpdate = useCallback(
-    (result?: {
+    async (result?: {
       data?: {
         refreshDepartments?: boolean;
         refreshDeviceFamilies?: boolean;
@@ -608,7 +608,14 @@ const Devices = () => {
             setIsLoading(false);
           });
       } else {
-        fetchDevices();
+        try {
+          await refetchDevices();
+        } catch (err) {
+          console.log(err);
+          Error("Failed to refresh devices");
+        } finally {
+          setIsLoading(false);
+        }
       }
     },
     [
@@ -620,6 +627,8 @@ const Devices = () => {
       fetchDevices,
       selectedDepartment,
       selectedSystem,
+      refetchDevices,
+      isLoading,
     ]
   );
 
