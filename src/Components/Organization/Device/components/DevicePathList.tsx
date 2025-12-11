@@ -37,7 +37,7 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
         return !isVirtual;
       })
       .map((device) => {
-        const deviceName = device.device_id || "";
+        const deviceName = device.device_name || "";
 
         return {
           path: `devices['${deviceName}']`,
