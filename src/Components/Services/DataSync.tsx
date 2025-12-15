@@ -75,6 +75,8 @@ const DataSync = () => {
     getDeviceFamily();
   }, [getDeviceFamily, fetchDevices, devices]);
 
+  
+
   const [deviceId, setDeviceId] = useState("");
   const [csvData, setCsvData] = useState<Record<string, string>[]>([]);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
