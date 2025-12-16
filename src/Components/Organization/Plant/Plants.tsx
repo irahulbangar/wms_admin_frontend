@@ -551,7 +551,7 @@ const Plants = () => {
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {formatDateForCSV(plant?.updated_at) || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap sticky right-0 bg-primary z-10">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap sticky right-0 bg-primary z-0">
                         <div className="flex items-center justify-center gap-2">
                           <span title="View devices" aria-label="View devices">
                             <Eye

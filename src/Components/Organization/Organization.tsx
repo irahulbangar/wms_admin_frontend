@@ -355,7 +355,7 @@ const Organization = () => {
                       <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {formatDateForCSV(organization?.created_at) || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize sticky right-0 bg-primary z-10">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize sticky right-0 bg-primary z-0">
                         <div className="flex items-center gap-3 justify-center">
                           <span title="View plants" aria-label="View plants">
                             <Eye

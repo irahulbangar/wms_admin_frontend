@@ -54,7 +54,7 @@ const DepartmentTableRow: React.FC<DepartmentTableRowProps> = ({
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
         {formatDateForCSV(department.updated_at)}
       </td>
-      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap sticky right-0 bg-primary z-10">
+      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap sticky right-0 bg-primary z-0">
         <div className="flex items-center justify-center gap-2">
           <span title="View systems" aria-label="View systems">
             <Eye
