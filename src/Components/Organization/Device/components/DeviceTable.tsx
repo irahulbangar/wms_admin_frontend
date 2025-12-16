@@ -51,41 +51,44 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
       <table className="w-full text-base text-left rtl:text-right text-text-primary min-w-[1200px]">
         <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
           <tr>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Sr No
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Device Name
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Organization Name
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Plant Name
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Department Name
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+              System Name
+            </th>
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Device Family
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Device Type
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Device Status
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               HWID Number
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Created At
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Updated At
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-              Actions
+            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal sticky right-0 bg-primary z-10">
+              Action
             </th>
           </tr>
         </thead>
@@ -104,7 +107,7 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
               key={device.device_id}
               className="border-b border-border-primary bg-primary hover:bg-primary/50"
             >
-              <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+              <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                 {index + 1}
               </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
@@ -136,6 +139,9 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
                   )?.department_name
                 }
               </td>
+              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                {device.system_name}
+              </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize truncate">
                 {
                   deviceFamily.find(
@@ -164,7 +170,7 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                 {formatDateForCSV(device.updated_at)}
               </td>
-              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize sticky right-0 bg-primary z-10">
                 <div className="flex items-center justify-center gap-2">
                   <span title="Edit" aria-label="Edit device">
                     <Edit

@@ -278,35 +278,35 @@ const Organization = () => {
             >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal font-roboto">
                     Sr No
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal font-roboto">
                     Organization Name
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto whitespace-nowrap">
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto whitespace-nowrap">
                     Contact Person
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto whitespace-nowrap">
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto whitespace-nowrap">
                     Contact Number
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
                     Email
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal font-roboto">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal font-roboto">
                     Address
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
                     Notes
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
                     Created At
                   </th>
-                  <th className="px-6 py-3 text-text-primary text-center text-base font-roboto font-normal font-roboto">
-                    Actions
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto sticky right-0 bg-primary z-10">
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -322,28 +322,28 @@ const Organization = () => {
                         )
                       }
                     >
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {organization?.organization_name || "-"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {organization?.contact_person || "-"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                         {organization?.contact_number || "-"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                         {organization?.email || "-"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {organization?.address || "-"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {organization?.note || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         <span
                           className={`px-2 py-1 rounded-full text-sm font-normal capitalize ${handleStatus(
                             organization?.status
@@ -352,10 +352,10 @@ const Organization = () => {
                           {organization?.status || "N/A"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {formatDateForCSV(organization?.created_at) || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize sticky right-0 bg-primary z-10">
                         <div className="flex items-center gap-3 justify-center">
                           <span title="View plants" aria-label="View plants">
                             <Eye

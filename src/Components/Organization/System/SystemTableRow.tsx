@@ -38,7 +38,7 @@ const SystemTableRow: React.FC<SystemTableRowProps> = ({
       }
       className="border-b border-border-primary bg-primary hover:bg-secondary cursor-pointer"
     >
-      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap">
         {(currentPage - 1) * rowsPerPage + index + 1}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
@@ -59,7 +59,7 @@ const SystemTableRow: React.FC<SystemTableRowProps> = ({
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
         {formatDateForCSV(system.updated_at)}
       </td>
-      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap sticky right-0 bg-primary z-10">
         <div className="flex items-center justify-center gap-2">
           <span title="View devices" aria-label="View devices">
             <Eye

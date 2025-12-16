@@ -467,34 +467,34 @@ const Plants = () => {
             >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Sr No
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Plant Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Organization Name
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Latitude
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Longitude
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Address
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Status
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Created At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Updated At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal sticky right-0 bg-primary z-10">
                     Action
                   </th>
                 </tr>
@@ -512,7 +512,7 @@ const Plants = () => {
                         )
                       }
                     >
-                      <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
@@ -551,7 +551,7 @@ const Plants = () => {
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {formatDateForCSV(plant?.updated_at) || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap sticky right-0 bg-primary z-10">
                         <div className="flex items-center justify-center gap-2">
                           <span title="View devices" aria-label="View devices">
                             <Eye

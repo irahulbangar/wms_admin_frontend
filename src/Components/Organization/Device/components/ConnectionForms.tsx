@@ -31,9 +31,7 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
   isOutReportType,
   isStorageReportType,
 }) => {
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
 
     const fieldMappings: Record<string, string> = {
@@ -228,8 +226,7 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
             <select
               name="plant_out"
               value={
-                formData.out_plant_id === null ||
-                formData.out_plant_id === -1
+                formData.out_plant_id === null || formData.out_plant_id === -1
                   ? "null"
                   : formData.out_plant_id || "0"
               }
@@ -260,7 +257,15 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
       {/* Department Connection */}
       <div>
         <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
-          Department Connection
+          {!isStorageReportType &&
+          formData.in_department_id !== null &&
+          formData.in_department_id !== -1 &&
+          formData.in_department_id !== 0 &&
+          formData.out_department_id !== null &&
+          formData.out_department_id !== -1 &&
+          formData.out_department_id !== 0
+            ? "Department Connection (Both)"
+            : "Department Connection"}
         </label>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -344,7 +349,15 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
       {/* System Connection */}
       <div>
         <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
-          System Connection
+          {!isStorageReportType &&
+          formData.in_system_id !== null &&
+          formData.in_system_id !== -1 &&
+          formData.in_system_id !== 0 &&
+          formData.out_system_id !== null &&
+          formData.out_system_id !== -1 &&
+          formData.out_system_id !== 0
+            ? "System Connection (Both)"
+            : "System Connection"}
         </label>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -389,8 +402,7 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
             <select
               name="system_out"
               value={
-                formData.out_system_id === null ||
-                formData.out_system_id === -1
+                formData.out_system_id === null || formData.out_system_id === -1
                   ? "null"
                   : formData.out_system_id || "0"
               }
@@ -422,4 +434,3 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
 };
 
 export default ConnectionForms;
-
