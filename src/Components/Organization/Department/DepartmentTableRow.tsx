@@ -43,12 +43,6 @@ const DepartmentTableRow: React.FC<DepartmentTableRowProps> = ({
         {department.department_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {department.organization_name}
-      </td>
-      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {department.plant_name}
-      </td>
-      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
         {formatDateForCSV(department.created_at)}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">

@@ -474,9 +474,6 @@ const Plants = () => {
                     Plant Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
-                    Organization Name
-                  </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Latitude
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
@@ -494,7 +491,7 @@ const Plants = () => {
                   <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Updated At
                   </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal sticky right-0 bg-primary z-10">
+                  <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal sticky right-0 bg-primary z-10">
                     Action
                   </th>
                 </tr>
@@ -517,15 +514,6 @@ const Plants = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {plant?.plant_name || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {
-                          organizations.find(
-                            (org) =>
-                              org.organization_id.toString() ===
-                              plant.organization_id.toString()
-                          )?.organization_name
-                        }
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {plant?.latitude || "N/A"}

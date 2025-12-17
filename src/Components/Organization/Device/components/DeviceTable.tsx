@@ -5,9 +5,6 @@ import { formatDateForCSV } from "../../../../utils/utils";
 
 interface DeviceTableProps {
   devices: DeviceResult[];
-  organizations: Array<{ organization_id: number; organization_name: string }>;
-  plants: Array<{ plant_id: number; plant_name: string }>;
-  departments: Array<{ department_id: number; department_name: string }>;
   deviceFamily: DeviceFamilyResult[];
   onEdit: (
     deviceId: number,
@@ -37,9 +34,6 @@ const deviceStatus = (status: string) => {
 
 const DeviceTable: React.FC<DeviceTableProps> = ({
   devices,
-  organizations,
-  plants,
-  departments,
   deviceFamily,
   onEdit,
   onReport,
@@ -56,18 +50,6 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
             </th>
             <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Device Name
-            </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
-              Organization Name
-            </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
-              Plant Name
-            </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
-              Department Name
-            </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
-              System Name
             </th>
             <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Device Family
@@ -87,7 +69,7 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
             <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
               Updated At
             </th>
-            <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal sticky right-0 bg-primary z-10">
+            <th className="p-4 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal sticky right-0 bg-primary z-10">
               Action
             </th>
           </tr>
@@ -112,35 +94,6 @@ const DeviceTable: React.FC<DeviceTableProps> = ({
               </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                 {device.device_name}
-              </td>
-              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                {
-                  organizations.find(
-                    (org) =>
-                      org.organization_id.toString() ===
-                      device.organization_id?.toString()
-                  )?.organization_name
-                }
-              </td>
-              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                {
-                  plants.find(
-                    (plant) =>
-                      plant.plant_id.toString() === device.plant_id?.toString()
-                  )?.plant_name
-                }
-              </td>
-              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                {
-                  departments.find(
-                    (department) =>
-                      department.department_id.toString() ===
-                      device.department_id?.toString()
-                  )?.department_name
-                }
-              </td>
-              <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                {device.system_name}
               </td>
               <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize truncate">
                 {

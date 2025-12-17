@@ -38,8 +38,6 @@ const DeviceList: React.FC<DeviceListProps> = ({
   groupedDevices,
   systems,
   organizations,
-  plants,
-  departments,
   deviceFamily,
   collapsedSystems,
   searchTerm,
@@ -120,9 +118,6 @@ const DeviceList: React.FC<DeviceListProps> = ({
             {!collapsedSystems.has(systemId) && (
               <DeviceTable
                 devices={systemDevices}
-                organizations={organizations}
-                plants={plants}
-                departments={departments}
                 deviceFamily={deviceFamily}
                 onEdit={onEdit}
                 onDelete={onDelete}

@@ -45,15 +45,6 @@ const SystemTableRow: React.FC<SystemTableRowProps> = ({
         {system.system_name}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {system.organization_name}
-      </td>
-      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {system.plant_name}
-      </td>
-      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
-        {system.department_name}
-      </td>
-      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
         {formatDateForCSV(system.created_at)}
       </td>
       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
