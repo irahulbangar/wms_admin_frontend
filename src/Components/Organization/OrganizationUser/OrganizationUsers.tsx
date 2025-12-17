@@ -471,31 +471,31 @@ const OrganizationUsers = () => {
             >
               <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                 <tr>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Sr No
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Phone
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Organization
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Created At
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Updated At
                   </th>
-                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                  <th className="px-6 py-3 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal sticky right-0 bg-primary z-10">
                     Action
                   </th>
                 </tr>
@@ -513,7 +513,7 @@ const OrganizationUsers = () => {
                         )
                       }
                     >
-                      <td className="px-6 py-4 text-center font-roboto text-text-secondary text-base capitalize">
+                      <td className="px-6 py-4 text-start font-roboto text-text-secondary text-base capitalize">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base capitalize">
@@ -549,7 +549,7 @@ const OrganizationUsers = () => {
                       <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base">
                         {formatDateForCSV(user.updated_at)}
                       </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap sticky right-0 bg-primary z-0">
                         <div className="flex items-center gap-3 justify-center">
                           <span title="Edit user" aria-label="Edit user">
                             <SquarePen
