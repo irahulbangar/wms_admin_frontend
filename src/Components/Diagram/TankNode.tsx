@@ -24,8 +24,22 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
   const systemConnection = data.systemConnection || "";
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
-
+  const reportType = data.reportType || "";
   const recordTimeOld = isRecordTimeOld(lastRecordTime);
+
+  const connectionInfo = [
+    `System Name : ${systemName}`,
+    `Device Name : ${deviceName}`,
+    organizationConnection ? `Org Conn. : ${organizationConnection}` : null,
+    plantConnection ? `Plant Conn. : ${plantConnection}` : null,
+    departmentConnection ? `Dep Conn. : ${departmentConnection}` : null,
+    systemConnection ? `System Conn. : ${systemConnection}` : null,
+    reportType ? `Report Type : ${reportType}` : null,
+    `Current Level : ${currentLevel} ${unit}`,
+    `Capacity : ${capacity} ${unit}`,
+  ]
+    .filter((line) => line !== null && line !== "")
+    .join("\n");
 
   const borderColor = recordTimeOld
     ? "border-status-danger"
@@ -37,16 +51,7 @@ const TankNode: React.FC<TankNodeProps> = ({ data }) => {
     <div className="relative">
       <div
         className={`relative w-25 h-35 bg-primary/20 border border-border-primary rounded-md overflow-hidden ${borderColor}`}
-        title={`
-System Name : ${systemName}
-Device Name : ${deviceName}
-Organization Connection : ${organizationConnection}
-Plant Connection : ${plantConnection}
-Department Connection : ${departmentConnection}
-System Connection : ${systemConnection}
-Current Level : ${currentLevel} ${unit}
-Capacity : ${capacity} ${unit}
-      `}
+        title={connectionInfo}
       >
         <div className="absolute inset-0 z-0">
           <div

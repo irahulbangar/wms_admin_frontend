@@ -15,15 +15,28 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
   const lastMm = Number(data.lastMm) || 0;
   // const firstMm = Number(data.firstMm) || 0;
   const systemName = data.systemName || "";
-  const systemConnection = data.systemConnection || "none";
-  const departmentConnection = data.departmentConnection || "none";
-  const plantConnection = data.plantConnection || "none";
-  const organizationConnection = data.organizationConnection || "none";
+  const systemConnection = data.systemConnection || "";
+  const departmentConnection = data.departmentConnection || "";
+  const plantConnection = data.plantConnection || "";
+  const organizationConnection = data.organizationConnection || "";
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
 
   const recordTimeOld = isRecordTimeOld(lastRecordTime);
-  
+
+  const connectionInfo = [
+    `System Name : ${systemName}`,
+    `Device Name : ${deviceName}`,
+    organizationConnection ? `Org Conn. : ${organizationConnection}` : null,
+    plantConnection ? `Plant Conn. : ${plantConnection}` : null,
+    departmentConnection ? `Dep Conn. : ${departmentConnection}` : null,
+    systemConnection ? `System Conn. : ${systemConnection}` : null,
+    `Rain : ${lastMm} mm`,
+    `Max : ${maxMm} mm | Min : ${minMm} mm`,
+  ]
+    .filter((line) => line !== null && line !== "")
+    .join("\n");
+
   const borderColor = recordTimeOld
     ? "border-status-danger"
     : isActive
@@ -33,14 +46,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
   return (
     <div
       className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-0 ${borderColor}`}
-      title={`
-System Name : ${systemName}
-Device Name : ${deviceName}
-Organization Connection : ${organizationConnection}
-Plant Connection : ${plantConnection}
-Department Connection : ${departmentConnection}
-System Connection : ${systemConnection}
-      `}
+      title={connectionInfo}
     >
       <div className="text-sm font-normal text-left font-roboto text-wrap mb-1 px-1 text-purple-800 leading-4">
         {deviceName}

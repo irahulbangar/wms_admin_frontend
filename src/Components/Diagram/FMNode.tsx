@@ -13,13 +13,26 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
   const isActive = data.isActive !== false;
   const totalizerReading = Number(data.totalizerReading) || 0;
   const flowRate = Number(data.flowRate) || 0;
-  const departmentConnection = data.departmentConnection || "none";
-  const organizationConnection = data.organizationConnection || "none";
-  const plantConnection = data.plantConnection || "none";
+  const departmentConnection = data.departmentConnection || "";
+  const organizationConnection = data.organizationConnection || "";
+  const plantConnection = data.plantConnection || "";
   const systemName = data.systemName || "";
-  const systemConnection = data.systemConnection || "none";
+  const systemConnection = data.systemConnection || "";
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
+
+  const connectionInfo = [
+    `System Name : ${systemName}`,
+    `Device Name : ${deviceName}`,
+    organizationConnection ? `Org Conn. : ${organizationConnection}` : null,
+    plantConnection ? `Plant Conn. : ${plantConnection}` : null,
+    departmentConnection ? `Dep Conn. : ${departmentConnection}` : null,
+    systemConnection ? `System Conn. : ${systemConnection}` : null,
+    `Totalizer : ${totalizerReading} ${unit}`,
+    `Flow Rate : ${flowRate} LPM`,
+  ]
+    .filter((line) => line !== null && line !== "")
+    .join("\n");
 
   const recordTimeOld = isRecordTimeOld(lastRecordTime);
 
@@ -32,16 +45,7 @@ const FMNode: React.FC<FMNodeProps> = ({ data }) => {
   return (
     <div
       className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${borderColor}`}
-      title={`
-System Name : ${systemName}
-Device Name : ${deviceName}
-Organization Connection : ${organizationConnection}
-Plant Connection : ${plantConnection}
-Department Connection : ${departmentConnection}
-System Connection : ${systemConnection}
-Totalizer Reading : ${totalizerReading} ${unit}
-Flow Rate : ${flowRate} LPM
-        `}
+      title={connectionInfo}
     >
       <div className="text-sm font-normal text-left text-wrap font-roboto mb-1 px-1 leading-4 text-text-primary">
         {data.label}

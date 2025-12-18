@@ -10,15 +10,28 @@ interface BRWHMSNodeProps {
 
 const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
   const isActive = data.isActive !== false;
-  const departmentConnection = data.departmentConnection || "none";
-  const plantConnection = data.plantConnection || "none";
-  const organizationConnection = data.organizationConnection || "none";
+  const departmentConnection = data.departmentConnection || "";
+  const plantConnection = data.plantConnection || "";
+  const organizationConnection = data.organizationConnection || "";
   const systemName = data.systemName || "";
-  const systemConnection = data.systemConnection || "none";
+  const systemConnection = data.systemConnection || "";
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
 
   const recordTimeOld = isRecordTimeOld(lastRecordTime);
+
+  const connectionInfo = [
+    `System Name : ${systemName}`,
+    `Device Name : ${deviceName}`,
+    organizationConnection ? `Org Conn. : ${organizationConnection}` : null,
+    plantConnection ? `Plant Conn. : ${plantConnection}` : null,
+    departmentConnection ? `Dep Conn. : ${departmentConnection}` : null,
+    systemConnection ? `System Conn. : ${systemConnection}` : null,
+    `Totalizer : ${data?.totalizerReading ? data?.totalizerReading : 0} Ltr`,
+    `Flow Rate : ${data?.avg} LPM`,
+  ]
+    .filter((line) => line !== null && line !== "")
+    .join("\n");
 
   const borderColor = recordTimeOld
     ? "border-status-danger"
@@ -28,16 +41,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
   return (
     <div
       className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${borderColor}`}
-      title={`
-System Name : ${systemName}
-Device Name : ${deviceName}
-Organization Connection : ${organizationConnection}
-Plant Connection : ${plantConnection}
-Department Connection : ${departmentConnection}
-System Connection : ${systemConnection}
-Totalizer Reading : ${data?.totalizerReading} Ltr
-Flow Rate : ${data?.avg} LPM
-      `}
+      title={connectionInfo}
     >
       <div className="text-sm font-normal text-left font-roboto text-wrap mb-1 px-1 text-text-primary leading-4">
         {deviceName}

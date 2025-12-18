@@ -82,6 +82,7 @@ export interface NodeData {
   lastMm?: number;
   firstMm?: number;
   reportValue?: number;
+  reportType?: string;
 }
 
 export interface Style {

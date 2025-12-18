@@ -152,60 +152,69 @@ export const useDiagramData = (plantId: string | undefined) => {
   }, [deviceData, nodes, convertDevicesToDiagramCallback]);
 
   const getSystemConnection = (matchingDevice: any): string => {
-    if (
-      matchingDevice.in_system_id === null &&
-      matchingDevice.out_system_id === null
-    ) {
-      return "None";
+    const inSystemName = matchingDevice.in_system_name;
+    const outSystemName = matchingDevice.out_system_name;
+
+    if (!inSystemName && !outSystemName) {
+      return "";
     }
-    if (matchingDevice.in_system_id && matchingDevice.out_system_id) {
-      return "Both";
+    if (inSystemName && outSystemName) {
+      if (inSystemName !== outSystemName) {
+        return `${inSystemName} / ${outSystemName}`;
+      }
+      return inSystemName;
     }
-    if (matchingDevice.in_system_id && !matchingDevice.out_system_id) {
-      return "In";
+    if (inSystemName && !outSystemName) {
+      return inSystemName;
     }
-    if (!matchingDevice.in_system_id && matchingDevice.out_system_id) {
-      return "Out";
+    if (!inSystemName && outSystemName) {
+      return outSystemName;
     }
     return "None";
   };
 
   const getPlantConnection = (matchingDevice: any): string => {
-    if (
-      matchingDevice.in_plant_id === null &&
-      matchingDevice.out_plant_id === null
-    ) {
-      return "None";
+    const inPlantName = matchingDevice.in_plant_name;
+    const outPlantName = matchingDevice.out_plant_name;
+
+    if (!inPlantName && !outPlantName) {
+      return "";
     }
-    if (matchingDevice.in_plant_id && matchingDevice.out_plant_id) {
-      return "Both";
+    if (inPlantName && outPlantName) {
+      if (inPlantName !== outPlantName) {
+        return `${inPlantName} / ${outPlantName}`;
+      }
+      return inPlantName;
     }
-    if (matchingDevice.in_plant_id && !matchingDevice.out_plant_id) {
-      return "In";
+    if (inPlantName && !outPlantName) {
+      return inPlantName;
     }
-    if (!matchingDevice.in_plant_id && matchingDevice.out_plant_id) {
-      return "Out";
+    if (!inPlantName && outPlantName) {
+      return outPlantName;
     }
-    return "None";
+    return "";
   };
 
   const getDepartmentConnection = (matchingDevice: any): string => {
-    if (
-      matchingDevice.in_department_id === null &&
-      matchingDevice.out_department_id === null
-    ) {
+    const inDeptName = matchingDevice.in_department_name;
+    const outDeptName = matchingDevice.out_department_name;
+
+    if (!inDeptName && !outDeptName) {
       return "None";
     }
-    if (matchingDevice.in_department_id && matchingDevice.out_department_id) {
-      return "Both";
+    if (inDeptName && outDeptName) {
+      if (inDeptName !== outDeptName) {
+        return `${inDeptName} / ${outDeptName}`;
+      }
+      return inDeptName;
     }
-    if (matchingDevice.in_department_id && !matchingDevice.out_department_id) {
-      return "In";
+    if (inDeptName && !outDeptName) {
+      return inDeptName;
     }
-    if (!matchingDevice.in_department_id && matchingDevice.out_department_id) {
-      return "Out";
+    if (!inDeptName && outDeptName) {
+      return outDeptName;
     }
-    return "None";
+    return "";
   };
 
   const updateNodesWithDynamicData = useCallback(() => {
@@ -233,11 +242,12 @@ export const useDiagramData = (plantId: string | undefined) => {
                 departmentConnection: getDepartmentConnection(matchingDevice),
                 plantConnection: getPlantConnection(matchingDevice),
                 systemConnection: getSystemConnection(matchingDevice),
-                organizationConnection: matchingDevice?.organization_connection,
+                organizationConnection: matchingDevice?.organization_name,
                 systemName: matchingDevice?.system_name,
                 crossSectionArea:
                   Number(matchingDevice?.params?.crossSectionArea) || 0,
                 lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportType: matchingDevice?.report_type_name,
               },
             };
           }
@@ -259,10 +269,11 @@ export const useDiagramData = (plantId: string | undefined) => {
                 isActive: matchingDevice?.device_status === "active",
                 departmentConnection: getDepartmentConnection(matchingDevice),
                 plantConnection: getPlantConnection(matchingDevice),
-                organizationConnection: matchingDevice?.organization_connection,
+                organizationConnection: matchingDevice?.organization_name,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportType: matchingDevice?.report_type_name,
               },
             };
           }
@@ -286,10 +297,11 @@ export const useDiagramData = (plantId: string | undefined) => {
                 isActive: matchingDevice?.device_status === "active",
                 departmentConnection: getDepartmentConnection(matchingDevice),
                 plantConnection: getPlantConnection(matchingDevice),
-                organizationConnection: matchingDevice?.organization_connection,
+                organizationConnection: matchingDevice?.organization_name,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportType: matchingDevice?.report_type_name,
               },
             };
           }
@@ -317,10 +329,11 @@ export const useDiagramData = (plantId: string | undefined) => {
                 isActive: matchingDevice?.device_status === "active",
                 departmentConnection: getDepartmentConnection(matchingDevice),
                 plantConnection: getPlantConnection(matchingDevice),
-                organizationConnection: matchingDevice?.organization_connection,
+                organizationConnection: matchingDevice?.organization_name,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportType: matchingDevice?.report_type_name,
               },
             };
           }
@@ -344,9 +357,10 @@ export const useDiagramData = (plantId: string | undefined) => {
                 isActive: matchingDevice?.device_status === "active",
                 departmentConnection: getDepartmentConnection(matchingDevice),
                 plantConnection: getPlantConnection(matchingDevice),
-                organizationConnection: matchingDevice?.organization_connection,
+                organizationConnection: matchingDevice?.organization_name,
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
+                reportType: matchingDevice?.report_type_name,
               },
             };
           }
@@ -383,8 +397,10 @@ export const useDiagramData = (plantId: string | undefined) => {
               data: {
                 ...node.data,
                 reportName: matchingDevice?.device_name || "",
-                reportValue: Number(matchingDevice?.device_reporting?.report_value) || 0,
+                reportValue:
+                  Number(matchingDevice?.device_reporting?.report_value) || 0,
                 unit: matchingDevice?.device_reporting?.report_unit || "Ltr",
+                reportType: matchingDevice?.report_type_name,
               },
             };
           }
