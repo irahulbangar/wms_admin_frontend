@@ -226,22 +226,22 @@ const Users = () => {
                       key={user?.admin_id}
                       className="border-b border-border-primary hover:bg-secondary transition-colors"
                     >
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap capitalize">
                         {user?.name}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap">
                         {user?.email}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap">
                         {user?.contact_number}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap capitalize">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap capitalize">
                         {user?.role === "admin" ? "Admin" : "Super Admin"}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap">
                         <span
                           className={`px-2 py-1 rounded-full text-sm font-normal font-roboto capitalize ${handleStatus(
                             user?.status
@@ -250,10 +250,10 @@ const Users = () => {
                           {user?.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap">
                         {formatDateForCSV(user?.created_at)}
                       </td>
-                      <td className="px-6 py-4 text-center font-roboto text-text-primary text-base whitespace-nowrap">
+                      <td className="px-6 py-4 text-start font-roboto text-text-primary text-base whitespace-nowrap">
                         {formatDateForCSV(user?.updated_at)}
                       </td>
                       {admin?.role === "super_admin" && (
