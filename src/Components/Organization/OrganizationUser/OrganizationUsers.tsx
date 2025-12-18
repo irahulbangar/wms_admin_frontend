@@ -517,7 +517,7 @@ const OrganizationUsers = () => {
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </td>
                       <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base capitalize">
-                        {user.client_name}
+                        {user.client_name.replace(/_/g, " ")}
                       </td>
                       <td className="px-6 py-4 font-roboto whitespace-nowrap text-text-primary text-base">
                         {user.client_email}
