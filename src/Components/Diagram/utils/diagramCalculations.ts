@@ -232,6 +232,7 @@ export const convertDevicesToDiagram = (
       data: {
         label: plant.plant_name,
         type: "plant",
+        plant_id: plant.plant_id?.toString() || "",
         unit: "Ltr",
       },
       position: { x: plantX, y: plantY },

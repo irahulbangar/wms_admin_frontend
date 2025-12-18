@@ -473,11 +473,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       )}
 
       <div
-        className={`fixed right-0 top-0 h-full w-fit bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 h-full w-90 bg-primary shadow-2xl border-l border-border-primary z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-border-primary bg-primary">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border-primary bg-primary">
           <div className="flex items-center space-x-2">
             <div
               className={`w-3 h-3 rounded-full ${

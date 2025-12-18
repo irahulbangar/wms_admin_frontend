@@ -59,12 +59,116 @@ export const useRightSidebar = (deviceData: DeviceResult[]) => {
             plantName = plantName.trim();
           }
 
-          const plantDevice = deviceData.find((device) => {
-            const devicePlantName = device.plant_name?.toString().trim();
-            return devicePlantName === plantName && device.plant_id;
+          const searchName = plantName.toLowerCase();
+
+          let plantDevice = deviceData.find((device) => {
+            const devicePlantName = device.plant_name
+              ?.toString()
+              .trim()
+              .toLowerCase();
+            const deviceInPlantName = device.in_plant_name
+              ?.toString()
+              .trim()
+              .toLowerCase();
+            const deviceOutPlantName = device.out_plant_name
+              ?.toString()
+              .trim()
+              .toLowerCase();
+
+            return (
+              (devicePlantName === searchName && device.plant_id) ||
+              (deviceInPlantName === searchName && device.in_plant_id) ||
+              (deviceOutPlantName === searchName && device.out_plant_id)
+            );
           });
-          if (plantDevice && plantDevice.plant_id) {
-            return String(plantDevice.plant_id);
+
+          if (plantDevice) {
+            if (
+              plantDevice.plant_name?.toString().trim().toLowerCase() ===
+                searchName &&
+              plantDevice.plant_id
+            ) {
+              return String(plantDevice.plant_id);
+            }
+            if (
+              plantDevice.in_plant_name?.toString().trim().toLowerCase() ===
+                searchName &&
+              plantDevice.in_plant_id
+            ) {
+              return String(plantDevice.in_plant_id);
+            }
+            if (
+              plantDevice.out_plant_name?.toString().trim().toLowerCase() ===
+                searchName &&
+              plantDevice.out_plant_id
+            ) {
+              return String(plantDevice.out_plant_id);
+            }
+          }
+
+          plantDevice = deviceData.find((device) => {
+            const devicePlantName = device.plant_name
+              ?.toString()
+              .trim()
+              .toLowerCase();
+            const deviceInPlantName = device.in_plant_name
+              ?.toString()
+              .trim()
+              .toLowerCase();
+            const deviceOutPlantName = device.out_plant_name
+              ?.toString()
+              .trim()
+              .toLowerCase();
+
+            return (
+              devicePlantName?.includes(searchName) ||
+              deviceInPlantName?.includes(searchName) ||
+              deviceOutPlantName?.includes(searchName)
+            );
+          });
+
+          if (plantDevice) {
+            if (
+              plantDevice.plant_name
+                ?.toString()
+                .trim()
+                .toLowerCase()
+                .includes(searchName) &&
+              plantDevice.plant_id
+            ) {
+              return String(plantDevice.plant_id);
+            }
+            if (
+              plantDevice.in_plant_name
+                ?.toString()
+                .trim()
+                .toLowerCase()
+                .includes(searchName) &&
+              plantDevice.in_plant_id
+            ) {
+              return String(plantDevice.in_plant_id);
+            }
+            if (
+              plantDevice.out_plant_name
+                ?.toString()
+                .trim()
+                .toLowerCase()
+                .includes(searchName) &&
+              plantDevice.out_plant_id
+            ) {
+              return String(plantDevice.out_plant_id);
+            }
+          }
+
+          const allPlantIds = new Set<number>();
+          deviceData.forEach((device) => {
+            if (device.plant_id) allPlantIds.add(device.plant_id);
+            if (device.in_plant_id) allPlantIds.add(device.in_plant_id);
+            if (device.out_plant_id) allPlantIds.add(device.out_plant_id);
+          });
+
+          if (allPlantIds.size === 1) {
+            return String(Array.from(allPlantIds)[0]);
           }
           return null;
         }
@@ -95,13 +199,21 @@ export const useRightSidebar = (deviceData: DeviceResult[]) => {
     (
       groupId: string,
       groupName: string,
-      groupType: "plant" | "department" | "system"
+      groupType: "plant" | "department" | "system",
+      directId?: string | number
     ) => {
+      if (directId !== undefined) {
+        setSelectedGroup({
+          id: String(directId),
+          name: groupName,
+          type: groupType,
+        });
+        setIsOpen(true);
+        return;
+      }
+
       const numericId = extractNumericId(groupId, groupType);
       if (!numericId) {
-        console.warn(
-          `Could not extract numeric ID from ${groupId} for type ${groupType}`
-        );
         return;
       }
 
@@ -123,7 +235,7 @@ export const useRightSidebar = (deviceData: DeviceResult[]) => {
   const handleGroupClick = useCallback(
     (nodeId: string, nodeData: any) => {
       if (nodeData.type === "plant") {
-        openSidebar(nodeId, nodeData.label, "plant");
+        openSidebar(nodeId, nodeData.label || "", "plant", nodeData.plant_id);
       } else if (nodeData.type === "department") {
         openSidebar(nodeId, nodeData.label, "department");
       } else if (nodeData.type === "system") {

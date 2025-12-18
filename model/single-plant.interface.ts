@@ -65,6 +65,7 @@ export interface NodeData {
   departmentName?: string;
   systemName?: string;
   systemConnection?: string;
+  plant_id?: string;
   avg?: number;
   max?: number;
   min?: number;
