@@ -11,6 +11,7 @@ import {
   Building2,
   ChevronDown,
   User2,
+  LogInIcon,
 } from "lucide-react";
 import NoDataFound from "../../NoDataFound";
 import { formatDateForCSV, handleStatus } from "../../../utils/utils";
@@ -22,6 +23,7 @@ import type {
 } from "../../../../model/client-users.interface";
 import {
   getAllClients,
+  getClientJwt,
   getClientsByOrganizationId,
   setClients,
 } from "../../../../store/clientSlice";
@@ -301,6 +303,30 @@ const OrganizationUsers = () => {
     setOrganizationId(0);
   };
 
+  const handleLoginAsUser = (clientId: number) => {
+    dispatch(getClientJwt(clientId))
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          const subdomain = res.org.subdomain.toLowerCase();
+          const hostname = document.location.hostname;
+          const protocol = document.location.protocol + "//";
+          const finalDomain =
+            protocol + subdomain + "." + hostname.split(".").slice(1).join(".");
+          const token = res.token;
+          const url = `${finalDomain}/login?token=${token}`;
+          // console.log("url", url);
+          window.open(url, "_blank");
+        } else {
+          Error(res.message || "Failed to login as user");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error(err.message || "Failed to login as user");
+      });
+  };
+
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
@@ -574,6 +600,15 @@ const OrganizationUsers = () => {
                                   user.organization_id.toString()
                                 )
                               }
+                            />
+                          </span>
+                          <span
+                            title="Login as user"
+                            aria-label="Login as user"
+                          >
+                            <LogInIcon
+                              className="w-5 h-5 text-status-success cursor-pointer"
+                              onClick={() => handleLoginAsUser(user.client_id)}
                             />
                           </span>
                           {/* <Trash2 className="w-5 h-5 text-status-danger cursor-pointer" /> */}

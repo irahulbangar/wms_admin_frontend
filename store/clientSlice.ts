@@ -205,6 +205,27 @@ export const getClientsByOrganizationId = createAsyncThunk(
   }
 );
 
+// GET CLIENT JWT BY CLIENT ID
+export const getClientJwt = createAsyncThunk(
+  "client/getClientJwt",
+  async (client_id: number, thunkAPI) => {
+    try {
+      const response = await api().get(
+        `/clients/admin/get-client-jwt/${client_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return thunkAPI.rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setClients, setLoading, setError } = clientSlice.actions;
 
 export default clientSlice.reducer;

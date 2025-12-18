@@ -14,9 +14,9 @@ import { nodeTypes } from "./Diagram/nodeTypes";
 import { useDiagramData } from "./Diagram/hooks/useDiagramData";
 import { useDiagramControls } from "./Diagram/hooks/useDiagramControls";
 import { useDepartmentPopup } from "./Diagram/hooks/useDepartmentPopup";
-import { useRightSidebar } from "./Diagram/hooks/useRightSidebar";
+// import { useRightSidebar } from "./Diagram/hooks/useRightSidebar";
 import DepartmentPopup from "./Diagram/DepartmentPopup";
-import RightSidebar from "./Diagram/RightSidebar";
+// import RightSidebar from "./Diagram/RightSidebar";
 import DiagramControls from "./Diagram/DiagramControls";
 import { ChartArea } from "lucide-react";
 
@@ -168,7 +168,7 @@ const DiagramPage = () => {
     departmentDimensions,
     setDepartmentDimensions,
     saveDiagramToAPI,
-    deviceData,
+    // deviceData,
     plantData,
   } = useDiagramData(plantId);
 
@@ -197,14 +197,14 @@ const DiagramPage = () => {
     handleCloseDepartmentPopup,
   } = useDepartmentPopup(setNodes, setHasChanges, setDepartmentDimensions);
 
-  const {
-    isOpen: isRightSidebarOpen,
-    selectedGroup,
-    calculations,
-    deviceData: sidebarDeviceData,
-    closeSidebar: closeRightSidebar,
-    handleGroupClick,
-  } = useRightSidebar(deviceData);
+  // const {
+  //   isOpen: isRightSidebarOpen,
+  //   selectedGroup,
+  //   calculations,
+  //   deviceData: sidebarDeviceData,
+  //   closeSidebar: closeRightSidebar,
+  //   handleGroupClick,
+  // } = useRightSidebar(deviceData);
 
   const handleNodeDragStop: NodeDragHandler = () => {
     setHasChanges(true);
@@ -335,10 +335,10 @@ const DiagramPage = () => {
       return;
     }
 
-    if (node.type === 'group' && (node.data.type === 'plant' || node.data.type === 'department' || node.data.type === 'system')) {
-      handleGroupClick(node.id, node.data);
-      return;
-    }
+    // if (node.type === 'group' && (node.data.type === 'plant' || node.data.type === 'department' || node.data.type === 'system')) {
+    //   handleGroupClick(node.id, node.data);
+    //   return;
+    // }
     
     onNodeClick(event, node);
   };
@@ -480,13 +480,13 @@ const DiagramPage = () => {
         onDimensionsChange={handleDepartmentDimensionsChange}
       />
 
-      <RightSidebar
+      {/* <RightSidebar
         isOpen={isRightSidebarOpen}
         onClose={closeRightSidebar}
         selectedGroup={selectedGroup}
         calculations={calculations}
         deviceData={sidebarDeviceData}
-      />
+      /> */}
     </div>
   );
 };
