@@ -160,7 +160,7 @@ export const useDiagramData = (plantId: string | undefined) => {
     }
     if (inSystemName && outSystemName) {
       if (inSystemName !== outSystemName) {
-        return `${inSystemName} / ${outSystemName}`;
+        return `${outSystemName} / ${inSystemName}`;
       }
       return inSystemName;
     }
@@ -182,7 +182,7 @@ export const useDiagramData = (plantId: string | undefined) => {
     }
     if (inPlantName && outPlantName) {
       if (inPlantName !== outPlantName) {
-        return `${inPlantName} / ${outPlantName}`;
+        return `${outPlantName} / ${inPlantName}`;
       }
       return inPlantName;
     }
@@ -204,7 +204,7 @@ export const useDiagramData = (plantId: string | undefined) => {
     }
     if (inDeptName && outDeptName) {
       if (inDeptName !== outDeptName) {
-        return `${inDeptName} / ${outDeptName}`;
+        return `${outDeptName} / ${inDeptName}`;
       }
       return inDeptName;
     }
