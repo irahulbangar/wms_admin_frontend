@@ -28,6 +28,7 @@ import VirtualReportingForm from "./components/VirtualReportingForm";
 import CommonParametersForm from "./components/CommonParametersForm";
 import TankParametersForm from "./components/TankParametersForm";
 import BRWHMSParametersForm from "./components/BRWHMSParametersForm";
+import DWLRParametersForm from "./components/DWLRParametersForm";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -157,7 +158,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     return selectedType?.device_type_name || "";
   };
 
-
   const [commonParams, setCommonParams] = useState<object>({
     maxThreshold: "",
     lowerLimit: "",
@@ -209,6 +209,60 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     hmin: "",
     A: "",
     B: "",
+  });
+
+  const createDefaultSensorParam = (): {
+    enable: boolean;
+    name: string;
+    unit: string;
+    multipliers: string;
+    min: string;
+    max: string;
+    set_limit: string;
+    set_min: string;
+    set_max: string;
+    ref_val: string;
+    ref_percent: string;
+  } => ({
+    enable: false,
+    name: "",
+    unit: "",
+    multipliers: "",
+    min: "",
+    max: "",
+    set_limit: "",
+    set_min: "",
+    set_max: "",
+    ref_val: "",
+    ref_percent: "",
+  });
+
+  const [dwlrParams, setDwlrParams] = useState({
+    device_params: {
+      serial: "",
+      identifier: "",
+      model_id: "",
+      cable_length: "",
+      lat: "",
+      lng: "",
+      installation_date: "",
+      daily_msgs_count: "",
+    },
+    water_column: createDefaultSensorParam(),
+    water_temperature: createDefaultSensorParam(),
+    water_pressure: createDefaultSensorParam(),
+    ambient_temperature: createDefaultSensorParam(),
+    ambient_pressure: createDefaultSensorParam(),
+    msg_time: createDefaultSensorParam(),
+    water_column_from_ground: createDefaultSensorParam(),
+    sensor_voltage: createDefaultSensorParam(),
+    battery_voltage: createDefaultSensorParam(),
+    param_1: createDefaultSensorParam(),
+    param_2: createDefaultSensorParam(),
+    param_3: createDefaultSensorParam(),
+    param_4: createDefaultSensorParam(),
+    param_5: createDefaultSensorParam(),
+    param_6: createDefaultSensorParam(),
   });
   const inReportType = ["Rainfall", "Regeneration", "Re-use"];
   const outReportType = [
@@ -307,6 +361,33 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       A: "",
       B: "",
     });
+    setDwlrParams({
+      device_params: {
+        serial: "",
+        identifier: "",
+        model_id: "",
+        cable_length: "",
+        lat: "",
+        lng: "",
+        installation_date: "",
+        daily_msgs_count: "",
+      },
+      water_column: createDefaultSensorParam(),
+      water_temperature: createDefaultSensorParam(),
+      water_pressure: createDefaultSensorParam(),
+      ambient_temperature: createDefaultSensorParam(),
+      ambient_pressure: createDefaultSensorParam(),
+      msg_time: createDefaultSensorParam(),
+      water_column_from_ground: createDefaultSensorParam(),
+      sensor_voltage: createDefaultSensorParam(),
+      battery_voltage: createDefaultSensorParam(),
+      param_1: createDefaultSensorParam(),
+      param_2: createDefaultSensorParam(),
+      param_3: createDefaultSensorParam(),
+      param_4: createDefaultSensorParam(),
+      param_5: createDefaultSensorParam(),
+      param_6: createDefaultSensorParam(),
+    });
     setReportData({
       report_name: "",
       report_unit: "",
@@ -316,6 +397,33 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     setErrors({});
   };
 
+  const convertSensorParam = (param: {
+    enable: boolean;
+    name: string;
+    unit: string;
+    multipliers: string;
+    min: string;
+    max: string;
+    set_limit: string;
+    set_min: string;
+    set_max: string;
+    ref_val: string;
+    ref_percent: string;
+  }) => ({
+    enable: param.enable || false,
+    name: param.name || "",
+    unit: param.unit || "",
+    multipliers:
+      param.multipliers === "" ? 0 : parseFloat(param.multipliers) || 0,
+    min: param.min === "" ? 0 : parseInt(param.min) || 0,
+    max: param.max === "" ? 0 : parseInt(param.max) || 0,
+    set_limit: param.set_limit === "" ? 0 : parseInt(param.set_limit) || 0,
+    set_min: param.set_min === "" ? 0 : parseInt(param.set_min) || 0,
+    set_max: param.set_max === "" ? 0 : parseInt(param.set_max) || 0,
+    ref_val: param.ref_val === "" ? 0 : parseFloat(param.ref_val) || 0,
+    ref_percent:
+      param.ref_percent === "" ? 0 : parseFloat(param.ref_percent) || 0,
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -358,6 +466,57 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             return { ...commonParams, ...tankParams };
           } else if (deviceFamilyName === "brwhms") {
             return { ...commonParams, ...brwhmsParams };
+          } else if (deviceFamilyName === "dwlr") {
+            const convertedDwlParams = {
+              device_params: {
+                serial: dwlrParams.device_params.serial || "",
+                identifier: dwlrParams.device_params.identifier || "",
+                model_id:
+                  dwlrParams.device_params.model_id === ""
+                    ? 0
+                    : parseInt(dwlrParams.device_params.model_id) || 0,
+                cable_length:
+                  dwlrParams.device_params.cable_length === ""
+                    ? 0
+                    : parseFloat(dwlrParams.device_params.cable_length) || 0,
+                lat:
+                  dwlrParams.device_params.lat === ""
+                    ? 0
+                    : parseFloat(dwlrParams.device_params.lat) || 0,
+                lng:
+                  dwlrParams.device_params.lng === ""
+                    ? 0
+                    : parseFloat(dwlrParams.device_params.lng) || 0,
+                installation_date:
+                  dwlrParams.device_params.installation_date || "",
+                daily_msgs_count:
+                  dwlrParams.device_params.daily_msgs_count === ""
+                    ? 0
+                    : parseInt(dwlrParams.device_params.daily_msgs_count) || 0,
+              },
+              water_column: convertSensorParam(dwlrParams.water_column),
+              water_temperature: convertSensorParam(
+                dwlrParams.water_temperature
+              ),
+              water_pressure: convertSensorParam(dwlrParams.water_pressure),
+              ambient_temperature: convertSensorParam(
+                dwlrParams.ambient_temperature
+              ),
+              ambient_pressure: convertSensorParam(dwlrParams.ambient_pressure),
+              msg_time: convertSensorParam(dwlrParams.msg_time),
+              water_column_from_ground: convertSensorParam(
+                dwlrParams.water_column_from_ground
+              ),
+              sensor_voltage: convertSensorParam(dwlrParams.sensor_voltage),
+              battery_voltage: convertSensorParam(dwlrParams.battery_voltage),
+              param_1: convertSensorParam(dwlrParams.param_1),
+              param_2: convertSensorParam(dwlrParams.param_2),
+              param_3: convertSensorParam(dwlrParams.param_3),
+              param_4: convertSensorParam(dwlrParams.param_4),
+              param_5: convertSensorParam(dwlrParams.param_5),
+              param_6: convertSensorParam(dwlrParams.param_6),
+            };
+            return convertedDwlParams;
           } else {
             return { ...commonParams };
           }
@@ -499,6 +658,76 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 A: brwhmsData?.A?.toString() || "",
                 B: brwhmsData?.B?.toString() || "",
               });
+            } else if (familyName === "dwlr") {
+              const convertSensorParam = (param: any) => ({
+                enable: param?.enable || false,
+                name: param?.name?.toString() || "",
+                unit: param?.unit?.toString() || "",
+                multipliers: param?.multipliers?.toString() || "",
+                min: param?.min?.toString() || "",
+                max: param?.max?.toString() || "",
+                set_limit: param?.set_limit?.toString() || "",
+                set_min: param?.set_min?.toString() || "",
+                set_max: param?.set_max?.toString() || "",
+                ref_val: param?.ref_val?.toString() || "",
+                ref_percent: param?.ref_percent?.toString() || "",
+              });
+
+              const dwlData = {
+                device_params: {
+                  serial:
+                    deviceData.params?.device_params?.serial?.toString() || "",
+                  identifier:
+                    deviceData.params?.device_params?.identifier?.toString() ||
+                    "",
+                  model_id:
+                    deviceData.params?.device_params?.model_id?.toString() ||
+                    "",
+                  cable_length:
+                    deviceData.params?.device_params?.cable_length?.toString() ||
+                    "",
+                  lat: deviceData.params?.device_params?.lat?.toString() || "",
+                  lng: deviceData.params?.device_params?.lng?.toString() || "",
+                  installation_date:
+                    deviceData.params?.device_params?.installation_date?.toString() ||
+                    "",
+                  daily_msgs_count:
+                    deviceData.params?.device_params?.daily_msgs_count?.toString() ||
+                    "",
+                },
+                water_column: convertSensorParam(
+                  deviceData.params?.water_column
+                ),
+                water_temperature: convertSensorParam(
+                  deviceData.params?.water_temperature
+                ),
+                water_pressure: convertSensorParam(
+                  deviceData.params?.water_pressure
+                ),
+                ambient_temperature: convertSensorParam(
+                  deviceData.params?.ambient_temperature
+                ),
+                ambient_pressure: convertSensorParam(
+                  deviceData.params?.ambient_pressure
+                ),
+                msg_time: convertSensorParam(deviceData.params?.msg_time),
+                water_column_from_ground: convertSensorParam(
+                  deviceData.params?.water_column_from_ground
+                ),
+                sensor_voltage: convertSensorParam(
+                  deviceData.params?.sensor_voltage
+                ),
+                battery_voltage: convertSensorParam(
+                  deviceData.params?.battery_voltage
+                ),
+                param_1: convertSensorParam(deviceData.params?.param_1),
+                param_2: convertSensorParam(deviceData.params?.param_2),
+                param_3: convertSensorParam(deviceData.params?.param_3),
+                param_4: convertSensorParam(deviceData.params?.param_4),
+                param_5: convertSensorParam(deviceData.params?.param_5),
+                param_6: convertSensorParam(deviceData.params?.param_6),
+              };
+              setDwlrParams(dwlData);
             }
 
             if (deviceData.device_reporting) {
@@ -662,17 +891,18 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
-            {!isVirtualReporting && (
-              <CommonParametersForm
-                commonInputValues={commonInputValues}
-                onCommonParamsChange={(values) => {
-                  setCommonInputValues(values);
-                  setCommonParams(values);
-                }}
-                errors={errors}
-                isBRWHMS={getSelectedDeviceFamilyName() === "brwhms"}
-              />
-            )}
+            {!isVirtualReporting &&
+              getSelectedDeviceFamilyName() !== "dwlr" && (
+                <CommonParametersForm
+                  commonInputValues={commonInputValues}
+                  onCommonParamsChange={(values) => {
+                    setCommonInputValues(values);
+                    setCommonParams(values);
+                  }}
+                  errors={errors}
+                  isBRWHMS={getSelectedDeviceFamilyName() === "brwhms"}
+                />
+              )}
 
             {getSelectedDeviceFamilyName() === "tank" && (
               <TankParametersForm
@@ -680,10 +910,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 onTankParamsChange={(values) => {
                   setTankInputValues(values);
                   setTankParams({
-                    height: values.height === "" ? 0 : parseFloat(values.height) || 0,
-                    storageCapacity: values.storageCapacity === "" ? 0 : parseFloat(values.storageCapacity) || 0,
-                    sensorPostion: values.sensorPostion === "" ? 0 : parseFloat(values.sensorPostion) || 0,
-                    crossSectionArea: values.crossSectionArea === "" ? 0 : parseFloat(values.crossSectionArea) || 0,
+                    height:
+                      values.height === "" ? 0 : parseFloat(values.height) || 0,
+                    storageCapacity:
+                      values.storageCapacity === ""
+                        ? 0
+                        : parseFloat(values.storageCapacity) || 0,
+                    sensorPostion:
+                      values.sensorPostion === ""
+                        ? 0
+                        : parseFloat(values.sensorPostion) || 0,
+                    crossSectionArea:
+                      values.crossSectionArea === ""
+                        ? 0
+                        : parseFloat(values.crossSectionArea) || 0,
                   });
                 }}
                 errors={errors}
@@ -707,6 +947,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
+            {getSelectedDeviceFamilyName() === "dwlr" && (
+              <DWLRParametersForm
+                dwlrParams={dwlrParams}
+                onDWLRParamsChange={setDwlrParams}
+                errors={errors}
+              />
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-4 pt-4">

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../api.service";
 import type { SystemReporting, SystemResponse, SystemResult } from "../model/system.interface";
 import { handleApiError } from "../src/utils/errorHandler";
-import type { SingleSystemResponse } from "../model/single-interface";
+import type { SingleSystemResponse } from "../model/single-system.interface";
 
 interface SystemState {
   systems: SystemResult[];

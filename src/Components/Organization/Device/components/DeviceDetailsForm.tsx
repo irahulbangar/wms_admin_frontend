@@ -162,7 +162,7 @@ const DeviceDetailsForm: React.FC<DeviceDetailsFormProps> = ({
             value={formData.hwid}
             onChange={handleInputChange}
             placeholder="Enter HWID number"
-            maxLength={16}
+            maxLength={20}
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
               errors.hwid ? "border-status-danger" : "border-border-primary"
             }`}
