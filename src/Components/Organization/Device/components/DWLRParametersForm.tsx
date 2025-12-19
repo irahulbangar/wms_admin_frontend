@@ -1,3 +1,4 @@
+import { MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
 interface SensorParam {
@@ -17,7 +18,6 @@ interface SensorParam {
 interface DeviceParams {
   serial: string;
   identifier: string;
-  model_id: string;
   cable_length: string;
   lat: string;
   lng: string;
@@ -153,25 +153,6 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
 
         <div>
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-            Model ID
-          </label>
-          <input
-            type="text"
-            value={dwlrParams.device_params.model_id}
-            onChange={(e) =>
-              handleDeviceParamChange("model_id", e.target.value)
-            }
-            placeholder="Enter model ID"
-            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-              errors["device_params.model_id"]
-                ? "border-status-danger"
-                : "border-border-primary"
-            }`}
-          />
-        </div>
-
-        <div>
-          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Cable Length
           </label>
           <input
@@ -283,7 +264,13 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
           <label className="block text-lg font-normal text-text-primary font-roboto">
             {label}
           </label>
-          <span className="text-text-primary">{isExpanded ? "−" : "+"}</span>
+          <span className="text-text-primary">
+            {isExpanded ? (
+              <MinusIcon className="w-3 h-3 text-text-primary cursor-pointer font-bold" />
+            ) : (
+              <PlusIcon className="w-3 h-3 text-text-primary cursor-pointer font-bold" />
+            )}
+          </span>
         </button>
 
         {isExpanded && (
@@ -531,12 +518,12 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
   return (
     <>
       <div>
-        <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+        <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-2">
           DWLR Parameters
         </label>
       </div>
 
-      <div className="pt-4 space-y-4">
+      <div className="pt-1 flex flex-col gap-4">
         <div className="border border-border-primary rounded-lg p-4">
           <button
             type="button"
@@ -547,7 +534,11 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
               Device Parameter
             </label>
             <span className="text-text-primary">
-              {expandedSections.device_params ? "−" : "+"}
+              {expandedSections.device_params ? (
+                <MinusIcon className="w-3 h-3 text-text-primary cursor-pointer font-bold" />
+              ) : (
+                <PlusIcon className="w-3 h-3 text-text-primary cursor-pointer font-bold" />
+              )}
             </span>
           </button>
           {expandedSections.device_params && (

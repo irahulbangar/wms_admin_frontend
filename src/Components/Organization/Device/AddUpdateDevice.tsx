@@ -241,7 +241,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     device_params: {
       serial: "",
       identifier: "",
-      model_id: "",
       cable_length: "",
       lat: "",
       lng: "",
@@ -365,7 +364,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       device_params: {
         serial: "",
         identifier: "",
-        model_id: "",
         cable_length: "",
         lat: "",
         lng: "",
@@ -471,10 +469,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               device_params: {
                 serial: dwlrParams.device_params.serial || "",
                 identifier: dwlrParams.device_params.identifier || "",
-                model_id:
-                  dwlrParams.device_params.model_id === ""
-                    ? 0
-                    : parseInt(dwlrParams.device_params.model_id) || 0,
                 cable_length:
                   dwlrParams.device_params.cable_length === ""
                     ? 0
@@ -673,15 +667,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 ref_percent: param?.ref_percent?.toString() || "",
               });
 
-              const dwlData = {
+              const dwlrData = {
                 device_params: {
                   serial:
                     deviceData.params?.device_params?.serial?.toString() || "",
                   identifier:
                     deviceData.params?.device_params?.identifier?.toString() ||
-                    "",
-                  model_id:
-                    deviceData.params?.device_params?.model_id?.toString() ||
                     "",
                   cable_length:
                     deviceData.params?.device_params?.cable_length?.toString() ||
@@ -727,7 +718,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 param_5: convertSensorParam(deviceData.params?.param_5),
                 param_6: convertSensorParam(deviceData.params?.param_6),
               };
-              setDwlrParams(dwlData);
+              setDwlrParams(dwlrData);
             }
 
             if (deviceData.device_reporting) {
