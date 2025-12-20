@@ -23,6 +23,7 @@ interface DeviceParams {
   lng: string;
   installation_date: string;
   daily_msgs_count: string;
+  undermentance: boolean;
 }
 
 interface DWLRParams {
@@ -85,7 +86,7 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
 
   const handleDeviceParamChange = (
     field: keyof DeviceParams,
-    value: string
+    value: string | boolean
   ) => {
     onDWLRParamsChange({
       ...dwlrParams,
@@ -241,6 +242,19 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
                 ? "border-status-danger"
                 : "border-border-primary"
             }`}
+          />
+        </div>
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Undermentance
+          </label>
+          <input
+            type="checkbox"
+            checked={dwlrParams.device_params.undermentance}
+            onChange={(e) =>
+              handleDeviceParamChange("undermentance", e.target.checked)
+            }
+            className="w-4 h-4"
           />
         </div>
       </div>
