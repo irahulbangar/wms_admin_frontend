@@ -2,7 +2,7 @@ import { MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
 interface SensorParam {
-  enable: boolean;
+  enable: number;
   name: string;
   unit: string;
   multipliers: string;
@@ -88,7 +88,7 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
 
   const handleDeviceParamChange = (
     field: keyof DeviceParams,
-    value: string | boolean
+    value: string | number
   ) => {
     onDWLRParamsChange({
       ...dwlrParams,
@@ -102,7 +102,7 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
   const handleSensorParamChange = (
     sensorKey: keyof DWLRParams,
     field: keyof SensorParam,
-    value: string | boolean
+    value: string | number
   ) => {
     onDWLRParamsChange({
       ...dwlrParams,
@@ -290,7 +290,7 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
             type="checkbox"
             checked={dwlrParams.device_params.undermentance}
             onChange={(e) =>
-              handleDeviceParamChange("undermentance", e.target.checked)
+              handleDeviceParamChange("undermentance", e.target.checked ? 1 : 0)
             }
             className="w-4 h-4"
           />
@@ -340,9 +340,13 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
-                checked={sensor.enable}
+                checked={sensor.enable === 1}
                 onChange={(e) =>
-                  handleSensorParamChange(sensorKey, "enable", e.target.checked)
+                  handleSensorParamChange(
+                    sensorKey,
+                    "enable",
+                    e.target.checked ? 1 : 0
+                  )
                 }
                 className="w-4 h-4"
               />

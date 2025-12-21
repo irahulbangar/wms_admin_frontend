@@ -212,7 +212,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
 
   const createDefaultSensorParam = (): {
-    enable: boolean;
+    enable: number;
     name: string;
     unit: string;
     multipliers: string;
@@ -224,7 +224,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     ref_val: string;
     ref_percent: string;
   } => ({
-    enable: false,
+    enable: 0,
     name: "",
     unit: "",
     multipliers: "",
@@ -403,7 +403,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
   const convertSensorParam = (
     param: {
-      enable: boolean;
+      enable: number;
       name: string;
       unit: string;
       multipliers: string;
@@ -427,7 +427,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       sensorKey && sensorsWithoutNameUnit.includes(sensorKey);
 
     const baseResult = {
-      enable: param.enable || false,
+      enable: param.enable || 0,
       multipliers:
         param.multipliers === "" ? 0 : parseFloat(param.multipliers) || 0,
       min: param.min === "" ? 0 : parseInt(param.min) || 0,
@@ -692,7 +692,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               });
             } else if (familyName === "dwlr") {
               const convertSensorParam = (param: any) => ({
-                enable: param?.enable || false,
+                enable: param?.enable || 0,
                 name: param?.name?.toString() || "",
                 unit: param?.unit?.toString() || "",
                 multipliers: param?.multipliers?.toString() || "",
