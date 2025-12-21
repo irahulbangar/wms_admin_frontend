@@ -799,6 +799,81 @@ export const getARGCustomReportData = createAsyncThunk(
   }
 );
 
+interface GetDWLRRuntimeDataPayload {
+  plantId: number;
+  deviceId: number;
+  date: string;
+}
+
+// get DWLR runtime data
+export const getDWLRRuntimeData = createAsyncThunk(
+  "device/getDWLRRuntimeData",
+  async ({ plantId, deviceId, date }: GetDWLRRuntimeDataPayload, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/dwlr/admin/device/dwlr-logs/${plantId}/${deviceId}`,
+        {
+          date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetDWLRCustomReportDataPayload {
+  plantId: number;
+  deviceId: number;
+  from_date: string;
+  to_date: string;
+  duration: string;
+}
+
+// get DWLR custom report data
+export const getDWLRCustomReportData = createAsyncThunk(
+  "device/getDWLRCustomReportData",
+  async (
+    {
+      plantId,
+      deviceId,
+      from_date,
+      to_date,
+      duration,
+    }: GetDWLRCustomReportDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/dwlr/admin/device/dwlr-reports/${plantId}/${deviceId}`,
+        {
+          from_date,
+          to_date,
+          duration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;

@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Download, Loader2, Home, ChevronRight } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
-import type { PHMCReportResult } from "../../../../../model/phmc-device.interface";
+import type { DwlrDeviceResultItem } from "../../../../../model/dwlr-device.interface";
+
 import {
-  getPHMCRuntimeData,
-  getPHMCCustomReportData,
+  getDWLRRuntimeData,
+  getDWLRCustomReportData,
   setDevices,
 } from "../../../../../store/deviceSlice";
 import { useAppDispatch } from "../../../../../store/store";
@@ -16,21 +17,19 @@ import {
   getOneWeekAgoDate,
   getTodayDate,
   reportTypeDurationMap,
-  calculateNumericAverage,
 } from "./utils/reportUtils";
 import { useGetAllDevicesQuery } from "../../../../../store/rtkQuery";
 
 type TabType = "runtime" | "custom";
 type ReportType = "1day" | "15min" | "1hour";
 
-const PHMCReport: React.FC = () => {
+const DWLRReport: React.FC = () => {
   const { plant_id, device_id } = useParams<{
     plant_id: string;
     device_id: string;
   }>();
   const dispatch = useAppDispatch();
-
-  const _plantId = plant_id ? parseInt(plant_id) : 0;
+  const plantId = plant_id ? parseInt(plant_id) : 0;
   const deviceId = device_id ? parseInt(device_id) : 0;
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab") as TabType | null;
@@ -41,11 +40,11 @@ const PHMCReport: React.FC = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [runtimeReportData, setRuntimeReportData] = useState<
-    PHMCReportResult[]
+    DwlrDeviceResultItem[]
   >([]);
-  const [customReportData, setCustomReportData] = useState<PHMCReportResult[]>(
-    []
-  );
+  const [customReportData, setCustomReportData] = useState<
+    DwlrDeviceResultItem[]
+  >([]);
   const [device, setDevice] = useState<DeviceResult | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
@@ -101,6 +100,14 @@ const PHMCReport: React.FC = () => {
     );
   }, [customReportData, currentPage, rowsPerPage]);
 
+  // Sync tab state with URL parameter
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") as TabType | null;
+    if (tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (deviceId) {
       const foundDevice = devicesData?.data?.find(
@@ -112,7 +119,7 @@ const PHMCReport: React.FC = () => {
         fetchDevices();
       }
     }
-  }, [deviceId, devicesData, dispatch, fetchDevices]);
+  }, [deviceId, devicesData, fetchDevices]);
 
   const [runtimeDate, setRuntimeDate] = useState<string>(getTodayDate());
 
@@ -120,23 +127,16 @@ const PHMCReport: React.FC = () => {
   const [fromDate, setFromDate] = useState<string>(getOneWeekAgoDate());
   const [toDate, setToDate] = useState<string>(getTodayDate());
 
-  useEffect(() => {
-    const tabFromUrl = searchParams.get("tab") as TabType | null;
-    if (tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [searchParams]);
-
   const handleGetData = useCallback(async () => {
-    if (!deviceId || !_plantId) return;
+    if (!deviceId || !plantId) return;
 
     setIsLoading(true);
     setCurrentPage(1);
     try {
       if (activeTab === "runtime") {
         await dispatch(
-          getPHMCRuntimeData({
-            plantId: _plantId,
+          getDWLRRuntimeData({
+            plantId: plantId,
             deviceId,
             date: runtimeDate,
           })
@@ -155,8 +155,8 @@ const PHMCReport: React.FC = () => {
           });
       } else {
         await dispatch(
-          getPHMCCustomReportData({
-            plantId: _plantId,
+          getDWLRCustomReportData({
+            plantId: plantId,
             deviceId,
             from_date: `${fromDate} 00:00:00`,
             to_date: `${toDate} 00:00:00`,
@@ -183,7 +183,7 @@ const PHMCReport: React.FC = () => {
     }
   }, [
     deviceId,
-    _plantId,
+    plantId,
     activeTab,
     runtimeDate,
     fromDate,
@@ -193,7 +193,7 @@ const PHMCReport: React.FC = () => {
   ]);
 
   useEffect(() => {
-    if (deviceId && _plantId) {
+    if (deviceId && plantId) {
       const shouldFetch =
         prevActiveTabRef.current === null ||
         prevActiveTabRef.current !== activeTab;
@@ -202,7 +202,7 @@ const PHMCReport: React.FC = () => {
         prevActiveTabRef.current = activeTab;
       }
     }
-  }, [deviceId, _plantId, activeTab, handleGetData]);
+  }, [deviceId, plantId, activeTab, handleGetData]);
 
   const handleDownloadCSV = () => {
     const dataToExport =
@@ -213,58 +213,27 @@ const PHMCReport: React.FC = () => {
       "SR No",
       "From Time",
       "To Time",
-      "Voltage (R)",
-      "Voltage (Y)",
-      "Voltage (B)",
-      "Current (R)",
-      "Current (Y)",
-      "Current (B)",
-      "Frequency",
+      "Flow (Ltr)",
+      "Totalizer (Ltr)",
     ];
 
     const csvContent = [
       headers.join(","),
       ...dataToExport.map((item, index) => {
-        const voltageRAvg = calculateNumericAverage(
-          item.first_record?.voltage_r,
-          item.last_record?.voltage_r
-        );
-        const voltageYAvg = calculateNumericAverage(
-          item.first_record?.voltage_y,
-          item.last_record?.voltage_y
-        );
-        const voltageBAvg = calculateNumericAverage(
-          item.first_record?.voltage_b,
-          item.last_record?.voltage_b
-        );
-        const currentRAvg = calculateNumericAverage(
-          item.first_record?.Current_r,
-          item.last_record?.Current_r
-        );
-        const currentYAvg = calculateNumericAverage(
-          item.first_record?.Current_y,
-          item.last_record?.Current_y
-        );
-        const currentBAvg = calculateNumericAverage(
-          item.first_record?.Current_b,
-          item.last_record?.Current_b
-        );
-        const frequencyAvg = calculateNumericAverage(
-          item.first_record?.Frequency,
-          item.last_record?.Frequency
-        );
-
+        const fromTime =
+          activeTab === "runtime"
+            ? formatDateForCSV(item.log_time)
+            : formatDateForCSV(item.log_time);
+        const toTime =
+          activeTab === "runtime"
+            ? formatDateForCSV(item.log_time)
+            : formatDateForCSV(item.log_time);
         return [
           index + 1,
-          formatDateForCSV(item.from_time),
-          formatDateForCSV(item.to_time),
-          voltageRAvg !== null ? `${(voltageRAvg / 10).toFixed(2)} V` : "-",
-          voltageYAvg !== null ? `${(voltageYAvg / 10).toFixed(2)} V` : "-",
-          voltageBAvg !== null ? `${(voltageBAvg / 10).toFixed(2)} V` : "-",
-          currentRAvg !== null ? `${currentRAvg.toFixed(1)} A` : "-",
-          currentYAvg !== null ? `${currentYAvg.toFixed(1)} A` : "-",
-          currentBAvg !== null ? `${currentBAvg.toFixed(1)} A` : "-",
-          frequencyAvg !== null ? `${frequencyAvg.toFixed(1)} Hz` : "-",
+          fromTime,
+          toTime,
+          item.water_column,
+          item.water_column_from_ground,
         ].join(",");
       }),
     ].join("\n");
@@ -275,7 +244,7 @@ const PHMCReport: React.FC = () => {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `phmc-${activeTab}-report-${deviceId}-${
+      `dwlr-${activeTab}-report-${deviceId}-${
         new Date().toISOString().split("T")[0]
       }.csv`
     );
@@ -297,7 +266,7 @@ const PHMCReport: React.FC = () => {
   return (
     <div className="flex flex-col gap-4 overflow-x-hidden h-full">
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
           <button
             onClick={handleBackToHome}
@@ -365,7 +334,7 @@ const PHMCReport: React.FC = () => {
 
       <div className="flex flex-col gap-4 h-full">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex gap-4 justify-center items-center">
+          <div className="flex gap-2 justify-center items-center">
             <button
               onClick={() => {
                 setActiveTab("runtime");
@@ -395,7 +364,6 @@ const PHMCReport: React.FC = () => {
               <span>Custom Report</span>
             </button>
           </div>
-
           {activeTab === "runtime" && (
             <div className="flex items-center justify-end gap-4 flex-wrap">
               <div className="flex flex-col gap-2">
@@ -508,6 +476,7 @@ const PHMCReport: React.FC = () => {
             </div>
           )}
         </div>
+
         {activeTab === "runtime" && (
           <>
             {isLoading ? (
@@ -522,7 +491,7 @@ const PHMCReport: React.FC = () => {
                       handlePaginatedRuntimeReportData.length > 0
                         ? "h-auto"
                         : "h-full"
-                    } min-w-[1400px]`}
+                    } min-w-[800px]`}
                   >
                     <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                       <tr>
@@ -536,25 +505,10 @@ const PHMCReport: React.FC = () => {
                           To Time
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Voltage (R)
+                          Flow
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Voltage (Y)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Voltage (B)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Current (R)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Current (Y)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Current (B)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Frequency
+                          Totalizer
                         </th>
                       </tr>
                     </thead>
@@ -569,93 +523,22 @@ const PHMCReport: React.FC = () => {
                               {(currentPage - 1) * rowsPerPage + index + 1}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {formatDateForCSV(item.from_time)}
+                              {formatDateForCSV(item.log_time)}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {formatDateForCSV(item.to_time)}
+                              {formatDateForCSV(item.log_time)}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.voltage_r,
-                                  item.last_record?.voltage_r
-                                );
-                                return avg !== null
-                                  ? `${(avg / 10).toFixed(2)} V`
-                                  : "-";
-                              })()}
+                              {item.water_column}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.voltage_y,
-                                  item.last_record?.voltage_y
-                                );
-                                return avg !== null
-                                  ? `${(avg / 10).toFixed(2)} V`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.voltage_b,
-                                  item.last_record?.voltage_b
-                                );
-                                return avg !== null
-                                  ? `${(avg / 10).toFixed(2)} V`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Current_r,
-                                  item.last_record?.Current_r
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} A`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Current_y,
-                                  item.last_record?.Current_y
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} A`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Current_b,
-                                  item.last_record?.Current_b
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} A`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Frequency,
-                                  item.last_record?.Frequency
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} Hz`
-                                  : "-";
-                              })()}
+                              {item.water_column_from_ground}
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={13} className="px-6 py-8 text-center">
+                          <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
                                 Click on get data button to get the data.
@@ -695,7 +578,7 @@ const PHMCReport: React.FC = () => {
                       handlePaginatedCustomReportData.length > 0
                         ? "h-auto"
                         : "h-full"
-                    } min-w-[1400px]`}
+                    } min-w-[800px]`}
                   >
                     <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                       <tr>
@@ -709,25 +592,10 @@ const PHMCReport: React.FC = () => {
                           To Time
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Voltage (R)
+                          Flow (Ltr)
                         </th>
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Voltage (Y)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Voltage (B)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Current (R)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Current (Y)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Current (B)
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Frequency
+                          Totalizer (Ltr)
                         </th>
                       </tr>
                     </thead>
@@ -742,93 +610,22 @@ const PHMCReport: React.FC = () => {
                               {(currentPage - 1) * rowsPerPage + index + 1}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {formatDateForCSV(item.from_time)}
+                              {formatDateForCSV(item.log_time)}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {formatDateForCSV(item.to_time)}
+                              {formatDateForCSV(item.log_time)}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.voltage_r,
-                                  item.last_record?.voltage_r
-                                );
-                                return avg !== null
-                                  ? `${(avg / 10).toFixed(2)} V`
-                                  : "-";
-                              })()}
+                              {item.water_column}
                             </td>
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.voltage_y,
-                                  item.last_record?.voltage_y
-                                );
-                                return avg !== null
-                                  ? `${(avg / 10).toFixed(2)} V`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.voltage_b,
-                                  item.last_record?.voltage_b
-                                );
-                                return avg !== null
-                                  ? `${(avg / 10).toFixed(2)} V`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Current_r,
-                                  item.last_record?.Current_r
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} A`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Current_y,
-                                  item.last_record?.Current_y
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} A`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Current_b,
-                                  item.last_record?.Current_b
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} A`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg = calculateNumericAverage(
-                                  item.first_record?.Frequency,
-                                  item.last_record?.Frequency
-                                );
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} Hz`
-                                  : "-";
-                              })()}
+                              {item.water_column_from_ground}
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={13} className="px-6 py-8 text-center">
+                          <td colSpan={5} className="px-6 py-8 text-center">
                             <div className="flex items-center justify-center">
                               <span className="text-text-secondary font-roboto">
                                 Click on get data button to get the data.
@@ -857,4 +654,4 @@ const PHMCReport: React.FC = () => {
   );
 };
 
-export default PHMCReport;
+export default DWLRReport;

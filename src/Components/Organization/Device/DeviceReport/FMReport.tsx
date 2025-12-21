@@ -399,7 +399,7 @@ const FMReport: React.FC = () => {
                 <select
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value as ReportType)}
-                  className="px-3 w-48 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto cursor-pointer"
+                  className="px-3 w-48 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto cursor-pointer"
                 >
                   <option value="15min">15 Min</option>
                   <option value="1hour">Hour</option>
