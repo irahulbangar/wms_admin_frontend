@@ -143,7 +143,7 @@ export interface Param1 {
   min: number;
   name: string;
   unit: string;
-  enable: boolean;
+  enable: number;
   ref_val: number;
   set_max: number;
   set_min: number;
@@ -254,11 +254,13 @@ export interface DeviceParams {
   lat: number;
   lng: number;
   serial: string;
-  model_id: number;
+  address: string;
+  sitename: string;
   identifier: string;
   cable_length: number;
   daily_msgs_count: number;
   installation_date: string;
+  undermentance: number;
 }
 
 export interface SensorVoltage {
