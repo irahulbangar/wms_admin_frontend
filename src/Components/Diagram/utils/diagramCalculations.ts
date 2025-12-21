@@ -529,6 +529,31 @@ export const convertDevicesToDiagram = (
           nodes.push(argNode);
         });
 
+        const dwlrs = system.devices.filter(
+          (device: DeviceResult) =>
+            device.device_family_type === "dwlr" ||
+            device.device_family?.toLowerCase().includes("dwlr")
+        );
+
+        dwlrs.forEach((device: DeviceResult, dwlrIndex: number) => {
+          const deviceId = `${systemId}-dwlr${dwlrIndex + 1}`;
+          const dwlrNode = createDWLRNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            dwlrIndex,
+            dwlrs.length,
+            tanks.length +
+              fms.length +
+              brwhms.length +
+              phmcs.length +
+              args.length
+          );
+          nodes.push(dwlrNode);
+        });
+
         const virtuals = system.devices.filter(
           (device: DeviceResult) =>
             (device.device_family_type === "virtual" ||
@@ -550,7 +575,8 @@ export const convertDevicesToDiagram = (
               fms.length +
               brwhms.length +
               phmcs.length +
-              args.length
+              args.length +
+              dwlrs.length
           );
           nodes.push(virtualNode);
         });
@@ -577,6 +603,7 @@ export const convertDevicesToDiagram = (
               brwhms.length +
               phmcs.length +
               args.length +
+              dwlrs.length +
               virtuals.length
           );
           nodes.push(resultantNode);
@@ -1059,6 +1086,101 @@ const createARGNode = (
     type: "arg",
     width: argWidth,
     height: argHeight,
+  };
+};
+
+const createDWLRNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  dwlrIndex: number,
+  totalDWLRs: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const dwlrWidth = 100;
+  const dwlrHeight = 120;
+  const sideMargin = 30;
+  const dwlrSpacing = 20;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxDevicesPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (dwlrWidth + dwlrSpacing))
+  );
+  const totalRows = Math.ceil(totalDWLRs / maxDevicesPerRow);
+
+  const footerHeight = 20;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 500 : 0;
+
+  const dwlrStartY = previousDevicesHeight + 60;
+  const availableHeight = groupHeight - dwlrStartY - footerHeight;
+
+  const dwlrSectionHeight = Math.min(
+    availableHeight * 0.6,
+    totalRows * (dwlrHeight + 40) + 60
+  );
+
+  const dwlrVerticalSpacing =
+    totalRows > 1
+      ? Math.max(
+          40,
+          Math.min(
+            70,
+            (dwlrSectionHeight - totalRows * dwlrHeight) / (totalRows - 1)
+          )
+        )
+      : 0;
+
+  const row = Math.floor(dwlrIndex / maxDevicesPerRow);
+  const col = dwlrIndex % maxDevicesPerRow;
+
+  const totalDevicesInRow = Math.min(
+    maxDevicesPerRow,
+    totalDWLRs - row * maxDevicesPerRow
+  );
+  const rowWidth =
+    totalDevicesInRow * dwlrWidth + (totalDevicesInRow - 1) * dwlrSpacing;
+  const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+  const deviceX = startX + col * (dwlrWidth + dwlrSpacing);
+  const deviceY = dwlrStartY + 30 + row * (dwlrHeight + dwlrVerticalSpacing);
+
+  const maxX = groupWidth - dwlrWidth - sideMargin;
+  const maxY = groupHeight - dwlrHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const waterColumn = Number((device.last_record as any)?.water_column) || 0;
+  const batteryVoltage =
+    Number((device.last_record as any)?.battery_voltage) || 0;
+  const unit = device.unit || "mm";
+
+  const dwlrNodeData: NodeData = {
+    label: device.device_name,
+    type: "bidirectional",
+    direction: "bidirectional",
+    unit: unit,
+    isActive: device.device_status === "active",
+    currentLevel: waterColumn,
+    reportValue: waterColumn,
+    voltageR: batteryVoltage * 10, // Store as integer (multiply by 10 for display)
+    lastRecordTime: device.last_record_time || "",
+    systemName: device.system_name || "",
+    organizationConnection: device.organization_connection || "",
+  };
+
+  return {
+    id: deviceId,
+    data: dwlrNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "dwlr",
+    width: dwlrWidth,
+    height: dwlrHeight,
   };
 };
 

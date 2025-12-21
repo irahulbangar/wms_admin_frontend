@@ -3,6 +3,7 @@ import FMNode from "./FMNode";
 import BRWHMSNode from "./BRWHMSNode";
 import PHMCNode from "./PHMCNode";
 import ARGNode from "./ARGNode";
+import DWLRNode from "./DWLRNode";
 import GroupNodeWrapper from "./GroupNodeWrapper";
 import SourceNode from "./SourceNode";
 import SinkNode from "./SinkNode";
@@ -15,6 +16,7 @@ export const nodeTypes = {
   brwhms: BRWHMSNode,
   phmc: PHMCNode,
   arg: ARGNode,
+  dwlr: DWLRNode,
   group: GroupNodeWrapper,
   source: SourceNode,
   sink: SinkNode,
