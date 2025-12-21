@@ -303,6 +303,16 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
     const sensor = dwlrParams[sensorKey] as SensorParam;
     const isExpanded = expandedSections[sensorKey];
 
+    const sensorsWithoutNameUnit = [
+      "water_column",
+      "water_temperature",
+      "water_pressure",
+      "water_column_from_ground",
+    ];
+    const shouldHideNameUnit = sensorsWithoutNameUnit.includes(
+      sensorKey as string
+    );
+
     return (
       <div
         key={sensorKey}
@@ -342,45 +352,49 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={sensor.name}
-                  onChange={(e) =>
-                    handleSensorParamChange(sensorKey, "name", e.target.value)
-                  }
-                  placeholder="Enter name"
-                  maxLength={50}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors[`${sensorKey}.name`]
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
+              {!shouldHideNameUnit && (
+                <div>
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={sensor.name}
+                    onChange={(e) =>
+                      handleSensorParamChange(sensorKey, "name", e.target.value)
+                    }
+                    placeholder="Enter name"
+                    maxLength={50}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors[`${sensorKey}.name`]
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
+                  />
+                </div>
+              )}
 
-              <div>
-                <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                  Unit
-                </label>
-                <input
-                  type="text"
-                  value={sensor.unit}
-                  onChange={(e) =>
-                    handleSensorParamChange(sensorKey, "unit", e.target.value)
-                  }
-                  placeholder="Enter unit"
-                  maxLength={20}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-                    errors[`${sensorKey}.unit`]
-                      ? "border-status-danger"
-                      : "border-border-primary"
-                  }`}
-                />
-              </div>
+              {!shouldHideNameUnit && (
+                <div>
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                    Unit
+                  </label>
+                  <input
+                    type="text"
+                    value={sensor.unit}
+                    onChange={(e) =>
+                      handleSensorParamChange(sensorKey, "unit", e.target.value)
+                    }
+                    placeholder="Enter unit"
+                    maxLength={20}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+                      errors[`${sensorKey}.unit`]
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-base font-normal text-text-primary mb-2 font-roboto">

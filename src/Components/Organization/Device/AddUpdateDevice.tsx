@@ -401,33 +401,55 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     setErrors({});
   };
 
-  const convertSensorParam = (param: {
-    enable: boolean;
-    name: string;
-    unit: string;
-    multipliers: string;
-    min: string;
-    max: string;
-    set_limit: string;
-    set_min: string;
-    set_max: string;
-    ref_val: string;
-    ref_percent: string;
-  }) => ({
-    enable: param.enable || false,
-    name: param.name || "",
-    unit: param.unit || "",
-    multipliers:
-      param.multipliers === "" ? 0 : parseFloat(param.multipliers) || 0,
-    min: param.min === "" ? 0 : parseInt(param.min) || 0,
-    max: param.max === "" ? 0 : parseInt(param.max) || 0,
-    set_limit: param.set_limit === "" ? 0 : parseInt(param.set_limit) || 0,
-    set_min: param.set_min === "" ? 0 : parseInt(param.set_min) || 0,
-    set_max: param.set_max === "" ? 0 : parseInt(param.set_max) || 0,
-    ref_val: param.ref_val === "" ? 0 : parseFloat(param.ref_val) || 0,
-    ref_percent:
-      param.ref_percent === "" ? 0 : parseFloat(param.ref_percent) || 0,
-  });
+  const convertSensorParam = (
+    param: {
+      enable: boolean;
+      name: string;
+      unit: string;
+      multipliers: string;
+      min: string;
+      max: string;
+      set_limit: string;
+      set_min: string;
+      set_max: string;
+      ref_val: string;
+      ref_percent: string;
+    },
+    sensorKey?: string
+  ) => {
+    const sensorsWithoutNameUnit = [
+      "water_column",
+      "water_temperature",
+      "water_pressure",
+      "water_column_from_ground",
+    ];
+    const shouldExcludeNameUnit =
+      sensorKey && sensorsWithoutNameUnit.includes(sensorKey);
+
+    const baseResult = {
+      enable: param.enable || false,
+      multipliers:
+        param.multipliers === "" ? 0 : parseFloat(param.multipliers) || 0,
+      min: param.min === "" ? 0 : parseInt(param.min) || 0,
+      max: param.max === "" ? 0 : parseInt(param.max) || 0,
+      set_limit: param.set_limit === "" ? 0 : parseInt(param.set_limit) || 0,
+      set_min: param.set_min === "" ? 0 : parseInt(param.set_min) || 0,
+      set_max: param.set_max === "" ? 0 : parseInt(param.set_max) || 0,
+      ref_val: param.ref_val === "" ? 0 : parseFloat(param.ref_val) || 0,
+      ref_percent:
+        param.ref_percent === "" ? 0 : parseFloat(param.ref_percent) || 0,
+    };
+
+    if (!shouldExcludeNameUnit) {
+      return {
+        ...baseResult,
+        name: param.name || "",
+        unit: param.unit || "",
+      };
+    }
+
+    return baseResult;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -496,18 +518,26 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     ? 0
                     : parseInt(dwlrParams.device_params.daily_msgs_count) || 0,
               },
-              water_column: convertSensorParam(dwlrParams.water_column),
-              water_temperature: convertSensorParam(
-                dwlrParams.water_temperature
+              water_column: convertSensorParam(
+                dwlrParams.water_column,
+                "water_column"
               ),
-              water_pressure: convertSensorParam(dwlrParams.water_pressure),
+              water_temperature: convertSensorParam(
+                dwlrParams.water_temperature,
+                "water_temperature"
+              ),
+              water_pressure: convertSensorParam(
+                dwlrParams.water_pressure,
+                "water_pressure"
+              ),
               ambient_temperature: convertSensorParam(
                 dwlrParams.ambient_temperature
               ),
               ambient_pressure: convertSensorParam(dwlrParams.ambient_pressure),
               msg_time: convertSensorParam(dwlrParams.msg_time),
               water_column_from_ground: convertSensorParam(
-                dwlrParams.water_column_from_ground
+                dwlrParams.water_column_from_ground,
+                "water_column_from_ground"
               ),
               sensor_voltage: convertSensorParam(dwlrParams.sensor_voltage),
               battery_voltage: convertSensorParam(dwlrParams.battery_voltage),
