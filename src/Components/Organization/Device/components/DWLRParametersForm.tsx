@@ -24,6 +24,8 @@ interface DeviceParams {
   installation_date: string;
   daily_msgs_count: string;
   undermentance: boolean;
+  sitename: string;
+  address: string;
 }
 
 interface DWLRParams {
@@ -126,6 +128,42 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
             maxLength={50}
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
               errors["device_params.serial"]
+                ? "border-status-danger"
+                : "border-border-primary"
+            }`}
+          />
+        </div>
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Sitename
+          </label>
+          <input
+            type="text"
+            value={dwlrParams.device_params.sitename}
+            onChange={(e) =>
+              handleDeviceParamChange("sitename", e.target.value)
+            }
+            placeholder="Enter sitename"
+            maxLength={100}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+              errors["device_params.sitename"]
+                ? "border-status-danger"
+                : "border-border-primary"
+            }`}
+          />
+        </div>
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Address
+          </label>
+          <input
+            type="text"
+            value={dwlrParams.device_params.address}
+            onChange={(e) => handleDeviceParamChange("address", e.target.value)}
+            placeholder="Enter address"
+            maxLength={100}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+              errors["device_params.address"]
                 ? "border-status-danger"
                 : "border-border-primary"
             }`}

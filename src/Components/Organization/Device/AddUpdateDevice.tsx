@@ -239,6 +239,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
   const [dwlrParams, setDwlrParams] = useState({
     device_params: {
+      sitename: "",
+      address: "",
       serial: "",
       identifier: "",
       cable_length: "",
@@ -363,6 +365,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     });
     setDwlrParams({
       device_params: {
+        sitename: "",
+        address: "",
         serial: "",
         identifier: "",
         cable_length: "",
@@ -469,6 +473,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
           } else if (deviceFamilyName === "dwlr") {
             const convertedDwlParams = {
               device_params: {
+                sitename: dwlrParams.device_params.sitename || "",
+                address: dwlrParams.device_params.address || "",
                 serial: dwlrParams.device_params.serial || "",
                 identifier: dwlrParams.device_params.identifier || "",
                 cable_length:
@@ -671,6 +677,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
               const dwlrData = {
                 device_params: {
+                  sitename:
+                    deviceData.params?.device_params?.sitename?.toString() ||
+                    "",
+                  address:
+                    deviceData.params?.device_params?.address?.toString() || "",
                   serial:
                     deviceData.params?.device_params?.serial?.toString() || "",
                   identifier:
