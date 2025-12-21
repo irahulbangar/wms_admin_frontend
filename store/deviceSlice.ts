@@ -799,6 +799,43 @@ export const getARGCustomReportData = createAsyncThunk(
   }
 );
 
+interface DataSyncForDWLRDevicesPayload {
+  device_id: number;
+  year: string;
+  month: string;
+  data: object;
+}
+
+// data sync for DWLR devices
+export const dataSyncForDWLRDevices = createAsyncThunk(
+  "device/dataSyncForDWLRDevices",
+  async (
+    { device_id, year, month, data }: DataSyncForDWLRDevicesPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post<DataSyncResponse>(
+        `/dwlr/device/dwlr-new-data-sync/${device_id}`,
+        {
+          year,
+          month,
+          data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 interface GetDWLRRuntimeDataPayload {
   plantId: number;
   deviceId: number;

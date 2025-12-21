@@ -17,6 +17,7 @@ import {
   dataSyncForBTLMDevices,
   setDevices,
   dataSyncForPHMCDevices,
+  dataSyncForDWLRDevices,
 } from "../../../store/deviceSlice";
 import { Error, Success } from "../../utils/toast";
 import { useGetAllDevicesQuery } from "../../../store/rtkQuery";
@@ -100,7 +101,8 @@ const DataSync = () => {
       family.type?.toLowerCase() === "fm" ||
       family.type?.toLowerCase() === "brwhms" ||
       family.type?.toLowerCase() === "tank" ||
-      family.type?.toLowerCase() === "phmc"
+      family.type?.toLowerCase() === "phmc" ||
+      family.type?.toLowerCase() === "dwlr"
   );
 
   const filteredDevices = deviceFamilyId
@@ -666,6 +668,13 @@ const DataSync = () => {
       });
     } else if (familyType === "phmc") {
       syncData = dataSyncForPHMCDevices({
+        device_id: Number(deviceId),
+        year: monthYear.split("-")[0],
+        month: monthYear.split("-")[1],
+        data: csvData,
+      });
+    } else if (familyType === "dwlr") {
+      syncData = dataSyncForDWLRDevices({
         device_id: Number(deviceId),
         year: monthYear.split("-")[0],
         month: monthYear.split("-")[1],

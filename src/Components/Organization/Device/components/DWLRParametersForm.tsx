@@ -601,15 +601,10 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
         {renderSensorParam("water_column", "Water Column")}
         {renderSensorParam("water_temperature", "Water Temperature")}
         {renderSensorParam("water_pressure", "Water Pressure")}
-        {renderSensorParam("ambient_temperature", "Ambient Temperature")}
-        {renderSensorParam("ambient_pressure", "Ambient Pressure")}
-        {renderSensorParam("msg_time", "Message Time")}
         {renderSensorParam(
           "water_column_from_ground",
           "Water Column From Ground"
         )}
-        {renderSensorParam("sensor_voltage", "Sensor Voltage")}
-        {renderSensorParam("battery_voltage", "Battery Voltage")}
         {renderSensorParam("param_1", "Parameter 1")}
         {renderSensorParam("param_2", "Parameter 2")}
         {renderSensorParam("param_3", "Parameter 3")}
