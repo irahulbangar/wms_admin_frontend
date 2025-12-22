@@ -248,7 +248,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       lng: "",
       installation_date: "",
       daily_msgs_count: "",
-      undermentance: false,
+      undermentance: 0,
     },
     water_column: createDefaultSensorParam(),
     water_temperature: createDefaultSensorParam(),
@@ -374,7 +374,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         lng: "",
         installation_date: "",
         daily_msgs_count: "",
-        undermentance: false,
+        undermentance: 0,
       },
       water_column: createDefaultSensorParam(),
       water_temperature: createDefaultSensorParam(),
@@ -517,6 +517,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   dwlrParams.device_params.daily_msgs_count === ""
                     ? 0
                     : parseInt(dwlrParams.device_params.daily_msgs_count) || 0,
+                undermentance: dwlrParams.device_params.undermentance || 0,
               },
               water_column: convertSensorParam(
                 dwlrParams.water_column,
@@ -728,9 +729,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   daily_msgs_count:
                     deviceData.params?.device_params?.daily_msgs_count?.toString() ||
                     "",
-                  undermentance: deviceData.params?.device_params?.undermentance
-                    ? true
-                    : false,
+                  undermentance:
+                    deviceData.params?.device_params?.undermentance || 0,
                 },
                 water_column: convertSensorParam(
                   deviceData.params?.water_column

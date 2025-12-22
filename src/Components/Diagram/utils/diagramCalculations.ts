@@ -284,7 +284,7 @@ export const convertDevicesToDiagram = (
       id: sinkNodeId,
       data: {
         type: "sink",
-        label: `${plant.plant_name} Sink`,
+        label: `${plant.plant_name}`,
         flowRate: 0,
         totalizerReading: 0,
         unit: "Ltr",

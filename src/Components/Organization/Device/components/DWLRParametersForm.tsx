@@ -23,7 +23,7 @@ interface DeviceParams {
   lng: string;
   installation_date: string;
   daily_msgs_count: string;
-  undermentance: boolean;
+  undermentance: number;
   sitename: string;
   address: string;
 }
@@ -288,7 +288,7 @@ const DWLRParametersForm: React.FC<DWLRParametersFormProps> = ({
           </label>
           <input
             type="checkbox"
-            checked={dwlrParams.device_params.undermentance}
+            checked={dwlrParams.device_params.undermentance === 1}
             onChange={(e) =>
               handleDeviceParamChange("undermentance", e.target.checked ? 1 : 0)
             }

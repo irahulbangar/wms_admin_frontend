@@ -12,7 +12,7 @@ const SourceNode: React.FC<SourceNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-32 h-20 bg-gradient-to-br from-status-success to-status-success/80 border-2 rounded-xl p-2 z-10 ${
+      className={`relative w-32 h-20 bg-gradient-to-br from-status-success to-status-success/80 border-2 rounded-xl p-2 z-10 flex items-center justify-center ${
         isActive
           ? "border-status-success shadow-lg shadow-status-success/30"
           : "border-border-primary"
@@ -21,18 +21,10 @@ const SourceNode: React.FC<SourceNodeProps> = ({ data }) => {
 Device Name: ${deviceName}
       `}
     >
-
-      {/* Device Name */}
-      <div className="text-white font-roboto font-normal text-center mb-1 truncate px-1 text-sm">
+      <div className="text-white font-roboto font-normal text-start px-1 text-sm">
         {deviceName}
       </div>
 
-      {/* Flow Information */}
-      <div className="text-white font-roboto font-normal text-sm mb-0.5 text-center">
-        Source
-      </div>
-
-      {/* Output Handle */}
       <Handle
         type="source"
         position={HandlePosition.Right}
