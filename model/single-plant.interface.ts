@@ -84,6 +84,10 @@ export interface NodeData {
   firstMm?: number;
   reportValue?: number;
   reportType?: string;
+  waterColumn?: number;
+  batteryVoltage?: number;
+  waterTemperature?: number;
+  waterPressure?: number;
 }
 
 export interface Style {

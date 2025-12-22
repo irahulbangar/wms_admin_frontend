@@ -364,6 +364,36 @@ export const useDiagramData = (plantId: string | undefined) => {
               },
             };
           }
+        } else if (node?.type === "dwlr") {
+          const matchingDevice = deviceData?.find(
+            (device) =>
+              device?.device_name === node?.data?.label &&
+              (device?.device_family_type === "dwlr" ||
+                device?.device_family?.toLowerCase().includes("dwlr"))
+          );
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                waterColumn: Number(matchingDevice?.params?.water_column) || 0,
+                waterTemperature:
+                  Number(matchingDevice?.params?.water_temperature) || 0,
+                waterPressure:
+                  Number(matchingDevice?.params?.water_pressure) || 0,
+                batteryVoltage:
+                  Number(matchingDevice?.params?.battery_voltage) || 0,
+                deviceFamilyType: matchingDevice?.device_family_type,
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
+                organizationConnection: matchingDevice?.organization_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportType: matchingDevice?.report_type_name,
+              },
+            };
+          }
         } else if (node?.type === "virtual") {
           const matchingDevice = deviceData?.find(
             (device) =>
