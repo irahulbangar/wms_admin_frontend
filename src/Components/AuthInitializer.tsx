@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { checkAuthStatus, logout } from "../../store/adminSlice";
 import { jwtDecode } from "jwt-decode";
@@ -23,7 +22,6 @@ interface CustomJwtPayload {
 const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { isAuthenticated } = useAppSelector((state) => state.admin);
 
   useEffect(() => {
@@ -50,7 +48,7 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
           if (decodedToken.exp && decodedToken.exp < currentTime) {
             dispatch(logout());
             if (window.location.pathname !== "/login") {
-              navigate("/login", { replace: true });
+              window.location.href = "/login";
             }
           } else {
             dispatch(checkAuthStatus());
@@ -59,7 +57,7 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
           console.error("Error validating token:", error);
           dispatch(logout());
           if (window.location.pathname !== "/login") {
-            navigate("/login", { replace: true });
+            window.location.href = "/login";
           }
         }
       } else {
@@ -70,7 +68,7 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
     return () => {
       clearInterval(tokenValidationInterval);
     };
-  }, [dispatch, navigate]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (
@@ -78,9 +76,9 @@ const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) => {
       !isAuthenticated &&
       window.location.pathname !== "/login"
     ) {
-      navigate("/login", { replace: true });
+      window.location.href = "/login";
     }
-  }, [isInitialized, isAuthenticated, navigate]);
+  }, [isInitialized, isAuthenticated]);
 
   if (!isInitialized) {
     return (
