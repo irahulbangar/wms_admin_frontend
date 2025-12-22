@@ -32,7 +32,11 @@ const errorInterceptor = (error: unknown) => {
     console.error("API Error:", apiError);
   }
 
-  if (apiError.type === "AUTHENTICATION_ERROR") {
+  if (
+    apiError.type === "AUTHENTICATION_ERROR" ||
+    apiError.status === 401 ||
+    apiError.status === 403
+  ) {
     localStorage.clear();
     if (window.location.pathname !== "/login") {
       window.location.href = "/login";

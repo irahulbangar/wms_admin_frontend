@@ -90,7 +90,6 @@ export const adminSlice = createSlice({
             state.token = null;
             state.isAuthenticated = false;
             localStorage.clear();
-            window.location.reload();
           } else {
             state.admin = JSON.parse(admin);
             state.token = token;
@@ -123,11 +122,11 @@ export const loginAdmin = createAsyncThunk(
     try {
       thunkAPI.dispatch(setLoading(true));
       const response = await api().post<LoginResponse>("/admin/login", data);
-      
+
       if (response.data.success || response.data.status === 200) {
         localStorage.setItem("LAST_LOGIN", new Date().toLocaleString());
         localStorage.setItem("accessToken", response.data.token);
-        
+
         const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
         const admin = {
           email: decodedToken.email,
@@ -139,12 +138,12 @@ export const loginAdmin = createAsyncThunk(
           location: decodedToken.location,
           department: decodedToken.department,
         };
-        
+
         localStorage.setItem("admin", JSON.stringify(admin));
         thunkAPI.dispatch(setAdmin(admin));
         thunkAPI.dispatch(setToken(response.data.token));
       }
-      
+
       return response.data;
     } catch (error: unknown) {
       const apiError = handleApiError(error);
