@@ -15,4 +15,5 @@ export interface BrwhmsDeviceResultItem {
   flow: number;
   from_time: string;
   to_time: string;
+  total: number;
 }

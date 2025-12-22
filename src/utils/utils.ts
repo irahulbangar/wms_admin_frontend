@@ -1,3 +1,5 @@
+import type { DeviceResult } from "../../model/devices.interface";
+
 export const fromatDateWithTime = (date: string) => {
   return new Date(date).toLocaleString("en-IN", {
     year: "numeric",
@@ -128,4 +130,26 @@ export const parseCSV = (
   }
 
   return { headers, data };
+};
+
+export const flowUnit = (
+  reportType: string,
+  reportTypeDuration: string,
+  device: DeviceResult | null | undefined
+): string => {
+  const unit = device?.unit;
+  if (reportType === "custom") {
+    const isCubicMeter = unit === "M^3";
+    switch (reportTypeDuration) {
+      case "15min":
+        return isCubicMeter ? "m³/M" : "LPM";
+      case "1hour":
+        return isCubicMeter ? "m³/H" : "LPH";
+      case "1day":
+        return isCubicMeter ? "m³/D" : "LPD";
+      default:
+        return unit === "M^3" ? "m³" : "Ltr";
+    }
+  }
+  return unit === "M^3" ? "m³" : "Ltr";
 };

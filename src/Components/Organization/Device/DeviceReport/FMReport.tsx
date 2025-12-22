@@ -10,7 +10,7 @@ import {
 import { useAppDispatch } from "../../../../../store/store";
 import type { DeviceResult } from "../../../../../model/devices.interface";
 import Pagination from "../../../Pagination";
-import { formatDateForCSV } from "../../../../utils/utils";
+import { flowUnit, formatDateForCSV } from "../../../../utils/utils";
 import { useDeviceReportBreadcrumb } from "./hooks/useDeviceReportBreadcrumb";
 import {
   getOneWeekAgoDate,
@@ -485,20 +485,40 @@ const FMReport: React.FC = () => {
                   >
                     <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                       <tr>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                           SR No
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                           From Time
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                           To Time
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Flow (Ltr)
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Flow </span>
+                          <span className="italic">
+                            (
+                            {flowUnit(
+                              reportType,
+                              reportTypeDurationMap[reportType],
+                              device
+                            )}
+                            )
+                          </span>
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Totalizer (Ltr)
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Totalizer </span>
+                          <span className="italic">
+                            (
+                            {device?.unit === "M^3" ? (
+                              <>
+                                m<sup>3</sup>
+                              </>
+                            ) : (
+                              device?.unit
+                            )}
+                            )
+                          </span>
                         </th>
                       </tr>
                     </thead>
@@ -509,20 +529,24 @@ const FMReport: React.FC = () => {
                             key={item.id || index}
                             className="border-b border-border-primary bg-primary hover:bg-primary/50"
                           >
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                               {(currentPage - 1) * rowsPerPage + index + 1}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.from_time)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.to_time)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {item.flow}
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {device?.unit === "M^3"
+                                ? (Number(item.flow || 0) / 1000).toFixed(2)
+                                : Number(item.flow || 0)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {item.max}
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {device?.unit === "M^3"
+                                ? (Number(item.max) / 1000).toFixed(3)
+                                : Number(item.max)}
                             </td>
                           </tr>
                         ))
@@ -572,20 +596,40 @@ const FMReport: React.FC = () => {
                   >
                     <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
                       <tr>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                           SR No
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                           From Time
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                           To Time
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Flow (Ltr)
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Flow </span>
+                          <span className="italic">
+                            (
+                            {flowUnit(
+                              reportType,
+                              reportTypeDurationMap[reportType],
+                              device
+                            )}
+                            )
+                          </span>
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Totalizer (Ltr)
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Totalizer </span>
+                          <span className="italic">
+                            (
+                            {device?.unit === "M^3" ? (
+                              <>
+                                m<sup>3</sup>
+                              </>
+                            ) : (
+                              device?.unit
+                            )}
+                            )
+                          </span>
                         </th>
                       </tr>
                     </thead>
@@ -596,20 +640,24 @@ const FMReport: React.FC = () => {
                             key={item.id || index}
                             className="border-b border-border-primary bg-primary hover:bg-primary/50"
                           >
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                               {(currentPage - 1) * rowsPerPage + index + 1}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.interval_start)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.interval_end)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {item.flow}
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {device?.unit === "M^3"
+                                ? (Number(item.flow || 0) / 1000).toFixed(2)
+                                : Number(item.flow || 0)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {item.max}
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {device?.unit === "M^3"
+                                ? (Number(item.max) / 1000).toFixed(3)
+                                : Number(item.max)}
                             </td>
                           </tr>
                         ))
