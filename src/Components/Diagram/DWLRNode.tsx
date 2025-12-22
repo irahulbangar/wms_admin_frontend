@@ -46,7 +46,7 @@ const DWLRNode: React.FC<DWLRNodeProps> = ({ data }) => {
 
   return (
     <div
-      className={`relative w-25 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${borderColor}`}
+      className={`relative w-20 h-fit bg-primary/20 border border-border-primary rounded-md p-1 z-10 ${borderColor}`}
       title={connectionInfo}
     >
       <div className="text-sm font-normal text-left text-wrap font-roboto mb-1 px-1 leading-4 text-text-primary">
@@ -57,7 +57,7 @@ const DWLRNode: React.FC<DWLRNodeProps> = ({ data }) => {
         <img
           src={dwlrLogo}
           alt="DWLR"
-          className="w-12 h-12 object-contain flex items-center justify-center"
+          className="w-16 h-16 object-contain flex items-center justify-center"
         />
       </div>
 
