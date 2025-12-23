@@ -2,12 +2,15 @@ interface CommonParams {
   maxThreshold: string;
   lowerLimit: string;
   upperLimit: string;
+  refValue: number;
+  refPercent: number;
   multiplier: string;
   shifter: string;
   A: string;
   B: string;
   C: string;
   D: string;
+  overWrite: number;
 }
 
 interface CommonParametersFormProps {
@@ -23,7 +26,10 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
   errors,
   isBRWHMS,
 }) => {
-  const handleInputChange = (field: keyof CommonParams, value: string) => {
+  const handleInputChange = (
+    field: keyof CommonParams,
+    value: string | number
+  ) => {
     onCommonParamsChange({
       ...commonInputValues,
       [field]: value,
@@ -37,6 +43,51 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           Common Parameters
         </label>
       </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Over Write
+          </label>
+          <input
+            type="checkbox"
+            checked={commonInputValues.overWrite === 1}
+            onChange={(e) =>
+              handleInputChange("overWrite", e.target.checked ? 1 : 0)
+            }
+            className="w-4 h-4 cursor-pointer"
+          />
+        </div>
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Ref Value
+          </label>
+          <input
+            type="text"
+            value={commonInputValues.refValue}
+            onChange={(e) => handleInputChange("refValue", e.target.value)}
+            placeholder="Enter ref value"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+              errors.refValue ? "border-status-danger" : "border-border-primary"
+            }`}
+          />
+        </div>
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Ref Percent
+          </label>
+          <input
+            type="text"
+            value={commonInputValues.refPercent}
+            onChange={(e) => handleInputChange("refPercent", e.target.value)}
+            placeholder="Enter ref percent"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+              errors.refPercent
+                ? "border-status-danger"
+                : "border-border-primary"
+            }`}
+          />
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
         <div>
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
@@ -44,7 +95,6 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           </label>
           <input
             type="text"
-            name="lowerLimit"
             value={commonInputValues.lowerLimit}
             onChange={(e) => handleInputChange("lowerLimit", e.target.value)}
             placeholder="Enter lower limit"
@@ -61,7 +111,6 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           </label>
           <input
             type="text"
-            name="upperLimit"
             value={commonInputValues.upperLimit}
             onChange={(e) => handleInputChange("upperLimit", e.target.value)}
             placeholder="Enter upper limit"
@@ -72,13 +121,13 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
             }`}
           />
         </div>
+
         <div>
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Multiplier
           </label>
           <input
             type="text"
-            name="multiplier"
             value={commonInputValues.multiplier}
             onChange={(e) => handleInputChange("multiplier", e.target.value)}
             placeholder="Enter multiplier"
@@ -95,14 +144,11 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           </label>
           <input
             type="text"
-            name="shifter"
             value={commonInputValues.shifter}
             onChange={(e) => handleInputChange("shifter", e.target.value)}
             placeholder="Enter shifter"
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
-              errors.shifter
-                ? "border-status-danger"
-                : "border-border-primary"
+              errors.shifter ? "border-status-danger" : "border-border-primary"
             }`}
           />
         </div>
@@ -112,11 +158,8 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           </label>
           <input
             type="text"
-            name="maxThreshold"
             value={commonInputValues.maxThreshold}
-            onChange={(e) =>
-              handleInputChange("maxThreshold", e.target.value)
-            }
+            onChange={(e) => handleInputChange("maxThreshold", e.target.value)}
             placeholder="Enter max threshold"
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
               errors.maxThreshold
@@ -134,7 +177,6 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
               </label>
               <input
                 type="text"
-                name="A"
                 value={commonInputValues.A}
                 onChange={(e) => handleInputChange("A", e.target.value)}
                 placeholder="Enter A"
@@ -150,7 +192,6 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
               </label>
               <input
                 type="text"
-                name="B"
                 value={commonInputValues.B}
                 onChange={(e) => handleInputChange("B", e.target.value)}
                 placeholder="Enter B"
@@ -167,7 +208,6 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           </label>
           <input
             type="text"
-            name="C"
             value={commonInputValues.C}
             onChange={(e) => handleInputChange("C", e.target.value)}
             placeholder="Enter C"
@@ -182,7 +222,6 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           </label>
           <input
             type="text"
-            name="D"
             value={commonInputValues.D}
             onChange={(e) => handleInputChange("D", e.target.value)}
             placeholder="Enter D"
@@ -197,4 +236,3 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
 };
 
 export default CommonParametersForm;
-

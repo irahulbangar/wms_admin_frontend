@@ -163,22 +163,29 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     lowerLimit: "",
     upperLimit: "",
     multiplier: "",
+    refValue: 0,
+    refPercent: 0,
+    shifter: "",
     A: "0",
     B: "0",
     C: "1",
     D: "0",
+    overWrite: 0,
   });
 
   const [commonInputValues, setCommonInputValues] = useState({
     maxThreshold: "",
     lowerLimit: "",
     upperLimit: "",
+    refValue: 0,
+    refPercent: 0,
     multiplier: "",
     shifter: "",
     A: "0",
     B: "0",
     C: "1",
     D: "0",
+    overWrite: 0,
   });
 
   const [tankParams, setTankParams] = useState<object>({
@@ -320,21 +327,29 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       maxThreshold: "",
       lowerLimit: "",
       upperLimit: "",
+      refValue: 0,
+      refPercent: 0,
+      multiplier: "",
+      shifter: "",
       A: "0",
       B: "0",
       C: "1",
       D: "0",
+      overWrite: 0,
     });
     setCommonInputValues({
       maxThreshold: "",
       lowerLimit: "",
       upperLimit: "",
+      refValue: 0,
+      refPercent: 0,
       multiplier: "",
       shifter: "",
       A: "",
       B: "",
       C: "",
       D: "",
+      overWrite: 0,
     });
 
     setTankParams({
@@ -643,22 +658,28 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               upperLimit: deviceData.params?.upperLimit || "",
               multiplier: deviceData.params?.multiplier || "",
               shifter: deviceData.params?.shifter || "",
+              refValue: deviceData.params?.refValue || 0,
+              refPercent: deviceData.params?.refPercent || 0,
               A: deviceData.params?.A || "",
               B: deviceData.params?.B || "",
               C: deviceData.params?.C || "",
               D: deviceData.params?.D || "",
+              overWrite: deviceData.params?.overWrite || 0,
             };
             setCommonParams(commonData);
             setCommonInputValues({
               maxThreshold: commonData?.maxThreshold?.toString() || "",
               lowerLimit: commonData?.lowerLimit?.toString() || "",
               upperLimit: commonData?.upperLimit?.toString() || "",
+              refValue: commonData?.refValue || 0,
+              refPercent: commonData?.refPercent || 0,
               multiplier: commonData?.multiplier?.toString() || "",
               shifter: commonData?.shifter?.toString() || "",
               A: commonData?.A?.toString() || "",
               B: commonData?.B?.toString() || "",
               C: commonData?.C?.toString() || "",
               D: commonData?.D?.toString() || "",
+              overWrite: commonData?.overWrite || 0,
             });
 
             if (familyName === "tank") {
@@ -928,18 +949,17 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
-            {!isVirtualReporting &&
-              getSelectedDeviceFamilyName() !== "dwlr" && (
-                <CommonParametersForm
-                  commonInputValues={commonInputValues}
-                  onCommonParamsChange={(values) => {
-                    setCommonInputValues(values);
-                    setCommonParams(values);
-                  }}
-                  errors={errors}
-                  isBRWHMS={getSelectedDeviceFamilyName() === "brwhms"}
-                />
-              )}
+            {!isVirtualReporting && (
+              <CommonParametersForm
+                commonInputValues={commonInputValues}
+                onCommonParamsChange={(values) => {
+                  setCommonInputValues(values);
+                  setCommonParams(values);
+                }}
+                errors={errors}
+                isBRWHMS={getSelectedDeviceFamilyName() === "brwhms"}
+              />
+            )}
 
             {getSelectedDeviceFamilyName() === "tank" && (
               <TankParametersForm
