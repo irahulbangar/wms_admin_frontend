@@ -4,6 +4,8 @@ interface BRWHMSInputValues {
   hmin: string;
   A: string;
   B: string;
+  A1: string;
+  B1: string;
 }
 
 interface BRWHMSParametersFormProps {
@@ -17,10 +19,7 @@ const BRWHMSParametersForm: React.FC<BRWHMSParametersFormProps> = ({
   onBRWHMSParamsChange,
   errors,
 }) => {
-  const handleInputChange = (
-    field: keyof BRWHMSInputValues,
-    value: string
-  ) => {
+  const handleInputChange = (field: keyof BRWHMSInputValues, value: string) => {
     onBRWHMSParamsChange({
       ...brwhmsInputValues,
       [field]: value,
@@ -114,10 +113,41 @@ const BRWHMSParametersForm: React.FC<BRWHMSParametersFormProps> = ({
             }`}
           />
         </div>
+
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            A1
+          </label>
+          <input
+            type="text"
+            name="A1"
+            value={brwhmsInputValues.A1}
+            onChange={(e) => handleInputChange("A1", e.target.value)}
+            placeholder="Enter A1"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+              errors.A1 ? "border-status-danger" : "border-border-primary"
+            }`}
+          />
+        </div>
+
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            B1
+          </label>
+          <input
+            type="text"
+            name="B1"
+            value={brwhmsInputValues.B1}
+            onChange={(e) => handleInputChange("B1", e.target.value)}
+            placeholder="Enter B1"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+              errors.B1 ? "border-status-danger" : "border-border-primary"
+            }`}
+          />
+        </div>
       </div>
     </>
   );
 };
 
 export default BRWHMSParametersForm;
-

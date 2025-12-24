@@ -201,6 +201,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     hmin: "",
     A: "",
     B: "",
+    A1: "",
+    B1: "",
   });
 
   const [tankInputValues, setTankInputValues] = useState({
@@ -216,6 +218,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     hmin: "",
     A: "",
     B: "",
+    A1: "",
+    B1: "",
   });
 
   const createDefaultSensorParam = (): {
@@ -370,6 +374,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hmin: "",
       A: "",
       B: "",
+      A1: "",
+      B1: "",
     });
     setBrwhmsInputValues({
       sg: "",
@@ -377,6 +383,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hmin: "",
       A: "",
       B: "",
+      A1: "",
+      B1: "",
     });
     setDwlrParams({
       device_params: {
@@ -703,6 +711,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 hmin: deviceData?.params?.hmin || 0,
                 A: deviceData?.params?.A || 0,
                 B: deviceData?.params?.B || 0,
+                A1: deviceData?.params?.A1 || 0,
+                B1: deviceData?.params?.B1 || 0,
               };
               setBrwhmsParams(brwhmsData);
               setBrwhmsInputValues({
@@ -711,6 +721,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 hmin: brwhmsData?.hmin?.toString() || "",
                 A: brwhmsData?.A?.toString() || "",
                 B: brwhmsData?.B?.toString() || "",
+                A1: brwhmsData?.A1?.toString() || "",
+                B1: brwhmsData?.B1?.toString() || "",
               });
             } else if (familyName === "dwlr") {
               const convertSensorParam = (param: any) => ({
@@ -998,6 +1010,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                     hmin: values.hmin === "" ? 0 : parseFloat(values.hmin) || 0,
                     A: values.A === "" ? 0 : parseFloat(values.A) || 0,
                     B: values.B === "" ? 0 : parseFloat(values.B) || 0,
+                    A1: values.A1 === "" ? 0 : parseFloat(values.A1) || 0,
+                    B1: values.B1 === "" ? 0 : parseFloat(values.B1) || 0,
                   });
                 }}
                 errors={errors}
