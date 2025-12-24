@@ -18,6 +18,7 @@ import {
   setDevices,
   dataSyncForPHMCDevices,
   dataSyncForDWLRDevices,
+  dataSyncForBDWFMSDevices,
 } from "../../../store/deviceSlice";
 import { Error, Success } from "../../utils/toast";
 import { useGetAllDevicesQuery } from "../../../store/rtkQuery";
@@ -676,6 +677,13 @@ const DataSync = () => {
       });
     } else if (familyType === "dwlr") {
       syncData = dataSyncForDWLRDevices({
+        device_id: Number(deviceId),
+        year: monthYear.split("-")[0],
+        month: monthYear.split("-")[1],
+        data: csvData,
+      });
+    } else if (familyType === "BDWFMS") {
+      syncData = dataSyncForBDWFMSDevices({
         device_id: Number(deviceId),
         year: monthYear.split("-")[0],
         month: monthYear.split("-")[1],

@@ -1,0 +1,708 @@
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { Download, Loader2, Home, ChevronRight } from "lucide-react";
+import { useParams, useSearchParams } from "react-router-dom";
+import type { BDWFMSDeviceResultItem } from "../../../../../model/bdwfms-device.interface";
+import {
+  getBDWFMSRuntimeData,
+  getBDWFMSCustomReportData,
+  setDevices,
+} from "../../../../../store/deviceSlice";
+import { useAppDispatch } from "../../../../../store/store";
+import type { DeviceResult } from "../../../../../model/devices.interface";
+import Pagination from "../../../Pagination";
+import { flowUnit, formatDateForCSV } from "../../../../utils/utils";
+import { useDeviceReportBreadcrumb } from "./hooks/useDeviceReportBreadcrumb";
+import {
+  getOneWeekAgoDate,
+  getTodayDate,
+  reportTypeDurationMap,
+} from "./utils/reportUtils";
+import { useGetAllDevicesQuery } from "../../../../../store/rtkQuery";
+
+type TabType = "runtime" | "custom";
+type ReportType = "1day" | "15min" | "1hour";
+
+const BDWFMSReport: React.FC = () => {
+  const { plant_id, device_id } = useParams<{
+    plant_id: string;
+    device_id: string;
+  }>();
+  const dispatch = useAppDispatch();
+  const plantId = plant_id ? parseInt(plant_id) : 0;
+  const deviceId = device_id ? parseInt(device_id) : 0;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") as TabType | null;
+  const [activeTab, setActiveTab] = useState<TabType>(
+    tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")
+      ? tabFromUrl
+      : "runtime"
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [runtimeReportData, setRuntimeReportData] = useState<
+    BDWFMSDeviceResultItem[]
+  >([]);
+  const [customReportData, setCustomReportData] = useState<
+    BDWFMSDeviceResultItem[]
+  >([]);
+  const [device, setDevice] = useState<DeviceResult | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const prevActiveTabRef = useRef<TabType | null>(null);
+
+  const {
+    data: devicesData,
+    isLoading: isFetchingDevices,
+    refetch: refetchDevices,
+  } = useGetAllDevicesQuery();
+
+  const fetchDevices = useCallback(() => {
+    if (isFetchingDevices) return;
+    refetchDevices();
+  }, [isFetchingDevices, refetchDevices]);
+
+  useEffect(() => {
+    if (devicesData?.success && devicesData?.data) {
+      dispatch(setDevices(devicesData.data));
+    }
+  }, [devicesData, dispatch]);
+
+  const totalItems = useMemo(() => {
+    return activeTab === "runtime"
+      ? runtimeReportData.length
+      : customReportData.length;
+  }, [activeTab, runtimeReportData, customReportData]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / rowsPerPage);
+  }, [totalItems, rowsPerPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1);
+  };
+
+  const handlePaginatedRuntimeReportData = useMemo(() => {
+    return runtimeReportData.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [runtimeReportData, currentPage, rowsPerPage]);
+
+  const handlePaginatedCustomReportData = useMemo(() => {
+    return customReportData.slice(
+      (currentPage - 1) * rowsPerPage,
+      currentPage * rowsPerPage
+    );
+  }, [customReportData, currentPage, rowsPerPage]);
+
+  // Sync tab state with URL parameter
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") as TabType | null;
+    if (tabFromUrl && (tabFromUrl === "runtime" || tabFromUrl === "custom")) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (deviceId) {
+      const foundDevice = devicesData?.data?.find(
+        (d) => d.device_id === deviceId
+      );
+      if (foundDevice) {
+        setDevice(foundDevice);
+      } else {
+        fetchDevices();
+      }
+    }
+  }, [deviceId, devicesData, fetchDevices]);
+
+  const [runtimeDate, setRuntimeDate] = useState<string>(getTodayDate());
+
+  const [reportType, setReportType] = useState<ReportType>("1day");
+  const [fromDate, setFromDate] = useState<string>(getOneWeekAgoDate());
+  const [toDate, setToDate] = useState<string>(getTodayDate());
+
+  const handleGetData = useCallback(async () => {
+    if (!deviceId || !plantId) return;
+
+    setIsLoading(true);
+    setCurrentPage(1);
+    try {
+      if (activeTab === "runtime") {
+        await dispatch(
+          getBDWFMSRuntimeData({
+            plantId: plantId,
+            deviceId,
+            date: runtimeDate,
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success && res.data && res.data.length > 0) {
+              setRuntimeReportData(res.data);
+            } else {
+              setRuntimeReportData([]);
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching runtime report data:", err);
+            setRuntimeReportData([]);
+          });
+      } else {
+        await dispatch(
+          getBDWFMSCustomReportData({
+            plantId: plantId,
+            deviceId,
+            from_date: `${fromDate} 00:00:00`,
+            to_date: `${toDate} 00:00:00`,
+            duration: reportTypeDurationMap[reportType],
+          })
+        )
+          .unwrap()
+          .then((res) => {
+            if (res.success && res.data && res.data.length > 0) {
+              setCustomReportData(res.data);
+            } else {
+              setCustomReportData([]);
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching custom report data:", err);
+            setCustomReportData([]);
+          });
+      }
+    } catch (error) {
+      console.error("Error fetching report data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    deviceId,
+    plantId,
+    activeTab,
+    runtimeDate,
+    fromDate,
+    toDate,
+    reportType,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (deviceId && plantId) {
+      const shouldFetch =
+        prevActiveTabRef.current === null ||
+        prevActiveTabRef.current !== activeTab;
+      if (shouldFetch) {
+        handleGetData();
+        prevActiveTabRef.current = activeTab;
+      }
+    }
+  }, [deviceId, plantId, activeTab, handleGetData]);
+
+  const handleDownloadCSV = () => {
+    const dataToExport =
+      activeTab === "runtime" ? runtimeReportData : customReportData;
+    if (dataToExport.length === 0) return;
+
+    const headers = [
+      "SR No",
+      "From Time",
+      "To Time",
+      "Flow (Ltr)",
+      "Totalizer (Ltr)",
+    ];
+
+    const csvContent = [
+      headers.join(","),
+      ...dataToExport.map((item, index) => {
+        const fromTime =
+          activeTab === "runtime"
+            ? formatDateForCSV(item.from_time)
+            : formatDateForCSV(item.interval_start);
+        const toTime =
+          activeTab === "runtime"
+            ? formatDateForCSV(item.to_time)
+            : formatDateForCSV(item.interval_end);
+        return [index + 1, fromTime, toTime, item.flow, item.max].join(",");
+      }),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `bdwfms-${activeTab}-report-${deviceId}-${
+        new Date().toISOString().split("T")[0]
+      }.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const {
+    handleBackToHome,
+    handleBackToOrganizations,
+    handleBackToPlants,
+    handleBackToDepartments,
+    handleBackToSystems,
+    handleBackToDevices,
+  } = useDeviceReportBreadcrumb(device);
+
+  return (
+    <div className="flex flex-col gap-4 overflow-x-hidden h-full">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2 text-sm text-text-secondary font-roboto bg-primary/50 px-2 py-1.5 rounded-lg w-fit">
+          <button
+            onClick={handleBackToHome}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <Home className="w-4 h-4" />
+            <span>Home</span>
+          </button>
+
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+
+          <button
+            onClick={handleBackToOrganizations}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Organization</span>
+          </button>
+
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToPlants}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Plants</span>
+          </button>
+
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToDepartments}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Departments</span>
+          </button>
+
+          <ChevronRight className="w-4 h-4 text-text-muted" />
+          <button
+            onClick={handleBackToSystems}
+            className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+          >
+            <span>Systems</span>
+          </button>
+
+          {device?.system_id && (
+            <>
+              <ChevronRight className="w-4 h-4 text-text-muted" />
+              <button
+                onClick={handleBackToDevices}
+                className="flex items-center gap-1 hover:text-text-primary hover:bg-overlay/20 px-2 py-1 rounded transition-all duration-200 cursor-pointer font-roboto"
+              >
+                <span>Devices</span>
+              </button>
+            </>
+          )}
+
+          {device?.device_name && (
+            <>
+              <ChevronRight className="w-4 h-4 text-text-muted" />
+              <span className="text-text-primary font-normal bg-secondary/30 px-2 py-1 rounded capitalize">
+                {device.device_name}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 h-full">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex gap-2 justify-center items-center">
+            <button
+              onClick={() => {
+                setActiveTab("runtime");
+                setCurrentPage(1);
+                setSearchParams({ tab: "runtime" });
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+                activeTab === "runtime"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                  : "text-text-secondary hover:text-text-primary bg-secondary"
+              }`}
+            >
+              <span>RunTime</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("custom");
+                setCurrentPage(1);
+                setSearchParams({ tab: "custom" });
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer font-roboto ${
+                activeTab === "custom"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                  : "text-text-secondary hover:text-text-primary bg-secondary"
+              }`}
+            >
+              <span>Custom Report</span>
+            </button>
+          </div>
+          {activeTab === "runtime" && (
+            <div className="flex items-center justify-end gap-4 flex-wrap">
+              <div className="flex flex-col gap-2">
+                <input
+                  type="date"
+                  value={runtimeDate}
+                  onChange={(e) => setRuntimeDate(e.target.value)}
+                  className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto"
+                />
+              </div>
+              <div className="flex items-end gap-4">
+                <button
+                  onClick={handleGetData}
+                  disabled={isLoading}
+                  className="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    "Get Data"
+                  )}
+                </button>
+                <button
+                  onClick={handleDownloadCSV}
+                  disabled={runtimeReportData.length === 0 || isLoading}
+                  className="px-4 py-1.5 bg-gradient-to-r bg-primary text-text-primary rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download CSV</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "custom" && (
+            <div className="flex items-center justify-end gap-4 flex-wrap">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary font-roboto">
+                  Report Type
+                </label>
+                <select
+                  value={reportType}
+                  onChange={(e) => setReportType(e.target.value as ReportType)}
+                  className="px-3 w-48 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto cursor-pointer"
+                >
+                  <option value="15min">15 Min</option>
+                  <option value="1hour">Hour</option>
+                  <option value="1day">Daily</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary font-roboto">
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary font-roboto">
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="px-3 py-1.5 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-text-secondary font-roboto opacity-0">
+                  Action
+                </label>
+                <button
+                  onClick={handleGetData}
+                  disabled={isLoading}
+                  className="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    "Get Data"
+                  )}
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm text-text-secondary font-roboto opacity-0">
+                    Action
+                  </label>
+                  <button
+                    onClick={handleDownloadCSV}
+                    disabled={customReportData.length === 0 || isLoading}
+                    className="px-4 py-1.5 bg-gradient-to-r bg-primary text-text-primary rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer font-roboto disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download CSV</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {activeTab === "runtime" && (
+          <>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+                <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+              </div>
+            ) : (
+              <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full">
+                <div className="overflow-auto h-[calc(100vh-238px)] table-scrollbar pb-17">
+                  <table
+                    className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                      handlePaginatedRuntimeReportData.length > 0
+                        ? "h-auto"
+                        : "h-full"
+                    }`}
+                  >
+                    <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          SR No
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          From Time
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          To Time
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Flow </span>
+                          <span className="italic">
+                            (
+                            {flowUnit(
+                              reportType,
+                              reportTypeDurationMap[reportType],
+                              device
+                            )}
+                            )
+                          </span>
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Totalizer </span>
+                          <span className="italic">
+                            (
+                            {device?.unit === "M^3" ? (
+                              <>
+                                m<sup>3</sup>
+                              </>
+                            ) : (
+                              device?.unit
+                            )}
+                            )
+                          </span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {handlePaginatedRuntimeReportData.length > 0 ? (
+                        handlePaginatedRuntimeReportData.map((item, index) => (
+                          <tr
+                            key={item.id || index}
+                            className="border-b border-border-primary bg-primary hover:bg-primary/50"
+                          >
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {(currentPage - 1) * rowsPerPage + index + 1}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {formatDateForCSV(item.from_time)}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {formatDateForCSV(item.to_time)}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {device?.unit === "M^3"
+                                ? (Number(item.flow || 0) / 1000).toFixed(2)
+                                : Number(item.flow || 0)}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {device?.unit === "M^3"
+                                ? (Number(item.total) / 1000).toFixed(3)
+                                : Number(item.total)}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center">
+                            <div className="flex items-center justify-center">
+                              <span className="text-text-secondary font-roboto">
+                                Click on get data button to get the data.
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  rowsPerPage={rowsPerPage}
+                  totalItems={totalItems}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Custom Report Section */}
+        {activeTab === "custom" && (
+          <>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full bg-primary rounded-lg">
+                <Loader2 className="w-14 h-14 text-text-primary animate-spin" />
+              </div>
+            ) : (
+              <div className="relative bg-primary rounded-lg shadow-sm overflow-hidden h-full pb-17">
+                <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-330px)] table-scrollbar">
+                  <table
+                    className={`w-full text-sm text-left rtl:text-right text-text-primary ${
+                      handlePaginatedCustomReportData.length > 0
+                        ? "h-auto"
+                        : "h-full"
+                    }`}
+                  >
+                    <thead className="text-xs text-text-primary uppercase bg-primary border-b border-border-primary sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          SR No
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          From Time
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          To Time
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Flow </span>
+                          <span className="italic">
+                            (
+                            {flowUnit(
+                              reportType,
+                              reportTypeDurationMap[reportType],
+                              device
+                            )}
+                            )
+                          </span>
+                        </th>
+                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                          <span className="uppercase">Totalizer</span>
+                          <span className="italic">
+                            (
+                            {device?.unit === "M^3" ? (
+                              <>
+                                m<sup>3</sup>
+                              </>
+                            ) : (
+                              device?.unit
+                            )}
+                            )
+                          </span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {handlePaginatedCustomReportData.length > 0 ? (
+                        handlePaginatedCustomReportData.map((item, index) => (
+                          <tr
+                            key={item.id || index}
+                            className="border-b border-border-primary bg-primary hover:bg-primary/50"
+                          >
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {(currentPage - 1) * rowsPerPage + index + 1}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {formatDateForCSV(item.interval_start)}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {formatDateForCSV(item.interval_end)}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {(() => {
+                                const flowValue =
+                                  flowUnit(
+                                    reportType,
+                                    reportTypeDurationMap[reportType],
+                                    device
+                                  ) === "LPM"
+                                    ? Number(item.avg || 0)
+                                    : Number(item.flow || 0);
+                                return device?.unit === "M^3"
+                                  ? (flowValue / 1000).toFixed(2)
+                                  : flowValue;
+                              })()}
+                            </td>
+                            <td className="px-4 py-2 text-text-primary text-start font-roboto text-base whitespace-nowrap">
+                              {device?.unit === "M^3"
+                                ? (Number(item.total) / 1000).toFixed(3)
+                                : Number(item.total)}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center">
+                            <div className="flex items-center justify-center">
+                              <span className="text-text-secondary font-roboto">
+                                Click on get data button to get the data.
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  rowsPerPage={rowsPerPage}
+                  totalItems={totalItems}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default BDWFMSReport;

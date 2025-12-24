@@ -30,6 +30,7 @@ import BTLMReport from "./Components/Organization/Device/DeviceReport/BTLMReport
 import ARGReport from "./Components/Organization/Device/DeviceReport/ARGReport";
 import PHMCReport from "./Components/Organization/Device/DeviceReport/PHMCReport";
 import DWLRReport from "./Components/Organization/Device/DeviceReport/DWLRReport";
+import BDWFMSReport from "./Components/Organization/Device/DeviceReport/BDWFMSReport";
 
 function ThemedToast() {
   const { theme } = useTheme();
@@ -104,6 +105,10 @@ const router = createBrowserRouter([
       {
         path: "/organization/devices/report/dwlr/:plant_id/:device_id",
         element: <DWLRReport />,
+      },
+      {
+        path: "/organization/devices/report/bdwfms/:plant_id/:device_id",
+        element: <BDWFMSReport />,
       },
       { path: "/organization/users", element: <OrganizationUsers /> },
       { path: "/organization/setting", element: <Setting /> },

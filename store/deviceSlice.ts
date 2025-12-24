@@ -422,6 +422,80 @@ export const dataSyncForPHMCDevices = createAsyncThunk(
   }
 );
 
+interface DataSyncForDWLRDevicesPayload {
+  device_id: number;
+  year: string;
+  month: string;
+  data: object;
+}
+
+// data sync for DWLR devices
+export const dataSyncForDWLRDevices = createAsyncThunk(
+  "device/dataSyncForDWLRDevices",
+  async (
+    { device_id, year, month, data }: DataSyncForDWLRDevicesPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post<DataSyncResponse>(
+        `/dwlr/device/dwlr-new-data-sync/${device_id}`,
+        {
+          year,
+          month,
+          data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface DataSyncForBDWFMSDevicesPayload {
+  device_id: number;
+  year: string;
+  month: string;
+  data: object;
+}
+
+// data sync for BDWFMS devices
+export const dataSyncForBDWFMSDevices = createAsyncThunk(
+  "device/dataSyncForBDWFMSDevices",
+  async (
+    { device_id, year, month, data }: DataSyncForBDWFMSDevicesPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post<DataSyncResponse>(
+        `/bdwfms/device/bdwfms-new-data-sync/${device_id}`,
+        {
+          year,
+          month,
+          data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 interface GetFMRuntimeDataPayload {
   plantId: number;
   deviceId: number;
@@ -799,43 +873,6 @@ export const getARGCustomReportData = createAsyncThunk(
   }
 );
 
-interface DataSyncForDWLRDevicesPayload {
-  device_id: number;
-  year: string;
-  month: string;
-  data: object;
-}
-
-// data sync for DWLR devices
-export const dataSyncForDWLRDevices = createAsyncThunk(
-  "device/dataSyncForDWLRDevices",
-  async (
-    { device_id, year, month, data }: DataSyncForDWLRDevicesPayload,
-    thunkAPI
-  ) => {
-    const { rejectWithValue } = thunkAPI;
-    try {
-      const response = await api().post<DataSyncResponse>(
-        `/dwlr/device/dwlr-new-data-sync/${device_id}`,
-        {
-          year,
-          month,
-          data,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = handleApiError(error);
-      return rejectWithValue(apiError);
-    }
-  }
-);
-
 interface GetDWLRRuntimeDataPayload {
   plantId: number;
   deviceId: number;
@@ -892,6 +929,83 @@ export const getDWLRCustomReportData = createAsyncThunk(
     try {
       const response = await api().post(
         `/dwlr/admin/device/dwlr-reports/${plantId}/${deviceId}`,
+        {
+          from_date,
+          to_date,
+          duration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetBDWFMSRuntimeDataPayload {
+  plantId: number;
+  deviceId: number;
+  date: string;
+}
+// get BDWFMS runtime data
+export const getBDWFMSRuntimeData = createAsyncThunk(
+  "device/getBDWFMSRuntimeData",
+  async (
+    { plantId, deviceId, date }: GetBDWFMSRuntimeDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/bdwfms/admin/device/bdwfms-logs/${plantId}/${deviceId}`,
+        {
+          date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetBDWFMSCustomReportDataPayload {
+  plantId: number;
+  deviceId: number;
+  from_date: string;
+  to_date: string;
+  duration: string;
+}
+
+// get BDWFMS custom report data
+export const getBDWFMSCustomReportData = createAsyncThunk(
+  "device/getBDWFMSCustomReportData",
+  async (
+    {
+      plantId,
+      deviceId,
+      from_date,
+      to_date,
+      duration,
+    }: GetBDWFMSCustomReportDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/bdwfms/admin/device/bdwfms-reports/${plantId}/${deviceId}`,
         {
           from_date,
           to_date,
