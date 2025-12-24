@@ -20,21 +20,21 @@ import DepartmentPopup from "./Diagram/DepartmentPopup";
 import DiagramControls from "./Diagram/DiagramControls";
 import { ChartArea } from "lucide-react";
 
-const DiagramWithZoomControls = ({ 
-  nodes: _nodes, 
-  edges: _edges, 
-  onNodesChange, 
-  onEdgesChange, 
-  onNodeDragStop, 
-  onConnect, 
-  onNodeClick, 
-  onEdgeClick, 
-  onPaneClick, 
+const DiagramWithZoomControls = ({
+  nodes: _nodes,
+  edges: _edges,
+  onNodesChange,
+  onEdgesChange,
+  onNodeDragStop,
+  onConnect,
+  onNodeClick,
+  onEdgeClick,
+  onPaneClick,
   onSelectionChange,
   nodeTypes,
   multiSelectionKeyCode,
   transformedNodes,
-  transformedEdges
+  transformedEdges,
 }: any) => {
   return (
     <ReactFlow
@@ -67,7 +67,7 @@ const DiagramWithZoomControls = ({
         padding: 0.2,
         minZoom: 0.1,
         maxZoom: 2,
-        includeHiddenNodes: false
+        includeHiddenNodes: false,
       }}
       attributionPosition="bottom-left"
       deleteKeyCode={["Backspace", "Delete"]}
@@ -94,36 +94,39 @@ const ZoomControls = () => {
   };
 
   const handleFitView = () => {
-    fitView({ 
-      duration: 500, 
+    fitView({
+      duration: 500,
       padding: 0.2,
       minZoom: 0.1,
       maxZoom: 2,
-      includeHiddenNodes: false
+      includeHiddenNodes: false,
     });
   };
 
   const handleResetView = () => {
     const nodes = getNodes();
     if (nodes.length > 0) {
-      const bounds = nodes.reduce((acc, node) => {
-        const x = node.position.x;
-        const y = node.position.y;
-        const width = node.width || 100;
-        const height = node.height || 100;
-        
-        return {
-          minX: Math.min(acc.minX, x),
-          maxX: Math.max(acc.maxX, x + width),
-          minY: Math.min(acc.minY, y),
-          maxY: Math.max(acc.maxY, y + height),
-        };
-      }, {
-        minX: Infinity,
-        maxX: -Infinity,
-        minY: Infinity,
-        maxY: -Infinity,
-      });
+      const bounds = nodes.reduce(
+        (acc, node) => {
+          const x = node.position.x;
+          const y = node.position.y;
+          const width = node.width || 100;
+          const height = node.height || 100;
+
+          return {
+            minX: Math.min(acc.minX, x),
+            maxX: Math.max(acc.maxX, x + width),
+            minY: Math.min(acc.minY, y),
+            maxY: Math.max(acc.maxY, y + height),
+          };
+        },
+        {
+          minX: Infinity,
+          maxX: -Infinity,
+          minY: Infinity,
+          maxY: -Infinity,
+        }
+      );
 
       const centerX = (bounds.minX + bounds.maxX) / 2;
       const centerY = (bounds.minY + bounds.maxY) / 2;
@@ -138,7 +141,7 @@ const ZoomControls = () => {
       zoomIn: handleZoomIn,
       zoomOut: handleZoomOut,
       fitView: handleFitView,
-      resetView: handleResetView
+      resetView: handleResetView,
     };
 
     const nodes = getNodes();
@@ -168,7 +171,7 @@ const DiagramPage = () => {
     departmentDimensions,
     setDepartmentDimensions,
     saveDiagramToAPI,
-    // deviceData,
+    deviceData,
     plantData,
   } = useDiagramData(plantId);
 
@@ -272,7 +275,6 @@ const DiagramPage = () => {
     }
   };
 
-
   const handleNavigate = (path: string) => {
     navigate(path);
   };
@@ -290,7 +292,7 @@ const DiagramPage = () => {
     if ((window as any).diagramZoomControls?.zoomIn) {
       (window as any).diagramZoomControls.zoomIn();
     } else {
-      console.warn('Zoom controls not yet available');
+      console.warn("Zoom controls not yet available");
     }
   }, []);
 
@@ -298,7 +300,7 @@ const DiagramPage = () => {
     if ((window as any).diagramZoomControls?.zoomOut) {
       (window as any).diagramZoomControls.zoomOut();
     } else {
-      console.warn('Zoom controls not yet available');
+      console.warn("Zoom controls not yet available");
     }
   }, []);
 
@@ -306,7 +308,7 @@ const DiagramPage = () => {
     if ((window as any).diagramZoomControls?.fitView) {
       (window as any).diagramZoomControls.fitView();
     } else {
-      console.warn('Zoom controls not yet available');
+      console.warn("Zoom controls not yet available");
     }
   }, []);
 
@@ -314,7 +316,7 @@ const DiagramPage = () => {
     if ((window as any).diagramZoomControls?.resetView) {
       (window as any).diagramZoomControls.resetView();
     } else {
-      console.warn('Zoom controls not yet available');
+      console.warn("Zoom controls not yet available");
     }
   }, []);
 
@@ -335,11 +337,56 @@ const DiagramPage = () => {
       return;
     }
 
-    // if (node.type === 'group' && (node.data.type === 'plant' || node.data.type === 'department' || node.data.type === 'system')) {
-    //   handleGroupClick(node.id, node.data);
-    //   return;
-    // }
-    
+    const excludedTypes = ["group", "virtual", "source", "sink", "resultant"];
+    if (excludedTypes.includes(node.type)) {
+      onNodeClick(event, node);
+      return;
+    }
+
+    const nodeTypeToFamilyType: Record<string, string> = {
+      fm: "fm",
+      tank: "tank",
+      brwhms: "brwhms",
+      bdwfms: "bdwfms",
+      phmc: "phmc",
+      arg: "arg",
+      dwlr: "dwlr",
+    };
+
+    const deviceFamilyType = nodeTypeToFamilyType[node.type];
+    if (!deviceFamilyType || !deviceData || deviceData.length === 0) {
+      onNodeClick(event, node);
+      return;
+    }
+
+    const matchingDevice = deviceData.find((device) => {
+      const deviceNameMatch = device.device_name === node.data?.label;
+      if (!deviceNameMatch) return false;
+
+      const deviceFamilyTypeLower = device.device_family_type?.toLowerCase();
+      const deviceFamilyLower = device.device_family?.toLowerCase();
+
+      if (deviceFamilyType === "bdwfms") {
+        return (
+          deviceFamilyTypeLower === "bdwfms" ||
+          device.device_family_type === "BDWFMS" ||
+          deviceFamilyLower?.includes("bdwfms")
+        );
+      }
+
+      return (
+        deviceFamilyTypeLower === deviceFamilyType ||
+        deviceFamilyLower?.includes(deviceFamilyType)
+      );
+    });
+
+    if (matchingDevice && plantId) {
+      navigate(
+        `/organization/devices/report/${deviceFamilyType}/${plantId}/${matchingDevice.device_id}`
+      );
+      return;
+    }
+
     onNodeClick(event, node);
   };
 
@@ -391,7 +438,6 @@ const DiagramPage = () => {
       className: "react-flow__edge-clickable",
     }));
   }, [edges, selectedEdge]);
-
 
   const isDiagramEmpty = useMemo(() => {
     return nodes?.length === 0 && edges?.length === 0;
