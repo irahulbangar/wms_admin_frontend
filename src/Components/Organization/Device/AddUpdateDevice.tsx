@@ -28,6 +28,7 @@ import VirtualReportingForm from "./components/VirtualReportingForm";
 import CommonParametersForm from "./components/CommonParametersForm";
 import TankParametersForm from "./components/TankParametersForm";
 import BRWHMSParametersForm from "./components/BRWHMSParametersForm";
+import BDWFMSParametersForm from "./components/BDWFMSParametersForm";
 import DWLRParametersForm from "./components/DWLRParametersForm";
 
 interface AddUpdateDeviceProps {
@@ -205,6 +206,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     B1: "",
   });
 
+  const [bdwfmsParams, setBdwfmsParams] = useState<object>({
+    sg: "",
+    hmax: "",
+    hmin: "",
+    A: "",
+    B: "",
+    A1: "",
+    B1: "",
+  });
+
   const [tankInputValues, setTankInputValues] = useState({
     height: "",
     storageCapacity: "",
@@ -213,6 +224,16 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   });
 
   const [brwhmsInputValues, setBrwhmsInputValues] = useState({
+    sg: "",
+    hmax: "",
+    hmin: "",
+    A: "",
+    B: "",
+    A1: "",
+    B1: "",
+  });
+
+  const [bdwfmsInputValues, setBdwfmsInputValues] = useState({
     sg: "",
     hmax: "",
     hmin: "",
@@ -386,6 +407,24 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       A1: "",
       B1: "",
     });
+    setBdwfmsParams({
+      sg: "",
+      hmax: "",
+      hmin: "",
+      A: "",
+      B: "",
+      A1: "",
+      B1: "",
+    });
+    setBdwfmsInputValues({
+      sg: "",
+      hmax: "",
+      hmin: "",
+      A: "",
+      B: "",
+      A1: "",
+      B1: "",
+    });
     setDwlrParams({
       device_params: {
         sitename: "",
@@ -515,6 +554,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             return { ...commonParams, ...tankParams };
           } else if (deviceFamilyName === "brwhms") {
             return { ...commonParams, ...brwhmsParams };
+          } else if (deviceFamilyName === "BDWFMS") {
+            return { ...commonParams, ...bdwfmsParams };
           } else if (deviceFamilyName === "dwlr") {
             const convertedDwlParams = {
               device_params: {
@@ -723,6 +764,26 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 B: brwhmsData?.B,
                 A1: brwhmsData?.A1,
                 B1: brwhmsData?.B1,
+              });
+            } else if (familyName === "BDWFMS") {
+              const bdwfmsData = {
+                sg: deviceData?.params?.sg,
+                hmax: deviceData?.params?.hmax,
+                hmin: deviceData?.params?.hmin,
+                A: deviceData?.params?.A,
+                B: deviceData?.params?.B,
+                A1: deviceData?.params?.A1,
+                B1: deviceData?.params?.B1,
+              };
+              setBdwfmsParams(bdwfmsData);
+              setBdwfmsInputValues({
+                sg: bdwfmsData?.sg,
+                hmax: bdwfmsData?.hmax,
+                hmin: bdwfmsData?.hmin,
+                A: bdwfmsData?.A,
+                B: bdwfmsData?.B,
+                A1: bdwfmsData?.A1,
+                B1: bdwfmsData?.B1,
               });
             } else if (familyName === "dwlr") {
               const convertSensorParam = (param: any) => ({
@@ -959,6 +1020,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 }}
                 errors={errors}
                 isBRWHMS={getSelectedDeviceFamilyName() === "brwhms"}
+                isBDWFMS={getSelectedDeviceFamilyName() === "BDWFMS"}
               />
             )}
 
@@ -994,6 +1056,25 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 onBRWHMSParamsChange={(values) => {
                   setBrwhmsInputValues(values);
                   setBrwhmsParams({
+                    sg: values.sg === "" ? 0 : parseFloat(values.sg),
+                    hmax: values.hmax === "" ? 0 : parseFloat(values.hmax),
+                    hmin: values.hmin === "" ? 0 : parseFloat(values.hmin),
+                    A: values.A === "" ? 0 : parseFloat(values.A),
+                    B: values.B === "" ? 0 : parseFloat(values.B),
+                    A1: values.A1 === "" ? 0 : parseFloat(values.A1),
+                    B1: values.B1 === "" ? 0 : parseFloat(values.B1),
+                  });
+                }}
+                errors={errors}
+              />
+            )}
+
+            {getSelectedDeviceFamilyName() === "BDWFMS" && (
+              <BDWFMSParametersForm
+                bdwfmsInputValues={bdwfmsInputValues}
+                onBDWFMSParamsChange={(values) => {
+                  setBdwfmsInputValues(values);
+                  setBdwfmsParams({
                     sg: values.sg === "" ? 0 : parseFloat(values.sg),
                     hmax: values.hmax === "" ? 0 : parseFloat(values.hmax),
                     hmin: values.hmin === "" ? 0 : parseFloat(values.hmin),

@@ -57,6 +57,7 @@ export interface DeviceResult {
 }
 
 export interface LastRecord {
+  total?: number;
   time?: string;
   max_level?: number;
   min_level?: number;

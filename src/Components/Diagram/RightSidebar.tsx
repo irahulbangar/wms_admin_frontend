@@ -142,7 +142,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     switch (device.device_family_type) {
       case "fm":
       case "brwhms":
-        value = Number(device.last_record?.max) || 0;
+        value = Number(device.last_record?.total) || 0;
+        break;
+      case "BDWFMS":
+        value = Number(device.last_record?.total) || 0;
         break;
       case "phmc":
         if (
@@ -187,7 +190,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     ];
 
     const inReportType = ["In", "Rainfall", "Regeneration", "Re-use"];
-    const outReportType = ["Out", "Evaporation", "Consumption", "Wastage", "Percolation"];
+    const outReportType = [
+      "Out",
+      "Evaporation",
+      "Consumption",
+      "Wastage",
+      "Percolation",
+    ];
 
     const groupId = getGroupId();
     if (!groupId) {

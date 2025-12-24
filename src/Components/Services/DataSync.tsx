@@ -100,6 +100,7 @@ const DataSync = () => {
       family.name.toLowerCase().includes("flow") ||
       family.type?.toLowerCase() === "fm" ||
       family.type?.toLowerCase() === "brwhms" ||
+      family.type?.toLowerCase() === "BDWFMS" ||
       family.type?.toLowerCase() === "tank" ||
       family.type?.toLowerCase() === "phmc" ||
       family.type?.toLowerCase() === "dwlr"

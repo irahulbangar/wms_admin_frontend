@@ -18,6 +18,7 @@ interface CommonParametersFormProps {
   onCommonParamsChange: (params: CommonParams) => void;
   errors: Record<string, string>;
   isBRWHMS: boolean;
+  isBDWFMS: boolean;
 }
 
 const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
@@ -25,6 +26,7 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
   onCommonParamsChange,
   errors,
   isBRWHMS,
+  isBDWFMS,
 }) => {
   const handleInputChange = (
     field: keyof CommonParams,
@@ -169,7 +171,7 @@ const CommonParametersForm: React.FC<CommonParametersFormProps> = ({
           />
         </div>
 
-        {!isBRWHMS && (
+        {!isBRWHMS && !isBDWFMS && (
           <>
             <div>
               <label className="block text-base font-normal text-text-primary mb-2 font-roboto">

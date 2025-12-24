@@ -88,6 +88,7 @@ export interface NodeData {
   batteryVoltage?: number;
   waterTemperature?: number;
   waterPressure?: number;
+  total?: number;
 }
 
 export interface Style {

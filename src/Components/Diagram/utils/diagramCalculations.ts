@@ -487,6 +487,27 @@ export const convertDevicesToDiagram = (
           nodes.push(brwhmsNode);
         });
 
+        const bdwfms = system.devices.filter(
+          (device: DeviceResult) =>
+            device.device_family_type === "BDWFMS" ||
+            device.device_family?.toLowerCase().includes("bdwfms")
+        );
+
+        bdwfms.forEach((device: DeviceResult, bdwfmsIndex: number) => {
+          const deviceId = `${systemId}-bdwfms${bdwfmsIndex + 1}`;
+          const bdwfmsNode = createBDWFMSNode(
+            device,
+            deviceId,
+            systemId,
+            systemWidth,
+            systemHeight,
+            bdwfmsIndex,
+            bdwfms.length,
+            tanks.length + fms.length + brwhms.length
+          );
+          nodes.push(bdwfmsNode);
+        });
+
         const phmcs = system.devices.filter(
           (device: DeviceResult) =>
             device.device_family_type === "phmc" ||
@@ -503,7 +524,7 @@ export const convertDevicesToDiagram = (
             systemHeight,
             phmcIndex,
             phmcs.length,
-            tanks.length + fms.length + brwhms.length
+            tanks.length + fms.length + brwhms.length + bdwfms.length
           );
           nodes.push(phmcNode);
         });
@@ -524,7 +545,11 @@ export const convertDevicesToDiagram = (
             systemHeight,
             argIndex,
             args.length,
-            tanks.length + fms.length + brwhms.length + phmcs.length
+            tanks.length +
+              fms.length +
+              brwhms.length +
+              bdwfms.length +
+              phmcs.length
           );
           nodes.push(argNode);
         });
@@ -548,6 +573,7 @@ export const convertDevicesToDiagram = (
             tanks.length +
               fms.length +
               brwhms.length +
+              bdwfms.length +
               phmcs.length +
               args.length
           );
@@ -574,6 +600,7 @@ export const convertDevicesToDiagram = (
             tanks.length +
               fms.length +
               brwhms.length +
+              bdwfms.length +
               phmcs.length +
               args.length +
               dwlrs.length
@@ -601,6 +628,7 @@ export const convertDevicesToDiagram = (
             tanks.length +
               fms.length +
               brwhms.length +
+              bdwfms.length +
               phmcs.length +
               args.length +
               dwlrs.length +
@@ -881,12 +909,7 @@ const createBRWHMSNode = (
     avg: Number(device.last_record?.avg) || 0,
     max: Number(device.last_record?.max) || 0,
     min: Number(device.last_record?.min) || 0,
-    // departmentConnection: device?.department_connection,
-    // plantConnection: device?.plant_connection,
-    // organizationConnection: device?.organization_connection,
-    // departmentName: device?.department_name,
-    // systemName: device?.system_name,
-    // systemConnection: device?.system_connection,
+    total: Number(device.last_record?.total) || 0,
   };
 
   return {
@@ -899,6 +922,96 @@ const createBRWHMSNode = (
     type: "brwhms",
     width: brwhmsWidth,
     height: brwhmsHeight,
+  };
+};
+
+const createBDWFMSNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  bdwfmsIndex: number,
+  totalBDWFMS: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const bdwfmsWidth = 10;
+  const bdwfmsHeight = 100;
+  const sideMargin = 50;
+  const bdwfmsSpacing = 30;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxDevicesPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (bdwfmsWidth + bdwfmsSpacing))
+  );
+  const totalRows = Math.ceil(totalBDWFMS / maxDevicesPerRow);
+
+  const footerHeight = 10;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 300 : 0;
+
+  const bdwfmsStartY = previousDevicesHeight + 50;
+  const availableHeight = groupHeight - bdwfmsStartY - footerHeight;
+
+  const bdwfmsSectionHeight = Math.min(
+    availableHeight * 0.5,
+    totalRows * (bdwfmsHeight + 50) + 80
+  );
+
+  const bdwfmsVerticalSpacing =
+    totalRows > 1
+      ? Math.max(
+          50,
+          Math.min(
+            80,
+            (bdwfmsSectionHeight - totalRows * bdwfmsHeight) / (totalRows - 1)
+          )
+        )
+      : 0;
+
+  const row = Math.floor(bdwfmsIndex / maxDevicesPerRow);
+  const col = bdwfmsIndex % maxDevicesPerRow;
+
+  const totalDevicesInRow = Math.min(
+    maxDevicesPerRow,
+    totalBDWFMS - row * maxDevicesPerRow
+  );
+  const rowWidth =
+    totalDevicesInRow * bdwfmsWidth + (totalDevicesInRow - 1) * bdwfmsSpacing;
+  const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+  const deviceX = startX + col * (bdwfmsWidth + bdwfmsSpacing);
+  const deviceY =
+    bdwfmsStartY + 40 + row * (bdwfmsHeight + bdwfmsVerticalSpacing);
+
+  const maxX = groupWidth - bdwfmsWidth - sideMargin;
+  const maxY = groupHeight - bdwfmsHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const bdwfmsNodeData: NodeData = {
+    label: device.device_name,
+    type: "bidirectional",
+    direction: "bidirectional",
+    unit: "Ltr",
+    isActive: device.device_status === "active",
+    flowRate: Number(device.last_record?.flow) || 0,
+    avg: Number(device.last_record?.avg) || 0,
+    max: Number(device.last_record?.max) || 0,
+    min: Number(device.last_record?.min) || 0,
+    total: Number(device.last_record?.total) || 0,
+  };
+
+  return {
+    id: deviceId,
+    data: bdwfmsNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "bdwfms",
+    width: bdwfmsWidth,
+    height: bdwfmsHeight,
   };
 };
 
@@ -1355,6 +1468,21 @@ export const cleanNodesForAPI = (
         avg: _avg,
         max: _max,
         min: _min,
+        total: _total,
+        isActive: _isActive,
+        ...cleanData
+      } = node.data;
+      return {
+        ...node,
+        data: cleanData,
+      };
+    } else if (node.type === "bdwfms") {
+      const {
+        flowRate: _flowRate,
+        avg: _avg,
+        max: _max,
+        min: _min,
+        total: _total,
         isActive: _isActive,
         ...cleanData
       } = node.data;
@@ -1435,7 +1563,11 @@ const getDeviceFlowValue = (device: DeviceResult): number => {
   }
 
   if (device_family_type === "brwhms") {
-    return Number(last_record?.max) || 0;
+    return Number(last_record?.total) || 0;
+  }
+
+  if (device_family_type === "BDWFMS") {
+    return Number(last_record?.total) || 0;
   }
 
   if (device_family_type === "phmc" && device_type === "New phmc") {
@@ -1451,6 +1583,8 @@ const shouldIncludeDevice = (device: DeviceResult): boolean => {
   if (device_family_type === "fm") return true;
 
   if (device_family_type === "brwhms") return true;
+
+  if (device_family_type === "BDWFMS") return true;
 
   if (device_family_type === "phmc" && device_type === "New phmc") return true;
 

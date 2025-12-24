@@ -16,7 +16,7 @@ const DWLRNode: React.FC<DWLRNodeProps> = ({ data }) => {
   const systemConnection = data.systemConnection || "";
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
-  const waterColumn = data.waterColumn || 0;
+  const waterColumn = Number(data.waterColumn) || 0;
   const waterTemperature = data.waterTemperature || 0;
   const waterPressure = data.waterPressure || 0;
   const batteryVoltage = data.batteryVoltage || 0;
@@ -28,10 +28,10 @@ const DWLRNode: React.FC<DWLRNodeProps> = ({ data }) => {
     plantConnection ? `Plant Conn. : ${plantConnection}` : null,
     departmentConnection ? `Dep Conn. : ${departmentConnection}` : null,
     systemConnection ? `System Conn. : ${systemConnection}` : null,
-    `Water Column : ${waterColumn} mWc`,
-    `Water Temperature : ${waterTemperature}°C`,
-    `Water Pressure : ${waterPressure} Bar`,
-    `Battery Voltage : ${batteryVoltage}V`,
+    `Water Column : ${waterColumn?.toFixed(2)} mWc`,
+    `Water Temperature : ${waterTemperature?.toFixed(1)}°C`,
+    `Water Pressure : ${waterPressure?.toFixed(2)} Bar`,
+    `Battery Voltage : ${batteryVoltage?.toFixed(2)}V`,
   ]
     .filter((line) => line !== null && line !== "")
     .join("\n");

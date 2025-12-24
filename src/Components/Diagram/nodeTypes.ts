@@ -1,6 +1,7 @@
 import TankNode from "./TankNode";
 import FMNode from "./FMNode";
 import BRWHMSNode from "./BRWHMSNode";
+import BDWFMSNode from "./BDWFMSNode";
 import PHMCNode from "./PHMCNode";
 import ARGNode from "./ARGNode";
 import DWLRNode from "./DWLRNode";
@@ -14,6 +15,7 @@ export const nodeTypes = {
   tank: TankNode,
   fm: FMNode,
   brwhms: BRWHMSNode,
+  bdwfms: BDWFMSNode,
   phmc: PHMCNode,
   arg: ARGNode,
   dwlr: DWLRNode,

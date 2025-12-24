@@ -294,6 +294,36 @@ export const useDiagramData = (plantId: string | undefined) => {
                 avg: Number(matchingDevice?.last_record?.avg) || 0,
                 max: Number(matchingDevice?.last_record?.max) || 0,
                 min: Number(matchingDevice?.last_record?.min) || 0,
+                total: Number(matchingDevice?.last_record?.total) || 0,
+                isActive: matchingDevice?.device_status === "active",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
+                organizationConnection: matchingDevice?.organization_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportType: matchingDevice?.report_type_name,
+              },
+            };
+          }
+        } else if (node?.type === "bdwfms") {
+          const matchingDevice = deviceData?.find(
+            (device) =>
+              device?.device_name === node?.data?.label &&
+              (device?.device_family_type === "BDWFMS" ||
+                device?.device_family?.toLowerCase().includes("BDWFMS"))
+          );
+
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                flowRate: Number(matchingDevice?.last_record?.flow) || 0,
+                avg: Number(matchingDevice?.last_record?.avg) || 0,
+                max: Number(matchingDevice?.last_record?.max) || 0,
+                min: Number(matchingDevice?.last_record?.min) || 0,
+                total: Number(matchingDevice?.last_record?.total) || 0,
                 isActive: matchingDevice?.device_status === "active",
                 departmentConnection: getDepartmentConnection(matchingDevice),
                 plantConnection: getPlantConnection(matchingDevice),
