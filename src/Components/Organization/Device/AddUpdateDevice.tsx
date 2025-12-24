@@ -374,7 +374,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hmin: "",
       A: "",
       B: "",
-      A1: "",
+      A1: "1",
       B1: "",
     });
     setBrwhmsInputValues({
@@ -383,7 +383,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hmin: "",
       A: "",
       B: "",
-      A1: "",
+      A1: "1",
       B1: "",
     });
     setDwlrParams({
@@ -661,109 +661,99 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               "";
 
             const commonData = {
-              maxThreshold: deviceData.params?.maxThreshold || "",
-              lowerLimit: deviceData.params?.lowerLimit || "",
-              upperLimit: deviceData.params?.upperLimit || "",
-              multiplier: deviceData.params?.multiplier || "",
-              shifter: deviceData.params?.shifter || "",
-              refValue: deviceData.params?.refValue || 0,
-              refPercent: deviceData.params?.refPercent || 0,
-              A: deviceData.params?.A || "",
-              B: deviceData.params?.B || "",
-              C: deviceData.params?.C || "",
-              D: deviceData.params?.D || "",
-              overWrite: deviceData.params?.overWrite || 0,
+              maxThreshold: deviceData.params?.maxThreshold,
+              lowerLimit: deviceData.params?.lowerLimit,
+              upperLimit: deviceData.params?.upperLimit,
+              multiplier: deviceData.params?.multiplier,
+              shifter: deviceData.params?.shifter,
+              refValue: deviceData.params?.refValue,
+              refPercent: deviceData.params?.refPercent,
+              A: deviceData.params?.A,
+              B: deviceData.params?.B,
+              C: deviceData.params?.C,
+              D: deviceData.params?.D,
+              overWrite: deviceData.params?.overWrite,
             };
             setCommonParams(commonData);
             setCommonInputValues({
-              maxThreshold: commonData?.maxThreshold?.toString() || "",
-              lowerLimit: commonData?.lowerLimit?.toString() || "",
-              upperLimit: commonData?.upperLimit?.toString() || "",
-              refValue: commonData?.refValue || 0,
-              refPercent: commonData?.refPercent || 0,
-              multiplier: commonData?.multiplier?.toString() || "",
-              shifter: commonData?.shifter?.toString() || "",
-              A: commonData?.A?.toString() || "",
-              B: commonData?.B?.toString() || "",
-              C: commonData?.C?.toString() || "",
-              D: commonData?.D?.toString() || "",
-              overWrite: commonData?.overWrite || 0,
+              maxThreshold: commonData?.maxThreshold,
+              lowerLimit: commonData?.lowerLimit,
+              upperLimit: commonData?.upperLimit,
+              refValue: commonData?.refValue,
+              refPercent: commonData?.refPercent,
+              multiplier: commonData?.multiplier,
+              shifter: commonData?.shifter,
+              A: commonData?.A,
+              B: commonData?.B,
+              C: commonData?.C,
+              D: commonData?.D,
+              overWrite: commonData?.overWrite,
             });
 
             if (familyName === "tank") {
               const tankData = {
-                height: deviceData.params?.height || 0,
-                storageCapacity: deviceData.params?.storageCapacity || 0,
-                sensorPostion: deviceData.params?.sensorPostion || 0,
-                crossSectionArea: deviceData.params?.crossSectionArea || 0,
+                height: deviceData.params?.height,
+                storageCapacity: deviceData.params?.storageCapacity,
+                sensorPostion: deviceData.params?.sensorPostion,
+                crossSectionArea: deviceData.params?.crossSectionArea,
               };
               setTankParams(tankData);
               setTankInputValues({
-                height: tankData?.height?.toString() || "",
-                storageCapacity: tankData?.storageCapacity?.toString() || "",
-                sensorPostion: tankData?.sensorPostion?.toString() || "",
-                crossSectionArea: tankData?.crossSectionArea?.toString() || "",
+                height: tankData?.height,
+                storageCapacity: tankData?.storageCapacity,
+                sensorPostion: tankData?.sensorPostion,
+                crossSectionArea: tankData?.crossSectionArea,
               });
             } else if (familyName === "brwhms") {
               const brwhmsData = {
-                sg: deviceData?.params?.sg || 0,
-                hmax: deviceData?.params?.hmax || 0,
-                hmin: deviceData?.params?.hmin || 0,
-                A: deviceData?.params?.A || 0,
-                B: deviceData?.params?.B || 0,
-                A1: deviceData?.params?.A1 || 0,
-                B1: deviceData?.params?.B1 || 0,
+                sg: deviceData?.params?.sg,
+                hmax: deviceData?.params?.hmax,
+                hmin: deviceData?.params?.hmin,
+                A: deviceData?.params?.A,
+                B: deviceData?.params?.B,
+                A1: deviceData?.params?.A1,
+                B1: deviceData?.params?.B1,
               };
               setBrwhmsParams(brwhmsData);
               setBrwhmsInputValues({
-                sg: brwhmsData?.sg?.toString() || "",
-                hmax: brwhmsData?.hmax?.toString() || "",
-                hmin: brwhmsData?.hmin?.toString() || "",
-                A: brwhmsData?.A?.toString() || "",
-                B: brwhmsData?.B?.toString() || "",
-                A1: brwhmsData?.A1?.toString() || "",
-                B1: brwhmsData?.B1?.toString() || "",
+                sg: brwhmsData?.sg,
+                hmax: brwhmsData?.hmax,
+                hmin: brwhmsData?.hmin,
+                A: brwhmsData?.A,
+                B: brwhmsData?.B,
+                A1: brwhmsData?.A1,
+                B1: brwhmsData?.B1,
               });
             } else if (familyName === "dwlr") {
               const convertSensorParam = (param: any) => ({
                 enable: param?.enable || 0,
-                name: param?.name?.toString() || "",
-                unit: param?.unit?.toString() || "",
-                multipliers: param?.multipliers?.toString() || "",
-                min: param?.min?.toString() || "",
-                max: param?.max?.toString() || "",
-                set_limit: param?.set_limit?.toString() || "",
-                set_min: param?.set_min?.toString() || "",
-                set_max: param?.set_max?.toString() || "",
-                ref_val: param?.ref_val?.toString() || "",
-                ref_percent: param?.ref_percent?.toString() || "",
+                name: param?.name,
+                unit: param?.unit,
+                multipliers: param?.multipliers,
+                min: param?.min,
+                max: param?.max,
+                set_limit: param?.set_limit,
+                set_min: param?.set_min,
+                set_max: param?.set_max,
+                ref_val: param?.ref_val,
+                ref_percent: param?.ref_percent,
               });
 
               const dwlrData = {
                 device_params: {
-                  sitename:
-                    deviceData.params?.device_params?.sitename?.toString() ||
-                    "",
-                  address:
-                    deviceData.params?.device_params?.address?.toString() || "",
-                  serial:
-                    deviceData.params?.device_params?.serial?.toString() || "",
-                  identifier:
-                    deviceData.params?.device_params?.identifier?.toString() ||
-                    "",
-                  cable_length:
-                    deviceData.params?.device_params?.cable_length?.toString() ||
-                    "",
-                  lat: deviceData.params?.device_params?.lat?.toString() || "",
-                  lng: deviceData.params?.device_params?.lng?.toString() || "",
+                  sitename: deviceData.params?.device_params?.sitename,
+                  address: deviceData.params?.device_params?.address,
+                  serial: deviceData.params?.device_params?.serial,
+                  identifier: deviceData.params?.device_params?.identifier,
+                  cable_length: deviceData.params?.device_params?.cable_length,
+                  lat: deviceData.params?.device_params?.lat,
+                  lng: deviceData.params?.device_params?.lng,
                   installation_date:
-                    deviceData.params?.device_params?.installation_date?.toString() ||
-                    "",
+                    deviceData.params?.device_params?.installation_date,
                   daily_msgs_count:
-                    deviceData.params?.device_params?.daily_msgs_count?.toString() ||
-                    "",
+                    deviceData.params?.device_params?.daily_msgs_count,
                   undermentance:
-                    deviceData.params?.device_params?.undermentance || 0,
+                    deviceData.params?.device_params?.undermentance,
                 },
                 water_column: convertSensorParam(
                   deviceData.params?.water_column
@@ -802,10 +792,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
             if (deviceData.device_reporting) {
               setReportData({
-                report_name: deviceData.device_reporting?.report_name || "",
-                report_unit: deviceData.device_reporting?.report_unit || "",
+                report_name: deviceData.device_reporting?.report_name,
+                report_unit: deviceData.device_reporting?.report_unit,
                 report_formula:
-                  deviceData.device_reporting?.report_formula || "",
+                  deviceData.device_reporting?.report_formula,
               });
             }
 
