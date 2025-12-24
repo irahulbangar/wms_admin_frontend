@@ -794,8 +794,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               setReportData({
                 report_name: deviceData.device_reporting?.report_name,
                 report_unit: deviceData.device_reporting?.report_unit,
-                report_formula:
-                  deviceData.device_reporting?.report_formula,
+                report_formula: deviceData.device_reporting?.report_formula,
               });
             }
 
@@ -970,19 +969,19 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   setTankInputValues(values);
                   setTankParams({
                     height:
-                      values.height === "" ? 0 : parseFloat(values.height) || 0,
+                      values.height === "" ? 0 : parseFloat(values.height),
                     storageCapacity:
                       values.storageCapacity === ""
                         ? 0
-                        : parseFloat(values.storageCapacity) || 0,
+                        : parseFloat(values.storageCapacity),
                     sensorPostion:
                       values.sensorPostion === ""
                         ? 0
-                        : parseFloat(values.sensorPostion) || 0,
+                        : parseFloat(values.sensorPostion),
                     crossSectionArea:
                       values.crossSectionArea === ""
                         ? 0
-                        : parseFloat(values.crossSectionArea) || 0,
+                        : parseFloat(values.crossSectionArea),
                   });
                 }}
                 errors={errors}
@@ -995,13 +994,13 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 onBRWHMSParamsChange={(values) => {
                   setBrwhmsInputValues(values);
                   setBrwhmsParams({
-                    sg: values.sg === "" ? 0 : parseFloat(values.sg) || 0,
-                    hmax: values.hmax === "" ? 0 : parseFloat(values.hmax) || 0,
-                    hmin: values.hmin === "" ? 0 : parseFloat(values.hmin) || 0,
-                    A: values.A === "" ? 0 : parseFloat(values.A) || 0,
-                    B: values.B === "" ? 0 : parseFloat(values.B) || 0,
-                    A1: values.A1 === "" ? 0 : parseFloat(values.A1) || 0,
-                    B1: values.B1 === "" ? 0 : parseFloat(values.B1) || 0,
+                    sg: values.sg === "" ? 0 : parseFloat(values.sg),
+                    hmax: values.hmax === "" ? 0 : parseFloat(values.hmax),
+                    hmin: values.hmin === "" ? 0 : parseFloat(values.hmin),
+                    A: values.A === "" ? 0 : parseFloat(values.A),
+                    B: values.B === "" ? 0 : parseFloat(values.B),
+                    A1: values.A1 === "" ? 0 : parseFloat(values.A1),
+                    B1: values.B1 === "" ? 0 : parseFloat(values.B1),
                   });
                 }}
                 errors={errors}
