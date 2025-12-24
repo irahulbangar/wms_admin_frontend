@@ -374,7 +374,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hmin: "",
       A: "",
       B: "",
-      A1: "1",
+      A1: "",
       B1: "",
     });
     setBrwhmsInputValues({
@@ -383,7 +383,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       hmin: "",
       A: "",
       B: "",
-      A1: "1",
+      A1: "",
       B1: "",
     });
     setDwlrParams({
