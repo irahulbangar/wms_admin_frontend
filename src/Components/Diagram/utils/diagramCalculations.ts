@@ -490,7 +490,7 @@ export const convertDevicesToDiagram = (
         const bdwfms = system.devices.filter(
           (device: DeviceResult) =>
             device.device_family_type === "BDWFMS" ||
-            device.device_family?.toLowerCase().includes("bdwfms")
+            device.device_family_type?.toLowerCase().includes("bdwfms")
         );
 
         bdwfms.forEach((device: DeviceResult, bdwfmsIndex: number) => {

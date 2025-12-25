@@ -311,7 +311,7 @@ export const useDiagramData = (plantId: string | undefined) => {
             (device) =>
               device?.device_name === node?.data?.label &&
               (device?.device_family_type === "BDWFMS" ||
-                device?.device_family?.toLowerCase().includes("BDWFMS"))
+                device?.device_family_type?.toLowerCase().includes("BDWFMS"))
           );
 
           if (matchingDevice) {

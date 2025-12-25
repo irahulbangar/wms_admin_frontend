@@ -101,7 +101,7 @@ const DataSync = () => {
       family.name.toLowerCase().includes("flow") ||
       family.type?.toLowerCase() === "fm" ||
       family.type?.toLowerCase() === "brwhms" ||
-      family.type?.toLowerCase() === "BDWFMS" ||
+      family.type?.toLowerCase() === "bdwfms" ||
       family.type?.toLowerCase() === "tank" ||
       family.type?.toLowerCase() === "phmc" ||
       family.type?.toLowerCase() === "dwlr"
@@ -682,7 +682,7 @@ const DataSync = () => {
         month: monthYear.split("-")[1],
         data: csvData,
       });
-    } else if (familyType === "BDWFMS") {
+    } else if (familyType === "bdwfms") {
       syncData = dataSyncForBDWFMSDevices({
         device_id: Number(deviceId),
         year: monthYear.split("-")[0],
