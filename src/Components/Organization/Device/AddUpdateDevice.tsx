@@ -530,6 +530,11 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
     setIsLoading(true);
     try {
+      // Debug: Log formula value before submission
+      if (isSmartDevice) {
+        console.log("Formula value before submit:", formData.formula);
+      }
+
       const deviceData = {
         device_family_id: formData.device_family_id,
         device_type_id: formData.device_type_id,
@@ -560,7 +565,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               report_formula: "",
               report_value: "",
             },
-        formula: formData.formula || "",
+        formula: isSmartDevice ? formData.formula ?? "" : "",
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {
@@ -704,7 +709,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               plant_id: deviceData.plant_id,
               department_id: deviceData.department_id,
               device_reporting: deviceData.device_reporting,
-              formula: deviceData.formula,
+              formula: deviceData.formula ?? "",
             });
 
             const selectedFamily = familyData.find(
@@ -1027,31 +1032,46 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             )}
 
             {isSmartDevice && (
-              <Editor
-                height="300px"
-                width="100%"
-                value={formData.formula || ""}
-                onChange={(value) =>
-                  setFormData({
-                    ...formData,
-                    formula: value ? value : "",
-                  })
-                }
-                language="javascript"
-                className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
-                  errors?.smart_device_config
-                    ? "border-status-danger"
-                    : "border-border-primary"
-                }`}
-                options={{
-                  wordWrap: "on",
-                  automaticLayout: true,
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  lineNumbers: "on",
-                  scrollBeyondLastLine: false,
-                }}
-              />
+              <div>
+                <label className="block text-xl font-normal text-text-primary font-roboto border-b border-border-primary pb-2 pt-4">
+                  Smart Device Configuration
+                </label>
+                <div className="pt-2">
+                  <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+                    Configuration Script
+                  </label>
+                  <Editor
+                    height="300px"
+                    width="100%"
+                    value={formData.formula ?? ""}
+                    onChange={(value: string | undefined) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        formula: value ?? "",
+                      }));
+                    }}
+                    language="javascript"
+                    className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
+                      errors?.formula
+                        ? "border-status-danger"
+                        : "border-border-primary"
+                    }`}
+                    options={{
+                      wordWrap: "on",
+                      automaticLayout: true,
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      lineNumbers: "on",
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
+                  {errors?.formula && (
+                    <p className="mt-1 text-sm text-status-danger font-roboto">
+                      {errors.formula}
+                    </p>
+                  )}
+                </div>
+              </div>
             )}
 
             {!isVirtualReporting && !isSmartDevice && (
