@@ -16,6 +16,7 @@ interface ConnectionFormsProps {
   isInReportType: boolean;
   isOutReportType: boolean;
   isStorageReportType: boolean;
+  isSmartDevice?: boolean;
 }
 
 const ConnectionForms: React.FC<ConnectionFormsProps> = ({
@@ -30,6 +31,7 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
   isInReportType,
   isOutReportType,
   isStorageReportType,
+  isSmartDevice = false,
 }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -111,14 +113,22 @@ const ConnectionForms: React.FC<ConnectionFormsProps> = ({
           </label>
           <select
             name="visibility"
-            value={formData.visibility}
+            value={isSmartDevice ? "hidden" : formData.visibility}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary"
+            disabled={isSmartDevice}
+            className={`w-full px-3 py-2 border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary ${
+              isSmartDevice ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <option value="0">Select Visibility</option>
             <option value="visible">Visible</option>
             <option value="hidden">Hidden</option>
           </select>
+          {isSmartDevice && (
+            <p className="mt-1 text-xs text-status-warning font-roboto">
+              Visibility is automatically set to "Hidden" for Smart Device
+            </p>
+          )}
         </div>
 
         <div>

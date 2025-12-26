@@ -951,6 +951,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       });
   }, [dispatch]);
 
+  useEffect(() => {
+    if (isSmartDevice) {
+      setFormData((prev) => {
+        if (prev.visibility !== "hidden") {
+          return {
+            ...prev,
+            visibility: "hidden",
+          };
+        }
+        return prev;
+      });
+    }
+  }, [isSmartDevice]);
+
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-primary rounded-lg shadow-xl w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -1019,6 +1033,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               isInReportType={isInReportType}
               isOutReportType={isOutReportType}
               isStorageReportType={isStorageReportType}
+              isSmartDevice={isSmartDevice}
             />
 
             {isVirtualReporting && (
