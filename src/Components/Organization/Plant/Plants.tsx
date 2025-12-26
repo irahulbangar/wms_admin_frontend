@@ -474,13 +474,13 @@ const Plants = () => {
                     Plant Name
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
+                    Address
+                  </th>
+                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Latitude
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Longitude
-                  </th>
-                  <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
-                    Address
                   </th>
                   <th className="p-4 text-text-primary whitespace-nowrap text-start text-base font-roboto font-normal">
                     Status
@@ -515,14 +515,14 @@ const Plants = () => {
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         {plant?.plant_name || "N/A"}
                       </td>
+                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
+                        {plant?.address || "N/A"}
+                      </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {plant?.latitude || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap">
                         {plant?.longitude || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
-                        {plant?.address || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary font-roboto text-base whitespace-nowrap capitalize">
                         <span

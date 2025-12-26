@@ -297,13 +297,13 @@ const Organization = () => {
                     Address
                   </th>
                   <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
-                    Notes
-                  </th>
-                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
                     Status
                   </th>
                   <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
                     Created At
+                  </th>
+                  <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto">
+                    Updated At
                   </th>
                   <th className="px-6 py-3 text-text-primary text-start text-base font-roboto font-normal font-roboto sticky right-0 bg-primary z-10">
                     Action
@@ -341,9 +341,6 @@ const Organization = () => {
                         {organization?.address || "-"}
                       </td>
                       <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
-                        {organization?.note || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         <span
                           className={`px-2 py-1 rounded-full text-sm font-normal capitalize ${handleStatus(
                             organization?.status
@@ -354,6 +351,9 @@ const Organization = () => {
                       </td>
                       <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
                         {formatDateForCSV(organization?.created_at) || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize">
+                        {formatDateForCSV(organization?.updated_at) || "N/A"}
                       </td>
                       <td className="px-6 py-4 text-text-primary text-start font-roboto text-base whitespace-nowrap capitalize sticky right-0 bg-primary z-0">
                         <div className="flex items-center gap-3 justify-center">
