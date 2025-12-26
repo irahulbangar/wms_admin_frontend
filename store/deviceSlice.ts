@@ -81,6 +81,7 @@ export interface CreateDevicePayload {
   plant_id: number | null;
   department_id: number | null;
   device_reporting: DeviceReporting | null;
+  formula: string;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {

@@ -30,6 +30,7 @@ import TankParametersForm from "./components/TankParametersForm";
 import BRWHMSParametersForm from "./components/BRWHMSParametersForm";
 import BDWFMSParametersForm from "./components/BDWFMSParametersForm";
 import DWLRParametersForm from "./components/DWLRParametersForm";
+import { Editor } from "@monaco-editor/react";
 
 interface AddUpdateDeviceProps {
   setShowAddModal: (show: boolean) => void;
@@ -96,6 +97,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     plant_id: plant_id,
     department_id: departmentId,
     device_reporting: null,
+    formula: "",
   });
   const [reportData, setReportData] = useState<VirtualReporting>({
     report_name: "",
@@ -158,6 +160,15 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     );
     return selectedType?.device_type_name || "";
   };
+
+  const getSelectedDeviceFamilyType = () => {
+    const selectedFamily = familyData.find(
+      (family) => family.device_family_id === formData.device_family_id
+    );
+    return selectedFamily?.type || "";
+  };
+
+  const isSmartDevice = getSelectedDeviceFamilyType() === "smart";
 
   const [commonParams, setCommonParams] = useState<object>({
     maxThreshold: "",
@@ -346,6 +357,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       plant_id: plant_id,
       department_id: departmentId,
       device_reporting: null,
+      formula: "",
     });
 
     setCommonParams({
@@ -548,6 +560,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               report_formula: "",
               report_value: "",
             },
+        formula: formData.formula || "",
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
           if (deviceFamilyName === "tank") {
@@ -691,6 +704,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               plant_id: deviceData.plant_id,
               department_id: deviceData.department_id,
               device_reporting: deviceData.device_reporting,
+              formula: deviceData.formula,
             });
 
             const selectedFamily = familyData.find(
@@ -893,6 +907,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         plant_id: plant_id,
         department_id: departmentId,
         device_reporting: null,
+        formula: "",
       });
       setLastRecord(null);
     }
@@ -1011,7 +1026,35 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
-            {!isVirtualReporting && (
+            {isSmartDevice && (
+              <Editor
+                height="300px"
+                width="100%"
+                value={formData.formula || ""}
+                onChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    formula: value ? value : "",
+                  })
+                }
+                language="javascript"
+                className={`w-full px-3 py-2 text-text-primary bg-primary border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto ${
+                  errors?.smart_device_config
+                    ? "border-status-danger"
+                    : "border-border-primary"
+                }`}
+                options={{
+                  wordWrap: "on",
+                  automaticLayout: true,
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  lineNumbers: "on",
+                  scrollBeyondLastLine: false,
+                }}
+              />
+            )}
+
+            {!isVirtualReporting && !isSmartDevice && (
               <CommonParametersForm
                 commonInputValues={commonInputValues}
                 onCommonParamsChange={(values) => {
@@ -1024,7 +1067,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
-            {getSelectedDeviceFamilyName() === "tank" && (
+            {!isSmartDevice && getSelectedDeviceFamilyName() === "tank" && (
               <TankParametersForm
                 tankInputValues={tankInputValues}
                 onTankParamsChange={(values) => {
@@ -1050,7 +1093,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
-            {getSelectedDeviceFamilyName() === "brwhms" && (
+            {!isSmartDevice && getSelectedDeviceFamilyName() === "brwhms" && (
               <BRWHMSParametersForm
                 brwhmsInputValues={brwhmsInputValues}
                 onBRWHMSParamsChange={(values) => {
@@ -1069,7 +1112,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
-            {getSelectedDeviceFamilyName() === "BDWFMS" && (
+            {!isSmartDevice && getSelectedDeviceFamilyName() === "BDWFMS" && (
               <BDWFMSParametersForm
                 bdwfmsInputValues={bdwfmsInputValues}
                 onBDWFMSParamsChange={(values) => {
@@ -1088,7 +1131,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               />
             )}
 
-            {getSelectedDeviceFamilyName() === "dwlr" && (
+            {!isSmartDevice && getSelectedDeviceFamilyName() === "dwlr" && (
               <DWLRParametersForm
                 dwlrParams={dwlrParams}
                 onDWLRParamsChange={setDwlrParams}

@@ -54,6 +54,7 @@ export interface DeviceResult {
   system_name: any;
   report_type_name: string;
   device_reporting: DeviceReporting;
+  formula: string;
 }
 
 export interface LastRecord {
