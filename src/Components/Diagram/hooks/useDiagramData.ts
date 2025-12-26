@@ -424,6 +424,30 @@ export const useDiagramData = (plantId: string | undefined) => {
               },
             };
           }
+        } else if (node?.type === "smartdevice") {
+          const matchingDevice = deviceData?.find(
+            (device) =>
+              device?.device_name === node?.data?.label &&
+              (device?.device_family?.toLowerCase() === "smart device" ||
+                device?.device_family_type?.toLowerCase() === "smart device" ||
+                device?.device_family?.toLowerCase().includes("smart device"))
+          );
+          if (matchingDevice) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                isActive: matchingDevice?.device_status === "active",
+                departmentConnection: getDepartmentConnection(matchingDevice),
+                plantConnection: getPlantConnection(matchingDevice),
+                organizationConnection: matchingDevice?.organization_name,
+                systemName: matchingDevice?.system_name,
+                systemConnection: getSystemConnection(matchingDevice),
+                lastRecordTime: matchingDevice?.last_record?.time || "",
+                reportType: matchingDevice?.report_type_name,
+              },
+            };
+          }
         } else if (node?.type === "virtual") {
           const matchingDevice = deviceData?.find(
             (device) =>

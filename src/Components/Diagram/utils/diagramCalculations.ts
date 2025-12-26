@@ -580,6 +580,36 @@ export const convertDevicesToDiagram = (
           nodes.push(dwlrNode);
         });
 
+        const smartDevices = system.devices.filter(
+          (device: DeviceResult) =>
+            device.device_family?.toLowerCase() === "smart device" ||
+            device.device_family_type?.toLowerCase() === "smart device" ||
+            device.device_family?.toLowerCase().includes("smart device")
+        );
+
+        smartDevices.forEach(
+          (device: DeviceResult, smartDeviceIndex: number) => {
+            const deviceId = `${systemId}-smartdevice${smartDeviceIndex + 1}`;
+            const smartDeviceNode = createSmartDeviceNode(
+              device,
+              deviceId,
+              systemId,
+              systemWidth,
+              systemHeight,
+              smartDeviceIndex,
+              smartDevices.length,
+              tanks.length +
+                fms.length +
+                brwhms.length +
+                bdwfms.length +
+                phmcs.length +
+                args.length +
+                dwlrs.length
+            );
+            nodes.push(smartDeviceNode);
+          }
+        );
+
         const virtuals = system.devices.filter(
           (device: DeviceResult) =>
             (device.device_family_type === "virtual" ||
@@ -603,7 +633,8 @@ export const convertDevicesToDiagram = (
               bdwfms.length +
               phmcs.length +
               args.length +
-              dwlrs.length
+              dwlrs.length +
+              smartDevices.length
           );
           nodes.push(virtualNode);
         });
@@ -632,6 +663,7 @@ export const convertDevicesToDiagram = (
               phmcs.length +
               args.length +
               dwlrs.length +
+              smartDevices.length +
               virtuals.length
           );
           nodes.push(resultantNode);
@@ -1294,6 +1326,99 @@ const createDWLRNode = (
     type: "dwlr",
     width: dwlrWidth,
     height: dwlrHeight,
+  };
+};
+
+const createSmartDeviceNode = (
+  device: DeviceResult,
+  deviceId: string,
+  groupId: string,
+  groupWidth: number,
+  groupHeight: number,
+  smartDeviceIndex: number,
+  totalSmartDevices: number,
+  previousDevicesCount: number
+): DiagramNode => {
+  const smartDeviceWidth = 100;
+  const smartDeviceHeight = 94;
+  const sideMargin = 30;
+  const smartDeviceSpacing = 20;
+
+  const availableWidth = groupWidth - 2 * sideMargin;
+  const maxDevicesPerRow = Math.max(
+    1,
+    Math.floor(availableWidth / (smartDeviceWidth + smartDeviceSpacing))
+  );
+  const totalRows = Math.ceil(totalSmartDevices / maxDevicesPerRow);
+
+  const footerHeight = 20;
+  const previousDevicesHeight = previousDevicesCount > 0 ? 500 : 0;
+
+  const smartDeviceStartY = previousDevicesHeight + 60;
+  const availableHeight = groupHeight - smartDeviceStartY - footerHeight;
+
+  const smartDeviceSectionHeight = Math.min(
+    availableHeight * 0.6,
+    totalRows * (smartDeviceHeight + 40) + 60
+  );
+
+  const smartDeviceVerticalSpacing =
+    totalRows > 1
+      ? Math.max(
+          40,
+          Math.min(
+            70,
+            (smartDeviceSectionHeight - totalRows * smartDeviceHeight) /
+              (totalRows - 1)
+          )
+        )
+      : 0;
+
+  const row = Math.floor(smartDeviceIndex / maxDevicesPerRow);
+  const col = smartDeviceIndex % maxDevicesPerRow;
+
+  const totalDevicesInRow = Math.min(
+    maxDevicesPerRow,
+    totalSmartDevices - row * maxDevicesPerRow
+  );
+  const rowWidth =
+    totalDevicesInRow * smartDeviceWidth +
+    (totalDevicesInRow - 1) * smartDeviceSpacing;
+  const startX = sideMargin + (availableWidth - rowWidth) / 2;
+
+  const deviceX = startX + col * (smartDeviceWidth + smartDeviceSpacing);
+  const deviceY =
+    smartDeviceStartY +
+    30 +
+    row * (smartDeviceHeight + smartDeviceVerticalSpacing);
+
+  const maxX = groupWidth - smartDeviceWidth - sideMargin;
+  const maxY = groupHeight - smartDeviceHeight - footerHeight;
+  const finalX = Math.min(deviceX, maxX);
+  const finalY = Math.min(deviceY, maxY);
+
+  const unit = device.unit || "";
+
+  const smartDeviceNodeData: NodeData = {
+    label: device.device_name,
+    type: "bidirectional",
+    direction: "bidirectional",
+    unit: unit,
+    isActive: device.device_status === "active",
+    lastRecordTime: device.last_record_time || "",
+    systemName: device.system_name || "",
+  };
+
+  return {
+    id: deviceId,
+    data: smartDeviceNodeData,
+    position: { x: finalX, y: finalY },
+    parentId: groupId,
+    sourcePosition: "right",
+    targetPosition: "left",
+    type: "smartdevice",
+    width: smartDeviceWidth,
+    height: smartDeviceHeight,
   };
 };
 

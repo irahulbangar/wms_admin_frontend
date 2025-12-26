@@ -10,6 +10,7 @@ import SourceNode from "./SourceNode";
 import SinkNode from "./SinkNode";
 import VirtualNode from "./VirtualNode";
 import ResultantNode from "./ResultantNode";
+import SmartDeviceNode from "./SmartDeviceNode";
 
 export const nodeTypes = {
   tank: TankNode,
@@ -24,4 +25,5 @@ export const nodeTypes = {
   sink: SinkNode,
   virtual: VirtualNode,
   resultant: ResultantNode,
+  smartdevice: SmartDeviceNode,
 };
