@@ -1026,6 +1026,81 @@ export const getBDWFMSCustomReportData = createAsyncThunk(
   }
 );
 
+interface GetSMARTRuntimeDataPayload {
+  plantId: number;
+  deviceId: number;
+  date: string;
+}
+
+// get PHMC runtime data
+export const getSMARTRuntimeData = createAsyncThunk(
+  "device/getSMARTRuntimeData",
+  async ({ plantId, deviceId, date }: GetSMARTRuntimeDataPayload, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/smart/admin/device/smart-logs/${plantId}/${deviceId}`,
+        {
+          date,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
+interface GetSMARTCustomReportDataPayload {
+  plantId: number;
+  deviceId: number;
+  from_date: string;
+  to_date: string;
+  duration: string;
+}
+
+// get PHMC custom report data
+export const getSMARTCustomReportData = createAsyncThunk(
+  "device/getSMARTCustomReportData",
+  async (
+    {
+      plantId,
+      deviceId,
+      from_date,
+      to_date,
+      duration,
+    }: GetSMARTCustomReportDataPayload,
+    thunkAPI
+  ) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const response = await api().post(
+        `/smart/admin/device/smart-reports/${plantId}/${deviceId}`,
+        {
+          from_date,
+          to_date,
+          duration,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const apiError = handleApiError(error);
+      return rejectWithValue(apiError);
+    }
+  }
+);
+
 export const { setDevices, setLoading, setError } = deviceSlice.actions;
 
 export default deviceSlice.reducer;
