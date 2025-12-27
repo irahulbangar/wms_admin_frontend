@@ -351,6 +351,7 @@ const DiagramPage = () => {
       phmc: "phmc",
       arg: "arg",
       dwlr: "dwlr",
+      smartdevice: "smart",
     };
 
     const deviceFamilyType = nodeTypeToFamilyType[node.type];
@@ -371,6 +372,15 @@ const DiagramPage = () => {
           deviceFamilyTypeLower === "bdwfms" ||
           device.device_family_type === "BDWFMS" ||
           deviceFamilyLower?.includes("bdwfms")
+        );
+      }
+
+      if (deviceFamilyType === "smart") {
+        return (
+          deviceFamilyTypeLower === "smart" ||
+          deviceFamilyTypeLower === "smart device" ||
+          deviceFamilyLower?.includes("smart") ||
+          device.device_family_type === "smart"
         );
       }
 
