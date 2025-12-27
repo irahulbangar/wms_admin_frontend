@@ -30,6 +30,7 @@ import TankParametersForm from "./components/TankParametersForm";
 import BRWHMSParametersForm from "./components/BRWHMSParametersForm";
 import BDWFMSParametersForm from "./components/BDWFMSParametersForm";
 import DWLRParametersForm from "./components/DWLRParametersForm";
+import SmartParametersForm from "./components/SmartParametersForm";
 import { Editor } from "@monaco-editor/react";
 
 interface AddUpdateDeviceProps {
@@ -55,6 +56,14 @@ interface VirtualReporting {
   report_name: string;
   report_unit: string;
   report_formula: string;
+}
+
+interface DisplayParam {
+  name: string;
+  report_visible: number;
+  diagram_visible: number;
+  display_name: string;
+  unit: string;
 }
 
 const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
@@ -104,6 +113,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     report_unit: "",
     report_formula: "",
   });
+  const [displayParams, setDisplayParams] = useState<DisplayParam[]>([]);
   const [showAddSystemPopup, setShowAddSystemPopup] = useState(false);
   const [reportTypes, setReportTypes] = useState<ReportTypeResult[]>([]);
   const [_lastRecord, setLastRecord] = useState<Record<string, any> | null>(
@@ -471,6 +481,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       report_unit: "",
       report_formula: "",
     });
+    setDisplayParams([]);
     setLastRecord(null);
     setErrors({});
   };
@@ -563,7 +574,17 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         formula: isSmartDevice ? formData.formula ?? "" : "",
         params: (() => {
           const deviceFamilyName = getSelectedDeviceFamilyName();
-          if (deviceFamilyName === "tank") {
+          if (isSmartDevice) {
+            return {
+              display_params: displayParams.map((param) => ({
+                name: param.name,
+                report_visible: param.report_visible,
+                diagram_visible: param.diagram_visible,
+                display_name: param.display_name,
+                unit: param.unit,
+              })),
+            };
+          } else if (deviceFamilyName === "tank") {
             return { ...commonParams, ...tankParams };
           } else if (deviceFamilyName === "brwhms") {
             return { ...commonParams, ...brwhmsParams };
@@ -873,6 +894,25 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               });
             }
 
+            // Initialize display_params for smart devices
+            if (
+              selectedFamily?.type === "smart" &&
+              deviceData.params?.display_params
+            ) {
+              setDisplayParams(
+                deviceData.params.display_params.map((param: any) => ({
+                  name: param.name || "",
+                  report_visible: param.report_visible || 0,
+                  diagram_visible: param.diagram_visible || 0,
+                  display_name: param.display_name || "",
+                  unit: param.unit || "",
+                  formula: param.formula || "",
+                }))
+              );
+            } else if (selectedFamily?.type === "smart") {
+              setDisplayParams([]);
+            }
+
             if (deviceData.last_record) {
               setLastRecord(deviceData.last_record);
             }
@@ -907,7 +947,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         plant_id: plant_id,
         department_id: departmentId,
         device_reporting: null,
-        formula: "",
+        formula: "// add your code here and don't remove result line\nresult = {};",
       });
       setLastRecord(null);
     }
@@ -945,20 +985,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         Error(err.message || "Failed to fetch report types");
       });
   }, [dispatch]);
-
-  useEffect(() => {
-    if (isSmartDevice) {
-      setFormData((prev) => {
-        if (prev.visibility !== "hidden") {
-          return {
-            ...prev,
-            visibility: "hidden",
-          };
-        }
-        return prev;
-      });
-    }
-  }, [isSmartDevice]);
 
   return (
     <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50">
@@ -1028,7 +1054,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               isInReportType={isInReportType}
               isOutReportType={isOutReportType}
               isStorageReportType={isStorageReportType}
-              isSmartDevice={isSmartDevice}
             />
 
             {isVirtualReporting && (
@@ -1053,7 +1078,10 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <Editor
                     height="300px"
                     width="100%"
-                    value={formData.formula ?? ""}
+                    value={
+                      formData.formula ||
+                      "// add your code here and don't remove result line\nresult = {};"
+                    }
                     onChange={(value: string | undefined) => {
                       setFormData((prev) => ({
                         ...prev,
@@ -1082,6 +1110,14 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   )}
                 </div>
               </div>
+            )}
+
+            {isSmartDevice && (
+              <SmartParametersForm
+                displayParams={displayParams}
+                onDisplayParamsChange={setDisplayParams}
+                errors={errors}
+              />
             )}
 
             {!isVirtualReporting && !isSmartDevice && (
