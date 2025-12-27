@@ -23,6 +23,7 @@ const SmartParametersForm: React.FC<SmartParametersFormProps> = ({
   const [expandedParams, setExpandedParams] = useState<Record<number, boolean>>(
     {}
   );
+  const [nameWarnings, setNameWarnings] = useState<Record<number, string>>({});
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -191,9 +192,29 @@ const SmartParametersForm: React.FC<SmartParametersFormProps> = ({
                     <input
                       type="text"
                       value={param.name}
-                      onChange={(e) =>
-                        handleParamChange(index, "name", e.target.value)
-                      }
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        const hasSpaces = /\s/.test(inputValue);
+
+                        if (hasSpaces) {
+                          setNameWarnings((prev) => ({
+                            ...prev,
+                            [index]: "Spaces are not allowed in parameter name",
+                          }));
+                        } else {
+                          setNameWarnings((prev) => {
+                            const newWarnings = { ...prev };
+                            delete newWarnings[index];
+                            return newWarnings;
+                          });
+                        }
+
+                        const valueWithoutSpaces = inputValue.replace(
+                          /\s/g,
+                          ""
+                        );
+                        handleParamChange(index, "name", valueWithoutSpaces);
+                      }}
                       placeholder="Enter parameter name (e.g., 'a')"
                       className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info bg-primary text-text-primary font-roboto ${
                         errors[`display_params.${index}.name`]
@@ -201,6 +222,11 @@ const SmartParametersForm: React.FC<SmartParametersFormProps> = ({
                           : "border-border-primary"
                       }`}
                     />
+                    {nameWarnings[index] && (
+                      <p className="mt-1 text-sm text-status-warning font-roboto">
+                        {nameWarnings[index]}
+                      </p>
+                    )}
                     {errors[`display_params.${index}.name`] && (
                       <p className="mt-1 text-sm text-status-danger font-roboto">
                         {errors[`display_params.${index}.name`]}

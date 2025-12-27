@@ -158,7 +158,7 @@ const SMARTReport: React.FC = () => {
             plantId: _plantId,
             deviceId,
             from_date: `${fromDate} 00:00:00`,
-            to_date: `${toDate} 00:00:00`,
+            to_date: `${toDate} 23:59:59`,
             duration: reportTypeDurationMap[reportType],
           })
         )
@@ -225,18 +225,19 @@ const SMARTReport: React.FC = () => {
       headers.join(","),
       ...dataToExport.map((item, index) => {
         const temp1Avg =
-          (item.first_record?.temp1 + item.last_record?.temp1) / 2;
+          (item.first_record?.param1 + item.last_record?.param1) / 2;
         const temp2Avg =
-          (item.first_record?.temp2 + item.last_record?.temp2) / 2;
+          (item.first_record?.param2 + item.last_record?.param2) / 2;
         const temp3Avg =
-          (item.first_record?.temp3 + item.last_record?.temp3) / 2;
+          (item.first_record?.param3 + item.last_record?.param3) / 2;
         const humidityAvg =
-          (item.first_record?.humidity + item.last_record?.humidity) / 2;
+          (item.first_record?.param4 + item.last_record?.param4) / 2;
         const powerAvg =
-          (item.first_record?.power + item.last_record?.power) / 2;
-        const flowAvg = (item.first_record?.flow + item.last_record?.flow) / 2;
+          (item.first_record?.param5 + item.last_record?.param5) / 2;
+        const flowAvg =
+          (item.first_record?.param6 + item.last_record?.param6) / 2;
         const levelAvg =
-          (item.first_record?.level + item.last_record?.level) / 2;
+          (item.first_record?.param7 + item.last_record?.param7) / 2;
 
         return [
           index + 1,
@@ -519,27 +520,16 @@ const SMARTReport: React.FC = () => {
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                           To Time
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Temp 1
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Temp 2
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Temp 3
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Humidity
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Power
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Flow
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Level
-                        </th>
+                        {device?.params?.display_params
+                          ?.filter((param) => param.report_visible !== 0)
+                          .map((param, index) => (
+                            <th
+                              key={index}
+                              className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal"
+                            >
+                              {param.display_name}
+                            </th>
+                          ))}
                       </tr>
                     </thead>
                     <tbody>
@@ -558,83 +548,27 @@ const SMARTReport: React.FC = () => {
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.to_time)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.temp1 +
-                                    item.last_record?.temp1) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} °C`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.temp2 +
-                                    item.last_record?.temp2) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} °C`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.temp3 +
-                                    item.last_record?.temp3) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} °C`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.humidity +
-                                    item.last_record?.humidity) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} %`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.power +
-                                    item.last_record?.power) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} W`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.flow +
-                                    item.last_record?.flow) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} L/min`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.level +
-                                    item.last_record?.level) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} %`
-                                  : "-";
-                              })()}
-                            </td>
+                            {device?.params?.display_params
+                              ?.filter((param) => param.report_visible !== 0)
+                              .map((param, index) => {
+                                const lastRecord = item.last_record;
+                                const value =
+                                  lastRecord &&
+                                  typeof lastRecord === "object" &&
+                                  Object.keys(lastRecord).length > 0
+                                    ? lastRecord[param.name]
+                                    : null;
+                                return (
+                                  <td
+                                    key={index}
+                                    className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap"
+                                  >
+                                    {value !== null && value !== undefined
+                                      ? value
+                                      : "-"}
+                                  </td>
+                                );
+                              })}
                           </tr>
                         ))
                       ) : (
@@ -692,27 +626,16 @@ const SMARTReport: React.FC = () => {
                         <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
                           To Time
                         </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Temp 1
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Temp 2
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Temp 3
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Humidity
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Power
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Flow
-                        </th>
-                        <th className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal">
-                          Level
-                        </th>
+                        {device?.params?.display_params
+                          ?.filter((param) => param.report_visible !== 0)
+                          .map((param, index) => (
+                            <th
+                              key={index}
+                              className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal"
+                            >
+                              {param.display_name}
+                            </th>
+                          ))}
                       </tr>
                     </thead>
                     <tbody>
@@ -731,83 +654,27 @@ const SMARTReport: React.FC = () => {
                             <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
                               {formatDateForCSV(item.to_time)}
                             </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.temp1 +
-                                    item.last_record?.temp1) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} °C`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.temp2 +
-                                    item.last_record?.temp2) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} °C`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.temp3 +
-                                    item.last_record?.temp3) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} °C`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-6 py-4 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.humidity +
-                                    item.last_record?.humidity) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} %`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.power +
-                                    item.last_record?.power) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} %`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.flow +
-                                    item.last_record?.flow) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} L/min`
-                                  : "-";
-                              })()}
-                            </td>
-                            <td className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap">
-                              {(() => {
-                                const avg =
-                                  (item.first_record?.level +
-                                    item.last_record?.level) /
-                                  2;
-                                return avg !== null
-                                  ? `${avg.toFixed(1)} %`
-                                  : "-";
-                              })()}
-                            </td>
+                            {device?.params?.display_params
+                              ?.filter((param) => param.report_visible !== 0)
+                              .map((param, index) => {
+                                const lastRecord = item.last_record;
+                                const value =
+                                  lastRecord &&
+                                  typeof lastRecord === "object" &&
+                                  Object.keys(lastRecord).length > 0
+                                    ? lastRecord[param.name]
+                                    : null;
+                                return (
+                                  <td
+                                    key={index}
+                                    className="px-4 py-2 text-text-primary text-center font-roboto text-base whitespace-nowrap"
+                                  >
+                                    {value !== null && value !== undefined
+                                      ? value
+                                      : "-"}
+                                  </td>
+                                );
+                              })}
                           </tr>
                         ))
                       ) : (

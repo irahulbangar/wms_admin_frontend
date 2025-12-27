@@ -446,6 +446,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
                 displayParams: matchingDevice?.params?.display_params || [],
+                lastRecord: matchingDevice?.last_record || {},
               },
             };
           }
