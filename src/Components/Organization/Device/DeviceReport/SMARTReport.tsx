@@ -212,44 +212,28 @@ const SMARTReport: React.FC = () => {
       "SR No",
       "From Time",
       "To Time",
-      "Temp 1",
-      "Temp 2",
-      "Temp 3",
-      "Humidity",
-      "Power",
-      "Flow",
-      "Level",
+      ...(device?.params?.display_params
+        ?.filter((param) => param.report_visible !== 0)
+        .map((param) => param.display_name) || []),
     ];
 
     const csvContent = [
       headers.join(","),
       ...dataToExport.map((item, index) => {
-        const temp1Avg =
-          (item.first_record?.param1 + item.last_record?.param1) / 2;
-        const temp2Avg =
-          (item.first_record?.param2 + item.last_record?.param2) / 2;
-        const temp3Avg =
-          (item.first_record?.param3 + item.last_record?.param3) / 2;
-        const humidityAvg =
-          (item.first_record?.param4 + item.last_record?.param4) / 2;
-        const powerAvg =
-          (item.first_record?.param5 + item.last_record?.param5) / 2;
-        const flowAvg =
-          (item.first_record?.param6 + item.last_record?.param6) / 2;
-        const levelAvg =
-          (item.first_record?.param7 + item.last_record?.param7) / 2;
+        const lastRecord = item.last_record;
 
         return [
           index + 1,
           formatDateForCSV(item.from_time),
           formatDateForCSV(item.to_time),
-          temp1Avg !== null ? `${temp1Avg.toFixed(1)} °C` : "-",
-          temp2Avg !== null ? `${temp2Avg.toFixed(1)} °C` : "-",
-          temp3Avg !== null ? `${temp3Avg.toFixed(1)} °C` : "-",
-          humidityAvg !== null ? `${humidityAvg.toFixed(1)} %` : "-",
-          powerAvg !== null ? `${powerAvg.toFixed(1)} W` : "-",
-          flowAvg !== null ? `${flowAvg.toFixed(1)} L/min` : "-",
-          levelAvg !== null ? `${levelAvg.toFixed(1)} %` : "-",
+          ...(
+            device?.params?.display_params
+              ?.filter((param) => param.report_visible !== 0)
+              .map((param) => {
+                const value = lastRecord?.[param.name];
+                return value !== null && value !== undefined ? value : "-";
+              }) || []
+          ),
         ].join(",");
       }),
     ].join("\n");
