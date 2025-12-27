@@ -530,11 +530,6 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
 
     setIsLoading(true);
     try {
-      // Debug: Log formula value before submission
-      if (isSmartDevice) {
-        console.log("Formula value before submit:", formData.formula);
-      }
-
       const deviceData = {
         device_family_id: formData.device_family_id,
         device_type_id: formData.device_type_id,
