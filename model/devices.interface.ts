@@ -138,6 +138,15 @@ export interface Params {
   sg?: number;
   hmax?: number;
   hmin?: number;
+  display_params: DisplayParam[] | null;
+}
+
+export interface DisplayParam {
+  name: string;
+  report_visible: number;
+  diagram_visible: number;
+  display_name: string;
+  unit: string;
 }
 
 export interface Param1 {

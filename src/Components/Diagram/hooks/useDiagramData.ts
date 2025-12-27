@@ -445,6 +445,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
+                displayParams: matchingDevice?.params?.display_params || [],
               },
             };
           }

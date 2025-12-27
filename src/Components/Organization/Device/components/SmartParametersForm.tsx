@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, Trash2, X } from "lucide-react";
 
 interface DisplayParam {
@@ -23,6 +23,14 @@ const SmartParametersForm: React.FC<SmartParametersFormProps> = ({
   const [expandedParams, setExpandedParams] = useState<Record<number, boolean>>(
     {}
   );
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    if (displayParams.length > 0 && !hasInitialized.current) {
+      setExpandedParams({ 0: true });
+      hasInitialized.current = true;
+    }
+  }, [displayParams.length]);
 
   const toggleParam = (index: number) => {
     setExpandedParams((prev) => {
@@ -46,11 +54,13 @@ const SmartParametersForm: React.FC<SmartParametersFormProps> = ({
       display_name: "",
       unit: "",
     };
+    const newIndex = displayParams.length;
     onDisplayParamsChange([...displayParams, newParam]);
-    setExpandedParams((prev) => ({
-      ...prev,
-      [displayParams.length]: true,
-    }));
+    if (newIndex === 0) {
+      setExpandedParams({ 0: true });
+    } else {
+      setExpandedParams({ [newIndex]: true });
+    }
   };
 
   const handleRemoveParam = (index: number) => {

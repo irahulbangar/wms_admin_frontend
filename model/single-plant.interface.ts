@@ -89,6 +89,15 @@ export interface NodeData {
   waterTemperature?: number;
   waterPressure?: number;
   total?: number;
+  displayParams?: DisplayParam[];
+}
+
+export interface DisplayParam {
+  name: string;
+  report_visible: number;
+  diagram_visible: number;
+  display_name: string;
+  unit: string;
 }
 
 export interface Style {
