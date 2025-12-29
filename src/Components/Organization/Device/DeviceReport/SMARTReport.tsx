@@ -511,7 +511,7 @@ const SMARTReport: React.FC = () => {
                               key={index}
                               className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal"
                             >
-                              {param.display_name}
+                              {param.display_name}({param.unit})
                             </th>
                           ))}
                       </tr>
@@ -617,7 +617,7 @@ const SMARTReport: React.FC = () => {
                               key={index}
                               className="px-4 py-2 text-text-primary whitespace-nowrap text-center text-base font-roboto font-normal"
                             >
-                              {param.display_name}
+                              {param.display_name}({param.unit})
                             </th>
                           ))}
                       </tr>
