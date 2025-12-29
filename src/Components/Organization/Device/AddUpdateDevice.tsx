@@ -947,7 +947,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         plant_id: plant_id,
         department_id: departmentId,
         device_reporting: null,
-        formula: "// add your code here and don't remove result line\nresult = {};",
+        formula: "",
       });
       setLastRecord(null);
     }
@@ -1078,10 +1078,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   <Editor
                     height="300px"
                     width="100%"
-                    value={
-                      formData.formula ||
-                      "// add your code here and don't remove result line\nresult = {};"
-                    }
+                    value={formData.formula || ""}
                     onChange={(value: string | undefined) => {
                       setFormData((prev) => ({
                         ...prev,
