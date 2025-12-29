@@ -8,8 +8,8 @@ import {
   updateSystem,
 } from "../../../../store/systemSlice";
 import { ApiError } from "../../../utils/errorHandler";
-import { Editor } from "@monaco-editor/react";
-import ReportUnitDropdown from "../../Common/ReportUnitDropdown";
+// import { Editor } from "@monaco-editor/react";
+// import ReportUnitDropdown from "../../Common/ReportUnitDropdown";
 
 interface AddUpdateSystemProps {
   setShowAddSystemPopup: (show: boolean) => void;
@@ -302,7 +302,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             )}
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-lg font-normal text-text-primary mb-2 font-roboto">
               System Reporting
             </label>
@@ -339,18 +339,6 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Report Formula
           </label>
-          {/* <textarea
-            name="report_formula"
-            value={reportData.report_formula}
-            onChange={(e) =>
-              setReportData((prev) => ({
-                ...prev,
-                report_formula: e.target.value,
-              }))
-            }
-            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-            placeholder="Enter report formula"
-          /> */}
           <Editor
             height="80%"
             width="100%"
@@ -367,18 +355,6 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
           <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
             Report Neutrality Formula
           </label>
-          {/* <textarea
-            name="report_neutrality_formula"
-            value={reportData.neutrality_formula}
-            onChange={(e) =>
-              setReportData((prev) => ({
-                ...prev,
-                neutrality_formula: e.target.value,
-              }))
-            }
-            className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-            placeholder="Enter report neutrality formula"
-          /> */}
           <Editor
             height="80%"
             width="100%"
@@ -391,7 +367,7 @@ const AddUpdateSystem: React.FC<AddUpdateSystemProps> = ({
             }
             language="javascript"
             className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-          />
+          /> */}
 
           <div className="flex items-center justify-end gap-4 pt-4">
             <button
