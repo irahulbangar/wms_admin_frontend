@@ -155,10 +155,14 @@ export const addPlant = createAsyncThunk(
   }
 );
 
+interface UpdatePlantPayload extends PlantPayload {
+  id: string;
+}
+
 // Update plant by id
 export const updatePlantById = createAsyncThunk(
   "plant/admin/updatePlantById",
-  async (plant: PlantPayload & { id: string }, thunkAPI) => {
+  async (plant: UpdatePlantPayload, thunkAPI) => {
     try {
       const response = await api().put<PlantResponse>(
         `/plant/admin/update-plant/${plant.id}`,
