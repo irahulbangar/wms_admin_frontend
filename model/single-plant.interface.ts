@@ -46,6 +46,7 @@ export interface Node {
 
 export interface NodeData {
   reportName?: string;
+  deviceId?: string;
   type: string;
   unit: string;
   label: string;

@@ -21,6 +21,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
   const organizationConnection = data.organizationConnection || "";
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
+  const deviceId = data.deviceId || "";
 
   const recordTimeOld = isRecordTimeOld(lastRecordTime);
 
@@ -33,6 +34,7 @@ const ARGNode: React.FC<ARGNodeProps> = ({ data }) => {
     systemConnection ? `System Conn. : ${systemConnection}` : null,
     `Rain : ${lastMm} mm`,
     `Max : ${maxMm} mm | Min : ${minMm} mm`,
+    `Device ID : ${deviceId}`,
   ]
     .filter((line) => line !== null && line !== "")
     .join("\n");

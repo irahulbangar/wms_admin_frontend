@@ -248,6 +248,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                   Number(matchingDevice?.params?.crossSectionArea) || 0,
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }
@@ -274,6 +275,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }
@@ -303,6 +305,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }
@@ -332,6 +335,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }
@@ -364,6 +368,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }
@@ -391,6 +396,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemName: matchingDevice?.system_name,
                 systemConnection: getSystemConnection(matchingDevice),
                 reportType: matchingDevice?.report_type_name,
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }
@@ -421,6 +427,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 systemConnection: getSystemConnection(matchingDevice),
                 lastRecordTime: matchingDevice?.last_record?.time || "",
                 reportType: matchingDevice?.report_type_name,
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }
@@ -447,6 +454,7 @@ export const useDiagramData = (plantId: string | undefined) => {
                 reportType: matchingDevice?.report_type_name,
                 displayParams: matchingDevice?.params?.display_params || [],
                 lastRecord: matchingDevice?.last_record || {},
+                deviceId: matchingDevice?.device_id?.toString() || "",
               },
             };
           }

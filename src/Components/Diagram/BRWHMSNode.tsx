@@ -17,7 +17,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
   const systemConnection = data.systemConnection || "";
   const deviceName = data.label || "";
   const lastRecordTime = data.lastRecordTime || "";
-
+  const deviceId = data.deviceId || "";
   const recordTimeOld = isRecordTimeOld(lastRecordTime);
 
   const connectionInfo = [
@@ -29,6 +29,7 @@ const BRWHMSNode: React.FC<BRWHMSNodeProps> = ({ data }) => {
     systemConnection ? `System Conn. : ${systemConnection}` : null,
     `Totalizer : ${data?.totalizerReading ? data?.totalizerReading : 0} Ltr`,
     `Flow Rate : ${data?.avg} LPM`,
+    `Device ID : ${deviceId}`,
   ]
     .filter((line) => line !== null && line !== "")
     .join("\n");

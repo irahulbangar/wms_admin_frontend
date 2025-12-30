@@ -23,6 +23,7 @@ export interface DiagramNode {
   selectable?: boolean;
   deletable?: boolean;
   dragHandle?: string;
+  deviceId?: string;
 }
 
 export interface DiagramEdge {
