@@ -17,12 +17,12 @@ const ResultantNode: React.FC<ResultantNodeProps> = ({ data }) => {
       title={`Device Name: ${data.label}\nReport Type: ${data.reportType}\nResult: ${resultValue} ${unit}`}
     >
       <div className="flex flex-col items-center gap-1 w-full">
-        <div className="text-white font-roboto font-medium truncate px-1 text-sm w-full text-center">
+        <div className="text-white font-roboto font-normal truncate px-1 text-sm w-full text-start">
           {reportName}
         </div>
 
         <div className="flex flex-col items-center gap-0.5 w-full">
-          <div className="text-white font-roboto font-bold text-base leading-tight">
+          <div className="text-white font-roboto font-normal text-base leading-tight">
             {resultValue}
             {unit && (
               <span className="text-white/80 font-normal text-xs ml-1">

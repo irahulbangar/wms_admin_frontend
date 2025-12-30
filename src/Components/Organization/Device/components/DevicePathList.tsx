@@ -5,6 +5,7 @@ import type { DeviceResult } from "../../../../../model/devices.interface";
 
 interface DevicePathItem {
   path: string;
+  copyPath: string;
   device: DeviceResult;
 }
 
@@ -38,9 +39,12 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
       })
       .map((device) => {
         const deviceName = device.device_name || "";
+        const deviceId = String(device.device_id);
+        const devicePath = `${deviceName} : devices['${deviceId}']`;
 
         return {
-          path: `devices['${deviceName}']`,
+          path: devicePath,
+          copyPath: `devices['${deviceId}']`,
           device: device,
         };
       })
@@ -197,7 +201,9 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                             e.preventDefault();
                             e.stopPropagation();
                             try {
-                              await navigator.clipboard.writeText(item.path);
+                              await navigator.clipboard.writeText(
+                                item.copyPath
+                              );
                               setCopiedPathIndex(originalIndex);
                               setTimeout(() => {
                                 setCopiedPathIndex(null);
@@ -220,7 +226,8 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                             any
                           >;
                           const variableValue = lastRecord?.[variable];
-                          const pathWithVariable = `${item.path}['${variable}']`;
+                          const copyPathWithVariable = `${item.copyPath}['${variable}']`;
+                          const displayPathWithVariable = `${item.path}['${variable}']`;
 
                           return (
                             <div
@@ -231,7 +238,7 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                                 e.stopPropagation();
                                 try {
                                   await navigator.clipboard.writeText(
-                                    pathWithVariable
+                                    copyPathWithVariable
                                   );
                                   setCopiedPathIndex(originalIndex);
                                   setTimeout(() => {
@@ -247,7 +254,7 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                               }}
                             >
                               <div className="font-mono text-xs mb-1">
-                                {pathWithVariable}
+                                {displayPathWithVariable}
                               </div>
                               <div className="flex items-center justify-between text-[10px] text-text-secondary">
                                 <span className="font-semibold">
@@ -271,7 +278,7 @@ const DevicePathList: React.FC<DevicePathListProps> = ({
                           e.preventDefault();
                           e.stopPropagation();
                           try {
-                            await navigator.clipboard.writeText(item.path);
+                            await navigator.clipboard.writeText(item.copyPath);
                             setCopiedPathIndex(originalIndex);
                             setTimeout(() => {
                               setCopiedPathIndex(null);
