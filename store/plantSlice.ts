@@ -131,6 +131,13 @@ interface PlantPayload {
   organization_id?: string;
   unit: string;
   plant_reporting: PlantReporting;
+  show_plant: number;
+  show_department: number;
+  show_system: number;
+  show_device: number;
+  show_water_report: number;
+  show_plant_layout: number;
+  show_notification: number;
 }
 
 // Add plant

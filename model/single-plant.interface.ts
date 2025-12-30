@@ -6,6 +6,13 @@ export interface SinglePlantResponse {
 }
 
 export interface SinglePlantResult {
+  show_plant: string;
+  show_department: string;
+  show_system: string;
+  show_device: string;
+  show_water_report: string;
+  show_plant_layout: string;
+  show_notification: string;
   plant_id: number;
   organization_id: number;
   plant_name: string;

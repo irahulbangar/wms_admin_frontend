@@ -18,6 +18,13 @@ interface PlantFormData {
   address: string;
   status: string;
   unit: string;
+  show_plant: number;
+  show_department: number;
+  show_system: number;
+  show_device: number;
+  show_water_report: number;
+  show_plant_layout: number;
+  show_notification: number;
 }
 
 interface ReportData {
@@ -55,6 +62,13 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
     address: "",
     status: "active",
     unit: "Ltr",
+    show_plant: 0,
+    show_department: 0,
+    show_system: 0,
+    show_device: 0,
+    show_water_report: 0,
+    show_plant_layout: 0,
+    show_notification: 0,
   });
 
   const [reportData, setReportData] = useState<ReportData>({
@@ -87,6 +101,13 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             address: plant.address || "",
             status: plant.status || "active",
             unit: plant.unit || "Ltr",
+            show_plant: plant.show_plant.toString() === "1" ? 1 : 0,
+            show_department: plant.show_department.toString() === "1" ? 1 : 0,
+            show_system: plant.show_system.toString() === "1" ? 1 : 0,
+            show_device: plant.show_device.toString() === "1" ? 1 : 0,
+            show_water_report: plant.show_water_report.toString() === "1" ? 1 : 0,
+            show_plant_layout: plant.show_plant_layout.toString() === "1" ? 1 : 0,
+            show_notification: plant.show_notification.toString() === "1" ? 1 : 0,
           };
           setFormData(newFormData);
 
@@ -113,7 +134,13 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
+    const { name, type } = e.target;
+    const value =
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+          ? 1
+          : 0
+        : e.target.value;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -310,73 +337,134 @@ const AddUpdatePlant: React.FC<AddUpdatePlantProps> = ({
             </option>
           </select>
 
-          {/* <div>
-            <label className="block text-lg font-normal text-text-primary mb-2 font-roboto">
-              Plant Reporting
-            </label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-            <div>
-              <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-                Report Name
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-base font-normal text-text-primary font-roboto">
+                Show Plant
               </label>
               <input
-                type="text"
-                name="report_name"
-                value={reportData.report_name}
-                onChange={(e) =>
-                  setReportData((prev) => ({
+                type="checkbox"
+                name="show_plant"
+                checked={formData.show_plant === 1}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setFormData((prev) => ({
                     ...prev,
-                    report_name: e.target.value,
-                  }))
-                }
-                className="w-full px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-                placeholder="Enter report name"
+                    show_plant: e.target.checked ? 1 : 0,
+                  }));
+                }}
+                className="w-4 h-4"
               />
             </div>
-            <ReportUnitDropdown
-              value={reportData.report_unit}
-              onChange={(value) =>
-                setReportData((prev) => ({
-                  ...prev,
-                  report_unit: value,
-                }))
-              }
-            />
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-base font-normal text-text-primary font-roboto">
+                Show Department
+              </label>
+              <input
+                type="checkbox"
+                name="show_department"
+                checked={formData.show_department === 1}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setFormData((prev) => ({
+                    ...prev,
+                    show_department: e.target.checked ? 1 : 0,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-base font-normal text-text-primary font-roboto">
+                Show System
+              </label>
+              <input
+                type="checkbox"
+                name="show_system"
+                checked={formData.show_system === 1}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setFormData((prev) => ({
+                    ...prev,
+                    show_system: e.target.checked ? 1 : 0,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-base font-normal text-text-primary font-roboto">
+                Show Device
+              </label>
+              <input
+                type="checkbox"
+                name="show_device"
+                checked={formData.show_device === 1}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setFormData((prev) => ({
+                    ...prev,
+                    show_device: e.target.checked ? 1 : 0,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-base font-normal text-text-primary font-roboto">
+                Show Water Report
+              </label>
+              <input
+                type="checkbox"
+                name="show_water_report"
+                checked={formData.show_water_report === 1}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setFormData((prev) => ({
+                    ...prev,
+                    show_water_report: e.target.checked ? 1 : 0,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-base font-normal text-text-primary font-roboto">
+                Show Plant Layout
+              </label>
+              <input
+                type="checkbox"
+                name="show_plant_layout"
+                checked={formData.show_plant_layout === 1}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setFormData((prev) => ({
+                    ...prev,
+                    show_plant_layout: e.target.checked ? 1 : 0,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-base font-normal text-text-primary font-roboto">
+                Show Notification
+              </label>
+              <input
+                type="checkbox"
+                name="show_notification"
+                checked={formData.show_notification === 1}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setFormData((prev) => ({
+                    ...prev,
+                    show_notification: e.target.checked ? 1 : 0,
+                  }));
+                }}
+                className="w-4 h-4"
+              />
+            </div>
           </div>
-
-          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-            Report Formula
-          </label>
-          <Editor
-            height="80%"
-            width="100%"
-            value={reportData.report_formula}
-            onChange={(value) =>
-              setReportData((prev) => ({
-                ...prev,
-                report_formula: value ? value : "",
-              }))
-            }
-            language="javascript"
-            className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-          />
-          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
-            Report Neutrality Formula
-          </label>
-          <Editor
-            height="80%"
-            width="100%"
-            value={reportData.neutrality_formula}
-            onChange={(value) =>
-              setReportData((prev) => ({
-                ...prev,
-                neutrality_formula: value ? value : "",
-              }))
-            }
-            language="javascript"
-            className="w-full h-[125px] px-3 py-2 text-text-primary bg-primary border border-border-primary rounded-lg focus:outline-none focus:ring-1 focus:ring-status-info font-roboto"
-          /> */}
 
           <div className="flex items-center justify-end gap-4 pt-6">
             <button
