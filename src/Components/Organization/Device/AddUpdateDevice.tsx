@@ -6,6 +6,7 @@ import type { DeviceTypeResult } from "../../../../model/device-type.interface";
 import {
   createDevice,
   getDeviceById,
+  getDeviceByPlantId,
   getDeviceBySystemId,
   updateDevice,
   type CreateDevicePayload,
@@ -30,6 +31,7 @@ import TankParametersForm from "./components/TankParametersForm";
 import BRWHMSParametersForm from "./components/BRWHMSParametersForm";
 import BDWFMSParametersForm from "./components/BDWFMSParametersForm";
 import DWLRParametersForm from "./components/DWLRParametersForm";
+import PHMCParametersForm from "./components/PHMCParametersForm";
 import SmartParametersForm from "./components/SmartParametersForm";
 import { Editor } from "@monaco-editor/react";
 
@@ -121,6 +123,32 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
   );
   const { organizations } = useAppSelector((state) => state.organization);
   const [systemDevices, setSystemDevices] = useState<DeviceResult[]>([]);
+  const [devices, setDevices] = useState<DeviceResult[]>([]);
+
+  const fetchDevices = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    await dispatch(getDeviceByPlantId(Number(plant_id)))
+      .unwrap()
+      .then((res) => {
+        if (res.success || res.status === 200) {
+          setDevices(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Error(err.message || "Failed to get devices");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (plant_id) {
+      fetchDevices();
+    }
+  }, [plant_id]);
 
   const {
     data: systemsData,
@@ -319,6 +347,21 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     param_5: createDefaultSensorParam(),
     param_6: createDefaultSensorParam(),
   });
+
+  const [phmcParams, setPhmcParams] = useState({
+    lower_tank: {
+      enable: 0,
+      tank_id: 0,
+      min_level: "",
+      max_level: "",
+    },
+    upper_tank: {
+      enable: 0,
+      tank_id: 0,
+      min_level: "",
+      max_level: "",
+    },
+  });
   const inReportType = ["Rainfall", "Regeneration", "Re-use"];
   const outReportType = [
     "Evaporation",
@@ -475,6 +518,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       param_4: createDefaultSensorParam(),
       param_5: createDefaultSensorParam(),
       param_6: createDefaultSensorParam(),
+    });
+    setPhmcParams({
+      lower_tank: {
+        enable: 0,
+        tank_id: 0,
+        min_level: "",
+        max_level: "",
+      },
+      upper_tank: {
+        enable: 0,
+        tank_id: 0,
+        min_level: "",
+        max_level: "",
+      },
     });
     setReportData({
       report_name: "",
@@ -648,6 +705,34 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               param_6: convertSensorParam(dwlrParams.param_6),
             };
             return convertedDwlParams;
+          } else if (deviceFamilyName === "phmc") {
+            return {
+              ...commonParams,
+              lower_tank: {
+                enable: phmcParams.lower_tank.enable || 0,
+                tank_id: phmcParams.lower_tank.tank_id || 0,
+                min_level:
+                  phmcParams.lower_tank.min_level === ""
+                    ? 0
+                    : parseFloat(phmcParams.lower_tank.min_level) || 0,
+                max_level:
+                  phmcParams.lower_tank.max_level === ""
+                    ? 0
+                    : parseFloat(phmcParams.lower_tank.max_level) || 0,
+              },
+              upper_tank: {
+                enable: phmcParams.upper_tank.enable || 0,
+                tank_id: phmcParams.upper_tank.tank_id || 0,
+                min_level:
+                  phmcParams.upper_tank.min_level === ""
+                    ? 0
+                    : parseFloat(phmcParams.upper_tank.min_level) || 0,
+                max_level:
+                  phmcParams.upper_tank.max_level === ""
+                    ? 0
+                    : parseFloat(phmcParams.upper_tank.max_level) || 0,
+              },
+            };
           } else {
             return { ...commonParams };
           }
@@ -884,6 +969,26 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 param_6: convertSensorParam(deviceData.params?.param_6),
               };
               setDwlrParams(dwlrData);
+            } else if (familyName === "phmc") {
+              const phmcData = {
+                lower_tank: {
+                  enable: deviceData.params?.lower_tank?.enable || 0,
+                  tank_id: deviceData.params?.lower_tank?.tank_id || 0,
+                  min_level:
+                    deviceData.params?.lower_tank?.min_level?.toString() || "",
+                  max_level:
+                    deviceData.params?.lower_tank?.max_level?.toString() || "",
+                },
+                upper_tank: {
+                  enable: deviceData.params?.upper_tank?.enable || 0,
+                  tank_id: deviceData.params?.upper_tank?.tank_id || 0,
+                  min_level:
+                    deviceData.params?.upper_tank?.min_level?.toString() || "",
+                  max_level:
+                    deviceData.params?.upper_tank?.max_level?.toString() || "",
+                },
+              };
+              setPhmcParams(phmcData);
             }
 
             if (deviceData.device_reporting) {
@@ -1199,6 +1304,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                 dwlrParams={dwlrParams}
                 onDWLRParamsChange={setDwlrParams}
                 errors={errors}
+              />
+            )}
+
+            {!isSmartDevice && getSelectedDeviceFamilyName() === "phmc" && (
+              <PHMCParametersForm
+                phmcParams={phmcParams}
+                onPHMCParamsChange={setPhmcParams}
+                errors={errors}
+                tankDevices={devices.filter(
+                  (device) =>
+                    (device.device_family_type === "tank" ||
+                      device.device_family?.toLowerCase().includes("tank")) &&
+                    Number(device.plant_id) === Number(plant_id)
+                )}
               />
             )}
           </div>
