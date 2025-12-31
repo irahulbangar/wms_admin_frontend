@@ -168,10 +168,21 @@ const DeviceDetailsForm: React.FC<DeviceDetailsFormProps> = ({
             }`}
           />
         </div>
+        <div>
+          <label className="block text-base font-normal text-text-primary mb-2 font-roboto">
+            Hidden Data
+          </label>
+          <input
+            type="checkbox"
+            name="hide_data"
+            checked={formData.hide_data}
+            onChange={handleInputChange}
+            className="w-4 h-4 cursor-pointer"
+          />
+        </div>
       </div>
     </>
   );
 };
 
 export default DeviceDetailsForm;
-

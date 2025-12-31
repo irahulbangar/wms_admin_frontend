@@ -33,6 +33,7 @@ import BDWFMSParametersForm from "./components/BDWFMSParametersForm";
 import DWLRParametersForm from "./components/DWLRParametersForm";
 import PHMCParametersForm from "./components/PHMCParametersForm";
 import SmartParametersForm from "./components/SmartParametersForm";
+import ComplianceLimitsForm from "./components/ComplianceLimitsForm";
 import { Editor } from "@monaco-editor/react";
 
 interface AddUpdateDeviceProps {
@@ -109,6 +110,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     department_id: departmentId,
     device_reporting: null,
     formula: "",
+    compliance_limits: {},
+    hide_data: false,
   });
   const [reportData, setReportData] = useState<VirtualReporting>({
     report_name: "",
@@ -348,18 +351,64 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
     param_6: createDefaultSensorParam(),
   });
 
-  const [phmcParams, setPhmcParams] = useState({
+  const [phmcParams, setPhmcParams] = useState<{
+    lower_tank: {
+      enable: number;
+      tank_id: number;
+      min_level: string;
+    };
+    upper_tank_params?: Array<{
+      enable: number;
+      tank_id: number;
+      min_level: string;
+      max_level: string;
+    }>;
+  }>({
     lower_tank: {
       enable: 0,
       tank_id: 0,
       min_level: "",
-      max_level: "",
     },
-    upper_tank: {
+    upper_tank_params: [],
+  });
+
+  const [complianceLimits, setComplianceLimits] = useState<{
+    day_wise: {
+      enable: number;
+      start_date: string;
+      end_date: string;
+      absolute_limit: string;
+    };
+    month_wise: {
+      enable: number;
+      start_date: string;
+      end_date: string;
+      absolute_limit: string;
+    };
+    year_wise: {
+      enable: number;
+      start_date: string;
+      end_date: string;
+      absolute_limit: string;
+    };
+  }>({
+    day_wise: {
       enable: 0,
-      tank_id: 0,
-      min_level: "",
-      max_level: "",
+      start_date: "",
+      end_date: "",
+      absolute_limit: "",
+    },
+    month_wise: {
+      enable: 0,
+      start_date: "",
+      end_date: "",
+      absolute_limit: "",
+    },
+    year_wise: {
+      enable: 0,
+      start_date: "",
+      end_date: "",
+      absolute_limit: "",
     },
   });
   const inReportType = ["Rainfall", "Regeneration", "Re-use"];
@@ -411,6 +460,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
       department_id: departmentId,
       device_reporting: null,
       formula: "",
+      compliance_limits: {},
+      hide_data: false,
     });
 
     setCommonParams({
@@ -524,13 +575,27 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         enable: 0,
         tank_id: 0,
         min_level: "",
-        max_level: "",
       },
-      upper_tank: {
+      upper_tank_params: [],
+    });
+    setComplianceLimits({
+      day_wise: {
         enable: 0,
-        tank_id: 0,
-        min_level: "",
-        max_level: "",
+        start_date: "",
+        end_date: "",
+        absolute_limit: "",
+      },
+      month_wise: {
+        enable: 0,
+        start_date: "",
+        end_date: "",
+        absolute_limit: "",
+      },
+      year_wise: {
+        enable: 0,
+        start_date: "",
+        end_date: "",
+        absolute_limit: "",
       },
     });
     setReportData({
@@ -706,6 +771,7 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
             };
             return convertedDwlParams;
           } else if (deviceFamilyName === "phmc") {
+            const upperTankParams = phmcParams.upper_tank_params || [];
             return {
               ...commonParams,
               lower_tank: {
@@ -715,29 +781,23 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   phmcParams.lower_tank.min_level === ""
                     ? 0
                     : parseFloat(phmcParams.lower_tank.min_level) || 0,
-                max_level:
-                  phmcParams.lower_tank.max_level === ""
-                    ? 0
-                    : parseFloat(phmcParams.lower_tank.max_level) || 0,
               },
-              upper_tank: {
-                enable: phmcParams.upper_tank.enable || 0,
-                tank_id: phmcParams.upper_tank.tank_id || 0,
+              upper_tank_params: upperTankParams.map((param) => ({
+                enable: param.enable || 0,
+                tank_id: param.tank_id || 0,
                 min_level:
-                  phmcParams.upper_tank.min_level === ""
-                    ? 0
-                    : parseFloat(phmcParams.upper_tank.min_level) || 0,
+                  param.min_level === "" ? 0 : parseFloat(param.min_level) || 0,
                 max_level:
-                  phmcParams.upper_tank.max_level === ""
-                    ? 0
-                    : parseFloat(phmcParams.upper_tank.max_level) || 0,
-              },
+                  param.max_level === "" ? 0 : parseFloat(param.max_level) || 0,
+              })),
             };
           } else {
             return { ...commonParams };
           }
         })(),
         device_flow_direction: formData.device_flow_direction,
+        compliance_limits: complianceLimits,
+        hide_data: formData.hide_data ?? false,
       };
 
       if (type === "add") {
@@ -811,6 +871,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               department_id: deviceData.department_id,
               device_reporting: deviceData.device_reporting,
               formula: deviceData.formula ?? "",
+              compliance_limits: deviceData.compliance_limits ?? {},
+              hide_data: deviceData.hide_data ?? false,
             });
 
             const selectedFamily = familyData.find(
@@ -979,16 +1041,20 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
                   max_level:
                     deviceData.params?.lower_tank?.max_level?.toString() || "",
                 },
-                upper_tank: {
-                  enable: deviceData.params?.upper_tank?.enable || 0,
-                  tank_id: deviceData.params?.upper_tank?.tank_id || 0,
-                  min_level:
-                    deviceData.params?.upper_tank?.min_level?.toString() || "",
-                  max_level:
-                    deviceData.params?.upper_tank?.max_level?.toString() || "",
-                },
+                upper_tank_params: deviceData.params?.upper_tank_params
+                  ? deviceData.params.upper_tank_params.map((param: any) => ({
+                      enable: param.enable || 0,
+                      tank_id: param.tank_id || 0,
+                      min_level: param.min_level?.toString() || "",
+                      max_level: param.max_level?.toString() || "",
+                    }))
+                  : [],
               };
               setPhmcParams(phmcData);
+            }
+
+            if (deviceData.compliance_limits) {
+              setComplianceLimits(deviceData.compliance_limits);
             }
 
             if (deviceData.device_reporting) {
@@ -1053,6 +1119,8 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
         department_id: departmentId,
         device_reporting: null,
         formula: "",
+        compliance_limits: {},
+        hide_data: false,
       });
       setLastRecord(null);
     }
@@ -1159,6 +1227,12 @@ const AddUpdateDevice: React.FC<AddUpdateDeviceProps> = ({
               isInReportType={isInReportType}
               isOutReportType={isOutReportType}
               isStorageReportType={isStorageReportType}
+            />
+
+            <ComplianceLimitsForm
+              complianceLimits={complianceLimits}
+              onComplianceLimitsChange={setComplianceLimits}
+              errors={errors}
             />
 
             {isVirtualReporting && (

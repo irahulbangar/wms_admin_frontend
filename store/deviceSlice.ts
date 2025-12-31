@@ -82,6 +82,8 @@ export interface CreateDevicePayload {
   department_id: number | null;
   device_reporting: DeviceReporting | null;
   formula: string;
+  compliance_limits: object;
+  hide_data: boolean;
 }
 
 interface UpdateDevicePayload extends CreateDevicePayload {
